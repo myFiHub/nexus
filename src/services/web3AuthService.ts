@@ -49,7 +49,7 @@ class Web3AuthService {
 
   constructor() {
     this.web3auth = new Web3Auth({
-      clientId: WEB3AUTH_CONFIG.CLIENT_ID,
+      clientId: WEB3AUTH_CONFIG.CLIENT_ID as string,
       chainConfig: {
         chainNamespace: CHAIN_NAMESPACES.OTHER,
         chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.CHAIN_ID,

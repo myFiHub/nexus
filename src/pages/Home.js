@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import SocialLinks from '../components/SocialLinks';
 
 const Home = () => {
   return (
@@ -117,6 +118,11 @@ const Home = () => {
         >
           Get Started Now
         </Link>
+      </section>
+
+      {/* Social Links and App Download Section */}
+      <section className="container mx-auto px-4 py-16">
+        <SocialLinks />
       </section>
     </div>
   );

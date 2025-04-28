@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useApp } from '../context/AppContext';
+import SocialLinks from '../components/SocialLinks';
 
 function Profile() {
   const {
@@ -106,6 +107,11 @@ function Profile() {
           ) : (
             <p className="text-podium-text-secondary">Connect your wallet to view wallet information.</p>
           )}
+        </div>
+        
+        {/* Social Links and App Download */}
+        <div className="mt-8">
+          <SocialLinks />
         </div>
         
         {/* Activity Section */}

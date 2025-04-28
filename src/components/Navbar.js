@@ -13,8 +13,15 @@ function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-podium-primary-blue">
-              Podium Nexus
+            <Link to="/" className="flex items-center">
+              <img 
+                src="/assets/images/podiumNexuslogo.png" 
+                alt="Podium Nexus" 
+                className="h-8 w-auto mr-2"
+              />
+              <span className="text-xl font-bold text-podium-primary-blue">
+                Podium Nexus
+              </span>
             </Link>
           </div>
           
