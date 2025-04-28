@@ -1,462 +1,321 @@
-import { AptosClient, AptosAccount, TxnBuilderTypes, BCS } from 'aptos';
-import { Buffer } from 'buffer';
+import { AptosClient } from 'aptos';
 import { PODIUM_PROTOCOL_CONFIG } from '../config/config';
 
-// Contract address
-const CONTRACT_ADDRESS = PODIUM_PROTOCOL_CONFIG.CONTRACT_ADDRESS;
+class PodiumProtocol {
+  constructor() {
+    this.client = new AptosClient(PODIUM_PROTOCOL_CONFIG.RPC_URL);
+    this.moduleAddress = PODIUM_PROTOCOL_CONFIG.CONTRACT_ADDRESS;
+    this.backupClients = PODIUM_PROTOCOL_CONFIG.PARTNER_RPC_URLS.map(url => new AptosClient(url));
+  }
 
-// Initialize Aptos client
-const client = new AptosClient(PODIUM_PROTOCOL_CONFIG.RPC_URL);
-
-/**
- * Service for interacting with the Podium Protocol smart contract
- */
-class PodiumProtocolService {
-  /**
-   * Get the current price for a pass
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<number>} - The current price in OCTA units
-   */
-  async getPassPrice(outpostAddress) {
+  // Helper function to get a working client
+  async getWorkingClient() {
     try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::calculate_single_pass_price`,
-        type_arguments: [],
-        arguments: [outpostAddress]
-      });
-      
-      return response[0];
+      await this.client.getLedgerInfo();
+      return this.client;
     } catch (error) {
-      console.error('Error getting pass price:', error);
+      // Try backup clients if main client fails
+      for (const client of this.backupClients) {
+        try {
+          await client.getLedgerInfo();
+          this.client = client; // Update main client to working one
+          return client;
+        } catch (e) {
+          continue;
+        }
+      }
+      throw new Error('No working RPC endpoints available');
+    }
+  }
+
+  // Helper function to build transaction payload
+  buildTransactionPayload(functionName, typeArgs = [], args = []) {
+    return {
+      function: `${this.moduleAddress}::PodiumProtocol::${functionName}`,
+      type_arguments: typeArgs,
+      arguments: args
+    };
+  }
+
+  // Helper function to execute transaction
+  async executeTransaction(signer, payload) {
+    // We need to get a working client but don't use it directly in this method
+    await this.getWorkingClient();
+    
+    try {
+      let transaction;
+      if (signer.type === 'web3auth') {
+        // Handle Web3Auth transaction
+        transaction = await this.buildWeb3AuthTransaction(signer, payload);
+      } else {
+        // Handle Nightly wallet transaction
+        transaction = await window.movement.generateTransaction(signer.address, payload);
+      }
+
+      const pendingTxn = await window.movement.signAndSubmitTransaction(transaction);
+      return pendingTxn.hash;
+    } catch (error) {
+      console.error('Transaction failed:', error);
       throw error;
     }
   }
 
-  /**
-   * Calculate the price to buy a pass with fees
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} amount - The amount of passes to buy
-   * @param {string|null} referrerAddress - Optional referrer address
-   * @returns {Promise<{totalPrice: number, protocolFee: number, subjectFee: number, referrerFee: number}>}
-   */
-  async calculateBuyPriceWithFees(outpostAddress, amount, referrerAddress = null) {
+  // Helper function for Web3Auth transactions
+  async buildWeb3AuthTransaction(signer, payload) {
+    const client = await this.getWorkingClient();
+
+    const rawTxn = await client.generateTransaction(signer.address, payload);
+    const bcsTxn = await client.signTransaction(signer, rawTxn);
+    const pendingTxn = await client.submitTransaction(bcsTxn);
+    
+    return pendingTxn.hash;
+  }
+
+  // Get outpost details
+  async getOutpost(outpostAddress) {
+    const client = await this.getWorkingClient();
     try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::calculate_buy_price_with_fees`,
-        type_arguments: [],
-        arguments: [
+      const resource = await client.getAccountResource(
           outpostAddress,
-          amount.toString(),
-          referrerAddress ? [referrerAddress] : []
-        ]
-      });
-      
-      return {
-        totalPrice: response[0],
-        protocolFee: response[1],
-        subjectFee: response[2],
-        referrerFee: response[3]
-      };
+        `${this.moduleAddress}::PodiumProtocol::OutpostData`
+      );
+      return this.parseOutpostData(resource.data);
     } catch (error) {
-      console.error('Error calculating buy price with fees:', error);
+      console.error('Error fetching outpost:', error);
       throw error;
     }
   }
 
-  /**
-   * Buy a pass
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} amount - The amount of passes to buy
-   * @param {string|null} referrerAddress - Optional referrer address
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async buyPass(account, outpostAddress, amount, referrerAddress = null) {
+  // Get all outposts
+  async getOutposts() {
+    const client = await this.getWorkingClient();
     try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::buy_pass`,
-        type_arguments: [],
-        arguments: [
-          outpostAddress,
-          amount.toString(),
-          referrerAddress ? [referrerAddress] : []
-        ]
-      };
+      const resource = await client.getAccountResource(
+        this.moduleAddress,
+        `${this.moduleAddress}::PodiumProtocol::Config`
+      );
 
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error buying pass:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Calculate the price to sell a pass with fees
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} amount - The amount of passes to sell
-   * @returns {Promise<{totalPrice: number, protocolFee: number, subjectFee: number}>}
-   */
-  async calculateSellPriceWithFees(outpostAddress, amount) {
-    try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::calculate_sell_price_with_fees`,
-        type_arguments: [],
-        arguments: [
-          outpostAddress,
-          amount.toString()
-        ]
-      });
-      
-      return {
-        totalPrice: response[0],
-        protocolFee: response[1],
-        subjectFee: response[2]
-      };
-    } catch (error) {
-      console.error('Error calculating sell price with fees:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Sell a pass
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} amount - The amount of passes to sell
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async sellPass(account, outpostAddress, amount) {
-    try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::sell_pass`,
-        type_arguments: [],
-        arguments: [
-          outpostAddress,
-          amount.toString()
-        ]
-      };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error selling pass:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get the balance of passes for a user
-   * @param {string} userAddress - The user's address
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<number>} - The balance of passes
-   */
-  async getPassBalance(userAddress, outpostAddress) {
-    try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::get_balance`,
-        type_arguments: [],
-        arguments: [userAddress, outpostAddress]
-      });
-      
-      return response[0];
-    } catch (error) {
-      console.error('Error getting pass balance:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get the total supply of passes for an outpost
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<number>} - The total supply of passes
-   */
-  async getTotalSupply(outpostAddress) {
-    try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::get_total_supply`,
-        type_arguments: [],
-        arguments: [outpostAddress]
-      });
-      
-      return response[0];
-    } catch (error) {
-      console.error('Error getting total supply:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Create a new outpost
-   * @param {AptosAccount} account - The user's account
-   * @param {string} name - The name of the outpost
-   * @param {string} description - The description of the outpost
-   * @param {string} uri - The URI for the outpost
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async createOutpost(account, name, description, uri) {
-    try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::create_outpost_entry`,
-        type_arguments: [],
-        arguments: [name, description, uri]
-      };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error creating outpost:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get outpost data
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<Object>} - The outpost data
-   */
-  async getOutpostData(outpostAddress) {
-    try {
-      // This is a simplified version - in a real implementation, you would need to
-      // fetch the outpost data from the blockchain and parse it
-      const response = await client.getAccountResource(
-        CONTRACT_ADDRESS,
-        `${CONTRACT_ADDRESS}::PodiumProtocol::OutpostData`
+      const outposts = resource.data.outposts;
+      const outpostDetails = await Promise.all(
+        outposts.map(address => this.getOutpost(address))
       );
       
-      return response.data;
+      return outpostDetails;
     } catch (error) {
-      console.error('Error getting outpost data:', error);
+      console.error('Error fetching outposts:', error);
       throw error;
     }
   }
 
-  /**
-   * Create a subscription tier
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {string} tierName - The name of the tier
-   * @param {number} price - The price of the tier in OCTA units
-   * @param {number} duration - The duration of the tier in seconds
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async createSubscriptionTier(account, outpostAddress, tierName, price, duration) {
+  // Get pass balance
+  async getPassBalance(accountAddress, targetAddress) {
+    const client = await this.getWorkingClient();
     try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::create_subscription_tier`,
+      const balance = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_balance`,
         type_arguments: [],
-        arguments: [
-          outpostAddress,
-          tierName,
-          price.toString(),
-          duration.toString()
-        ]
-      };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error creating subscription tier:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Subscribe to an outpost
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} tierId - The ID of the tier
-   * @param {string|null} referrerAddress - Optional referrer address
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async subscribe(account, outpostAddress, tierId, referrerAddress = null) {
-    try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::subscribe`,
-        type_arguments: [],
-        arguments: [
-          outpostAddress,
-          tierId.toString(),
-          referrerAddress ? [referrerAddress] : []
-        ]
-      };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error subscribing to outpost:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Cancel a subscription
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async cancelSubscription(account, outpostAddress) {
-    try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::cancel_subscription`,
-        type_arguments: [],
-        arguments: [outpostAddress]
-      };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
-    } catch (error) {
-      console.error('Error canceling subscription:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get subscription details
-   * @param {string} userAddress - The user's address
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<{tierId: number, startTime: number, endTime: number}>}
-   */
-  async getSubscription(userAddress, outpostAddress) {
-    try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::get_subscription`,
-        type_arguments: [],
-        arguments: [userAddress, outpostAddress]
+        arguments: [accountAddress, targetAddress]
       });
-      
+      return balance[0];
+    } catch (error) {
+      console.error('Error fetching pass balance:', error);
+      return 0;
+    }
+  }
+
+  // Get pass price
+  async getPassPrice(targetAddress) {
+    const client = await this.getWorkingClient();
+    try {
+      const supply = await this.getTotalSupply(targetAddress);
+      const price = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::calculate_single_pass_price`,
+        type_arguments: [],
+        arguments: [supply]
+      });
+      return price[0];
+    } catch (error) {
+      console.error('Error fetching pass price:', error);
+      throw error;
+    }
+  }
+
+  // Get total supply
+  async getTotalSupply(targetAddress) {
+    const client = await this.getWorkingClient();
+    try {
+      const supply = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_total_supply`,
+        type_arguments: [],
+        arguments: [targetAddress]
+      });
+      return supply[0];
+    } catch (error) {
+      console.error('Error fetching total supply:', error);
+      return 0;
+    }
+  }
+
+  // Buy pass
+  async buyPass(buyerAddress, targetAddress, amount, referrerAddress = null, wallet = null) {
+    const payload = this.buildTransactionPayload(
+      'buy_pass',
+      [],
+      [targetAddress, amount, referrerAddress]
+    );
+    
+    return this.executeTransaction(
+      wallet || { type: 'web3auth', address: buyerAddress },
+      payload
+    );
+  }
+
+  // Sell pass
+  async sellPass(sellerAddress, targetAddress, amount, wallet = null) {
+    const payload = this.buildTransactionPayload(
+      'sell_pass',
+      [],
+      [targetAddress, amount]
+    );
+    
+    return this.executeTransaction(
+      wallet || { type: 'web3auth', address: sellerAddress },
+      payload
+    );
+  }
+
+  // Get subscription details
+  async getSubscription(subscriberAddress, outpostAddress) {
+    const client = await this.getWorkingClient();
+    try {
+      const subscription = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_subscription`,
+        type_arguments: [],
+        arguments: [subscriberAddress, outpostAddress]
+      });
       return {
-        tierId: response[0],
-        startTime: response[1],
-        endTime: response[2]
+        tierId: subscription[0],
+        startTime: subscription[1],
+        endTime: subscription[2]
       };
     } catch (error) {
-      console.error('Error getting subscription:', error);
-      throw error;
+      console.error('Error fetching subscription:', error);
+      return null;
     }
   }
 
-  /**
-   * Get subscription tier details
-   * @param {string} outpostAddress - The address of the outpost
-   * @param {number} tierId - The ID of the tier
-   * @returns {Promise<{name: string, price: number, duration: number}>}
-   */
-  async getSubscriptionTierDetails(outpostAddress, tierId) {
+  // Get subscription tier details
+  async getSubscriptionTier(outpostAddress, tierId) {
+    const client = await this.getWorkingClient();
     try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::get_subscription_tier_details`,
+      const tier = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_subscription_tier_details`,
         type_arguments: [],
-        arguments: [outpostAddress, tierId.toString()]
+        arguments: [outpostAddress, tierId]
       });
-      
       return {
-        name: response[0],
-        price: response[1],
-        duration: response[2]
+        name: tier[0],
+        price: tier[1],
+        duration: tier[2]
       };
     } catch (error) {
-      console.error('Error getting subscription tier details:', error);
-      throw error;
+      console.error('Error fetching subscription tier:', error);
+      return null;
     }
   }
 
-  /**
-   * Get the number of tiers for an outpost
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<number>} - The number of tiers
-   */
-  async getTierCount(outpostAddress) {
-    try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::get_tier_count`,
-        type_arguments: [],
-        arguments: [outpostAddress]
-      });
+  // Subscribe to tier
+  async subscribe(subscriberAddress, outpostAddress, tierId, referrerAddress = null, wallet = null) {
+    const payload = this.buildTransactionPayload(
+      'subscribe',
+      [],
+      [outpostAddress, tierId, referrerAddress]
+    );
+    
+    return this.executeTransaction(
+      wallet || { type: 'web3auth', address: subscriberAddress },
+      payload
+    );
+  }
+
+  // Cancel subscription
+  async cancelSubscription(subscriberAddress, outpostAddress, wallet = null) {
+    const payload = this.buildTransactionPayload(
+      'cancel_subscription',
+      [],
+      [outpostAddress]
+    );
       
-      return response[0];
-    } catch (error) {
-      console.error('Error getting tier count:', error);
-      throw error;
-    }
+    return this.executeTransaction(
+      wallet || { type: 'web3auth', address: subscriberAddress },
+      payload
+    );
   }
 
-  /**
-   * Toggle emergency pause for an outpost
-   * @param {AptosAccount} account - The user's account
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<string>} - Transaction hash
-   */
-  async toggleEmergencyPause(account, outpostAddress) {
+  // Create outpost
+  async createOutpost(creatorAddress, name, description, uri, wallet = null) {
+    const payload = this.buildTransactionPayload(
+      'create_outpost',
+      [],
+      [name, description, uri]
+    );
+    
+    return this.executeTransaction(
+      wallet || { type: 'web3auth', address: creatorAddress },
+      payload
+    );
+  }
+
+  // Helper function to parse outpost data
+  parseOutpostData(data) {
+    return {
+      owner: data.owner,
+      name: data.name,
+      description: data.description,
+      uri: data.uri,
+      price: data.price,
+      feeShare: data.fee_share,
+      emergencyPause: data.emergency_pause,
+      maxTiers: data.max_tiers,
+      tierCount: data.tier_count
+    };
+  }
+
+  // Get protocol fees
+  async getProtocolFees() {
+    const client = await this.getWorkingClient();
     try {
-      const payload = {
-        type: "entry_function_payload",
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::toggle_emergency_pause`,
+      const fees = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_protocol_fees`,
         type_arguments: [],
-        arguments: [outpostAddress]
+        arguments: []
+      });
+      return {
+        subscriptionFee: fees[0],
+        passFee: fees[1],
+        referrerFee: fees[2]
       };
-
-      const txnRequest = await client.generateTransaction(account.address(), payload);
-      const signedTxn = await client.signTransaction(account, txnRequest);
-      const txnResult = await client.submitTransaction(signedTxn);
-      await client.waitForTransaction(txnResult.hash);
-      
-      return txnResult.hash;
     } catch (error) {
-      console.error('Error toggling emergency pause:', error);
+      console.error('Error fetching protocol fees:', error);
       throw error;
     }
   }
 
-  /**
-   * Check if an outpost is paused
-   * @param {string} outpostAddress - The address of the outpost
-   * @returns {Promise<boolean>} - Whether the outpost is paused
-   */
-  async isPaused(outpostAddress) {
+  // Verify subscription
+  async verifySubscription(subscriberAddress, outpostAddress, tierId) {
+    const client = await this.getWorkingClient();
     try {
-      const response = await client.view({
-        function: `${CONTRACT_ADDRESS}::PodiumProtocol::is_paused`,
+      const isValid = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::verify_subscription`,
         type_arguments: [],
-        arguments: [outpostAddress]
+        arguments: [subscriberAddress, outpostAddress, tierId]
       });
-      
-      return response[0];
+      return isValid[0];
     } catch (error) {
-      console.error('Error checking if outpost is paused:', error);
-      throw error;
+      console.error('Error verifying subscription:', error);
+      return false;
     }
   }
 }
 
-export default new PodiumProtocolService(); 
+export default new PodiumProtocol(); 

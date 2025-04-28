@@ -1,33 +1,75 @@
 # Podium Nexus
 
-Podium Nexus is a web application for interacting with the Podium Protocol on the Aptos blockchain. It provides a user-friendly interface for managing passes, outposts, and subscriptions.
+Podium Nexus is a Web3 platform that revolutionizes creator monetization through the Podium Protocol on the Movement blockchain. It enables creators to monetize their content through lifetime memberships (Podium Passes), subscription tiers, and custom community spaces (Outposts).
 
-## Features
+## Vision & Objectives
 
-- **Web3Auth Integration**: Sign in with social accounts (Google, Twitter, Facebook, etc.)
-- **External Wallet Support**: Connect with Nightly wallet for Aptos
-- **Pass Management**: View, buy, and sell passes
-- **Outpost Discovery**: Browse and interact with available outposts
-- **Subscription Management**: Subscribe to outposts and manage subscriptions
+Our platform aims to:
+- Accelerate user adoption by attracting creators and speculative investors
+- Generate viral growth through SocialFi mechanics
+- Provide creators with monetizable lifetime memberships and flexible subscription tiers
+- Leverage bonding curve mechanisms for dynamic pricing and value appreciation
+
+## Core Features
+
+### Podium Passes (Lifetime Memberships)
+- Buy and sell passes via bonding curve pricing
+- Exponential price escalation promotes early adoption
+- Lifetime access to creator benefits
+- Transparent fee structure for protocol, creators, and referrals
+
+### Subscription Management
+- Customizable subscription tiers (weekly, monthly, yearly)
+- Smart contract-managed renewable subscriptions
+- Seamless integration with lifetime memberships
+- Built-in referral incentives
+
+### Outpost Creation & Management
+- Create unique community spaces
+- Fixed creation price with deterministic addressing
+- Customizable fee share mechanism (default 5%)
+- Advanced management tools including emergency controls
+
+### Growth Mechanisms
+- Integrated referral system
+- Rewards structure:
+  - Up to 2% trading fees
+  - Up to 10% subscription fees
 
 ## Authentication
 
-The application supports multiple authentication methods:
+The platform supports multiple authentication methods:
 
 1. **Web3Auth (Social Login)**
    - Sign in with Google, Twitter, Facebook, or other social accounts
    - Seamless onboarding for new users
-   - No need to manage private keys
+   - Automatic wallet generation
 
 2. **External Wallet (Nightly)**
    - Connect with existing Nightly wallet
-   - Full control over your private keys
-   - Advanced users can use their preferred wallet
+   - Full control over private keys
+   - Advanced user functionality
+
+## Technical Architecture
+
+### Smart Contract Integration
+- **PodiumOutpost**: Outpost creation and management
+- **PodiumPassCoin**: Fungible asset management
+- **PodiumPass**: Core business logic for passes and subscriptions
+
+### Bonding Curve Mechanics
+- Initial pricing: 1-10 MOVE
+- Exponential price escalation
+- Transparent pricing formula
+
+### Network Details
+- Network: Movement Mainnet
+- Chain ID: 126
+- Protocol Address: 0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js (v14 or higher)
 - npm or yarn
 
@@ -35,20 +77,16 @@ The application supports multiple authentication methods:
 
 1. Clone the repository
 2. Install dependencies:
-   ```
+   ```bash
    npm install
-   ```
-   or
-   ```
+   # or
    yarn install
    ```
 
 3. Start the development server:
-   ```
+   ```bash
    npm start
-   ```
-   or
-   ```
+   # or
    yarn start
    ```
 
@@ -60,14 +98,14 @@ The application supports multiple authentication methods:
 - `src/context`: React context providers
 - `src/pages`: Page components
 - `src/services`: Service modules for API interactions
-  - `authService.js`: Authentication service for Web3Auth and external wallets
-  - `podiumProtocol.js`: Service for interacting with the Podium Protocol
+  - `authService.js`: Authentication service
+  - `podiumProtocol.js`: Podium Protocol integration
 
 ## Technologies Used
 
 - React
 - Web3Auth
-- Aptos SDK
+- Movement SDK
 - React Router
 - Tailwind CSS
 
