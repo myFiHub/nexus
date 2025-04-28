@@ -17,6 +17,7 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "csv-parse": "^5.6.0",
+    "csv-stringify": "^6.5.2",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
     "process": "^0.11.10",
@@ -30,6 +31,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
+    "@types/csv-stringify": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^5.59.0",
     "@typescript-eslint/parser": "^5.59.0",
     "eslint": "^8.38.0",

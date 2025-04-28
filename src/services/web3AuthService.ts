@@ -7,6 +7,10 @@ import { WEB3AUTH_CONFIG } from "../config/config";
 export interface Web3AuthUser {
   privKey: string;
   ed25519PrivKey: string;
+  name?: string;
+  email?: string;
+  profileImage?: string;
+  provider?: string;
   userInfo: {
     email: string;
     name: string;
@@ -24,13 +28,41 @@ export interface Web3AuthConfig {
     chainNamespace: string;
     chainId: string;
     rpcTarget: string;
+    wsTarget?: string;
     displayName: string;
     blockExplorer: string;
     ticker: string;
     tickerName: string;
+    logo?: string;
+    decimals?: number;
+    isTestnet?: boolean;
   };
   web3AuthNetwork: string;
   enableLogging: boolean;
+  sessionTime?: number;
+  storageKey?: string;
+  mfaSettings?: {
+    deviceShareFactor?: {
+      enable: boolean;
+      priority: number;
+      mandatory: boolean;
+    };
+    backUpShareFactor?: {
+      enable: boolean;
+      priority: number;
+      mandatory: boolean;
+    };
+    socialBackupFactor?: {
+      enable: boolean;
+      priority: number;
+      mandatory: boolean;
+    };
+    passwordFactor?: {
+      enable: boolean;
+      priority: number;
+      mandatory: boolean;
+    };
+  };
 }
 
 export interface ProviderConfig {
@@ -52,15 +84,17 @@ class Web3AuthService {
       clientId: WEB3AUTH_CONFIG.CLIENT_ID as string,
       chainConfig: {
         chainNamespace: CHAIN_NAMESPACES.OTHER,
-        chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.CHAIN_ID,
-        rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.RPC_TARGET,
-        displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.DISPLAY_NAME,
-        blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.BLOCK_EXPLORER,
-        ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.TICKER,
-        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.TICKER_NAME,
+        chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
+        rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
+        displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
+        blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
+        ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
+        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
       },
       web3AuthNetwork: "mainnet",
-      enableLogging: true,
+      enableLogging: WEB3AUTH_CONFIG.ENABLE_LOGGING || false,
+      sessionTime: WEB3AUTH_CONFIG.SESSION_TIME,
+      storageKey: WEB3AUTH_CONFIG.STORAGE_KEY as "local" | "session" | undefined,
     });
     this.provider = null;
     this.account = null;

@@ -1,38 +1,56 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useWeb3Auth } from '../hooks/useWeb3Auth';
-import { WEB3AUTH_PROVIDERS } from '../constants/web3authProviders';
+import { WEB3AUTH_PROVIDERS } from '../constants/web3auth';
 import './Web3AuthLogin.css';
 
-const Web3AuthLogin: React.FC = () => {
-  const { isConnected, userInfo, error, login, logout } = useWeb3Auth();
+export const Web3AuthLogin: React.FC = () => {
+  const { login, logout, user, isAuthenticated, error } = useWeb3Auth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (provider: string) => {
     try {
-      await login(provider);
-    } catch (error) {
-      console.error('Login error:', error);
+      setIsLoading(true);
+      await login(provider as any);
+    } catch (err) {
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleLogout = async () => {
     try {
+      setIsLoading(true);
       await logout();
-    } catch (error) {
-      console.error('Logout error:', error);
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  if (isConnected && userInfo) {
+  if (isAuthenticated && user) {
     return (
       <div className="web3auth-profile">
-        <h2>Welcome, {userInfo.name || userInfo.email}</h2>
+        <h2>Welcome, {user.userInfo.name || 'User'}!</h2>
         <div className="profile-info">
-          <p>Email: {userInfo.email}</p>
-          {userInfo.profileImage && (
-            <img src={userInfo.profileImage} alt="Profile" className="profile-image" />
+          {user.userInfo.profileImage && (
+            <img
+              src={user.userInfo.profileImage}
+              alt="Profile"
+              className="profile-image"
+            />
           )}
+          <p>Email: {user.userInfo.email}</p>
+          <p>Provider: {user.userInfo.typeOfLogin}</p>
         </div>
-        <button className="logout-button" onClick={handleLogout}>Logout</button>
+        <button
+          className="logout-button"
+          onClick={handleLogout}
+          disabled={isLoading}
+        >
+          {isLoading ? 'Logging out...' : 'Logout'}
+        </button>
       </div>
     );
   }
@@ -40,53 +58,57 @@ const Web3AuthLogin: React.FC = () => {
   return (
     <div className="web3auth-login">
       <h2>Login with Web3Auth</h2>
-      {error && <p className="error-message">{error}</p>}
+      {error && <div className="error-message">{error.message}</div>}
       <div className="login-options">
-        <button 
-          className="login-button google" 
+        <button
+          className="login-button google"
           onClick={() => handleLogin(WEB3AUTH_PROVIDERS.GOOGLE)}
+          disabled={isLoading}
         >
           <span className="icon">G</span>
-          <span>Login with Google</span>
+          {isLoading ? 'Connecting...' : 'Continue with Google'}
         </button>
-        <button 
-          className="login-button facebook" 
+        <button
+          className="login-button facebook"
           onClick={() => handleLogin(WEB3AUTH_PROVIDERS.FACEBOOK)}
+          disabled={isLoading}
         >
-          <span className="icon">F</span>
-          <span>Login with Facebook</span>
+          <span className="icon">f</span>
+          {isLoading ? 'Connecting...' : 'Continue with Facebook'}
         </button>
-        <button 
-          className="login-button twitter" 
+        <button
+          className="login-button twitter"
           onClick={() => handleLogin(WEB3AUTH_PROVIDERS.TWITTER)}
+          disabled={isLoading}
         >
-          <span className="icon">T</span>
-          <span>Login with Twitter</span>
+          <span className="icon">𝕏</span>
+          {isLoading ? 'Connecting...' : 'Continue with Twitter'}
         </button>
-        <button 
-          className="login-button discord" 
+        <button
+          className="login-button discord"
           onClick={() => handleLogin(WEB3AUTH_PROVIDERS.DISCORD)}
+          disabled={isLoading}
         >
           <span className="icon">D</span>
-          <span>Login with Discord</span>
+          {isLoading ? 'Connecting...' : 'Continue with Discord'}
         </button>
-        <button 
-          className="login-button github" 
+        <button
+          className="login-button github"
           onClick={() => handleLogin(WEB3AUTH_PROVIDERS.GITHUB)}
+          disabled={isLoading}
         >
-          <span className="icon">GH</span>
-          <span>Login with GitHub</span>
+          <span className="icon">G</span>
+          {isLoading ? 'Connecting...' : 'Continue with GitHub'}
         </button>
-        <button 
-          className="login-button email" 
-          onClick={() => handleLogin(WEB3AUTH_PROVIDERS.EMAIL_PASSWORDLESS)}
+        <button
+          className="login-button email"
+          onClick={() => handleLogin(WEB3AUTH_PROVIDERS.EMAIL)}
+          disabled={isLoading}
         >
-          <span className="icon">E</span>
-          <span>Login with Email</span>
+          <span className="icon">✉</span>
+          {isLoading ? 'Connecting...' : 'Continue with Email'}
         </button>
       </div>
     </div>
   );
-};
-
-export default Web3AuthLogin; 
+}; 

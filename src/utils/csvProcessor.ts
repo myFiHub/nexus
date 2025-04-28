@@ -1,5 +1,6 @@
 import { readFile, writeFile } from 'fs/promises';
-import { parse, stringify } from 'csv-parse/sync';
+import { parse } from 'csv-parse/sync';
+import { stringify } from 'csv-stringify';
 
 interface CSVRow {
   [key: string]: string;

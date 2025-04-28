@@ -1,119 +1,98 @@
-import { useEffect, useState } from 'react';
-import { Web3AuthNoModal } from '@web3auth/no-modal';
+import { useCallback, useEffect, useState } from 'react';
+import { Web3Auth } from '@web3auth/modal';
 import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from '@web3auth/base';
-import { WEB3AUTH_CONFIG } from '../constants/web3authConfig';
+import { WEB3AUTH_CONFIG } from '../config/config';
+import { Web3AuthUser } from '../services/web3AuthService';
+import { Web3AuthProvider } from '../constants/web3auth';
 
-export const useWeb3Auth = () => {
-  const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
+export interface Web3AuthHook {
+  user: Web3AuthUser | null;
+  isAuthenticated: boolean;
+  error: Error | null;
+  login: (provider: Web3AuthProvider) => Promise<void>;
+  logout: () => Promise<void>;
+}
+
+export const useWeb3Auth = (): Web3AuthHook => {
+  const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<any>(null);
-  const [isConnected, setIsConnected] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<Web3AuthUser | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    const init = async () => {
+    const initWeb3Auth = async () => {
       try {
-        const web3authInstance = new Web3AuthNoModal({
-          clientId: WEB3AUTH_CONFIG.clientId,
+        if (!WEB3AUTH_CONFIG.CLIENT_ID) {
+          throw new Error('Web3Auth client ID is not set');
+        }
+
+        const web3authInstance = new Web3Auth({
+          clientId: WEB3AUTH_CONFIG.CLIENT_ID,
           chainConfig: {
             chainNamespace: CHAIN_NAMESPACES.OTHER,
-            chainId: WEB3AUTH_CONFIG.chainConfig.chainId,
-            rpcTarget: WEB3AUTH_CONFIG.chainConfig.rpcTarget,
-            displayName: WEB3AUTH_CONFIG.chainConfig.displayName,
-            blockExplorerUrl: WEB3AUTH_CONFIG.chainConfig.blockExplorerUrl,
-            ticker: WEB3AUTH_CONFIG.chainConfig.ticker,
-            tickerName: WEB3AUTH_CONFIG.chainConfig.tickerName,
+            chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
+            rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
+            displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
+            blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
+            ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
+            tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
           },
-          web3AuthNetwork: WEB3AUTH_CONFIG.web3AuthNetwork,
+          web3AuthNetwork: 'mainnet',
         });
 
-        await web3authInstance.init();
+        await web3authInstance.initModal();
         setWeb3auth(web3authInstance);
-
-        if (web3authInstance.connected) {
-          const provider = await web3authInstance.provider;
-          const userInfo = await web3authInstance.getUserInfo();
-          setProvider(provider);
-          setUserInfo(userInfo);
-          setIsConnected(true);
-        }
       } catch (error) {
         console.error('Error initializing Web3Auth:', error);
-        setError('Failed to initialize Web3Auth');
+        setError(error instanceof Error ? error : new Error('Failed to initialize Web3Auth'));
       }
     };
 
-    init();
+    initWeb3Auth();
   }, []);
 
-  const login = async (loginProvider: string) => {
+  const login = useCallback(async (provider: Web3AuthProvider) => {
+    if (!web3auth) {
+      throw new Error('Web3Auth not initialized');
+    }
+
     try {
-      if (!web3auth) {
-        throw new Error('Web3Auth not initialized');
-      }
-
       const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-        loginProvider,
+        loginProvider: provider,
       });
-
-      if (!web3authProvider) {
-        throw new Error('Failed to connect to provider');
-      }
-
-      const userInfo = await web3auth.getUserInfo();
       setProvider(web3authProvider);
-      setUserInfo(userInfo);
-      setIsConnected(true);
+      const user = await web3auth.getUserInfo();
+      setUserInfo(user as Web3AuthUser);
       setError(null);
     } catch (error) {
       console.error('Error logging in:', error);
-      setError('Failed to log in');
+      setError(error instanceof Error ? error : new Error('Failed to login'));
       throw error;
     }
-  };
+  }, [web3auth]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
+    if (!web3auth) {
+      throw new Error('Web3Auth not initialized');
+    }
+
     try {
-      if (!web3auth) {
-        throw new Error('Web3Auth not initialized');
-      }
-
       await web3auth.logout();
       setProvider(null);
       setUserInfo(null);
-      setIsConnected(false);
       setError(null);
     } catch (error) {
       console.error('Error logging out:', error);
-      setError('Failed to log out');
+      setError(error instanceof Error ? error : new Error('Failed to logout'));
       throw error;
     }
-  };
-
-  const getUserInfo = async () => {
-    try {
-      if (!web3auth) {
-        throw new Error('Web3Auth not initialized');
-      }
-
-      const userInfo = await web3auth.getUserInfo();
-      setUserInfo(userInfo);
-      return userInfo;
-    } catch (error) {
-      console.error('Error getting user info:', error);
-      setError('Failed to get user info');
-      throw error;
-    }
-  };
+  }, [web3auth]);
 
   return {
-    web3auth,
-    provider,
-    isConnected,
-    userInfo,
+    user: userInfo,
+    isAuthenticated: !!provider,
     error,
     login,
     logout,
-    getUserInfo,
   };
 }; 
