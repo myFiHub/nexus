@@ -15,6 +15,22 @@ const WalletConnect: React.FC = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showWalletOptions, setShowWalletOptions] = useState(false);
 
+  // Show wallet options on mount
+  useEffect(() => {
+    console.log('[WalletConnect] Component mounted, showing wallet options');
+    setShowWalletOptions(true);
+  }, []);
+
+  // Log state changes
+  useEffect(() => {
+    console.log('[WalletConnect] State updated:', {
+      isConnected,
+      isLoading,
+      error,
+      walletState
+    });
+  }, [isConnected, isLoading, error, walletState]);
+
   // Format wallet address for display
   const formatAddress = (address: string | null) => {
     if (!address) return "";
@@ -23,6 +39,7 @@ const WalletConnect: React.FC = () => {
 
   // Toggle dropdown
   const toggleDropdown = () => {
+    console.log('[WalletConnect] Toggling dropdown');
     setIsDropdownOpen(!isDropdownOpen);
   };
 
@@ -33,6 +50,7 @@ const WalletConnect: React.FC = () => {
       (e.target.closest(".wallet-dropdown") || e.target.closest(".wallet-options"))
     )
       return;
+    console.log('[WalletConnect] Clicking outside, closing dropdowns');
     setIsDropdownOpen(false);
     setShowWalletOptions(false);
   };
@@ -48,11 +66,12 @@ const WalletConnect: React.FC = () => {
   // Handle wallet connection
   const handleConnect = async (walletType: string) => {
     try {
-      console.log(`Connecting to ${walletType} wallet...`);
+      console.log(`[WalletConnect] Attempting to connect to ${walletType} wallet...`);
       await connectWallet(walletType);
+      console.log(`[WalletConnect] Successfully connected to ${walletType} wallet`);
       setShowWalletOptions(false);
     } catch (error) {
-      console.error(`Error connecting to ${walletType} wallet:`, error);
+      console.error(`[WalletConnect] Error connecting to ${walletType} wallet:`, error);
       // Show error in UI
       if (error instanceof Error) {
         alert(error.message);

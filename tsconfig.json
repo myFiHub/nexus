@@ -25,7 +25,16 @@
     "strictBindCallApply": true,
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
-    "alwaysStrict": true
+    "alwaysStrict": true,
+    "baseUrl": ".",
+    "paths": {
+      "@aptos-labs/ts-sdk": ["node_modules/@aptos-labs/ts-sdk"],
+      "aptos": ["node_modules/aptos"]
+    },
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types"
+    ]
   },
   "include": [
     "src"

@@ -109,18 +109,23 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     useEffect(() => {
         const initWallet = async () => {
             try {
+                console.log('[AppContext] Starting wallet initialization...');
                 await walletService.init();
+                console.log('[AppContext] Wallet service initialized');
                 
                 // Add listener for wallet state changes
+                console.log('[AppContext] Setting up wallet state listener');
                 walletService.addListener((state) => {
+                    console.log('[AppContext] Wallet state changed:', state);
                     setWalletState({
                         address: state.address,
                         type: state.walletType,
                     });
                     setIsConnected(state.isConnected);
                 });
+                console.log('[AppContext] Wallet initialization complete');
             } catch (error) {
-                console.error("Error initializing wallet:", error);
+                console.error("[AppContext] Wallet initialization failed:", error);
                 setError("Failed to initialize wallet");
             }
         };
@@ -131,8 +136,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     // Fetch user passes and outposts when wallet is connected
     useEffect(() => {
         if (isConnected && walletState?.address) {
-            fetchUserPasses();
-            fetchOutposts();
+            console.log('[AppContext] Wallet connected, fetching user data...');
+            Promise.all([
+                fetchUserPasses(),
+                fetchOutposts()
+            ]).then(() => {
+                console.log('[AppContext] User data fetched successfully');
+            }).catch((error) => {
+                console.error('[AppContext] Error fetching user data:', error);
+            });
         }
     }, [isConnected, walletState?.address, fetchUserPasses, fetchOutposts]);
 
@@ -220,14 +232,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const connectWallet = async (walletType = "web3auth") => {
         try {
+            console.log(`[AppContext] Starting ${walletType} wallet connection...`);
             setIsLoading(true);
             setError(null);
-            console.log(`Connecting to ${walletType} wallet...`);
 
             let success = false;
             if (walletType === "web3auth") {
+                console.log('[AppContext] Connecting to Web3Auth...');
                 success = await walletService.connectWeb3Auth();
             } else if (walletType === "nightly") {
+                console.log('[AppContext] Connecting to Nightly wallet...');
                 success = await walletService.connectNightlyWallet();
             }
 
@@ -235,19 +249,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
                 throw new Error("Failed to connect wallet");
             }
             
-            console.log(`Successfully connected to ${walletType} wallet`);
+            console.log(`[AppContext] Successfully connected to ${walletType} wallet`);
             
             // Fetch user data after successful connection
             if (walletState?.address) {
+                console.log('[AppContext] Fetching user data after connection...');
                 await Promise.all([
                     fetchUserPasses(),
                     fetchOutposts()
                 ]);
+                console.log('[AppContext] User data fetched successfully');
             }
         } catch (error: any) {
-            console.error("Error connecting wallet:", error);
+            console.error("[AppContext] Wallet connection failed:", error);
             setError(error.message || "Failed to connect wallet");
-            throw error; // Re-throw to let the component handle the error
+            throw error;
         } finally {
             setIsLoading(false);
         }
@@ -255,15 +271,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const disconnectWallet = async () => {
         try {
-            console.log('Disconnecting wallet...');
+            console.log('[AppContext] Starting wallet disconnection...');
             await walletService.disconnect();
-            console.log('Wallet disconnected successfully');
+            console.log('[AppContext] Wallet disconnected successfully');
             
             // Clear related data
             setUserPasses([]);
             setOutposts([]);
+            console.log('[AppContext] User data cleared');
         } catch (error: any) {
-            console.error("Error disconnecting wallet:", error);
+            console.error("[AppContext] Wallet disconnection failed:", error);
             setError(error.message || "Failed to disconnect wallet");
             throw error;
         }

@@ -11,6 +11,8 @@ function Profile() {
     error
   } = useApp();
 
+  console.log('[Profile] Component mounted');
+
   const [profileData, setProfileData] = useState({
     username: 'User',
     bio: 'No bio available',
@@ -25,7 +27,9 @@ function Profile() {
 
   // Mock function to fetch profile data
   useEffect(() => {
+    console.log('[Profile] Wallet connection status:', { isConnected, walletState });
     if (isConnected) {
+      console.log('[Profile] Loading profile data...');
       // In a real implementation, this would fetch from an API
       setProfileData({
         username: 'Creator123',
@@ -38,8 +42,9 @@ function Profile() {
           github: 'https://github.com/creator123'
         }
       });
+      console.log('[Profile] Profile data loaded');
     }
-  }, [isConnected]);
+  }, [isConnected, walletState]);
 
   return (
     <div className="space-y-8">
@@ -61,7 +66,7 @@ function Profile() {
             <p className="text-podium-secondary-text mb-4">{profileData.bio}</p>
             <p className="text-podium-secondary-text mb-4">Joined: {profileData.joinedDate}</p>
             
-            <div className="flex gap-4">
+            <div className="flex space-x-4">
               {profileData.socialLinks.twitter && (
                 <a 
                   href={profileData.socialLinks.twitter} 
@@ -110,7 +115,7 @@ function Profile() {
         </div>
         
         {/* Social Links and App Download */}
-        <div className="mt-8">
+        <div className="mb-8">
           <SocialLinks />
         </div>
         

@@ -17,13 +17,32 @@ function Dashboard() {
     fetchOutposts
   } = useApp();
 
+  console.log('[Dashboard] Component mounted');
+
   // Fetch data when wallet is connected
   useEffect(() => {
+    console.log('[Dashboard] Wallet connection status:', { isConnected, walletType });
     if (isConnected) {
+      console.log('[Dashboard] Fetching user data...');
       fetchUserPasses();
       fetchOutposts();
     }
   }, [isConnected, fetchUserPasses, fetchOutposts]);
+
+  const handleWeb3AuthConnect = () => {
+    console.log('[Dashboard] Web3Auth connect button clicked');
+    connectWeb3Auth();
+  };
+
+  const handleNightlyConnect = () => {
+    console.log('[Dashboard] Nightly wallet connect button clicked');
+    connectNightlyWallet();
+  };
+
+  const handleDisconnect = () => {
+    console.log('[Dashboard] Disconnect button clicked');
+    disconnectWallet();
+  };
 
   return (
     <div className="space-y-8">
@@ -38,7 +57,7 @@ function Dashboard() {
               <div>
                 <h3 className="text-lg font-medium text-podium-text mb-2">Connect with Social Login</h3>
                 <button
-                  onClick={connectWeb3Auth}
+                  onClick={handleWeb3AuthConnect}
                   className="bg-podium-primary hover:bg-podium-primary-dark text-white font-bold py-2 px-4 rounded w-full md:w-auto"
                 >
                   Connect with Web3Auth
@@ -51,7 +70,7 @@ function Dashboard() {
               <div>
                 <h3 className="text-lg font-medium text-podium-text mb-2">Connect External Wallet</h3>
                 <button
-                  onClick={connectNightlyWallet}
+                  onClick={handleNightlyConnect}
                   className="bg-podium-secondary hover:bg-podium-secondary-dark text-white font-bold py-2 px-4 rounded w-full md:w-auto"
                 >
                   Connect Nightly Wallet
@@ -71,7 +90,7 @@ function Dashboard() {
                   </p>
                 </div>
                 <button
-                  onClick={disconnectWallet}
+                  onClick={handleDisconnect}
                   className="bg-podium-secondary hover:bg-podium-secondary-dark text-white font-bold py-2 px-4 rounded"
                 >
                   Disconnect

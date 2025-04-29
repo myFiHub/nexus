@@ -17,7 +17,7 @@ const Web3AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children })
         chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
         rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
         displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
-        blockExplorerUrl: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
+        blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
         ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
         tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
       },

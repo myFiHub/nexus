@@ -108,20 +108,26 @@ class Web3AuthService {
     });
 
     this.web3auth = new Web3Auth({
-      clientId: WEB3AUTH_CONFIG.CLIENT_ID,
+      clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || '',
       chainConfig: {
-        chainNamespace: CHAIN_NAMESPACES.OTHER,
-        chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
-        rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
-        displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
-        blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
-        ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
-        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName
+        chainNamespace: CHAIN_NAMESPACES.EIP155,
+        chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID || '126',
+        rpcTarget: process.env.REACT_APP_RPC_TARGET || 'https://mainnet.movementnetwork.xyz/v1',
+        displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME || 'Movement',
+        blockExplorer: process.env.REACT_APP_BLOCK_EXPLORER || 'https://explorer.movementnetwork.xyz/?network=mainnet',
+        ticker: process.env.REACT_APP_CHAIN_TICKER || 'MOVE',
+        tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME || 'Movement'
       },
-      web3AuthNetwork: "mainnet",
-      enableLogging: WEB3AUTH_CONFIG.ENABLE_LOGGING || false,
-      sessionTime: WEB3AUTH_CONFIG.SESSION_TIME,
-      storageKey: WEB3AUTH_CONFIG.STORAGE_KEY as "local" | "session" | undefined,
+      web3AuthNetwork: "mainnet" as "mainnet" | "testnet" | "cyan" | "aqua",
+      enableLogging: true,
+      sessionTime: 86400,
+      storageKey: "local" as "local" | "session" | undefined,
+      uiConfig: {
+        theme: "dark",
+        loginMethodsOrder: ["google", "facebook", "twitter"],
+        defaultLanguage: "en",
+        appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg"
+      }
     });
     this.provider = null;
     this.account = null;
@@ -143,7 +149,20 @@ class Web3AuthService {
       this.error = null;
       this.notifyListeners();
 
-      console.log('Initializing Web3Auth modal...');
+      console.log('Starting Web3Auth initialization...');
+      console.log('Web3Auth config:', {
+        clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID,
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID,
+          rpcTarget: process.env.REACT_APP_RPC_TARGET,
+          displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME,
+          blockExplorer: process.env.REACT_APP_BLOCK_EXPLORER,
+          ticker: process.env.REACT_APP_CHAIN_TICKER,
+          tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME
+        }
+      });
+
       await this.web3auth.initModal();
       console.log('Web3Auth initialized successfully');
       
@@ -154,7 +173,8 @@ class Web3AuthService {
       this.error = error instanceof Error ? error : new Error('Failed to initialize Web3Auth');
       console.error('Web3Auth initialization error:', {
         message: this.error.message,
-        stack: this.error.stack
+        stack: this.error.stack,
+        error
       });
       this.notifyListeners();
       throw this.error;
@@ -166,12 +186,15 @@ class Web3AuthService {
    */
   async login(provider: string = "google"): Promise<Web3AuthUser | null> {
     try {
+      console.log('Starting Web3Auth login with provider:', provider);
       this.isLoggingIn = true;
       this.error = null;
       this.notifyListeners();
 
       console.log('Attempting to connect with Web3Auth...');
       const response = await this.web3auth.connect();
+      console.log('Web3Auth connect response:', response);
+
       if (!response) {
         throw new Error('No response from Web3Auth connect');
       }
@@ -185,6 +208,7 @@ class Web3AuthService {
       const privateKey = await this.provider.request({
         method: "private_key"
       });
+      console.log('Private key received:', privateKey ? 'Yes' : 'No');
 
       if (!privateKey) {
         throw new Error('No private key received from provider');
@@ -192,6 +216,7 @@ class Web3AuthService {
 
       console.log('Getting user info...');
       const userInfo = await this.web3auth.getUserInfo();
+      console.log('User info received:', userInfo);
       
       const user: Web3AuthUser = {
         privKey: privateKey,
@@ -217,7 +242,8 @@ class Web3AuthService {
       this.error = error instanceof Error ? error : new Error('Failed to login with Web3Auth');
       console.error('Web3Auth login error:', {
         message: this.error.message,
-        stack: this.error.stack
+        stack: this.error.stack,
+        error
       });
       this.notifyListeners();
       throw this.error;
