@@ -50,6 +50,8 @@ class WalletService {
    */
   async init(): Promise<void> {
     try {
+      console.log('Initializing wallet service...');
+      
       // Initialize Web3Auth
       await web3AuthService.initialize();
 
@@ -57,11 +59,13 @@ class WalletService {
       const storedWallet = localStorage.getItem(STORAGE_KEYS.EXTERNAL_WALLET);
       if (storedWallet) {
         try {
+          console.log('Found stored wallet, attempting to restore...');
           const walletData = JSON.parse(storedWallet);
           this.externalWalletType = walletData.type;
           this.account = new AptosAccount(Buffer.from(walletData.privateKey, "hex"));
           this.address = this.account.address().toString();
           this.isConnected = true;
+          console.log('Successfully restored wallet:', { address: this.address });
           this.notifyListeners();
         } catch (error) {
           console.error("Error initializing external wallet:", error);
@@ -79,6 +83,7 @@ class WalletService {
    */
   async createWallet(): Promise<WalletInfo> {
     try {
+      console.log('Creating new wallet...');
       this.account = new AptosAccount();
       this.address = this.account.address().toString();
       this.isConnected = true;
@@ -90,6 +95,7 @@ class WalletService {
         publicKey: Buffer.from(this.account.signingKey.publicKey).toString("hex"),
       };
 
+      console.log('Wallet created successfully:', { address: this.address });
       this.notifyListeners();
       return walletInfo;
     } catch (error) {
@@ -103,6 +109,7 @@ class WalletService {
    */
   async importWallet(privateKey: string): Promise<WalletInfo> {
     try {
+      console.log('Importing wallet...');
       this.account = new AptosAccount(Buffer.from(privateKey, "hex"));
       this.address = this.account.address().toString();
       this.isConnected = true;
@@ -114,6 +121,7 @@ class WalletService {
         publicKey: Buffer.from(this.account.signingKey.publicKey).toString("hex"),
       };
 
+      console.log('Wallet imported successfully:', { address: this.address });
       this.notifyListeners();
       return walletInfo;
     } catch (error) {
@@ -127,19 +135,25 @@ class WalletService {
    */
   async connectWeb3Auth(): Promise<boolean> {
     try {
-      const user = await web3AuthService.login("google");
-      if (user) {
-        this.account = new AptosAccount(Buffer.from(user.privKey, "hex"));
-        this.address = this.account.address().toString();
-        this.isConnected = true;
-        this.externalWalletType = null;
-        this.notifyListeners();
-        return true;
+      console.log('Connecting to Web3Auth...');
+      const user = await web3AuthService.login();
+      if (!user) {
+        throw new Error('Failed to get user data from Web3Auth');
       }
-      return false;
+
+      this.account = new AptosAccount(Buffer.from(user.privKey.slice(2), "hex"));
+      this.address = this.account.address().toString();
+      this.isConnected = true;
+      this.externalWalletType = "web3auth";
+      
+      console.log('Web3Auth connected successfully:', { address: this.address });
+      this.notifyListeners();
+      return true;
     } catch (error) {
-      console.error("Error connecting to Web3Auth:", error);
-      throw error;
+      console.error('Failed to connect Web3Auth:', error);
+      this.isConnected = false;
+      this.notifyListeners();
+      return false;
     }
   }
 
@@ -148,30 +162,44 @@ class WalletService {
    */
   async connectNightlyWallet(): Promise<boolean> {
     try {
-      if (!window.movement) {
+      console.log('Checking for Nightly wallet...');
+      
+      // Check if Nightly wallet is available
+      if (typeof window === 'undefined' || !window.movement) {
+        console.error('Nightly wallet is not installed');
         throw new Error("Nightly wallet is not installed");
       }
 
+      console.log('Connecting to Nightly wallet...');
       const response = await window.movement.connect();
-      if (response) {
-        this.account = new AptosAccount();
-        this.address = this.account.address().toString();
-        this.isConnected = true;
-        this.externalWalletType = "nightly";
-
-        // Store the wallet data
-        localStorage.setItem(
-          STORAGE_KEYS.EXTERNAL_WALLET,
-          JSON.stringify({
-            type: "nightly",
-            privateKey: Buffer.from(this.account.signingKey.secretKey).toString("hex"),
-          })
-        );
-
-        this.notifyListeners();
-        return true;
+      
+      if (!response) {
+        console.error('Failed to connect to Nightly wallet');
+        return false;
       }
-      return false;
+      
+      console.log('Nightly wallet connected, getting address...');
+      
+      // For Nightly wallet, we'll create a new account for now
+      // In a production environment, you would get the actual address from the wallet
+      this.account = new AptosAccount();
+      this.address = this.account.address().toString();
+      this.isConnected = true;
+      this.externalWalletType = "nightly";
+
+      console.log('Nightly wallet connected successfully:', { address: this.address });
+
+      // Store the wallet data
+      localStorage.setItem(
+        STORAGE_KEYS.EXTERNAL_WALLET,
+        JSON.stringify({
+          type: "nightly",
+          address: this.address,
+        })
+      );
+
+      this.notifyListeners();
+      return true;
     } catch (error) {
       console.error("Error connecting to Nightly wallet:", error);
       throw error;
@@ -183,18 +211,26 @@ class WalletService {
    */
   async disconnect(): Promise<void> {
     try {
-      if (this.externalWalletType) {
-        // Disconnect from external wallet
-        this.account = null;
-        this.address = null;
-        this.isConnected = false;
-        this.externalWalletType = null;
-        localStorage.removeItem(STORAGE_KEYS.EXTERNAL_WALLET);
-      } else {
+      console.log('Disconnecting wallet...');
+      
+      if (this.externalWalletType === "nightly" && window.movement) {
+        try {
+          await window.movement.disconnect();
+        } catch (error) {
+          console.error("Error disconnecting Nightly wallet:", error);
+        }
+      } else if (this.externalWalletType === "web3auth") {
         // Disconnect from Web3Auth
         await web3AuthService.logout();
       }
 
+      this.account = null;
+      this.address = null;
+      this.isConnected = false;
+      this.externalWalletType = null;
+      localStorage.removeItem(STORAGE_KEYS.EXTERNAL_WALLET);
+      
+      console.log('Wallet disconnected successfully');
       this.notifyListeners();
     } catch (error) {
       console.error("Error disconnecting wallet:", error);
@@ -254,32 +290,22 @@ class WalletService {
    */
   private notifyListeners(): void {
     const state = {
-      isConnected: this.isConnected,
       address: this.address,
-      account: this.account,
-      walletType: this.getWalletType(),
+      walletType: this.externalWalletType,
+      isConnected: this.isConnected,
     };
     this.listeners.forEach(listener => listener(state));
   }
 
   /**
-   * Get user passes for a given address
-   * @param address The wallet address to get passes for
-   * @returns Array of user passes
+   * Get user passes
    */
   async getUserPasses(address: string): Promise<any[]> {
-    try {
-      // This is a placeholder implementation
-      // In a real application, this would fetch from a blockchain or API
-      console.log(`Fetching passes for address: ${address}`);
-      
-      // Return empty array for now
-      return [];
-    } catch (error) {
-      console.error('Error fetching user passes:', error);
-      throw error;
-    }
+    // This is a placeholder for the actual implementation
+    return [];
   }
 }
 
-export default new WalletService(); 
+// Export a singleton instance
+const walletService = new WalletService();
+export default walletService; 

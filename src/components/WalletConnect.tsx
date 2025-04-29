@@ -46,9 +46,20 @@ const WalletConnect: React.FC = () => {
   }, []);
 
   // Handle wallet connection
-  const handleConnect = (walletType: string) => {
-    connectWallet(walletType);
-    setShowWalletOptions(false);
+  const handleConnect = async (walletType: string) => {
+    try {
+      console.log(`Connecting to ${walletType} wallet...`);
+      await connectWallet(walletType);
+      setShowWalletOptions(false);
+    } catch (error) {
+      console.error(`Error connecting to ${walletType} wallet:`, error);
+      // Show error in UI
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert('Failed to connect wallet. Please try again.');
+      }
+    }
   };
 
   // Get wallet icon based on type
@@ -126,6 +137,7 @@ const WalletConnect: React.FC = () => {
           <button
             className="wallet-option-btn web3auth"
             onClick={() => handleConnect("web3auth")}
+            disabled={isLoading}
           >
             <span className="wallet-icon">🔑</span>
             <span>Continue with Web3Auth</span>
@@ -133,6 +145,7 @@ const WalletConnect: React.FC = () => {
           <button
             className="wallet-option-btn nightly"
             onClick={() => handleConnect("nightly")}
+            disabled={isLoading}
           >
             <span className="wallet-icon">🌙</span>
             <span>Connect Nightly Wallet</span>
@@ -140,6 +153,7 @@ const WalletConnect: React.FC = () => {
           <button
             className="wallet-option-cancel"
             onClick={() => setShowWalletOptions(false)}
+            disabled={isLoading}
           >
             Cancel
           </button>
@@ -148,6 +162,7 @@ const WalletConnect: React.FC = () => {
         <button
           className="wallet-connect-btn"
           onClick={() => setShowWalletOptions(true)}
+          disabled={isLoading}
         >
           Connect Wallet
         </button>

@@ -41,6 +41,9 @@
     "lint-staged": "^13.2.1",
     "react-app-rewired": "^2.2.1"
   },
+  "resolutions": {
+    "@polkadot/util": "12.6.2"
+  },
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",

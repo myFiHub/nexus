@@ -4,7 +4,7 @@ import { WEB3AUTH_PROVIDERS } from '../constants/web3auth';
 import './Web3AuthLogin.css';
 
 export const Web3AuthLogin: React.FC = () => {
-  const { login, logout, user, isAuthenticated, error } = useWeb3Auth();
+  const { login, logout, user, isAuthenticated, error, isInitializing } = useWeb3Auth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (provider: string) => {
@@ -28,6 +28,15 @@ export const Web3AuthLogin: React.FC = () => {
       setIsLoading(false);
     }
   };
+
+  if (isInitializing) {
+    return (
+      <div className="web3auth-login">
+        <h2>Initializing Web3Auth...</h2>
+        <div className="loading-spinner" />
+      </div>
+    );
+  }
 
   if (isAuthenticated && user) {
     return (

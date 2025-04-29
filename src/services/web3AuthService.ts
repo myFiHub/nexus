@@ -71,17 +71,44 @@ export interface ProviderConfig {
   verifier: string;
 }
 
+export interface Web3AuthState {
+  isConnected: boolean;
+  address: string | null;
+  account: AptosAccount | null;
+  provider: any;
+  isInitializing: boolean;
+  isLoggingIn: boolean;
+  isLoggingOut: boolean;
+  error: Error | null;
+}
+
 class Web3AuthService {
   private web3auth: Web3Auth;
   private provider: any;
   private account: AptosAccount | null;
   private address: string | null;
   private isConnected: boolean;
-  private listeners: ((state: any) => void)[];
+  private isInitializing: boolean;
+  private isLoggingIn: boolean;
+  private isLoggingOut: boolean;
+  private error: Error | null;
+  private listeners: ((state: Web3AuthState) => void)[];
 
   constructor() {
+    if (!WEB3AUTH_CONFIG.CLIENT_ID) {
+      console.error('Web3Auth client ID is not set. Please check your environment variables.');
+      throw new Error('Web3Auth client ID is not set');
+    }
+
+    console.log('Initializing Web3Auth with config:', {
+      clientId: WEB3AUTH_CONFIG.CLIENT_ID,
+      chainConfig: WEB3AUTH_CONFIG.CHAIN_CONFIG,
+      web3AuthNetwork: WEB3AUTH_CONFIG.WEB3AUTH_NETWORK,
+      enableLogging: WEB3AUTH_CONFIG.ENABLE_LOGGING || false,
+    });
+
     this.web3auth = new Web3Auth({
-      clientId: WEB3AUTH_CONFIG.CLIENT_ID as string,
+      clientId: WEB3AUTH_CONFIG.CLIENT_ID,
       chainConfig: {
         chainNamespace: CHAIN_NAMESPACES.OTHER,
         chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
@@ -89,7 +116,7 @@ class Web3AuthService {
         displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
         blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
         ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
-        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
+        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName
       },
       web3AuthNetwork: "mainnet",
       enableLogging: WEB3AUTH_CONFIG.ENABLE_LOGGING || false,
@@ -100,6 +127,10 @@ class Web3AuthService {
     this.account = null;
     this.address = null;
     this.isConnected = false;
+    this.isInitializing = false;
+    this.isLoggingIn = false;
+    this.isLoggingOut = false;
+    this.error = null;
     this.listeners = [];
   }
 
@@ -108,57 +139,88 @@ class Web3AuthService {
    */
   async initialize(): Promise<void> {
     try {
+      this.isInitializing = true;
+      this.error = null;
+      this.notifyListeners();
+
+      console.log('Initializing Web3Auth modal...');
       await this.web3auth.initModal();
+      console.log('Web3Auth initialized successfully');
+      
+      this.isInitializing = false;
       this.notifyListeners();
     } catch (error) {
-      console.error("Error initializing Web3Auth:", error);
-      throw error;
+      this.isInitializing = false;
+      this.error = error instanceof Error ? error : new Error('Failed to initialize Web3Auth');
+      console.error('Web3Auth initialization error:', {
+        message: this.error.message,
+        stack: this.error.stack
+      });
+      this.notifyListeners();
+      throw this.error;
     }
   }
 
   /**
    * Login with a specific provider
    */
-  async login(provider: WALLET_ADAPTER_TYPE): Promise<Web3AuthUser> {
+  async login(provider: string = "google"): Promise<Web3AuthUser | null> {
     try {
-      const web3authProvider = await this.web3auth.connectTo(provider);
-      if (!web3authProvider) {
-        throw new Error("Failed to connect to provider");
+      this.isLoggingIn = true;
+      this.error = null;
+      this.notifyListeners();
+
+      console.log('Attempting to connect with Web3Auth...');
+      const response = await this.web3auth.connect();
+      if (!response) {
+        throw new Error('No response from Web3Auth connect');
       }
-      this.provider = web3authProvider;
-      const userInfo = await this.web3auth.getUserInfo();
-      const privateKey = await this.web3auth.provider?.request({
+
+      this.provider = this.web3auth.provider;
+      if (!this.provider) {
+        throw new Error('No provider available after connection');
+      }
+
+      console.log('Requesting private key from provider...');
+      const privateKey = await this.provider.request({
         method: "private_key"
       });
+
       if (!privateKey) {
-        throw new Error("Failed to get private key");
+        throw new Error('No private key received from provider');
       }
-      const ed25519PrivKey = await this.web3auth.provider?.request({
-        method: "ed25519_private_key"
-      });
-      if (!ed25519PrivKey) {
-        throw new Error("Failed to get ed25519 private key");
-      }
-      this.account = new AptosAccount(Buffer.from(privateKey as string, "hex"));
+
+      console.log('Getting user info...');
+      const userInfo = await this.web3auth.getUserInfo();
+      
+      const user: Web3AuthUser = {
+        privKey: privateKey,
+        ed25519PrivKey: privateKey,
+        userInfo: userInfo as any,
+      };
+
+      console.log('Creating AptosAccount from private key...');
+      this.account = new AptosAccount(Buffer.from(privateKey.slice(2), "hex"));
       this.address = this.account.address().toString();
       this.isConnected = true;
+      
+      console.log('Web3Auth login successful:', {
+        address: this.address,
+        userInfo
+      });
+
+      this.isLoggingIn = false;
       this.notifyListeners();
-      return {
-        privKey: privateKey as string,
-        ed25519PrivKey: ed25519PrivKey as string,
-        userInfo: {
-          email: userInfo.email || "",
-          name: userInfo.name || "",
-          profileImage: userInfo.profileImage || "",
-          verifier: userInfo.verifier || "",
-          verifierId: userInfo.verifierId || "",
-          typeOfLogin: userInfo.typeOfLogin || "",
-          aggregateVerifier: userInfo.aggregateVerifier || ""
-        }
-      };
+      return user;
     } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+      this.isLoggingIn = false;
+      this.error = error instanceof Error ? error : new Error('Failed to login with Web3Auth');
+      console.error('Web3Auth login error:', {
+        message: this.error.message,
+        stack: this.error.stack
+      });
+      this.notifyListeners();
+      throw this.error;
     }
   }
 
@@ -167,37 +229,54 @@ class Web3AuthService {
    */
   async logout(): Promise<void> {
     try {
+      this.isLoggingOut = true;
+      this.error = null;
+      this.notifyListeners();
+
       await this.web3auth.logout();
+      
       this.provider = null;
       this.account = null;
       this.address = null;
       this.isConnected = false;
+      
+      console.log('Web3Auth logout successful');
+
+      this.isLoggingOut = false;
       this.notifyListeners();
     } catch (error) {
-      console.error("Error logging out:", error);
-      throw error;
+      this.isLoggingOut = false;
+      this.error = error instanceof Error ? error : new Error('Failed to logout from Web3Auth');
+      console.error('Web3Auth logout error:', {
+        message: this.error.message,
+        stack: this.error.stack
+      });
+      this.notifyListeners();
+      throw this.error;
     }
   }
 
   /**
-   * Get current user information
+   * Get user info
    */
   async getUserInfo(): Promise<Web3AuthUser | null> {
-    if (!this.isConnected) {
-      return null;
-    }
-
     try {
+      if (!this.web3auth) {
+        throw new Error('Web3Auth not initialized');
+      }
+
       const userInfo = await this.web3auth.getUserInfo();
-      const privateKey = await this.provider.request({ method: "private_key" });
+      if (!userInfo) {
+        return null;
+      }
 
       return {
-        privKey: privateKey,
-        ed25519PrivKey: privateKey,
+        privKey: '',
+        ed25519PrivKey: '',
         userInfo: userInfo as any,
       };
     } catch (error) {
-      console.error("Error getting user info:", error);
+      console.error('Error getting user info:', error);
       return null;
     }
   }
@@ -217,38 +296,95 @@ class Web3AuthService {
   }
 
   /**
-   * Check if connected
+   * Check if the wallet is connected
    */
   isWalletConnected(): boolean {
     return this.isConnected;
   }
 
   /**
-   * Add a listener for state changes
+   * Get the current state
    */
-  addListener(listener: (state: any) => void): void {
-    this.listeners.push(listener);
-  }
-
-  /**
-   * Remove a listener
-   */
-  removeListener(listener: (state: any) => void): void {
-    this.listeners = this.listeners.filter(l => l !== listener);
+  private getState(): Web3AuthState {
+    return {
+      isConnected: this.isConnected,
+      address: this.address,
+      account: this.account,
+      provider: this.provider,
+      isInitializing: this.isInitializing,
+      isLoggingIn: this.isLoggingIn,
+      isLoggingOut: this.isLoggingOut,
+      error: this.error,
+    };
   }
 
   /**
    * Notify all listeners of state changes
    */
   private notifyListeners(): void {
-    const state = {
-      isConnected: this.isConnected,
-      address: this.address,
-      account: this.account,
-      provider: this.provider,
-    };
+    const state = this.getState();
     this.listeners.forEach(listener => listener(state));
+  }
+
+  /**
+   * Add a listener for state changes
+   */
+  addListener(listener: (state: Web3AuthState) => void): void {
+    this.listeners.push(listener);
+  }
+
+  /**
+   * Remove a listener
+   */
+  removeListener(listener: (state: Web3AuthState) => void): void {
+    this.listeners = this.listeners.filter(l => l !== listener);
+  }
+
+  /**
+   * Recover session from storage
+   */
+  async recoverSession(): Promise<boolean> {
+    try {
+      if (!this.web3auth) {
+        return false;
+      }
+
+      // Check if already connected
+      const userInfo = await this.web3auth.getUserInfo();
+      if (!userInfo) {
+        return false;
+      }
+
+      this.provider = this.web3auth.provider;
+      if (!this.provider) {
+        return false;
+      }
+
+      const privateKey = await this.provider.request({
+        method: "private_key"
+      });
+
+      if (!privateKey) {
+        return false;
+      }
+
+      this.account = new AptosAccount(Buffer.from(privateKey.slice(2), "hex"));
+      this.address = this.account.address().toString();
+      this.isConnected = true;
+      
+      console.log('Session recovered successfully:', {
+        address: this.address
+      });
+
+      this.notifyListeners();
+      return true;
+    } catch (error) {
+      console.error('Error recovering session:', error);
+      return false;
+    }
   }
 }
 
-export default new Web3AuthService(); 
+// Export a singleton instance
+const web3AuthService = new Web3AuthService();
+export default web3AuthService; 

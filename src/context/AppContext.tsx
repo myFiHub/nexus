@@ -222,6 +222,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         try {
             setIsLoading(true);
             setError(null);
+            console.log(`Connecting to ${walletType} wallet...`);
 
             let success = false;
             if (walletType === "web3auth") {
@@ -233,9 +234,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
             if (!success) {
                 throw new Error("Failed to connect wallet");
             }
+            
+            console.log(`Successfully connected to ${walletType} wallet`);
+            
+            // Fetch user data after successful connection
+            if (walletState?.address) {
+                await Promise.all([
+                    fetchUserPasses(),
+                    fetchOutposts()
+                ]);
+            }
         } catch (error: any) {
             console.error("Error connecting wallet:", error);
             setError(error.message || "Failed to connect wallet");
+            throw error; // Re-throw to let the component handle the error
         } finally {
             setIsLoading(false);
         }
@@ -243,10 +255,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const disconnectWallet = async () => {
         try {
+            console.log('Disconnecting wallet...');
             await walletService.disconnect();
+            console.log('Wallet disconnected successfully');
+            
+            // Clear related data
+            setUserPasses([]);
+            setOutposts([]);
         } catch (error: any) {
             console.error("Error disconnecting wallet:", error);
             setError(error.message || "Failed to disconnect wallet");
+            throw error;
         }
     };
 
