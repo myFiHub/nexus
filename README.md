@@ -2,6 +2,17 @@
 
 Podium Nexus is a Web3 platform that revolutionizes creator monetization through the Podium Protocol on the Movement blockchain. It enables creators to monetize their content through lifetime memberships (Podium Passes), subscription tiers, and custom community spaces (Outposts).
 
+# ⚠️ Environment Variables
+
+- **Podium Protocol Address:**
+  - `REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS=0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa`
+- **Aptos Network:**
+  - `REACT_APP_APTOS_NETWORK=mainnet` (Movement Mainnet)
+- **Web3Auth Client ID:**
+  - `REACT_APP_WEB3AUTH_CLIENT_ID=your_client_id_here`
+
+> **Note:** Do not edit the `.env` file if instructed not to.
+
 ## Vision & Objectives
 
 Our platform aims to:
@@ -66,6 +77,22 @@ The platform supports multiple authentication methods:
 - Network: Movement Mainnet
 - Chain ID: 126
 - Protocol Address: 0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa
+
+## Custom React Hooks
+
+### `useAptosClient`
+- Provides a Movement Mainnet Aptos client for blockchain interactions.
+- Usage:
+  ```ts
+  const { client, loading, error } = useAptosClient();
+  ```
+
+### `useNexusModule`
+- Provides profile management and Podium Protocol integration.
+- Usage:
+  ```ts
+  const { profile, loading, error, createProfile, updateProfile } = useNexusModule();
+  ```
 
 ## Getting Started
 

@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Web3Auth } from '@web3auth/modal';
-import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from '@web3auth/base';
+import { CHAIN_NAMESPACES } from '@web3auth/base';
+import { CommonPrivateKeyProvider } from '@web3auth/base-provider';
+import { AuthAdapter } from '@web3auth/auth-adapter';
 import { WEB3AUTH_CONFIG } from '../config/config';
 import { Web3AuthUser } from '../services/web3AuthService';
 import { Web3AuthProvider } from '../constants/web3auth';
@@ -31,27 +33,42 @@ export const useWeb3Auth = (): Web3AuthHook => {
           throw new Error('Web3Auth client ID is not set. Please check your environment variables.');
         }
 
-        console.log('Initializing Web3Auth with client ID:', WEB3AUTH_CONFIG.CLIENT_ID);
+        const privateKeyProvider = new CommonPrivateKeyProvider({
+          config: {
+            chainConfig: {
+              chainNamespace: CHAIN_NAMESPACES.OTHER,
+              chainId: '126',
+              rpcTarget: 'https://mainnet.movementnetwork.xyz/v1',
+              displayName: 'Movement Mainnet',
+              blockExplorerUrl: 'https://explorer.movementnetwork.xyz/?network=mainnet',
+              ticker: 'MOVE',
+              tickerName: 'Movement',
+            },
+          },
+        });
 
         const web3authInstance = new Web3Auth({
           clientId: WEB3AUTH_CONFIG.CLIENT_ID,
           chainConfig: {
             chainNamespace: CHAIN_NAMESPACES.OTHER,
-            chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
-            rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
-            displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
-            blockExplorer: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
-            ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
-            tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
+            chainId: '126',
+            rpcTarget: 'https://mainnet.movementnetwork.xyz/v1',
+            displayName: 'Movement Mainnet',
+            blockExplorerUrl: 'https://explorer.movementnetwork.xyz/?network=mainnet',
+            ticker: 'MOVE',
+            tickerName: 'Movement',
           },
           web3AuthNetwork: 'mainnet',
           enableLogging: true,
+          privateKeyProvider,
         });
 
-        console.log('Web3Auth instance created, initializing modal...');
-        await web3authInstance.initModal();
-        console.log('Web3Auth modal initialized successfully');
+        const authAdapter = new AuthAdapter({
+          privateKeyProvider,
+        });
+        web3authInstance.configureAdapter(authAdapter);
 
+        await web3authInstance.initModal();
         setWeb3auth(web3authInstance);
       } catch (error) {
         console.error('Error initializing Web3Auth:', error);
@@ -73,9 +90,7 @@ export const useWeb3Auth = (): Web3AuthHook => {
       setError(null);
       console.log('Attempting to login with provider:', provider);
       
-      const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-        loginProvider: provider,
-      });
+      const web3authProvider = await web3auth.connect();
       
       if (!web3authProvider) {
         throw new Error('Failed to connect to provider');
@@ -100,7 +115,15 @@ export const useWeb3Auth = (): Web3AuthHook => {
       const userWithKey: Web3AuthUser = {
         privKey: privateKey,
         ed25519PrivKey: privateKey,
-        userInfo: user as any,
+        userInfo: {
+          email: user.email || '',
+          name: user.name || '',
+          profileImage: user.profileImage || '',
+          verifier: user.verifier || '',
+          verifierId: user.verifierId || '',
+          typeOfLogin: user.typeOfLogin || '',
+          aggregateVerifier: user.aggregateVerifier || '',
+        },
       };
       
       setUserInfo(userWithKey);

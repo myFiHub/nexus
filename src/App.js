@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import { AppProvider } from './context/AppContext';
+import Web3AuthTest from './components/Web3AuthTest';
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <div className="min-h-screen bg-podium-page-bg">
           <Navbar />
           <main className="container mx-auto px-4 py-8">
+            <Web3AuthTest />
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/dashboard" element={<Dashboard />} />

@@ -1,8 +1,10 @@
 import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, WALLET_ADAPTER_TYPE } from "@web3auth/base";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 import { AptosAccount } from "aptos";
 import { Buffer } from "buffer";
 import { WEB3AUTH_CONFIG } from "../config/config";
+import { AuthAdapter } from "@web3auth/auth-adapter";
 
 export interface Web3AuthUser {
   privKey: string;
@@ -66,7 +68,7 @@ export interface Web3AuthConfig {
 }
 
 export interface ProviderConfig {
-  provider: WALLET_ADAPTER_TYPE;
+  provider: typeof WALLET_ADAPTERS[keyof typeof WALLET_ADAPTERS];
   clientId: string;
   verifier: string;
 }
@@ -107,28 +109,45 @@ class Web3AuthService {
       enableLogging: WEB3AUTH_CONFIG.ENABLE_LOGGING || false,
     });
 
-    this.web3auth = new Web3Auth({
-      clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || '',
-      chainConfig: {
-        chainNamespace: CHAIN_NAMESPACES.EIP155,
-        chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID || '126',
-        rpcTarget: process.env.REACT_APP_RPC_TARGET || 'https://mainnet.movementnetwork.xyz/v1',
-        displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME || 'Movement',
-        blockExplorer: process.env.REACT_APP_BLOCK_EXPLORER || 'https://explorer.movementnetwork.xyz/?network=mainnet',
-        ticker: process.env.REACT_APP_CHAIN_TICKER || 'MOVE',
-        tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME || 'Movement'
-      },
-      web3AuthNetwork: "mainnet" as "mainnet" | "testnet" | "cyan" | "aqua",
-      enableLogging: true,
-      sessionTime: 86400,
-      storageKey: "local" as "local" | "session" | undefined,
-      uiConfig: {
-        theme: "dark",
-        loginMethodsOrder: ["google", "facebook", "twitter"],
-        defaultLanguage: "en",
-        appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg"
+    const privateKeyProvider = new EthereumPrivateKeyProvider({
+      config: {
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.OTHER,
+          chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
+          rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
+          displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
+          blockExplorerUrl: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
+          ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
+          tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
+        }
       }
     });
+
+    const web3AuthOptions = {
+      clientId: WEB3AUTH_CONFIG.CLIENT_ID,
+      chainConfig: {
+        chainNamespace: CHAIN_NAMESPACES.OTHER,
+        chainId: WEB3AUTH_CONFIG.CHAIN_CONFIG.chainId,
+        rpcTarget: WEB3AUTH_CONFIG.CHAIN_CONFIG.rpcTarget,
+        displayName: WEB3AUTH_CONFIG.CHAIN_CONFIG.displayName,
+        blockExplorerUrl: WEB3AUTH_CONFIG.CHAIN_CONFIG.blockExplorer,
+        ticker: WEB3AUTH_CONFIG.CHAIN_CONFIG.ticker,
+        tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.tickerName,
+      },
+      web3AuthNetwork: 'mainnet' as any,
+      enableLogging: true,
+      sessionTime: 86400,
+      storageKey: 'local' as 'local',
+      uiConfig: {
+        appName: "FiHub",
+        loginMethodsOrder: ["google", "facebook", "twitter"],
+      },
+      privateKeyProvider,
+    };
+
+    this.web3auth = new Web3Auth(web3AuthOptions);
+    const authAdapter = new AuthAdapter({ privateKeyProvider });
+    this.web3auth.configureAdapter(authAdapter);
     this.provider = null;
     this.account = null;
     this.address = null;
@@ -157,7 +176,7 @@ class Web3AuthService {
           chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID,
           rpcTarget: process.env.REACT_APP_RPC_TARGET,
           displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME,
-          blockExplorer: process.env.REACT_APP_BLOCK_EXPLORER,
+          blockExplorerUrl: process.env.REACT_APP_BLOCK_EXPLORER,
           ticker: process.env.REACT_APP_CHAIN_TICKER,
           tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME
         }

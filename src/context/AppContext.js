@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Web3Auth } from "@web3auth/modal";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
+import { CommonPrivateKeyProvider } from "@web3auth/base-provider";
 import PropTypes from 'prop-types';
-import { WEB3AUTH_CONFIG, DEFAULTS } from '../config/config';
+import { DEFAULTS } from '../config/config';
 import podiumProtocol from '../services/podiumProtocol';
 
 // Create context
@@ -25,9 +27,33 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const initWeb3Auth = async () => {
       try {
+        const privateKeyProvider = new CommonPrivateKeyProvider({
+          config: {
+            chainConfig: {
+              chainNamespace: CHAIN_NAMESPACES.OTHER,
+              chainId: "126",
+              rpcTarget: "https://mainnet.movementnetwork.xyz/v1",
+              displayName: "Movement Mainnet",
+              blockExplorerUrl: "https://explorer.movementnetwork.xyz/?network=mainnet",
+              ticker: "MOVE",
+              tickerName: "Movement",
+            },
+          },
+        });
         const web3AuthInstance = new Web3Auth({
-          clientId: WEB3AUTH_CONFIG.CLIENT_ID,
-          chainConfig: WEB3AUTH_CONFIG.CHAIN_CONFIG
+          clientId: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID,
+          chainConfig: {
+            chainNamespace: CHAIN_NAMESPACES.OTHER,
+            chainId: "126",
+            rpcTarget: "https://mainnet.movementnetwork.xyz/v1",
+            displayName: "Movement Mainnet",
+            blockExplorerUrl: "https://explorer.movementnetwork.xyz/?network=mainnet",
+            ticker: "MOVE",
+            tickerName: "Movement",
+          },
+          privateKeyProvider,
+          web3AuthNetwork: "sapphire_mainnet",
+          enableLogging: true,
         });
         await web3AuthInstance.initModal();
         setWeb3Auth(web3AuthInstance);
@@ -36,7 +62,6 @@ export function AppProvider({ children }) {
         setError('Failed to initialize Web3Auth');
       }
     };
-
     initWeb3Auth();
   }, []);
 
@@ -276,6 +301,16 @@ export function AppProvider({ children }) {
     }
   };
 
+  // Wrapper for Web3Auth connection
+  const connectWeb3Auth = async () => {
+    return connectWallet('web3auth');
+  };
+
+  // Wrapper for Nightly Wallet connection
+  const connectNightlyWallet = async () => {
+    return connectWallet('nightly');
+  };
+
   // Context value
   const value = {
     walletState,
@@ -288,6 +323,8 @@ export function AppProvider({ children }) {
     disconnectWallet,
     buyPass,
     sellPass,
+    connectWeb3Auth,
+    connectNightlyWallet,
   };
 
   return (

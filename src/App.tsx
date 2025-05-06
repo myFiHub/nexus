@@ -4,6 +4,7 @@ import './App.css';
 
 // Components
 import Navbar from './components/Navbar';
+import NexusProfile from './components/NexusProfile';
 
 // Pages
 import Home from './pages/Home';
@@ -30,6 +31,7 @@ function App() {
               <Route path="/settings" element={<Settings />} />
               <Route path="/outposts" element={<OutpostExplorer />} />
               <Route path="/outpost/:address" element={<OutpostDetail />} />
+              <Route path="/nexus-profile" element={<NexusProfile />} />
             </Routes>
           </main>
         </div>

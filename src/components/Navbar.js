@@ -57,6 +57,16 @@ function Navbar() {
               Profile
             </Link>
             <Link
+              to="/nexus-profile"
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                isActive('/nexus-profile')
+                  ? 'bg-podium-primary-blue text-podium-black'
+                  : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
+              }`}
+            >
+              Nexus Profile
+            </Link>
+            <Link
               to="/settings"
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 isActive('/settings')

@@ -5,47 +5,67 @@
  * In a production environment, these values are loaded from environment variables.
  */
 
-// Type definitions
-interface ChainConfig {
-  chainNamespace: string;
-  chainId: string;
-  rpcTarget: string;
-  wsTarget?: string;
-  displayName: string;
-  blockExplorer: string;
-  ticker: string;
-  tickerName: string;
-  logo?: string;
-  decimals?: number;
-  isTestnet?: boolean;
-}
+import { CHAIN_NAMESPACES } from "@web3auth/base";
 
+// Debug logs for environment variables
+console.log('[DEBUG] REACT_APP_WEB3_AUTH_CLIENT_ID:', process.env.REACT_APP_WEB3_AUTH_CLIENT_ID);
+console.log('[DEBUG] REACT_APP_WEB3_AUTH_CLIENT_SECRET:', process.env.REACT_APP_WEB3_AUTH_CLIENT_SECRET);
+console.log('[DEBUG] REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID:', process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID);
+console.log('[DEBUG] REACT_APP_CHAIN_NAMESPACE:', process.env.REACT_APP_CHAIN_NAMESPACE);
+console.log('[DEBUG] REACT_APP_RPC_TARGET:', process.env.REACT_APP_RPC_TARGET);
+console.log('[DEBUG] REACT_APP_CHAIN_DISPLAY_NAME:', process.env.REACT_APP_CHAIN_DISPLAY_NAME);
+console.log('[DEBUG] REACT_APP_BLOCK_EXPLORER:', process.env.REACT_APP_BLOCK_EXPLORER);
+console.log('[DEBUG] REACT_APP_CHAIN_TICKER:', process.env.REACT_APP_CHAIN_TICKER);
+console.log('[DEBUG] REACT_APP_CHAIN_TICKER_NAME:', process.env.REACT_APP_CHAIN_TICKER_NAME);
+console.log('[DEBUG] REACT_APP_IS_TESTNET:', process.env.REACT_APP_IS_TESTNET);
+console.log('[DEBUG] REACT_APP_PROJECT_ID:', process.env.REACT_APP_PROJECT_ID);
+console.log('[DEBUG] REACT_APP_FIHUB_ADDRESS_APTOS:', process.env.REACT_APP_FIHUB_ADDRESS_APTOS);
+console.log('[DEBUG] REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS:', process.env.REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS);
+console.log('[DEBUG] REACT_APP_CHEERBOO_APTOS_ADDRESS:', process.env.REACT_APP_CHEERBOO_APTOS_ADDRESS);
+
+// Type definitions
 interface Web3AuthConfig {
   CLIENT_ID: string;
   CLIENT_SECRET: string;
-  CHAIN_NAMESPACE: string;
-  CHAIN_CONFIG: ChainConfig;
-  SESSION_TIME?: number;
-  ENABLE_LOGGING?: boolean;
-  STORAGE_KEY?: string;
-  WEB3AUTH_NETWORK?: string;
-  MFA_SETTINGS?: {
-    deviceShareFactor?: {
+  CHAIN_CONFIG: {
+    chainNamespace: string;
+    chainId: string;
+    rpcTarget: string;
+    displayName: string;
+    blockExplorer: string;
+    ticker: string;
+    tickerName: string;
+  };
+  WEB3AUTH_NETWORK: string;
+  ENABLE_LOGGING: boolean;
+  SESSION_TIME: number;
+  UI_CONFIG: {
+    theme: string;
+    loginMethodsOrder: string[];
+    defaultLanguage: string;
+    appLogo: string;
+    mode: string;
+    primaryButton: string;
+  };
+  AUTH_NETWORK: string;
+  MFA_LEVEL: string;
+  MFA_SETTINGS: {
+    deviceShareFactor: {
       enable: boolean;
       priority: number;
       mandatory: boolean;
     };
-    backUpShareFactor?: {
+    backUpShareFactor: {
       enable: boolean;
       priority: number;
       mandatory: boolean;
     };
-    socialBackupFactor?: {
+    socialBackupFactor: {
       enable: boolean;
       priority: number;
       mandatory: boolean;
     };
-    passwordFactor?: {
+    passwordFactor: {
       enable: boolean;
       priority: number;
       mandatory: boolean;
@@ -120,11 +140,10 @@ const validateEnvVar = (name: string, value: string | undefined): string => {
 
 // Web3Auth configuration
 export const WEB3AUTH_CONFIG: Web3AuthConfig = {
-  CLIENT_ID: validateEnvVar('REACT_APP_WEB3_AUTH_CLIENT_ID', process.env.REACT_APP_WEB3_AUTH_CLIENT_ID),
-  CLIENT_SECRET: validateEnvVar('REACT_APP_WEB3_AUTH_CLIENT_SECRET', process.env.REACT_APP_WEB3_AUTH_CLIENT_SECRET),
-  CHAIN_NAMESPACE: process.env.REACT_APP_CHAIN_NAMESPACE || "eip155",
+  CLIENT_ID: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || "",
+  CLIENT_SECRET: process.env.REACT_APP_WEB3_AUTH_CLIENT_SECRET || "",
   CHAIN_CONFIG: {
-    chainNamespace: process.env.REACT_APP_CHAIN_NAMESPACE || "eip155",
+    chainNamespace: CHAIN_NAMESPACES.OTHER,
     chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID || "126",
     rpcTarget: process.env.REACT_APP_RPC_TARGET || "https://mainnet.movementnetwork.xyz/v1",
     displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME || "Movement",
@@ -132,20 +151,29 @@ export const WEB3AUTH_CONFIG: Web3AuthConfig = {
     ticker: process.env.REACT_APP_CHAIN_TICKER || "MOVE",
     tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME || "Movement"
   },
-  SESSION_TIME: 86400, // 24 hours in seconds
-  ENABLE_LOGGING: true, // Enable logging for debugging
-  STORAGE_KEY: "local",
-  WEB3AUTH_NETWORK: "mainnet",
+  WEB3AUTH_NETWORK: "sapphire_mainnet",
+  ENABLE_LOGGING: true,
+  SESSION_TIME: 86400,
+  UI_CONFIG: {
+    theme: "dark",
+    loginMethodsOrder: ["google", "facebook", "twitter"],
+    defaultLanguage: "en",
+    appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg",
+    mode: "auto",
+    primaryButton: "socialLogin"
+  },
+  AUTH_NETWORK: "sapphire_mainnet",
+  MFA_LEVEL: "none",
   MFA_SETTINGS: {
     deviceShareFactor: {
       enable: true,
       priority: 1,
-      mandatory: true
+      mandatory: false
     },
     backUpShareFactor: {
       enable: true,
       priority: 2,
-      mandatory: true
+      mandatory: false
     },
     socialBackupFactor: {
       enable: true,
