@@ -1,43 +1,32 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css';
+import { Provider } from 'react-redux';
+import store from './redux/store';
+import AppLayout from './components/layout/AppLayout';
+import UnifiedExplorer from './components/common/UnifiedExplorer';
+import OutpostDetail from './components/outpost/OutpostDetail';
+import CreatorDetail from './components/creator/CreatorDetail';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
-// Components
-import Navbar from './components/Navbar';
-import NexusProfile from './components/NexusProfile';
+// Main App entry point with routing
+const App: React.FC = () => {
+  React.useEffect(() => {
+    console.debug('[App] Mounted');
+  }, []);
 
-// Pages
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-import OutpostExplorer from './pages/OutpostExplorer';
-import OutpostDetail from './pages/OutpostDetail';
-
-// Context
-import { AppProvider } from './context/AppContext';
-
-function App() {
   return (
-    <AppProvider>
+    <Provider store={store}>
       <Router>
-        <div className="App min-h-screen bg-podium-page-bg">
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/outposts" element={<OutpostExplorer />} />
-              <Route path="/outpost/:address" element={<OutpostDetail />} />
-              <Route path="/nexus-profile" element={<NexusProfile />} />
-            </Routes>
-          </main>
-        </div>
+        <AppLayout>
+          <Routes>
+            <Route path="/" element={<Navigate to="/explorer" replace />} />
+            <Route path="/explorer" element={<UnifiedExplorer />} />
+            <Route path="/outposts/:address" element={<OutpostDetail />} />
+            <Route path="/creators/:address" element={<CreatorDetail />} />
+          </Routes>
+        </AppLayout>
       </Router>
-    </AppProvider>
+    </Provider>
   );
-}
+};
 
-export default App;
+export default App; 

@@ -10,10 +10,10 @@ const validateEnvVar = (name: string, value: string | undefined): string => {
 };
 
 export const WEB3AUTH_CONFIG = {
-  clientId: validateEnvVar('REACT_APP_WEB3_AUTH_CLIENT_ID', process.env.REACT_APP_WEB3_AUTH_CLIENT_ID),
+  clientId: validateEnvVar('VITE_WEB3_AUTH_CLIENT_ID', import.meta.env.VITE_WEB3_AUTH_CLIENT_ID),
   chainConfig: {
     chainNamespace: CHAIN_NAMESPACES.OTHER,
-    chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID || '126', // Movement Network
+    chainId: import.meta.env.VITE_INITIAL_EXTERNAL_WALLET_CHAIN_ID || '126', // Movement Network
     rpcTarget: 'https://mainnet.movementnetwork.xyz/v1',
     displayName: 'Movement Mainnet',
     blockExplorerUrl: 'https://explorer.movementnetwork.xyz/?network=mainnet',

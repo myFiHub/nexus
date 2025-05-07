@@ -28,8 +28,6 @@
 // Core Technologies
 - React 18+ with TypeScript
 - Next.js for SSR/SSG
-- TailwindCSS for styling
-- Redux Toolkit for state management
 - React Query for data fetching
 - Ethers.js for blockchain interaction
 - Web3Auth SDK
@@ -45,17 +43,8 @@
 ### Smart Contract Architecture
 ```solidity
 // Core Contracts
-- PodiumOutpost.sol    // Base outpost functionality
-- PodiumPassCoin.sol   // Token implementation
-- PodiumPass.sol       // Business logic & access control
-- PodiumFactory.sol    // Outpost deployment & management
-
-// Supporting Contracts
-- AccessControl.sol     // Role-based permissions
-- PriceOracle.sol      // Price feed integration
-- FeeManager.sol       // Fee calculation & distribution
-- EmergencyPause.sol   // Circuit breaker pattern
-```
+- PodiumProtocol.sol  
+/* this includes  Base outpost functionality ;  Token (Podium passes  for target addresses/outposts) implementation;  Business logic & access control; Outpost deployment & management; Role-based permissions;  Price feed integration; Fee calculation & distribution
 
 ## Data Architecture
 

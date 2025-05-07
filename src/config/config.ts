@@ -8,20 +8,20 @@
 import { CHAIN_NAMESPACES } from "@web3auth/base";
 
 // Debug logs for environment variables
-console.log('[DEBUG] REACT_APP_WEB3_AUTH_CLIENT_ID:', process.env.REACT_APP_WEB3_AUTH_CLIENT_ID);
-console.log('[DEBUG] REACT_APP_WEB3_AUTH_CLIENT_SECRET:', process.env.REACT_APP_WEB3_AUTH_CLIENT_SECRET);
-console.log('[DEBUG] REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID:', process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID);
-console.log('[DEBUG] REACT_APP_CHAIN_NAMESPACE:', process.env.REACT_APP_CHAIN_NAMESPACE);
-console.log('[DEBUG] REACT_APP_RPC_TARGET:', process.env.REACT_APP_RPC_TARGET);
-console.log('[DEBUG] REACT_APP_CHAIN_DISPLAY_NAME:', process.env.REACT_APP_CHAIN_DISPLAY_NAME);
-console.log('[DEBUG] REACT_APP_BLOCK_EXPLORER:', process.env.REACT_APP_BLOCK_EXPLORER);
-console.log('[DEBUG] REACT_APP_CHAIN_TICKER:', process.env.REACT_APP_CHAIN_TICKER);
-console.log('[DEBUG] REACT_APP_CHAIN_TICKER_NAME:', process.env.REACT_APP_CHAIN_TICKER_NAME);
-console.log('[DEBUG] REACT_APP_IS_TESTNET:', process.env.REACT_APP_IS_TESTNET);
-console.log('[DEBUG] REACT_APP_PROJECT_ID:', process.env.REACT_APP_PROJECT_ID);
-console.log('[DEBUG] REACT_APP_FIHUB_ADDRESS_APTOS:', process.env.REACT_APP_FIHUB_ADDRESS_APTOS);
-console.log('[DEBUG] REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS:', process.env.REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS);
-console.log('[DEBUG] REACT_APP_CHEERBOO_APTOS_ADDRESS:', process.env.REACT_APP_CHEERBOO_APTOS_ADDRESS);
+console.log('[DEBUG] VITE_WEB3_AUTH_CLIENT_ID:', import.meta.env.VITE_WEB3_AUTH_CLIENT_ID);
+console.log('[DEBUG] VITE_WEB3_AUTH_CLIENT_SECRET:', import.meta.env.VITE_WEB3_AUTH_CLIENT_SECRET);
+console.log('[DEBUG] VITE_INITIAL_EXTERNAL_WALLET_CHAIN_ID:', import.meta.env.VITE_INITIAL_EXTERNAL_WALLET_CHAIN_ID);
+console.log('[DEBUG] VITE_CHAIN_NAMESPACE:', import.meta.env.VITE_CHAIN_NAMESPACE);
+console.log('[DEBUG] VITE_RPC_TARGET:', import.meta.env.VITE_RPC_TARGET);
+console.log('[DEBUG] VITE_CHAIN_DISPLAY_NAME:', import.meta.env.VITE_CHAIN_DISPLAY_NAME);
+console.log('[DEBUG] VITE_BLOCK_EXPLORER:', import.meta.env.VITE_BLOCK_EXPLORER);
+console.log('[DEBUG] VITE_CHAIN_TICKER:', import.meta.env.VITE_CHAIN_TICKER);
+console.log('[DEBUG] VITE_CHAIN_TICKER_NAME:', import.meta.env.VITE_CHAIN_TICKER_NAME);
+console.log('[DEBUG] VITE_IS_TESTNET:', import.meta.env.VITE_IS_TESTNET);
+console.log('[DEBUG] VITE_PROJECT_ID:', import.meta.env.VITE_PROJECT_ID);
+console.log('[DEBUG] VITE_FIHUB_ADDRESS_APTOS:', import.meta.env.VITE_FIHUB_ADDRESS_APTOS);
+console.log('[DEBUG] VITE_PODIUM_PROTOCOL_APTOS_ADDRESS:', import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS);
+console.log('[DEBUG] VITE_CHEERBOO_APTOS_ADDRESS:', import.meta.env.VITE_CHEERBOO_APTOS_ADDRESS);
 
 // Type definitions
 interface Web3AuthConfig {
@@ -140,16 +140,16 @@ const validateEnvVar = (name: string, value: string | undefined): string => {
 
 // Web3Auth configuration
 export const WEB3AUTH_CONFIG: Web3AuthConfig = {
-  CLIENT_ID: process.env.REACT_APP_WEB3_AUTH_CLIENT_ID || "",
-  CLIENT_SECRET: process.env.REACT_APP_WEB3_AUTH_CLIENT_SECRET || "",
+  CLIENT_ID: import.meta.env.VITE_WEB3_AUTH_CLIENT_ID || "",
+  CLIENT_SECRET: import.meta.env.VITE_WEB3_AUTH_CLIENT_SECRET || "",
   CHAIN_CONFIG: {
     chainNamespace: CHAIN_NAMESPACES.OTHER,
-    chainId: process.env.REACT_APP_INITIAL_EXTERNAL_WALLET_CHAIN_ID || "126",
-    rpcTarget: process.env.REACT_APP_RPC_TARGET || "https://mainnet.movementnetwork.xyz/v1",
-    displayName: process.env.REACT_APP_CHAIN_DISPLAY_NAME || "Movement",
-    blockExplorer: process.env.REACT_APP_BLOCK_EXPLORER || "https://explorer.movementnetwork.xyz/?network=mainnet",
-    ticker: process.env.REACT_APP_CHAIN_TICKER || "MOVE",
-    tickerName: process.env.REACT_APP_CHAIN_TICKER_NAME || "Movement"
+    chainId: import.meta.env.VITE_INITIAL_EXTERNAL_WALLET_CHAIN_ID || "126",
+    rpcTarget: import.meta.env.VITE_RPC_TARGET || "https://mainnet.movementnetwork.xyz/v1",
+    displayName: import.meta.env.VITE_CHAIN_DISPLAY_NAME || "Movement",
+    blockExplorer: import.meta.env.VITE_BLOCK_EXPLORER || "https://explorer.movementnetwork.xyz/?network=mainnet",
+    ticker: import.meta.env.VITE_CHAIN_TICKER || "MOVE",
+    tickerName: import.meta.env.VITE_CHAIN_TICKER_NAME || "Movement"
   },
   WEB3AUTH_NETWORK: "sapphire_mainnet",
   ENABLE_LOGGING: true,
@@ -191,26 +191,26 @@ export const WEB3AUTH_CONFIG: Web3AuthConfig = {
 // Contract Addresses
 export const CONTRACT_ADDRESSES: ContractAddresses = {
   AVALANCHE: {
-    FIHUB: validateEnvVar('REACT_APP_FIHUB_ADDRESS_AVALANCHE_MAINNET', process.env.REACT_APP_FIHUB_ADDRESS_AVALANCHE_MAINNET),
-    STARS_ARENA: validateEnvVar('REACT_APP_STARS_ARENA_ADDRESS_AVALANCHE_MAINNET', process.env.REACT_APP_STARS_ARENA_ADDRESS_AVALANCHE_MAINNET),
-    STARS_ARENA_PROXY: validateEnvVar('REACT_APP_STARS_ARENA_PROXY_ADDRESS_AVALANCHE_MAINNET', process.env.REACT_APP_STARS_ARENA_PROXY_ADDRESS_AVALANCHE_MAINNET),
+    FIHUB: validateEnvVar('VITE_FIHUB_ADDRESS_AVALANCHE_MAINNET', import.meta.env.VITE_FIHUB_ADDRESS_AVALANCHE_MAINNET),
+    STARS_ARENA: validateEnvVar('VITE_STARS_ARENA_ADDRESS_AVALANCHE_MAINNET', import.meta.env.VITE_STARS_ARENA_ADDRESS_AVALANCHE_MAINNET),
+    STARS_ARENA_PROXY: validateEnvVar('VITE_STARS_ARENA_PROXY_ADDRESS_AVALANCHE_MAINNET', import.meta.env.VITE_STARS_ARENA_PROXY_ADDRESS_AVALANCHE_MAINNET),
   },
   BASECHAIN: {
-    FRIENDTECH: validateEnvVar('REACT_APP_FRIENDTECH_ADDRESS_BASECHAIN_MAINNET', process.env.REACT_APP_FRIENDTECH_ADDRESS_BASECHAIN_MAINNET),
+    FRIENDTECH: validateEnvVar('VITE_FRIENDTECH_ADDRESS_BASECHAIN_MAINNET', import.meta.env.VITE_FRIENDTECH_ADDRESS_BASECHAIN_MAINNET),
   },
   MOVEMENT: {
-    CHEERBOO: validateEnvVar('REACT_APP_CHEERBOO_ADDRESS_MOVEMENT_DEVNET', process.env.REACT_APP_CHEERBOO_ADDRESS_MOVEMENT_DEVNET),
+    CHEERBOO: validateEnvVar('VITE_CHEERBOO_ADDRESS_MOVEMENT_DEVNET', import.meta.env.VITE_CHEERBOO_ADDRESS_MOVEMENT_DEVNET),
   },
   APTOS: {
-    CHEERBOO: validateEnvVar('REACT_APP_CHEERBOO_APTOS_ADDRESS', process.env.REACT_APP_CHEERBOO_APTOS_ADDRESS),
-    PODIUM_PROTOCOL: validateEnvVar('REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS', process.env.REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS),
-    FIHUB: validateEnvVar('REACT_APP_FIHUB_ADDRESS_APTOS', process.env.REACT_APP_FIHUB_ADDRESS_APTOS),
+    CHEERBOO: validateEnvVar('VITE_CHEERBOO_APTOS_ADDRESS', import.meta.env.VITE_CHEERBOO_APTOS_ADDRESS),
+    PODIUM_PROTOCOL: validateEnvVar('VITE_PODIUM_PROTOCOL_APTOS_ADDRESS', import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS),
+    FIHUB: validateEnvVar('VITE_FIHUB_ADDRESS_APTOS', import.meta.env.VITE_FIHUB_ADDRESS_APTOS),
   }
 };
 
 // Podium Protocol configuration
 export const PODIUM_PROTOCOL_CONFIG: PodiumProtocolConfig = {
-  CONTRACT_ADDRESS: process.env.REACT_APP_PODIUM_PROTOCOL_APTOS_ADDRESS || "0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa",
+  CONTRACT_ADDRESS: import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS || "0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa",
   RPC_URL: "https://mainnet.movementnetwork.xyz/v1",
   PARTNER_RPC_URLS: [
     "https://movement.blockpi.network/rpc/v1/public/v1",
@@ -224,29 +224,29 @@ export const PODIUM_PROTOCOL_CONFIG: PodiumProtocolConfig = {
 
 // API configuration
 export const API_CONFIG: ApiConfig = {
-  PROJECT_ID: validateEnvVar('REACT_APP_PROJECT_ID', process.env.REACT_APP_PROJECT_ID),
-  ALBY_API_KEY: validateEnvVar('REACT_APP_ALBY_API_KEY', process.env.REACT_APP_ALBY_API_KEY),
-  LUMA_API_KEY: validateEnvVar('REACT_APP_LUMA_API_KEY', process.env.REACT_APP_LUMA_API_KEY),
-  ONESIGNAL_API_KEY: validateEnvVar('REACT_APP_ONESIGNAL_API_KEY', process.env.REACT_APP_ONESIGNAL_API_KEY),
-  BACKEND_BASE_URL: process.env.REACT_APP_PODIUM_BACKEND_BASE_URL || "https://prod.podium.myfihub.com/api/v1",
-  WEBSOCKET_ADDRESS: process.env.REACT_APP_WEBSOCKET_ADDRESS || "wss://ws.prod.podium.myfihub.com",
-  JITSI_SERVER_URL: process.env.REACT_APP_JITSI_SERVER_URL || "https://outposts.myfihub.com",
+  PROJECT_ID: validateEnvVar('VITE_PROJECT_ID', import.meta.env.VITE_PROJECT_ID),
+  ALBY_API_KEY: validateEnvVar('VITE_ALBY_API_KEY', import.meta.env.VITE_ALBY_API_KEY),
+  LUMA_API_KEY: validateEnvVar('VITE_LUMA_API_KEY', import.meta.env.VITE_LUMA_API_KEY),
+  ONESIGNAL_API_KEY: validateEnvVar('VITE_ONESIGNAL_API_KEY', import.meta.env.VITE_ONESIGNAL_API_KEY),
+  BACKEND_BASE_URL: import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || "https://prod.podium.myfihub.com/api/v1",
+  WEBSOCKET_ADDRESS: import.meta.env.VITE_WEBSOCKET_ADDRESS || "wss://ws.prod.podium.myfihub.com",
+  JITSI_SERVER_URL: import.meta.env.VITE_JITSI_SERVER_URL || "https://outposts.myfihub.com",
 };
 
 // Deep linking configuration
 export const DEEP_LINKING_CONFIG: DeepLinkingConfig = {
-  APP_STORE_URL: process.env.REACT_APP_APP_STORE_URL || "https://play.google.com/store/apps/details?id=com.web3podium",
-  BASE_DEEP_LINK_URL: process.env.REACT_APP_BASE_DEEP_LINK_URL || "https://web3podium.page.link",
+  APP_STORE_URL: import.meta.env.VITE_APP_STORE_URL || "https://play.google.com/store/apps/details?id=com.web3podium",
+  BASE_DEEP_LINK_URL: import.meta.env.VITE_BASE_DEEP_LINK_URL || "https://web3podium.page.link",
 };
 
 // CheerBoo configuration
 export const CHEERBOO_CONFIG: CheerBooConfig = {
-  MINIMUM_AMOUNT: Number(process.env.REACT_APP_MINIMUM_CHEERBOO_AMOUNT) || 0.1,
-  TIME_MULTIPLICATION: Number(process.env.REACT_APP_CHEERBOO_TIME_MULTIPLICATION) || 60,
+  MINIMUM_AMOUNT: Number(import.meta.env.VITE_MINIMUM_CHEERBOO_AMOUNT) || 0.1,
+  TIME_MULTIPLICATION: Number(import.meta.env.VITE_CHEERBOO_TIME_MULTIPLICATION) || 60,
 };
 
 // Version information
-export const VERSION = process.env.REACT_APP_VERSION || "1.3.1";
+export const VERSION = import.meta.env.VITE_VERSION || "1.3.1";
 
 // Local storage keys
 export const STORAGE_KEYS = {

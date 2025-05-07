@@ -1,11 +1,16 @@
+/// <reference types="vite/client" />
+
 import axios from 'axios';
 
 // API Configuration
 export const API_CONFIG = {
-    BASE_URL: process.env.REACT_APP_API_BASE_URL || 'http://localhost:3000/api/v1',
-    WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:3000/api/v1/ws',
+    BASE_URL: import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || 'http://localhost:3000/api/v1',
+    WS_URL: import.meta.env.VITE_WEBSOCKET_ADDRESS || 'ws://localhost:3000/api/v1/ws',
     TIMEOUT: 30000, // 30 seconds
 };
+
+console.debug('[api.config] API base URL:', API_CONFIG.BASE_URL);
+console.debug('[api.config] WebSocket URL:', API_CONFIG.WS_URL);
 
 // Create axios instance with default config
 export const apiClient = axios.create({
