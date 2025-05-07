@@ -1,12 +1,18 @@
-import { Web3Auth } from '@web3auth/modal';
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from '@web3auth/base';
+import { Web3AuthNoModal } from '@web3auth/no-modal';
+import { CHAIN_NAMESPACES, SafeEventEmitterProvider, WEB3AUTH_NETWORK, WALLET_ADAPTERS } from '@web3auth/base';
+import { CommonPrivateKeyProvider } from '@web3auth/base-provider';
+import { AuthAdapter } from '@web3auth/auth-adapter';
 import { Ed25519Account } from '@aptos-labs/ts-sdk';
+
+// Print package versions for diagnostics
+console.debug('[Web3AuthService] @web3auth/no-modal version: 9.7.0');
+console.debug('[Web3AuthService] @web3auth/base version: 9.7.0');
 
 // Web3AuthService: Handles Web3Auth v9 login and Movement (Aptos) account creation
 // Singleton pattern for service instance
 class Web3AuthService {
   private static instance: Web3AuthService;
-  private web3auth: Web3Auth | null = null;
+  private web3auth: Web3AuthNoModal | null = null;
   private provider: SafeEventEmitterProvider | null = null;
 
   private constructor() {}
@@ -18,27 +24,30 @@ class Web3AuthService {
     return Web3AuthService.instance;
   }
 
-  // Initialize Web3Auth modal
+  // Initialize Web3AuthNoModal with CommonPrivateKeyProvider for Movement/Aptos
   public async init(clientId: string, movementRpcUrl: string, explorerUrl: string) {
     if (this.web3auth) return;
-    // @ts-ignore
-    // TypeScript may complain about missing privateKeyProvider, but for non-EVM chains (Aptos/Movement),
-    // the official Web3Auth docs show this is correct: https://web3auth.io/docs/connect-blockchain/other/aptos
-    this.web3auth = new Web3Auth({
+    const chainConfig = {
+      chainNamespace: CHAIN_NAMESPACES.OTHER,
+      chainId: '0x1',
+      rpcTarget: movementRpcUrl,
+      displayName: 'Movement',
+      blockExplorerUrl: explorerUrl,
+      ticker: 'MOV',
+      tickerName: 'Movement',
+    };
+    const privateKeyProvider = new CommonPrivateKeyProvider({ config: { chainConfig } });
+    this.web3auth = new Web3AuthNoModal({
       clientId,
-      chainConfig: {
-        chainNamespace: CHAIN_NAMESPACES.OTHER,
-        chainId: '0x1', // Use '0x1' for mainnet, or Movement's chainId if different
-        rpcTarget: movementRpcUrl,
-        displayName: 'Movement',
-        blockExplorerUrl: explorerUrl,
-        ticker: 'MOV',
-        tickerName: 'Movement',
-      },
-      web3AuthNetwork: 'sapphire_mainnet',
+      web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
+      privateKeyProvider,
+      chainConfig,
     });
-    await this.web3auth.initModal();
-    console.debug('[Web3AuthService] Web3Auth modal initialized');
+    // Configure the AuthAdapter for social login
+    const authAdapter = new AuthAdapter();
+    this.web3auth.configureAdapter(authAdapter);
+    await this.web3auth.init();
+    console.debug('[Web3AuthService] Web3AuthNoModal initialized');
   }
 
   // Login and return Aptos/Movement account info
@@ -47,8 +56,11 @@ class Web3AuthService {
     privateKey: string;
     aptosAccount: Ed25519Account;
   } | null> {
-    if (!this.web3auth) throw new Error('Web3Auth not initialized');
-    const provider = await this.web3auth.connect();
+    if (!this.web3auth) throw new Error('Web3AuthNoModal not initialized');
+    // Use connectTo with WALLET_ADAPTERS.AUTH for social login
+    const provider = await this.web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
+      loginProvider: 'google', // You can make this dynamic if needed
+    });
     this.provider = provider;
     console.debug('[Web3AuthService] User connected');
 

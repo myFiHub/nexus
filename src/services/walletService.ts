@@ -54,7 +54,7 @@ const walletService = {
       } else if (providerType === 'nightly') {
         console.debug('[walletService] Attempting Nightly Wallet connection...');
         const { aptosWallets } = getAptosWallets();
-        const nightly = aptosWallets.find(w => (w as any).label.toLowerCase().includes('nightly'));
+        const nightly = aptosWallets.find(w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly'));
         if (!nightly) {
           console.error('[walletService] Nightly Wallet not detected.');
           throw new Error('Nightly Wallet not detected. Please install the Nightly Wallet extension.');

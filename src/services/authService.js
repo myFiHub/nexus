@@ -1,8 +1,9 @@
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES } from "@web3auth/base";
+import { Web3Auth } from "@web3auth/no-modal";
+import { CHAIN_NAMESPACES, WALLET_ADAPTERS } from "@web3auth/base";
 import { AptosAccount } from "aptos";
 import { Buffer } from "buffer";
 import { WEB3AUTH_CONFIG, STORAGE_KEYS, FEATURE_FLAGS } from "../config/config";
+import { AuthAdapter } from '@web3auth/auth-adapter';
 
 // Initialize Web3Auth
 const web3auth = new Web3Auth({
@@ -17,6 +18,10 @@ const web3auth = new Web3Auth({
     tickerName: WEB3AUTH_CONFIG.CHAIN_CONFIG.TICKER_NAME,
   },
 });
+
+// After initializing web3auth, configure the AuthAdapter
+const authAdapter = new AuthAdapter();
+web3auth.configureAdapter(authAdapter);
 
 class AuthService {
   constructor() {
@@ -34,7 +39,7 @@ class AuthService {
    */
   async init() {
     try {
-      await this.web3auth.initModal();
+      await this.web3auth.init();
       
       // Check if there's a stored external wallet
       const storedWallet = localStorage.getItem(STORAGE_KEYS.EXTERNAL_WALLET);
@@ -67,7 +72,9 @@ class AuthService {
     }
 
     try {
-      this.provider = await this.web3auth.connect();
+      this.provider = await this.web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
+        loginProvider: 'google', // or your preferred provider
+      });
       if (this.provider) {
         // Get the private key from the provider
         const privateKey = await this.provider.request({ method: "private_key" });
