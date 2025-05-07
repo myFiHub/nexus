@@ -35,12 +35,22 @@ const MOVEMENT_RPC_URL = 'https://fullnode.mainnet.movementlabs.xyz/v1';
 
 // WalletService: Handles wallet connection logic and Redux integration
 const walletService = {
-  async connectWallet(dispatch: AppDispatch, providerType: 'web3auth' | 'nightly') {
+  async connectWallet(dispatch: AppDispatch, providerType: 'web3auth' | 'nightly', loginProvider?: 'google' | 'twitter' | 'email_passwordless') {
     dispatch(startConnecting());
     try {
       if (providerType === 'web3auth') {
-        console.debug('[walletService] Attempting Web3Auth login...');
-        const loginResult = await web3AuthService.login();
+        if (!loginProvider) throw new Error('loginProvider is required for Web3Auth');
+        let loginResult = null;
+        try {
+          loginResult = await web3AuthService.login(loginProvider);
+        } catch (error: any) {
+          if (error?.message?.includes('Already connected')) {
+            console.warn('[walletService] Already connected error, syncing session...');
+            loginResult = await walletService.syncWeb3AuthSession();
+          } else {
+            throw error;
+          }
+        }
         console.debug('[walletService] Web3Auth login result:', loginResult);
         if (!loginResult) {
           console.error('[walletService] Web3Auth login failed: No result returned');
@@ -54,7 +64,9 @@ const walletService = {
       } else if (providerType === 'nightly') {
         console.debug('[walletService] Attempting Nightly Wallet connection...');
         const { aptosWallets } = getAptosWallets();
-        const nightly = aptosWallets.find(w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly'));
+        const nightly = aptosWallets.find(
+          w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly')
+        );
         if (!nightly) {
           console.error('[walletService] Nightly Wallet not detected.');
           throw new Error('Nightly Wallet not detected. Please install the Nightly Wallet extension.');
@@ -89,7 +101,9 @@ const walletService = {
       // Attempt to disconnect Nightly if connected
       const { aptosWallets } = getAptosWallets();
       // TypeScript: Cast to 'any' to access label/features/accounts due to upstream type limitations
-      const nightly = aptosWallets.find(w => (w as any).label.toLowerCase().includes('nightly'));
+      const nightly = aptosWallets.find(
+        w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly')
+      );
       if (nightly && (nightly as any).features['aptos:disconnect']) {
         await (nightly as any).features['aptos:disconnect'].disconnect();
         console.debug('[walletService] Nightly Wallet disconnected');
@@ -125,6 +139,52 @@ const walletService = {
 
   async getWalletInfo() {
     return null;
+  },
+
+  // Sync Redux state with existing Web3Auth session
+  async syncWeb3AuthSession(): Promise<{ address: string; privateKey: string; aptosAccount: any } | null> {
+    if (!web3AuthService || !web3AuthService['web3auth'] || !web3AuthService['web3auth'].provider) {
+      console.warn('[walletService] No Web3Auth session to sync');
+      return null;
+    }
+    const provider = web3AuthService['web3auth'].provider;
+    const rawPrivateKey = await provider.request({ method: 'private_key' }) as string | undefined;
+    if (!rawPrivateKey) {
+      console.error('[walletService] Failed to get private key from provider during sync');
+      return null;
+    }
+    const privateKeyUint8Array = new Uint8Array(
+      rawPrivateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
+    );
+    const seed = privateKeyUint8Array.slice(0, 32);
+    let aptosAccount = null;
+    let address = null;
+    try {
+      const { Ed25519Account } = await import('@aptos-labs/ts-sdk');
+      aptosAccount = new Ed25519Account({ privateKey: seed });
+      address = aptosAccount.accountAddress.toString();
+    } catch (e) {
+      console.error('[walletService] Failed to construct Ed25519Account in syncWeb3AuthSession:', e);
+      return null;
+    }
+    if (!address || !aptosAccount) {
+      console.error('[walletService] syncWeb3AuthSession: address or aptosAccount is null');
+      return null;
+    }
+    return { address, privateKey: rawPrivateKey, aptosAccount };
+  },
+
+  // Sync Redux state with any existing wallet session (Web3Auth or Nightly)
+  async syncWalletSession(dispatch: AppDispatch) {
+    // Try Web3Auth session first
+    const web3AuthSession = await walletService.syncWeb3AuthSession();
+    if (web3AuthSession && web3AuthSession.address) {
+      const balance = await walletService.fetchBalance(web3AuthSession.address);
+      dispatch(setWallet({ address: web3AuthSession.address, chainId: 1, balance }));
+      console.debug('[walletService] Synced Web3Auth session:', web3AuthSession.address);
+      return;
+    }
+    // TODO: Add Nightly session sync if needed
   },
 };
 

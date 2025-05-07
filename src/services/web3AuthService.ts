@@ -51,33 +51,65 @@ class Web3AuthService {
   }
 
   // Login and return Aptos/Movement account info
-  public async login(): Promise<{
+  public async login(loginProvider: 'google' | 'twitter' | 'email_passwordless'): Promise<{
     address: string;
     privateKey: string;
-    aptosAccount: Ed25519Account;
+    aptosAccount: any;
   } | null> {
     if (!this.web3auth) throw new Error('Web3AuthNoModal not initialized');
-    // Use connectTo with WALLET_ADAPTERS.AUTH for social login
-    const provider = await this.web3auth.connectTo(WALLET_ADAPTERS.AUTH, {
-      loginProvider: 'google', // You can make this dynamic if needed
-    });
-    this.provider = provider;
-    console.debug('[Web3AuthService] User connected');
-
-    // Get private key from Web3Auth provider
-    const privateKey: string = await provider.request({ method: 'private_key' });
-    console.debug('[Web3AuthService] Private key extracted');
-
-    // Convert hex string to Uint8Array
+    let connectedProvider: any = undefined;
+    try {
+      // loginProvider is required for no-modal SDK
+      connectedProvider = await this.web3auth.connectTo(WALLET_ADAPTERS.AUTH, { loginProvider });
+      if (!connectedProvider) {
+        console.error('[Web3AuthService] Failed to connect to provider');
+        return null;
+      }
+      this.provider = connectedProvider;
+      console.debug('[Web3AuthService] User connected');
+    } catch (error: any) {
+      if (error?.message?.includes('Already connected')) {
+        console.warn('[Web3AuthService] Already connected, fetching session info...');
+        if (this.web3auth.provider) {
+          this.provider = this.web3auth.provider;
+        } else {
+          console.error('[Web3AuthService] No provider found in existing session');
+          return null;
+        }
+      } else {
+        throw error;
+      }
+    }
+    if (!this.provider) {
+      console.error('[Web3AuthService] Provider is null, cannot get private key');
+      return null;
+    }
+    // Get private key from provider
+    const rawPrivateKey = await this.provider.request({ method: 'private_key' }) as string | undefined;
+    if (!rawPrivateKey) {
+      console.error('[Web3AuthService] Failed to get private key from provider');
+      return null;
+    }
+    // Convert hex string to Uint8Array (32 bytes)
     const privateKeyUint8Array = new Uint8Array(
-      privateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
+      rawPrivateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
     );
-    // Create Aptos/Movement account using Ed25519Account (use only first 32 bytes as seed)
-    const aptosAccount = new Ed25519Account({ privateKey: privateKeyUint8Array.slice(0, 32) });
-    const address = aptosAccount.accountAddress.toString();
-    console.debug('[Web3AuthService] Aptos/Movement account created:', address);
-
-    return { address, privateKey, aptosAccount };
+    const seed = privateKeyUint8Array.slice(0, 32);
+    try {
+      // Use Ed25519PrivateKey constructor with 32-byte Uint8Array seed
+      const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
+      const ed25519PrivateKey = new Ed25519PrivateKey(seed);
+      const aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
+      const address = aptosAccount.accountAddress.toString();
+      if (!address || !aptosAccount) {
+        console.error('[Web3AuthService] login: address or aptosAccount is null');
+        return null;
+      }
+      return { address, privateKey: rawPrivateKey, aptosAccount };
+    } catch (e) {
+      console.error('[Web3AuthService] Failed to construct Ed25519Account:', e);
+      return null;
+    }
   }
 
   // Logout

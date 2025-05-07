@@ -12,7 +12,11 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
 
   React.useEffect(() => {
     if (open) console.debug('[WalletConnectModal] Opened');
-  }, [open]);
+    // On modal open, sync Redux state with any existing wallet session if not already connected
+    if (open && !wallet.address) {
+      walletService.syncWalletSession(dispatch);
+    }
+  }, [open, wallet.address, dispatch]);
 
   // Close modal on successful connection
   React.useEffect(() => {
@@ -22,12 +26,12 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
     }
   }, [wallet.address, open, onClose]);
 
-  const handleWeb3AuthClick = async () => {
-    console.debug('[WalletConnectModal] Web3Auth v9 clicked');
+  // Handler for Web3Auth login with provider
+  const handleWeb3AuthClick = async (provider: 'google' | 'twitter' | 'email_passwordless') => {
     setLocalLoading(true);
     try {
-      const result = await walletService.connectWallet(dispatch, 'web3auth');
-      console.debug('[WalletConnectModal] Web3Auth connect result:', result);
+      await walletService.connectWallet(dispatch, 'web3auth', provider);
+      console.debug('[WalletConnectModal] Web3Auth', provider, 'clicked');
     } catch (e) {
       console.error('[WalletConnectModal] Web3Auth connect error:', e);
     } finally {
@@ -48,20 +52,91 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
     }
   };
 
+  // Disconnect handler
+  const handleDisconnect = async () => {
+    setLocalLoading(true);
+    try {
+      await walletService.disconnectWallet(dispatch);
+      console.debug('[WalletConnectModal] Disconnected wallet');
+    } catch (e) {
+      console.error('[WalletConnectModal] Disconnect error:', e);
+    } finally {
+      setLocalLoading(false);
+    }
+  };
+
   React.useEffect(() => {
     if (!open) console.debug('[WalletConnectModal] Closed');
   }, [open]);
 
   if (!open) return null;
 
+  // Connection status dot style
+  const isConnected = Boolean(wallet.address);
+  const statusDotStyle = {
+    display: 'inline-block',
+    width: 10,
+    height: 10,
+    borderRadius: '50%',
+    backgroundColor: isConnected ? '#27ae60' : '#e74c3c',
+    marginLeft: 8,
+    border: '1.5px solid #fff',
+    boxShadow: '0 0 2px #0002',
+    verticalAlign: 'middle',
+  };
+
   return (
     <div className="wallet-connect-modal">
       <div className="modal-content">
-        <h3>Connect Your Wallet</h3>
-        {wallet.error && <div className="error">{wallet.error}</div>}
-        <button onClick={handleWeb3AuthClick} disabled={wallet.isConnecting || localLoading}>
-          {wallet.isConnecting || localLoading ? 'Connecting...' : 'Connect with Web3Auth v9'}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <h3 style={{ margin: 0 }}>Connect Your Wallet</h3>
+          {/* Status dot at top right */}
+          <span style={statusDotStyle} title={isConnected ? 'Connected' : 'Disconnected'} />
+        </div>
+        {/* Show address if connected */}
+        {isConnected && wallet.address && (
+          <>
+            <div style={{ fontSize: 12, color: '#27ae60', marginBottom: 8 }}>
+              Connected: {wallet.address}
+            </div>
+            <button
+              onClick={handleDisconnect}
+              disabled={wallet.isConnecting || localLoading}
+              style={{ marginBottom: 8 }}
+            >
+              Disconnect
+            </button>
+          </>
+        )}
+        {/* Social login provider buttons */}
+        <div style={{ margin: '16px 0' }}>
+          <button
+            style={{ marginRight: 8 }}
+            disabled={localLoading || wallet.isConnecting}
+            onClick={() => handleWeb3AuthClick('google')}
+          >
+            Login with Google
+          </button>
+          <button
+            style={{ marginRight: 8 }}
+            disabled={localLoading || wallet.isConnecting}
+            onClick={() => handleWeb3AuthClick('twitter')}
+          >
+            Login with Twitter
+          </button>
+          <button
+            disabled={localLoading || wallet.isConnecting}
+            onClick={() => handleWeb3AuthClick('email_passwordless')}
+          >
+            Login with Email
+          </button>
+        </div>
+        {/* Show error if present */}
+        {wallet.error && (
+          <div style={{ color: '#e74c3c', fontSize: 13, marginBottom: 8 }}>
+            {wallet.error}
+          </div>
+        )}
         <button onClick={handleNightlyClick} disabled={wallet.isConnecting || localLoading}>
           {wallet.isConnecting || localLoading ? 'Connecting...' : 'Connect with Nightly Wallet'}
         </button>
