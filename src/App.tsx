@@ -5,6 +5,8 @@ import AppLayout from './components/layout/AppLayout';
 import UnifiedExplorer from './components/common/UnifiedExplorer';
 import OutpostDetail from './components/outpost/OutpostDetail';
 import CreatorDetail from './components/creator/CreatorDetail';
+import Home from './pages/Home';
+import Dashboard from './pages/Dashboard';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import web3AuthService from './services/web3authService';
 import { WEB3AUTH_CONFIG } from './config/config';
@@ -39,7 +41,8 @@ const App: React.FC = () => {
       <Router>
         <AppLayout>
           <Routes>
-            <Route path="/" element={<Navigate to="/explorer" replace />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explorer" element={<UnifiedExplorer />} />
             <Route path="/outposts/:address" element={<OutpostDetail />} />
             <Route path="/creators/:address" element={<CreatorDetail />} />
