@@ -1,238 +1,38 @@
-/* App Layout */
-.app-layout {
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
   min-height: 100vh;
-  background: #f7f8fa;
-  color: #222;
-  font-family: 'Inter', Arial, sans-serif;
-}
-
-.app-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 2rem;
-  background: #fff;
-  border-bottom: 1px solid #e5e7eb;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-}
-
-.app-branding img {
-  height: 40px;
-  width: auto;
-}
-
-.wallet-status {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.wallet-address {
-  font-family: monospace;
-  background: #f1f1f1;
-  border-radius: 4px;
-  padding: 0.2rem 0.5rem;
-}
-
-.wallet-balance {
-  font-weight: 500;
-  color: #2e7d32;
-}
-
-.app-content {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 1rem;
-}
-
-/* Explorer */
-.unified-explorer {
-  width: 100%;
-}
-
-.explorer-tabs {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
-}
-.explorer-tabs button {
-  background: #f1f1f1;
-  border: none;
-  border-radius: 6px;
-  padding: 0.5rem 1.2rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.explorer-tabs button.active {
-  background: #2e7d32;
-  color: #fff;
-}
-
-.explorer-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 1.5rem;
-}
-
-/* Explorer Card */
-.explorer-card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 1.2rem;
   display: flex;
   flex-direction: column;
-  gap: 0.7rem;
-  align-items: flex-start;
-  transition: box-shadow 0.2s, transform 0.2s;
-}
-.explorer-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.10);
-  transform: translateY(-2px) scale(1.01);
-}
-.explorer-card-header {
-  display: flex;
   align-items: center;
-  gap: 0.8rem;
-}
-.explorer-card-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #e5e7eb;
-}
-.explorer-card-type {
-  display: inline-block;
-  margin-left: 0.5rem;
-  font-size: 0.9em;
-  color: #fff;
-  background: #2e7d32;
-  border-radius: 4px;
-  padding: 0.1rem 0.6rem;
-  font-weight: 600;
-}
-.explorer-card-type:after {
-  content: '';
-}
-.explorer-card-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.7rem;
-  font-size: 0.97em;
-  color: #555;
-}
-.explorer-card-actions {
-  display: flex;
-  gap: 0.7rem;
-}
-.explorer-card-actions button {
-  background: #2e7d32;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  padding: 0.4rem 1.1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.explorer-card-actions button:hover {
-  background: #388e3c;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
 }
 
-/* Detail Pages */
-.outpost-detail, .creator-detail {
-  background: #fff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-  padding: 2rem 1.5rem;
-  margin-top: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-.outpost-header, .creator-header {
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-}
-.outpost-avatar, .creator-avatar {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  object-fit: cover;
-  background: #e5e7eb;
-}
-.outpost-type, .creator-type {
-  display: inline-block;
-  margin-left: 0.7rem;
-  font-size: 1em;
-  color: #fff;
-  background: #2e7d32;
-  border-radius: 4px;
-  padding: 0.1rem 0.7rem;
-  font-weight: 600;
-}
-.outpost-followers, .creator-followers {
-  margin-left: 1.2rem;
-  color: #555;
-  font-size: 0.98em;
-}
-.outpost-pass-info, .creator-pass-info {
-  display: flex;
-  gap: 2.5rem;
-  font-size: 1.1em;
-  color: #2e7d32;
-  font-weight: 500;
-}
-.outpost-trading, .creator-trading,
-.outpost-subscriptions, .creator-subscriptions,
-.outpost-activity, .creator-activity,
-.outpost-analytics, .creator-analytics,
-.creator-social {
-  border-top: 1px solid #e5e7eb;
-  padding-top: 1.1rem;
-}
-.outpost-trading h3, .creator-trading h3,
-.outpost-subscriptions h3, .creator-subscriptions h3,
-.outpost-activity h3, .creator-activity h3,
-.outpost-analytics h3, .creator-analytics h3,
-.creator-social h3 {
-  margin-bottom: 0.7rem;
-  color: #2e7d32;
-  font-size: 1.1em;
+.App-link {
+  color: #61dafb;
 }
 
-/* Responsive Design */
-@media (max-width: 700px) {
-  .app-content {
-    padding: 0.5rem;
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
   }
-  .outpost-detail, .creator-detail {
-    padding: 1rem 0.5rem;
+  to {
+    transform: rotate(360deg);
   }
-  .explorer-list {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .app-nav {
-    flex-direction: column;
-    gap: 0.7rem;
-    padding: 0.5rem 0.7rem;
-  }
-  .app-branding span {
-    font-size: 1.1em;
-  }
-  .outpost-header, .creator-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.7rem;
-  }
-  .outpost-avatar, .creator-avatar {
-    width: 54px;
-    height: 54px;
-  }
-} 
+}

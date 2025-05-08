@@ -3,7 +3,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import walletService from '../../services/walletService';
 import WalletConnectModal from '../wallet/WalletConnectModal';
-import podiumLogo from '../../assets/images/podiumNexuslogo.png';
+import Navbar from './Navbar';
+import logo from '../../assets/images/logo.svg';
 
 // Helper to shorten address
 const shortenAddress = (address: string) => address.slice(0, 6) + '...' + address.slice(-4);
@@ -37,19 +38,16 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="app-layout">
-      {/* Navigation bar with branding/logo and wallet status */}
-      <nav className="app-nav">
-        <div className="app-branding" style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <img src={podiumLogo} alt="Podium Nexus Logo" style={{ height: 40 }} />
-          <span style={{ fontWeight: 700, fontSize: 22 }}>Podium Platform</span>
-        </div>
-        <div className="wallet-status">
+    <div className="App">
+      <Navbar />
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <div style={{ marginBottom: 24 }}>
           {wallet.address ? (
             <>
               <span className="wallet-address">{shortenAddress(wallet.address)}</span>
               <span className="wallet-balance">{formatBalance(wallet.balance)} MOVE</span>
-              <button onClick={handleDisconnectClick} disabled={wallet.isConnecting}>
+              <button onClick={handleDisconnectClick} disabled={wallet.isConnecting} style={{ marginLeft: 12 }}>
                 Disconnect
               </button>
             </>
@@ -59,13 +57,9 @@ const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
             </button>
           )}
         </div>
-      </nav>
-      {/* Main content area */}
-      <main className="app-content">
-        {children}
-      </main>
-      {/* Wallet connect modal */}
-      <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
+        <main style={{ width: '100%' }}>{children}</main>
+        <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
+      </header>
     </div>
   );
 };
