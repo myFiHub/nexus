@@ -1,13 +1,16 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import AppLayout from './components/layout/AppLayout';
+import MainLayout from './components/layout/MainLayout';
 import UnifiedExplorer from './components/common/UnifiedExplorer';
 import OutpostDetail from './components/outpost/OutpostDetail';
 import CreatorDetail from './components/creator/CreatorDetail';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Profile from './pages/Profile';
+import Settings from './pages/Settings';
+import Explorer from './pages/Explorer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import web3AuthService from './services/web3authService';
 import { WEB3AUTH_CONFIG } from './config/config';
 
@@ -39,15 +42,17 @@ const App: React.FC = () => {
   return (
     <Provider store={store}>
       <Router>
-        <AppLayout>
+        <MainLayout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/explorer" element={<UnifiedExplorer />} />
+            <Route path="/explorer" element={<Explorer />} />
             <Route path="/outposts/:address" element={<OutpostDetail />} />
             <Route path="/creators/:address" element={<CreatorDetail />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
           </Routes>
-        </AppLayout>
+        </MainLayout>
       </Router>
     </Provider>
   );

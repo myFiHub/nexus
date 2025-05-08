@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/store';
 import walletService from '../../services/walletService';
 import WalletConnectModal from '../wallet/WalletConnectModal';
+import Button from '../common/Button';
 
 const shortenAddress = (address: string) => address.slice(0, 6) + '...' + address.slice(-4);
 const formatBalance = (balance: string) => {
@@ -12,6 +13,25 @@ const formatBalance = (balance: string) => {
   return num.toLocaleString(undefined, { maximumFractionDigits: 4 });
 };
 
+/**
+ * Navigation link type
+ */
+type NavItem = {
+  label: string;
+  href: string;
+};
+
+const navItems: NavItem[] = [
+  { label: 'Home', href: '/' },
+  { label: 'Explorer', href: '/explorer' },
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Profile', href: '/profile' },
+  { label: 'Settings', href: '/settings' },
+];
+
+/**
+ * Navbar component for main site navigation
+ */
 const Navbar: React.FC = () => {
   const location = useLocation();
   const dispatch = useDispatch();
@@ -26,7 +46,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-podium-card-bg border-b border-podium-card-border">
+    <nav className="bg-podium-card-bg border-b border-podium-card-border" role="navigation" aria-label="Main navigation">
       <div className="container mx-auto px-4 flex items-center justify-between h-16">
         <div className="flex items-center">
           <Link to="/" className="text-xl font-bold text-podium-primary-blue">
@@ -35,46 +55,19 @@ const Navbar: React.FC = () => {
         </div>
         <div className="flex items-center space-x-8">
           <div className="flex space-x-4">
-            <Link
-              to="/"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/')
-                  ? 'bg-podium-primary-blue text-podium-black'
-                  : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
-              }`}
-            >
-              Home
-            </Link>
-            <Link
-              to="/dashboard"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/dashboard')
-                  ? 'bg-podium-primary-blue text-podium-black'
-                  : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
-              }`}
-            >
-              Dashboard
-            </Link>
-            <Link
-              to="/profile"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/profile')
-                  ? 'bg-podium-primary-blue text-podium-black'
-                  : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
-              }`}
-            >
-              Profile
-            </Link>
-            <Link
-              to="/settings"
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
-                isActive('/settings')
-                  ? 'bg-podium-primary-blue text-podium-black'
-                  : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
-              }`}
-            >
-              Settings
-            </Link>
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive(item.href)
+                    ? 'bg-podium-primary-blue text-podium-black'
+                    : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
           </div>
           {/* Wallet Status */}
           <div className="flex items-center space-x-2">
@@ -91,13 +84,9 @@ const Navbar: React.FC = () => {
                 </button>
               </>
             ) : (
-              <button
-                className="btn-primary px-3 py-1 text-xs"
-                onClick={handleConnectClick}
-                disabled={wallet.isConnecting}
-              >
+              <Button variant="primary" onClick={handleConnectClick} disabled={wallet.isConnecting}>
                 Connect Wallet
-              </button>
+              </Button>
             )}
             <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
           </div>

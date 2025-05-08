@@ -1,0 +1,75 @@
+/* Podium Design System Theme */
+:root {
+  /* Primary Colors */
+  --primary-100: #E6F7FF;
+  --primary-500: #1890FF;
+  --primary-900: #003A8C;
+
+  /* Secondary Colors */
+  --secondary-100: #F6FFED;
+  --secondary-500: #52C41A;
+  --secondary-900: #135200;
+
+  /* Neutral Colors */
+  --neutral-50: #FAFAFA;
+  --neutral-100: #F5F5F5;
+  --neutral-200: #EEEEEE;
+  --neutral-300: #E0E0E0;
+  --neutral-400: #BDBDBD;
+  --neutral-500: #9E9E9E;
+  --neutral-600: #757575;
+  --neutral-700: #616161;
+  --neutral-800: #424242;
+  --neutral-900: #212121;
+
+  /* Semantic Colors */
+  --success: #52C41A;
+  --warning: #FAAD14;
+  --error: #FF4D4F;
+  --info: #1890FF;
+
+  /* Font Families */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Font Sizes */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+
+  /* Line Heights */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Container */
+  --container-max-width: 1200px;
+}
+
+[data-theme="dark"] {
+  --bg-primary: var(--neutral-900);
+  --text-primary: white;
+  --border-color: var(--neutral-800);
+}
+
+:root {
+  --bg-primary: white;
+  --text-primary: var(--neutral-900);
+  --border-color: var(--neutral-200);
+} 

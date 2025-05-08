@@ -26,30 +26,21 @@
 ### Frontend Architecture
 ```typescript
 // Core Technologies
-- React 18+ with TypeScript
-- Next.js for SSR/SSG
-- React Query for data fetching
-- Ethers.js for blockchain interaction
-- Web3Auth SDK
-- PWA support
 
 // Build & Development
-- Webpack 5
-- ESLint + Prettier
-- Jest + React Testing Library
-- Cypress for E2E testing
+
 ```
 
 ### Smart Contract Architecture
-```solidity
+```move
 // Core Contracts
-- PodiumProtocol.sol  
+- PodiumProtocol.move
 /* this includes  Base outpost functionality ;  Token (Podium passes  for target addresses/outposts) implementation;  Business logic & access control; Outpost deployment & management; Role-based permissions;  Price feed integration; Fee calculation & distribution
 
 ## Data Architecture
 
 ### Smart Contract Data Models
-```solidity
+```move
 struct Outpost {
     address owner;
     string name;
@@ -120,7 +111,7 @@ interface OutpostStats {
 ## API Architecture
 
 ### Smart Contract Interface
-```solidity
+```move
 interface IPodiumOutpost {
     // Outpost Management
     function createOutpost(string name, string uri) external returns (address);
@@ -278,7 +269,7 @@ interface TransactionsState {
 ## Testing Architecture
 
 ### Smart Contract Testing
-```solidity
+```move
 // Test Categories
 1. Unit Tests
    - Individual function testing
