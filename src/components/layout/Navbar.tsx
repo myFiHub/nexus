@@ -46,50 +46,48 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="bg-podium-card-bg border-b border-podium-card-border" role="navigation" aria-label="Main navigation">
-      <div className="container mx-auto px-4 flex items-center justify-between h-16">
-        <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold text-podium-primary-blue">
-            Podium Nexus
-          </Link>
+    <nav className="sticky top-0 z-40 w-full bg-[#23263B] border-b border-[#23263B]">
+      <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 h-16">
+        {/* Logo */}
+        <Link to="/" className="text-fuchsia-400 font-extrabold text-xl tracking-wide hover:text-fuchsia-300 transition">
+          Podium Nexus
+        </Link>
+        {/* Nav Links */}
+        <div className="flex gap-6">
+          {navItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={`px-3 py-1 rounded-md font-medium transition ${
+                isActive(item.href)
+                  ? 'bg-fuchsia-500 text-white'
+                  : 'text-neutral-300 hover:text-white hover:bg-fuchsia-700/20'
+              }`}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
-        <div className="flex items-center space-x-8">
-          <div className="flex space-x-4">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                to={item.href}
-                className={`px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive(item.href)
-                    ? 'bg-podium-primary-blue text-podium-black'
-                    : 'text-podium-primary-text hover:bg-podium-secondary-blue hover:text-podium-white'
-                }`}
+        {/* Wallet Status */}
+        <div className="flex items-center space-x-2">
+          {wallet.address ? (
+            <>
+              <span className="font-mono bg-gray-800 rounded px-2 py-1 text-xs">{shortenAddress(wallet.address)}</span>
+              <span className="text-fuchsia-400 font-semibold text-xs">{formatBalance(wallet.balance)} MOVE</span>
+              <button
+                className="btn-secondary px-3 py-1 text-xs"
+                onClick={handleDisconnectClick}
+                disabled={wallet.isConnecting}
               >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-          {/* Wallet Status */}
-          <div className="flex items-center space-x-2">
-            {wallet.address ? (
-              <>
-                <span className="font-mono bg-gray-800 rounded px-2 py-1 text-xs">{shortenAddress(wallet.address)}</span>
-                <span className="text-fuchsia-400 font-semibold text-xs">{formatBalance(wallet.balance)} MOVE</span>
-                <button
-                  className="btn-secondary px-3 py-1 text-xs"
-                  onClick={handleDisconnectClick}
-                  disabled={wallet.isConnecting}
-                >
-                  Disconnect
-                </button>
-              </>
-            ) : (
-              <Button variant="primary" onClick={handleConnectClick} disabled={wallet.isConnecting}>
-                Connect Wallet
-              </Button>
-            )}
-            <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
-          </div>
+                Disconnect
+              </button>
+            </>
+          ) : (
+            <Button variant="primary" onClick={handleConnectClick} disabled={wallet.isConnecting}>
+              Connect Wallet
+            </Button>
+          )}
+          <WalletConnectModal open={walletModalOpen} onClose={() => setWalletModalOpen(false)} />
         </div>
       </div>
     </nav>

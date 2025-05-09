@@ -23,6 +23,120 @@
 
 ## Technical Stack
 
+### Frontend Design Criteria & Best Practices
+#### Visual/UX Criteria
+- **Modern, Dark Theme:** Use a dark background (`#181A20` or similar) for the entire app. All cards, sections, and modals should use dark backgrounds with subtle contrast.
+- **Brand Colors:** Use vibrant accent colors (e.g., fuchsia, blue) for CTAs, highlights, and links. Headings and buttons should use these brand colors for visual pop.
+- **Typography:** Use a modern, sans-serif font (e.g., Inter). Headings should be bold and large (`text-4xl`/`text-5xl`), subheadings subtle (`text-neutral-400`).
+- **Spacing & Layout:** Use generous vertical rhythm (`py-16`, `mb-12`, `gap-8`). Center content with `mx-auto`, `max-w-7xl`.
+- **Cards & Containers:** All cards should be `bg-[#23263B]` or similar, with `rounded-xl`, `shadow-lg`, and ample padding.
+- **Buttons:** Use consistent, bold button styles with `rounded-lg`, `px-6`, `py-3`, and brand colors. Use utility classes directly in JSX.
+- **Section Separation:** Visually separate sections with background color changes or gradients.
+- **Responsiveness:** All layouts must be mobile-first and responsive using Tailwind grid/flex utilities.
+- **Accessibility:** Ensure color contrast, keyboard navigation, and ARIA labels for all interactive elements.
+
+#### Tailwind v4+ Caveats & Best Practices
+- **No @apply for Tailwind utility classes in CSS:** Use utility classes directly in JSX/HTML. Only use `@apply` for your own custom classes or CSS variable syntax.
+- **Global Styles:** Set a global font and background in your main CSS file. Use Google Fonts for Inter or similar.
+- **Utility-First:** All styling should be done with Tailwind utility classes in JSX, not custom CSS classes.
+- **Custom Colors:** Use CSS variables for brand colors and reference them in utility classes with `[color:var(--brand-color)]` syntax.
+- **Section-by-Section Build:** Build and test each section visually before moving to the next.
+- **Pitfalls:**
+  - Avoid mixing legacy CSS with Tailwind utilities.
+  - Don't rely on custom classes for core layout or color.
+  - Always check for color contrast and font readability on dark backgrounds.
+
+#### Consultant/Developer Notes
+- **Start with a global layout:** Navbar (sticky, dark, branded), main content (centered, padded), footer (simple, dark).
+- **Rebuild each section (Hero, Features, Trending, How It Works) with only utility classes and modern design.**
+- **Test visually after each change.**
+- **Be prepared to delete and rewrite sections that look off.**
+- **Document all design tokens and color variables.**
+
+### Frontend Visual System & Component Map
+
+#### 1. **Design Tokens & Brand Variables**
+| Token Name         | Example Value      | Usage                                 |
+|--------------------|-------------------|---------------------------------------|
+| --color-bg         | #181A20           | App background                        |
+| --color-surface    | #23263B           | Card/section backgrounds              |
+| --color-primary    | #D946EF           | Brand accent (magenta/fuchsia)        |
+| --color-secondary  | #2563EB           | Secondary accent (blue)               |
+| --color-success    | #22C55E           | Success/positive                      |
+| --color-error      | #EF4444           | Error/negative                        |
+| --color-text-main  | #F3F4F6           | Main text                             |
+| --color-text-muted | #A1A1AA           | Muted/subtle text                     |
+| --font-main        | 'Inter', sans-serif | All text                            |
+| --radius-lg        | 1rem              | Card/button border radius             |
+| --shadow-lg        | 0 4px 32px #0004  | Card/button shadow                    |
+
+> **Define these as CSS variables in `index.css` and reference in Tailwind with `[bg:var(--color-bg)]` etc.**
+
+#### 2. **Component Map & Visual Structure**
+
+- **Layout**
+  - Sticky dark navbar (`bg-[var(--color-bg)]`, `border-b`, `shadow`)
+  - Main content centered, `max-w-7xl`, `mx-auto`, `py-16`
+  - Simple dark footer
+
+- **Navbar**
+  - Left: Logo (clickable)
+  - Center/Right: Nav links (Home, Dashboard, Profile, Settings)
+  - Far right: Wallet status (connect/disconnect, address, balance)
+  - Mobile: Hamburger menu, slide-in nav
+
+- **Base Components**
+  - `Button`: Utility classes only, brand color, `rounded-lg`, `px-6`, `py-3`
+  - `Card`: `bg-[var(--color-surface)]`, `rounded-xl`, `shadow-lg`, `p-8`
+  - `Input`, `Select`: Full width, dark background, clear focus state
+
+- **Home Page Sections**
+  - **Hero:** Large gradient headline, subheading, two CTAs, subtle animation
+  - **Feature Highlights:** 3 cards, icons, value-focused copy
+  - **Trending Outposts:** Responsive grid, outpost cards with avatars/stats, "View All" link
+  - **How It Works:** 4-step process, numbered circles, short descriptions
+
+- **Explorer**
+  - Grid of outpost cards, filters, search, pagination/infinite scroll
+
+- **Outpost Detail**
+  - Header: Avatar, name, creator, stats, CTAs
+  - Pass trading: Price chart, buy/sell form
+  - Subscription tiers: Cards for each tier, subscribe/upgrade/downgrade
+  - Community feed: Posts, comments, likes (gated by pass/sub)
+
+- **Dashboard**
+  - User: Portfolio, transactions, followed outposts, quick actions
+  - Creator: Outpost management, analytics, content manager
+
+- **Notifications/Toasts**
+  - Transaction status, errors, success, auto-dismiss, manual close
+
+- **Wallet Modal**
+  - Social login, wallet connect, error/loading states
+
+#### 3. **On-Chain & Server Data Mapping**
+
+| UI Component         | Data Source         | Data Fields Used                                  |
+|----------------------|---------------------|---------------------------------------------------|
+| Outpost Card         | Move contract       | name, avatar, stats (holders, price, volume)      |
+| Pass Trading         | Move contract       | price, bonding curve, buy/sell, fees              |
+| Subscription Tiers   | Move contract       | tier name, price, duration, benefits              |
+| User Profile         | Server              | username, avatar, social links, badges            |
+| Notifications        | Server/contract     | transaction status, alerts, content updates        |
+| Community Feed       | Server (gated)      | posts, comments, likes, user info                 |
+
+- **All contract data is fetched via PodiumSDK and mapped to UI components.**
+- **User data, notifications, and content are fetched from the server and displayed in real time.**
+
+#### 4. **Section-by-Section Build & QA**
+- Build each section using only Tailwind utility classes and CSS variables.
+- Test visually after each section.
+- Delete/rewrite any section that does not meet visual or accessibility standards.
+- Document all design tokens and color variables in this file.
+
+---
+
 ### Frontend Architecture
 ```typescript
 // Core Technologies
