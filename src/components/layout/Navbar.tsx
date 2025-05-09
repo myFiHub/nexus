@@ -46,10 +46,10 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-[#23263B] border-b border-[#23263B]">
+    <nav className="sticky top-0 z-40 w-full bg-[var(--color-surface)] border-b border-[var(--color-surface)] shadow-lg">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-8 h-16">
         {/* Logo */}
-        <Link to="/" className="text-fuchsia-400 font-extrabold text-xl tracking-wide hover:text-fuchsia-300 transition">
+        <Link to="/" className="text-[var(--color-primary)] font-extrabold text-xl tracking-wide hover:text-[var(--color-secondary)] transition">
           Podium Nexus
         </Link>
         {/* Nav Links */}
@@ -60,8 +60,8 @@ const Navbar: React.FC = () => {
               to={item.href}
               className={`px-3 py-1 rounded-md font-medium transition ${
                 isActive(item.href)
-                  ? 'bg-fuchsia-500 text-white'
-                  : 'text-neutral-300 hover:text-white hover:bg-fuchsia-700/20'
+                  ? 'bg-[var(--color-primary)] text-white'
+                  : 'text-[var(--color-text-muted)] hover:text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10'
               }`}
             >
               {item.label}
@@ -72,10 +72,10 @@ const Navbar: React.FC = () => {
         <div className="flex items-center space-x-2">
           {wallet.address ? (
             <>
-              <span className="font-mono bg-gray-800 rounded px-2 py-1 text-xs">{shortenAddress(wallet.address)}</span>
-              <span className="text-fuchsia-400 font-semibold text-xs">{formatBalance(wallet.balance)} MOVE</span>
+              <span className="font-mono bg-[var(--color-bg)] rounded px-2 py-1 text-xs border border-[var(--color-surface)]">{shortenAddress(wallet.address)}</span>
+              <span className="text-[var(--color-primary)] font-semibold text-xs">{formatBalance(wallet.balance)} MOVE</span>
               <button
-                className="btn-secondary px-3 py-1 text-xs"
+                className="px-3 py-1 text-xs rounded-lg border border-[var(--color-error)] text-[var(--color-error)] hover:bg-[var(--color-error)]/10 transition"
                 onClick={handleDisconnectClick}
                 disabled={wallet.isConnecting}
               >

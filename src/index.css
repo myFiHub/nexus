@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Brand Colors */
+  --color-bg: #181A20;
+  --color-surface: #23263B;
+  --color-primary: #D946EF;
+  --color-secondary: #2563EB;
+  --color-success: #22C55E;
+  --color-error: #EF4444;
+  --color-text-main: #F3F4F6;
+  --color-text-muted: #A1A1AA;
+
+  /* Typography */
+  --font-main: 'Inter', sans-serif;
+
+  /* Radius & Shadow */
+  --radius-lg: 1rem;
+  --shadow-lg: 0 4px 32px #0004;
+}
+
+html {
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  color: var(--color-text-main);
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  background: var(--color-bg);
+  color: var(--color-text-main);
+}
+
+/* Remove all legacy or custom class-based styling. Only utility classes and variables allowed. */ 

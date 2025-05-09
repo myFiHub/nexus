@@ -21,11 +21,11 @@ const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   // Tailwind v4+ utility classes for each variant
-  const base = 'font-semibold py-2 px-4 rounded-lg shadow transition focus:outline-none';
+  const base = 'font-semibold py-2 px-4 rounded-lg shadow-lg transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2';
   const variants: Record<ButtonVariant, string> = {
-    primary: `${base} text-white` + ' ' + '[background-color:#d946ef] hover:[background-color:#a21caf] focus:ring-2 focus:ring-fuchsia-400',
-    secondary: `${base} text-white` + ' ' + '[background-color:var(--secondary-500)] hover:[background-color:var(--primary-500)] focus:ring-2 focus:ring-[var(--primary-500)]',
-    ghost: `${base} text-[var(--primary-500)] bg-transparent border border-[var(--primary-500)] hover:bg-[var(--primary-100)]`,
+    primary: `${base} text-white bg-[var(--color-primary)] hover:bg-[var(--color-secondary)] focus-visible:ring-[var(--color-primary)]`,
+    secondary: `${base} text-white bg-[var(--color-secondary)] hover:bg-[var(--color-primary)] focus-visible:ring-[var(--color-secondary)]`,
+    ghost: `${base} text-[var(--color-primary)] bg-transparent border border-[var(--color-primary)] hover:bg-[var(--color-primary)]/10`,
   };
   return (
     <button

@@ -12,8 +12,7 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(({ className, ch
   return (
     <select
       ref={ref}
-      className={`border rounded-lg px-4 py-2 bg-white text-black focus:outline-none transition ${className || ''}`.trim()}
-      style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--primary-500)', color: 'var(--text-primary)' }}
+      className={`bg-[var(--color-surface)] text-[var(--color-text-main)] border-none rounded-lg px-4 py-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)] transition ${className || ''}`.trim()}
       {...props}
     >
       {children}

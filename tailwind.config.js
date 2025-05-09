@@ -6,20 +6,23 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'podium-primary-blue': 'var(--primary-500)',
-        'podium-secondary-blue': 'var(--secondary-500)',
-        'podium-black': 'var(--neutral-900)',
-        'podium-white': 'var(--neutral-50)',
-        'podium-primary-text': 'var(--text-primary)',
-        'podium-page-bg': 'var(--bg-primary)',
-        'podium-card-bg': 'var(--bg-primary)',
-        'podium-card-border': 'var(--border-color)',
-        'podium-button-outline': 'var(--primary-500)',
-        'success': 'var(--success)',
-        'error': 'var(--error)',
-        'warning': 'var(--warning)',
-        'info': 'var(--info)',
-        // Add more as needed
+        'bg': 'var(--color-bg)',
+        'surface': 'var(--color-surface)',
+        'primary': 'var(--color-primary)',
+        'secondary': 'var(--color-secondary)',
+        'success': 'var(--color-success)',
+        'error': 'var(--color-error)',
+        'text-main': 'var(--color-text-main)',
+        'text-muted': 'var(--color-text-muted)',
+      },
+      borderRadius: {
+        'lg': 'var(--radius-lg)',
+      },
+      boxShadow: {
+        'lg': 'var(--shadow-lg)',
+      },
+      fontFamily: {
+        'main': [ 'var(--font-main)' ],
       },
     },
   },

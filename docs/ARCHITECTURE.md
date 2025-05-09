@@ -70,7 +70,7 @@
 | --radius-lg        | 1rem              | Card/button border radius             |
 | --shadow-lg        | 0 4px 32px #0004  | Card/button shadow                    |
 
-> **Define these as CSS variables in `index.css` and reference in Tailwind with `[bg:var(--color-bg)]` etc.**
+> **All design tokens are defined as CSS variables in `src/index.css` and referenced in Tailwind utility classes using `[bg:var(--color-bg)]`, `[text:var(--color-text-main)]`, etc. No legacy CSS or custom class-based styling is used. All visual work is done with Tailwind utilities and variables.**
 
 #### 2. **Component Map & Visual Structure**
 

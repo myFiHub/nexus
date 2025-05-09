@@ -8,13 +8,14 @@ import HowItWorks from '../components/home/HowItWorks';
  * Home page: landing experience for Podium Nexus
  */
 const Home: React.FC = () => {
-  console.debug('[Home] Rendering Home page');
   return (
     <>
       <HeroSection />
       <FeatureHighlights />
       <TrendingOutposts />
       <HowItWorks />
+      {/* TrendingOutposts will be added here */}
+      {/* HowItWorks will be added here */}
     </>
   );
 };

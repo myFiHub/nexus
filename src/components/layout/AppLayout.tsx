@@ -3,9 +3,9 @@ import Navbar from './Navbar';
 
 const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return (
-    <div className="min-h-screen bg-podium-page-bg text-podium-primary-text">
+    <div className="min-h-screen bg-[var(--color-bg)] text-[var(--color-text-main)]">
       <Navbar />
-      <main>
+      <main className="max-w-7xl mx-auto py-16 px-4">
         {children}
       </main>
     </div>

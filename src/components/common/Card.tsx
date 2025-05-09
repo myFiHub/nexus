@@ -14,12 +14,11 @@ type CardProps = React.HTMLAttributes<HTMLDivElement> & {
  */
 const Card: React.FC<CardProps> = ({ hoverable = false, children, className, ...props }) => {
   // Tailwind v4+ utility classes for card
-  const base = 'border rounded-lg p-6 shadow-lg';
+  const base = 'bg-[var(--color-surface)] rounded-xl shadow-lg p-8';
   const hover = hoverable ? 'transition-transform hover:-translate-y-1 hover:shadow-xl' : '';
   return (
     <div
       className={classNames(base, hover, className)}
-      style={{ backgroundColor: 'var(--bg-primary)', borderColor: 'var(--border-color)' }}
       {...props}
     >
       {children}
