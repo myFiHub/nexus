@@ -1,10 +1,8 @@
 import React from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
-import MainLayout from './components/layout/MainLayout';
-import UnifiedExplorer from './components/common/UnifiedExplorer';
-import OutpostDetail from './components/outpost/OutpostDetail';
-import CreatorDetail from './components/creator/CreatorDetail';
+import Layout from './components/Layout';
+import OutpostDetail from './pages/OutpostDetail';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
@@ -42,17 +40,17 @@ const App: React.FC = () => {
   return (
     <Provider store={store}>
       <Router>
-        <MainLayout>
+        <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/explorer" element={<Explorer />} />
             <Route path="/outposts/:address" element={<OutpostDetail />} />
-            <Route path="/creators/:address" element={<CreatorDetail />} />
+            <Route path="/creators/:address" element={<OutpostDetail />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
-        </MainLayout>
+        </Layout>
       </Router>
     </Provider>
   );
