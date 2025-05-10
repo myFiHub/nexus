@@ -6,6 +6,7 @@ import walletReducer from './slices/walletSlice';
 import outpostReducer from './slices/outpostSlice';
 import creatorReducer from './slices/creatorSlice';
 import userReducer from './slices/userSlice';
+import sessionReducer from './slices/sessionSlice';
 
 // Root reducer with all slices
 const store = configureStore({
@@ -14,6 +15,7 @@ const store = configureStore({
     outposts: outpostReducer,
     creators: creatorReducer,
     user: userReducer,
+    session: sessionReducer,
   },
 });
 

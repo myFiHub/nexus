@@ -22,6 +22,7 @@ console.log('[DEBUG] VITE_PROJECT_ID:', import.meta.env.VITE_PROJECT_ID);
 console.log('[DEBUG] VITE_FIHUB_ADDRESS_APTOS:', import.meta.env.VITE_FIHUB_ADDRESS_APTOS);
 console.log('[DEBUG] VITE_PODIUM_PROTOCOL_APTOS_ADDRESS:', import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS);
 console.log('[DEBUG] VITE_CHEERBOO_APTOS_ADDRESS:', import.meta.env.VITE_CHEERBOO_APTOS_ADDRESS);
+console.log('[DEBUG] VITE_APTOS_NODE_URL:', import.meta.env.VITE_APTOS_NODE_URL);
 
 // Type definitions
 interface Web3AuthConfig {
@@ -280,6 +281,9 @@ export const UI_CONFIG: UiConfig = {
 export const DEFAULTS = {
   REFERRER_ADDRESS: null,
 };
+
+// Export the Aptos/Movement node URL from env
+export const APTOS_NODE_URL = import.meta.env.VITE_APTOS_NODE_URL || 'https://mainnet.movementnetwork.xyz/v1';
 
 export default {
   WEB3AUTH_CONFIG,

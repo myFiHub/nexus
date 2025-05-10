@@ -119,6 +119,17 @@ class Web3AuthService {
     this.provider = null;
     console.debug('[Web3AuthService] User logged out');
   }
+
+  // Sign a message for authentication (Web3Auth)
+  public async signMessage(message: string): Promise<string> {
+    if (!this.provider) throw new Error('No Web3Auth provider');
+    const result = await this.provider.request({
+      method: 'aptos_signMessage',
+      params: [{ message }],
+    }) as { signature?: string };
+    if (!result || typeof result.signature !== 'string') throw new Error('Web3Auth: signMessage failed');
+    return result.signature;
+  }
 }
 
 export default Web3AuthService.getInstance(); 

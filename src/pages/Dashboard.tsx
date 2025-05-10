@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import walletService from '../services/walletService';
+import { loginWithWallet, fetchOutposts } from '../services/podiumApiService';
+import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
+import { RootState } from '../redux/store';
 
-// Types for mock data
+// Types for mock data (to be replaced with real data)
 interface UserPass {
   id: number;
   outpostName: string;
@@ -17,33 +22,88 @@ interface Outpost {
   currentPrice: number;
 }
 
-// Mock data and state for demonstration (replace with real hooks/services)
-const mockWallet = '0x1234...abcd';
-const mockWalletType = 'web3auth';
-const mockIsConnected = false;
-const mockIsLoading = false;
-const mockError = null;
-const mockUserPasses: UserPass[] = [
-  { id: 1, outpostName: 'Creator Alpha', balance: 2, currentPrice: 100000000 },
-];
-const mockOutposts: Outpost[] = [
-  { address: '0xoutpost1', name: 'Outpost One', description: 'A great creator outpost.', currentPrice: 200000000 },
-];
-
 const Dashboard: React.FC = () => {
-  // Replace with real wallet connection logic
-  const [isConnected, setIsConnected] = useState(mockIsConnected);
-  const [isLoading, setIsLoading] = useState(mockIsLoading);
-  const [error, setError] = useState<typeof mockError>(mockError);
-  const [wallet] = useState(mockWallet);
-  const [walletType] = useState(mockWalletType);
-  const [userPasses] = useState<UserPass[]>(mockUserPasses);
-  const [outposts] = useState<Outpost[]>(mockOutposts);
+  const dispatch = useDispatch();
+  // Redux selectors for wallet and session state
+  const address = useSelector((state: RootState) => state.wallet.address);
+  // No walletType in Wallet type; use a generic label or infer from connection logic if needed
+  const isConnected = Boolean(address);
+  const jwt = useSelector((state: RootState) => state.session.token);
+  const sessionLoading = useSelector((state: RootState) => state.session.loading);
+  const sessionError = useSelector((state: RootState) => state.session.error);
 
-  // Handlers (replace with real logic)
-  const handleWeb3AuthConnect = () => setIsConnected(true);
-  const handleNightlyConnect = () => setIsConnected(true);
-  const handleDisconnect = () => setIsConnected(false);
+  // State for user passes and outposts
+  const [userPasses, setUserPasses] = useState<UserPass[]>([]);
+  const [outposts, setOutposts] = useState<Outpost[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [dataError, setDataError] = useState<string | null>(null);
+
+  // Wallet login/authentication effect
+  useEffect(() => {
+    const doLogin = async () => {
+      if (!address || jwt) return;
+      dispatch(setSessionLoading(true));
+      try {
+        const loginMessage = `Sign in to Podium Nexus at ${new Date().toISOString()}`;
+        const signature = await walletService.signMessage(address, loginMessage);
+        const result = await loginWithWallet(address, signature);
+        if (result && result.token) {
+          dispatch(setToken(result.token));
+        } else {
+          dispatch(setSessionError('Login failed: No token returned'));
+        }
+      } catch (e: any) {
+        dispatch(setSessionError(e?.message || 'Login failed'));
+      } finally {
+        dispatch(setSessionLoading(false));
+      }
+    };
+    if (isConnected && !jwt && !sessionLoading) {
+      doLogin();
+    }
+  }, [isConnected, jwt, address, dispatch, sessionLoading]);
+
+  // Fetch user passes and outposts after authentication
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!isConnected || !jwt) return;
+      setDataLoading(true);
+      setDataError(null);
+      try {
+        // Fetch user passes
+        const passesRes = await fetch('/api/v1/podium-passes/my-passes', {
+          headers: { Authorization: `Bearer ${jwt}` },
+        });
+        const passesData = await passesRes.json();
+        // Map to UserPass[]
+        const passes: UserPass[] = (passesData.data || []).map((p: any, idx: number) => ({
+          id: idx,
+          outpostName: p.outpost_name || p.outpostName || 'Unknown',
+          balance: p.balance || 0,
+          currentPrice: p.current_price || 0,
+        }));
+        setUserPasses(passes);
+
+        // Fetch outposts
+        const outpostsData = await fetchOutposts();
+        // Map to Outpost[]
+        const outpostsList: Outpost[] = (outpostsData || []).map((o: any) => ({
+          address: o.address || o.uuid || '',
+          name: o.name || 'Unknown',
+          description: o.description || '',
+          currentPrice: o.current_price || 0,
+        }));
+        setOutposts(outpostsList);
+      } catch (e: any) {
+        setDataError(e?.message || 'Failed to fetch data');
+      } finally {
+        setDataLoading(false);
+      }
+    };
+    if (isConnected && jwt && !sessionLoading) {
+      fetchData();
+    }
+  }, [isConnected, jwt, sessionLoading]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -54,46 +114,34 @@ const Dashboard: React.FC = () => {
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Wallet Connection</h2>
           {!isConnected ? (
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-medium mb-2">Connect with Social Login</h3>
-                <Button onClick={handleWeb3AuthConnect} className="w-full mb-2">Connect with Web3Auth</Button>
-                <p className="text-sm text-[var(--color-text-muted)]">Sign in with Google, Twitter, or other social accounts</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-medium mb-2">Connect External Wallet</h3>
-                <Button variant="secondary" onClick={handleNightlyConnect} className="w-full mb-2">Connect Nightly Wallet</Button>
-                <p className="text-sm text-[var(--color-text-muted)]">Use your existing Nightly wallet</p>
-              </div>
-            </div>
+            <div className="text-[var(--color-text-muted)]">Please connect your wallet using the button in the navbar.</div>
           ) : (
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
-                <p className="text-[var(--color-text-main)]">Connected: <span className="font-mono">{wallet}</span></p>
-                <p className="text-sm text-[var(--color-text-muted)]">Wallet Type: {walletType === 'web3auth' ? 'Web3Auth (Social Login)' : 'Nightly Wallet'}</p>
+                <p className="text-[var(--color-text-main)]">Connected: <span className="font-mono">{address}</span></p>
+                <p className="text-sm text-[var(--color-text-muted)]">Wallet Connected</p>
               </div>
-              <Button variant="secondary" onClick={handleDisconnect}>Disconnect</Button>
             </div>
           )}
         </section>
 
-        {/* Loading State */}
-        {isLoading && (
+        {/* Loading State (session login) */}
+        {sessionLoading && (
           <div className="text-center py-4">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto"></div>
-            <p className="text-[var(--color-text-muted)] mt-2">Loading...</p>
+            <p className="text-[var(--color-text-muted)] mt-2">Authenticating...</p>
           </div>
         )}
 
-        {/* Error State */}
-        {error && (
+        {/* Error State (session login) */}
+        {sessionError && (
           <div className="bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] text-[var(--color-error)] px-4 py-3 rounded mb-4">
             <strong className="font-bold">Error: </strong>
-            <span>{error}</span>
+            <span>{sessionError}</span>
           </div>
         )}
 
-        {/* User Passes Section */}
+        {/* User Passes Section (placeholder) */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Your Passes</h2>
           {userPasses.length > 0 ? (
@@ -111,7 +159,7 @@ const Dashboard: React.FC = () => {
           )}
         </section>
 
-        {/* Outposts Section */}
+        {/* Outposts Section (placeholder) */}
         <section>
           <h2 className="text-xl font-semibold mb-4">Available Outposts</h2>
           {outposts.length > 0 ? (
@@ -128,6 +176,22 @@ const Dashboard: React.FC = () => {
             <p className="text-[var(--color-text-muted)]">No outposts available.</p>
           )}
         </section>
+
+        {/* Loading State (data fetching) */}
+        {dataLoading && (
+          <div className="text-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto"></div>
+            <p className="text-[var(--color-text-muted)] mt-2">Loading...</p>
+          </div>
+        )}
+
+        {/* Error State (data fetching) */}
+        {dataError && (
+          <div className="bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] text-[var(--color-error)] px-4 py-3 rounded mb-4">
+            <strong className="font-bold">Error: </strong>
+            <span>{dataError}</span>
+          </div>
+        )}
       </Card>
     </div>
   );

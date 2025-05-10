@@ -1,13 +1,40 @@
 import axios from 'axios';
+import store from '../redux/store';
 
-// Podium backend API base URL
-const API_BASE = 'https://prod.podium.myfihub.com/api/v1';
+// Use environment variable for backend API base URL (best practice)
+const API_BASE = import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || 'https://prod.podium.myfihub.com/api/v1';
 
 // Axios instance for Podium API
 export const podiumApi = axios.create({
   baseURL: API_BASE,
   headers: { 'Content-Type': 'application/json' },
 });
+
+// Attach JWT from Redux session to all requests
+podiumApi.interceptors.request.use(
+  (config) => {
+    const state = store.getState();
+    const token = state.session?.token;
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Login with wallet (get JWT)
+export async function loginWithWallet(address: string, signature: string) {
+  try {
+    const res = await podiumApi.post('/auth/login', { address, signature });
+    console.debug('[podiumApiService] loginWithWallet:', res.data.data);
+    return res.data.data;
+  } catch (e) {
+    console.error('[podiumApiService] loginWithWallet error:', e);
+    throw e;
+  }
+}
 
 // Fetch all outposts
 export async function fetchOutposts() {

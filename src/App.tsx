@@ -11,6 +11,8 @@ import Explorer from './pages/Explorer';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import web3AuthService from './services/web3authService';
 import { WEB3AUTH_CONFIG } from './config/config';
+import walletService from './services/walletService';
+import { setWallet } from './redux/slices/walletSlice';
 
 // Main App entry point with routing
 const App: React.FC = () => {
@@ -32,6 +34,26 @@ const App: React.FC = () => {
         console.error('[App] Web3Auth initialization failed:', err);
       });
   }, []);
+
+  // Restore wallet session from localStorage on app load
+  React.useEffect(() => {
+    if (!web3AuthReady) return;
+    const walletRaw = localStorage.getItem('wallet');
+    if (walletRaw) {
+      try {
+        const wallet = JSON.parse(walletRaw);
+        if (wallet && wallet.address) {
+          console.debug('[App] Restoring wallet from localStorage:', wallet);
+          store.dispatch(setWallet(wallet));
+          walletService.syncWalletSession(store.dispatch);
+        }
+      } catch (e) {
+        console.error('[App] Failed to restore wallet from localStorage:', e);
+      }
+    } else {
+      console.debug('[App] No wallet found in localStorage to restore.');
+    }
+  }, [web3AuthReady]);
 
   if (!web3AuthReady) {
     return <div>Initializing Web3Auth...</div>;

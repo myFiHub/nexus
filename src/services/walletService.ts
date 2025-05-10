@@ -3,6 +3,7 @@ import { AppDispatch } from '../redux/store';
 import { startConnecting, setWallet, setError, disconnect } from '../redux/slices/walletSlice';
 import { getAptosWallets, type NetworkInfo } from '@aptos-labs/wallet-standard';
 import { Network, Aptos, AptosConfig } from '@aptos-labs/ts-sdk';
+import { APTOS_NODE_URL } from '../config/config';
 
 export interface WalletInfo {
   address: string;
@@ -31,16 +32,16 @@ export interface WalletError {
   details?: any;
 }
 
-const MOVEMENT_RPC_URL = 'https://fullnode.mainnet.movementlabs.xyz/v1';
-
 // WalletService: Handles wallet connection logic and Redux integration
 const walletService = {
   async connectWallet(dispatch: AppDispatch, providerType: 'web3auth' | 'nightly', loginProvider?: 'google' | 'twitter' | 'email_passwordless') {
     dispatch(startConnecting());
+    // Debug printout for endpoint
+    console.debug('[walletService] Using APTOS_NODE_URL:', APTOS_NODE_URL);
     try {
       if (providerType === 'web3auth') {
         if (!loginProvider) throw new Error('loginProvider is required for Web3Auth');
-        let loginResult = null;
+        let loginResult: any = null;
         try {
           loginResult = await web3AuthService.login(loginProvider);
         } catch (error: any) {
@@ -59,6 +60,9 @@ const walletService = {
         const { address, aptosAccount } = loginResult;
         const balance = await walletService.fetchBalance(address);
         dispatch(setWallet({ address, chainId: 1, balance }));
+        // Persist wallet state in localStorage
+        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance }));
+        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance });
         console.debug('[walletService] Web3Auth wallet connected:', address, 'Balance:', balance);
         return { address, chainId: 1, balance };
       } else if (providerType === 'nightly') {
@@ -74,7 +78,7 @@ const walletService = {
         const networkInfo: NetworkInfo = {
           name: Network.MAINNET,
           chainId: 1,
-          url: MOVEMENT_RPC_URL,
+          url: APTOS_NODE_URL,
         };
         console.debug('[walletService] Connecting to Nightly Wallet with networkInfo:', networkInfo);
         await (nightly as any).features['aptos:connect'].connect(false, networkInfo);
@@ -86,6 +90,9 @@ const walletService = {
         const address = account.address;
         const balance = await walletService.fetchBalance(address);
         dispatch(setWallet({ address, chainId: 1, balance }));
+        // Persist wallet state in localStorage
+        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance }));
+        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance });
         console.debug('[walletService] Nightly Wallet connected:', address, 'Balance:', balance);
         return { address, chainId: 1, balance };
       }
@@ -110,6 +117,9 @@ const walletService = {
       }
       await web3AuthService.logout();
       dispatch(disconnect());
+      // Remove wallet state from localStorage
+      localStorage.removeItem('wallet');
+      console.debug('[walletService] Wallet state removed from localStorage');
       console.debug('[walletService] Wallet disconnected');
     } catch (error: any) {
       dispatch(setError(error.message || 'Wallet disconnect failed'));
@@ -119,7 +129,7 @@ const walletService = {
 
   async fetchBalance(address: string): Promise<string> {
     try {
-      const config = new AptosConfig({ network: Network.MAINNET, fullnode: MOVEMENT_RPC_URL });
+      const config = new AptosConfig({ network: Network.MAINNET, fullnode: APTOS_NODE_URL });
       const aptos = new Aptos(config);
       const resources = await aptos.account.getAccountResources({ accountAddress: address });
       const coinResource = resources.find((r: any) => r.type.includes('0x1::coin::CoinStore'));
@@ -153,15 +163,18 @@ const walletService = {
       console.error('[walletService] Failed to get private key from provider during sync');
       return null;
     }
+    // Convert hex string to Uint8Array (32 bytes)
     const privateKeyUint8Array = new Uint8Array(
       rawPrivateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
     );
     const seed = privateKeyUint8Array.slice(0, 32);
-    let aptosAccount = null;
-    let address = null;
+    let aptosAccount: any = null;
+    let address: string | null = null;
     try {
-      const { Ed25519Account } = await import('@aptos-labs/ts-sdk');
-      aptosAccount = new Ed25519Account({ privateKey: seed });
+      // Use Ed25519PrivateKey constructor with 32-byte Uint8Array seed (best practice)
+      const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
+      const ed25519PrivateKey = new Ed25519PrivateKey(seed);
+      aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
       address = aptosAccount.accountAddress.toString();
     } catch (e) {
       console.error('[walletService] Failed to construct Ed25519Account in syncWeb3AuthSession:', e);
@@ -185,6 +198,36 @@ const walletService = {
       return;
     }
     // TODO: Add Nightly session sync if needed
+  },
+
+  /**
+   * Sign a message for authentication (Web3Auth or Nightly)
+   * @param address Wallet address
+   * @param message Message to sign
+   * @returns signature (hex/base64)
+   */
+  async signMessage(address: string, message: string): Promise<string> {
+    // Try Web3Auth first
+    if (web3AuthService && web3AuthService.signMessage) {
+      return await web3AuthService.signMessage(message);
+    }
+    // Try Nightly Wallet
+    try {
+      const { aptosWallets } = getAptosWallets();
+      const nightly = aptosWallets.find(
+        w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly')
+      );
+      if (nightly && (nightly as any).features['aptos:signMessage']) {
+        const result = await (nightly as any).features['aptos:signMessage'].signMessage({
+          address,
+          message,
+        });
+        return result.signature;
+      }
+    } catch (e) {
+      console.error('[walletService] Nightly signMessage error:', e);
+    }
+    throw new Error('No wallet connected or signMessage not supported');
   },
 };
 
