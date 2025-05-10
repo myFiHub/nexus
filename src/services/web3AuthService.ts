@@ -19,6 +19,7 @@ class Web3AuthService {
   private _resolveReady: (() => void) | null = null;
 
   private constructor() {
+    console.debug('[Web3AuthService] Constructor called. Instance:', this);
     this._readyPromise = new Promise((resolve) => {
       this._resolveReady = resolve;
     });
@@ -27,6 +28,9 @@ class Web3AuthService {
   public static getInstance(): Web3AuthService {
     if (!Web3AuthService.instance) {
       Web3AuthService.instance = new Web3AuthService();
+      console.debug('[Web3AuthService] Singleton instance created:', Web3AuthService.instance);
+    } else {
+      console.debug('[Web3AuthService] Singleton instance reused:', Web3AuthService.instance);
     }
     return Web3AuthService.instance;
   }
@@ -40,7 +44,11 @@ class Web3AuthService {
 
   // Initialize Web3AuthNoModal with CommonPrivateKeyProvider for Movement/Aptos
   public async init(clientId: string, movementRpcUrl: string, explorerUrl: string) {
-    if (this.web3auth) return;
+    if (this.web3auth) {
+      console.debug('[Web3AuthService] init() called but already initialized.');
+      return;
+    }
+    console.debug('[Web3AuthService] Initializing Web3AuthNoModal...');
     const chainConfig = {
       chainNamespace: CHAIN_NAMESPACES.OTHER,
       chainId: '0x1',
@@ -63,7 +71,7 @@ class Web3AuthService {
     await this.web3auth.init();
     this._isInitialized = true;
     if (this._resolveReady) this._resolveReady();
-    console.debug('[Web3AuthService] Web3AuthNoModal initialized');
+    console.debug('[Web3AuthService] Web3AuthNoModal initialized. Instance:', this);
   }
 
   // Login and return Aptos/Movement account info

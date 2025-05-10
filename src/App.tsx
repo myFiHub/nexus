@@ -9,7 +9,7 @@ import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Explorer from './pages/Explorer';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import web3AuthService from './services/web3authService';
+import web3AuthService from './services/web3AuthService';
 import { WEB3AUTH_CONFIG } from './config/config';
 import walletService from './services/walletService';
 import { setWallet } from './redux/slices/walletSlice';
@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [web3AuthReady, setWeb3AuthReady] = React.useState(false);
 
   React.useEffect(() => {
+    console.debug('[App] web3AuthService instance:', web3AuthService);
     console.debug('[App] Initializing Web3Auth...');
     web3AuthService
       .init(
@@ -28,7 +29,7 @@ const App: React.FC = () => {
       )
       .then(() => {
         setWeb3AuthReady(true);
-        console.debug('[App] Web3Auth initialized');
+        console.debug('[App] Web3Auth initialized. isInitialized:', web3AuthService.isInitialized);
       })
       .catch((err) => {
         console.error('[App] Web3Auth initialization failed:', err);

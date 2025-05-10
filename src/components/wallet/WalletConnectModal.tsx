@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import walletService from '../../services/walletService';
+import web3AuthService from '../../services/web3AuthService';
 import { RootState } from '../../redux/store';
 import Card from '../Card';
 import Button from '../Button';
@@ -31,9 +32,27 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
   const dispatch = useDispatch();
   const wallet = useSelector((state: RootState) => state.wallet);
   const [localLoading, setLocalLoading] = useState(false);
+  const [web3AuthReady, setWeb3AuthReady] = useState(web3AuthService.isInitialized);
   const address = useSelector(selectWalletAddress);
   const isConnecting = useSelector(selectWalletIsConnecting);
   const error = useSelector(selectWalletError);
+
+  // Debug printout for instance and state
+  console.debug('[WalletConnectModal] web3AuthService instance:', web3AuthService, 'isInitialized:', web3AuthService.isInitialized, 'web3AuthReady:', web3AuthReady);
+
+  React.useEffect(() => {
+    // Always check current value on mount
+    console.debug('[WalletConnectModal] Effect: web3AuthService.isInitialized:', web3AuthService.isInitialized, 'web3AuthReady:', web3AuthReady, 'instance:', web3AuthService);
+    if (web3AuthService.isInitialized) {
+      setWeb3AuthReady(true);
+      console.debug('[WalletConnectModal] Web3Auth already initialized, setting web3AuthReady to true');
+    } else {
+      web3AuthService.readyPromise.then(() => {
+        setWeb3AuthReady(true);
+        console.debug('[WalletConnectModal] Web3Auth readyPromise resolved, setting web3AuthReady to true');
+      });
+    }
+  }, []);
 
   React.useEffect(() => {
     if (open) console.debug('[WalletConnectModal] Opened');
@@ -128,7 +147,7 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           <Button
             variant="primary"
             onClick={() => handleWeb3AuthClick('google')}
-            disabled={localLoading || wallet.isConnecting}
+            disabled={localLoading || wallet.isConnecting || !web3AuthReady}
             className="flex items-center justify-center gap-2"
           >
             <GoogleIcon /> Login with Google
@@ -136,7 +155,7 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           <Button
             variant="primary"
             onClick={() => handleWeb3AuthClick('twitter')}
-            disabled={localLoading || wallet.isConnecting}
+            disabled={localLoading || wallet.isConnecting || !web3AuthReady}
             className="flex items-center justify-center gap-2"
           >
             <TwitterIcon /> Login with Twitter
@@ -144,7 +163,7 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           <Button
             variant="primary"
             onClick={() => handleWeb3AuthClick('email_passwordless')}
-            disabled={localLoading || wallet.isConnecting}
+            disabled={localLoading || wallet.isConnecting || !web3AuthReady}
             className="flex items-center justify-center gap-2"
           >
             <EmailIcon /> Login with Email
@@ -167,6 +186,11 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           <div className="flex justify-center my-2">
             <span className="inline-block w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" aria-label="Loading" />
             <span className="ml-2 text-[var(--color-text-muted)]">Connecting...</span>
+          </div>
+        )}
+        {!web3AuthReady && (
+          <div className="text-center text-[var(--color-text-muted)] mt-2">
+            Initializing Web3Auth...
           </div>
         )}
       </Card>
