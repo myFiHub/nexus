@@ -1,6 +1,89 @@
 # Podium Nexus
 
-Podium Nexus is a Web3 platform that revolutionizes creator monetization through the Podium Protocol on the Movement blockchain. It enables creators to monetize their content through lifetime memberships (Podium Passes), subscription tiers, and custom community spaces (Outposts).
+Podium Nexus is a next-generation Web3 platform for creator monetization, built on the Movement blockchain. It enables creators to monetize their content through lifetime memberships (Podium Passes), subscription tiers, and custom community spaces (Outposts).
+
+---
+
+## ⚡️ Tech Stack
+
+- **Frontend:** React 19, Redux Toolkit, TypeScript
+- **Build:** Vite 6, PostCSS, Tailwind CSS v4
+- **State:** Redux slices (wallet, session, user, outposts, etc.)
+- **Wallets:** Web3Auth (social login), Nightly (external wallet)
+- **API:** Axios with JWT auth, environment-based base URL
+- **Smart Contracts:** Movement/Aptos (Podium Protocol)
+
+---
+
+## ⚙️ Environment Variables
+
+Set these in your `.env` file (do **not** commit secrets):
+
+- `VITE_PODIUM_BACKEND_BASE_URL=https://prod.podium.myfihub.com/api/v1` (or your custom API URL)
+- `VITE_PODIUM_PROTOCOL_APTOS_ADDRESS=...` (see below)
+- `VITE_APTOS_NETWORK=mainnet`
+- `VITE_WEB3AUTH_CLIENT_ID=...`
+
+> **Note:** All API calls use the `VITE_PODIUM_BACKEND_BASE_URL` via Axios. Do not hardcode URLs in code.
+
+---
+
+## 🦾 Wallet & Authentication Flow
+
+1. **Connect Wallet:**
+   - Web3Auth (Google, Twitter, Email, etc.) or Nightly Wallet
+2. **Sign Message:**
+   - On first connect, user signs a login message
+3. **JWT Auth:**
+   - Signature is sent to `/auth/login` to receive a JWT
+   - JWT is stored in Redux session slice (in-memory)
+   - All API requests use JWT via Axios interceptor
+4. **Data Fetching:**
+   - User passes: `/podium-passes/my-passes`
+   - Outposts: `/outposts`
+   - On-chain data via Movement/Aptos contracts
+
+---
+
+## 🛠️ Development Workflow
+
+- **Install:** `yarn install`
+- **Run Dev:** `yarn dev`
+- **Build:** `yarn build`
+- **Preview:** `yarn preview`
+- **Lint/Format:** Use your preferred tools
+
+---
+
+## 🧩 Core Features
+
+- **Podium Passes:** Lifetime memberships, bonding curve pricing, transparent fees
+- **Subscriptions:** Customizable tiers, smart contract-managed, referral incentives
+- **Outposts:** Community spaces, deterministic addressing, advanced management
+- **Growth:** Integrated referral system, rewards, analytics
+
+---
+
+## 🏗️ Architecture Highlights
+
+- **Redux Slices:** wallet, session, user, outposts, etc.
+- **Services:** walletService, podiumApiService, etc.
+- **Axios:** All API calls use a single Axios instance with JWT interceptor
+- **Tailwind 4:** Utility-first, dark mode, CSS variables for design tokens
+- **Vite:** Fast dev/build, modern config
+
+---
+
+## 📝 Notes
+
+- **Wallet state** is persisted in localStorage for session restore.
+- **JWT** is kept in Redux (in-memory) for security.
+- **API base URL** is always read from `VITE_PODIUM_BACKEND_BASE_URL`.
+- **Do not edit the `.env` file** unless you know what you're doing.
+
+---
+
+For more, see `docs/ARCHITECTURE.md` and `docs/DESIGN_SYSTEM.md`.
 
 # ⚠️ Environment Variables
 

@@ -17,6 +17,13 @@ const store = configureStore({
     user: userReducer,
     session: sessionReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredActions: ['wallet/setWallet'],
+        ignoredPaths: ['wallet.provider'],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

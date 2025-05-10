@@ -21,7 +21,70 @@
    - Efficient caching
    - Load distribution
 
-## Technical Stack
+## Technical Stack (Current)
+
+- **Frontend:** React 19, Redux Toolkit, TypeScript
+- **Build:** Vite 6, PostCSS, Tailwind CSS v4
+- **State:** Redux slices (wallet, session, user, outposts, etc.)
+- **Wallets:** Web3Auth (social login), Nightly (external wallet)
+- **API:** Axios with JWT auth, environment-based base URL
+- **Smart Contracts:** Movement/Aptos (Podium Protocol)
+
+## Frontend Architecture
+
+### State Management
+- **Redux Slices:**
+  - `wallet`: address, chainId, balance, walletType, provider, isConnecting, error
+  - `session`: JWT token, isAuthenticated, loading, error
+  - `user`: profile, loading, error
+  - `outposts`: items, loading, error, filters, pagination
+
+### Wallet & Auth Flow
+1. **Connect Wallet** (Web3Auth or Nightly)
+2. **Sign Message** (for login)
+3. **JWT Auth** (signature sent to `/auth/login`, JWT stored in Redux session)
+4. **API Calls** (Axios instance with JWT in Authorization header)
+5. **Data Fetching** (user passes, outposts, etc.)
+
+### API Integration
+- **podiumApiService.ts**: All API calls use a single Axios instance with JWT interceptor.
+- **API base URL** is set via `VITE_PODIUM_BACKEND_BASE_URL` (see `.env`).
+- **No hardcoded URLs** in code.
+
+### Data Flow
+- **On-chain Data:** Fetched via Movement/Aptos contracts (podiumProtocol, walletService)
+- **Server Data:** Fetched via authenticated API (podiumApiService)
+- **Separation:** UI components map both on-chain and server data to display user passes, outposts, etc.
+
+### Styling & Theming
+- **Tailwind CSS v4:** Utility-first, dark mode, CSS variables for design tokens
+- **PostCSS:** Used for autoprefixer and Tailwind
+- **Design tokens:** Defined as CSS variables, referenced in Tailwind config and utility classes
+
+### Build & Tooling
+- **Vite:** Fast dev/build, modern config (`vite.config.mts`)
+- **PostCSS:** Used for Tailwind and autoprefixer (`postcss.config.js`)
+- **Tailwind Config:** Custom colors, fonts, radii, shadows, etc. (`tailwind.config.mjs`)
+
+### Environment & Configuration
+- **All environment variables** (API base URL, protocol address, etc.) are set in `.env` and referenced via `import.meta.env`.
+- **Never hardcode sensitive or environment-specific values.**
+
+## Data Model & Flow
+
+- **Wallet state** is persisted in localStorage for session restore.
+- **JWT** is kept in Redux (in-memory) for security.
+- **API base URL** is always read from `VITE_PODIUM_BACKEND_BASE_URL`.
+
+## Security & Best Practices
+- **JWT** is never stored in localStorage or cookies.
+- **Wallet connection** is required for all authenticated actions.
+- **All API requests** are authenticated via JWT in the Authorization header.
+- **Sensitive config** is always via environment variables.
+
+## See Also
+- `README.md` for quickstart and workflow
+- `docs/DESIGN_SYSTEM.md` for design tokens and UI guidelines
 
 ### Frontend Design Criteria & Best Practices
 #### Visual/UX Criteria

@@ -7,4 +7,6 @@ export interface Wallet {
   balance: string; // BigNumber as string
   isConnecting: boolean;
   error: string | null;
+  walletType: string | null;
+  provider?: any | null;
 } 

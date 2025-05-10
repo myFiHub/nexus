@@ -58,13 +58,14 @@ const walletService = {
           throw new Error('Web3Auth login failed');
         }
         const { address, aptosAccount } = loginResult;
+        const provider = (web3AuthService as any).provider || null;
         const balance = await walletService.fetchBalance(address);
-        dispatch(setWallet({ address, chainId: 1, balance }));
+        dispatch(setWallet({ address, chainId: 1, balance, walletType: 'web3auth', provider }));
         // Persist wallet state in localStorage
-        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance }));
-        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance });
+        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance, walletType: 'web3auth' }));
+        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance, walletType: 'web3auth' });
         console.debug('[walletService] Web3Auth wallet connected:', address, 'Balance:', balance);
-        return { address, chainId: 1, balance };
+        return { address, chainId: 1, balance, walletType: 'web3auth', provider };
       } else if (providerType === 'nightly') {
         console.debug('[walletService] Attempting Nightly Wallet connection...');
         const { aptosWallets } = getAptosWallets();
@@ -89,12 +90,12 @@ const walletService = {
         }
         const address = account.address;
         const balance = await walletService.fetchBalance(address);
-        dispatch(setWallet({ address, chainId: 1, balance }));
+        dispatch(setWallet({ address, chainId: 1, balance, walletType: 'nightly', provider: nightly }));
         // Persist wallet state in localStorage
-        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance }));
-        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance });
+        localStorage.setItem('wallet', JSON.stringify({ address, chainId: 1, balance, walletType: 'nightly' }));
+        console.debug('[walletService] Wallet state persisted to localStorage:', { address, chainId: 1, balance, walletType: 'nightly' });
         console.debug('[walletService] Nightly Wallet connected:', address, 'Balance:', balance);
-        return { address, chainId: 1, balance };
+        return { address, chainId: 1, balance, walletType: 'nightly', provider: nightly };
       }
     } catch (error: any) {
       dispatch(setError(error.message || 'Wallet connection failed'));
@@ -152,49 +153,35 @@ const walletService = {
   },
 
   // Sync Redux state with existing Web3Auth session
-  async syncWeb3AuthSession(): Promise<{ address: string; privateKey: string; aptosAccount: any } | null> {
+  async syncWeb3AuthSession(): Promise<{ provider: any } | null> {
+    // Only check for provider, do not attempt to fetch private key
     if (!web3AuthService || !web3AuthService['web3auth'] || !web3AuthService['web3auth'].provider) {
       console.warn('[walletService] No Web3Auth session to sync');
       return null;
     }
     const provider = web3AuthService['web3auth'].provider;
-    const rawPrivateKey = await provider.request({ method: 'private_key' }) as string | undefined;
-    if (!rawPrivateKey) {
-      console.error('[walletService] Failed to get private key from provider during sync');
-      return null;
+    if (provider) {
+      // Optionally, you could try to get the address from the provider if needed
+      return { provider };
     }
-    // Convert hex string to Uint8Array (32 bytes)
-    const privateKeyUint8Array = new Uint8Array(
-      rawPrivateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
-    );
-    const seed = privateKeyUint8Array.slice(0, 32);
-    let aptosAccount: any = null;
-    let address: string | null = null;
-    try {
-      // Use Ed25519PrivateKey constructor with 32-byte Uint8Array seed (best practice)
-      const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
-      const ed25519PrivateKey = new Ed25519PrivateKey(seed);
-      aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
-      address = aptosAccount.accountAddress.toString();
-    } catch (e) {
-      console.error('[walletService] Failed to construct Ed25519Account in syncWeb3AuthSession:', e);
-      return null;
-    }
-    if (!address || !aptosAccount) {
-      console.error('[walletService] syncWeb3AuthSession: address or aptosAccount is null');
-      return null;
-    }
-    return { address, privateKey: rawPrivateKey, aptosAccount };
+    return null;
   },
 
   // Sync Redux state with any existing wallet session (Web3Auth or Nightly)
   async syncWalletSession(dispatch: AppDispatch) {
     // Try Web3Auth session first
     const web3AuthSession = await walletService.syncWeb3AuthSession();
-    if (web3AuthSession && web3AuthSession.address) {
-      const balance = await walletService.fetchBalance(web3AuthSession.address);
-      dispatch(setWallet({ address: web3AuthSession.address, chainId: 1, balance }));
-      console.debug('[walletService] Synced Web3Auth session:', web3AuthSession.address);
+    if (web3AuthSession && web3AuthSession.provider) {
+      // Ensure the singleton is in sync after reload
+      if (web3AuthService && typeof web3AuthService === 'object') {
+        (web3AuthService as any).provider = web3AuthSession.provider;
+      }
+      // If provider is available, update Redux (address is already in state)
+      dispatch(setWallet({
+        ...JSON.parse(localStorage.getItem('wallet') || '{}'),
+        provider: web3AuthSession.provider
+      }));
+      console.debug('[walletService] Synced Web3Auth provider');
       return;
     }
     // TODO: Add Nightly session sync if needed
@@ -204,30 +191,44 @@ const walletService = {
    * Sign a message for authentication (Web3Auth or Nightly)
    * @param address Wallet address
    * @param message Message to sign
+   * @param walletType Type of wallet (web3auth, nightly, etc.)
+   * @param provider Wallet provider object
    * @returns signature (hex/base64)
    */
-  async signMessage(address: string, message: string): Promise<string> {
-    // Try Web3Auth first
-    if (web3AuthService && web3AuthService.signMessage) {
-      return await web3AuthService.signMessage(message);
-    }
-    // Try Nightly Wallet
-    try {
-      const { aptosWallets } = getAptosWallets();
-      const nightly = aptosWallets.find(
-        w => w && typeof (w as any).label === 'string' && (w as any).label.toLowerCase().includes('nightly')
-      );
-      if (nightly && (nightly as any).features['aptos:signMessage']) {
-        const result = await (nightly as any).features['aptos:signMessage'].signMessage({
-          address,
-          message,
-        });
-        return result.signature;
+  async signMessage(address: string, message: string, walletType: string, provider: any): Promise<string> {
+    if (!walletType) throw new Error('No wallet type specified. Please reconnect your wallet.');
+    if (!provider) throw new Error('No wallet provider found. Please reconnect your wallet.');
+    if (walletType === 'web3auth') {
+      if (web3AuthService && typeof web3AuthService.signMessage === 'function') {
+        try {
+          const sig = await web3AuthService.signMessage(message);
+          console.debug('[walletService] Web3Auth signMessage success');
+          return sig;
+        } catch (err) {
+          console.error('[walletService] Web3Auth signMessage error:', err);
+          throw err;
+        }
+      } else {
+        throw new Error('Web3Auth signMessage not available.');
       }
-    } catch (e) {
-      console.error('[walletService] Nightly signMessage error:', e);
+    } else if (walletType === 'nightly') {
+      if (provider && provider.features && provider.features['aptos:signMessage']) {
+        try {
+          const result = await provider.features['aptos:signMessage'].signMessage({
+            address,
+            message,
+          });
+          console.debug('[walletService] Nightly signMessage success');
+          return result.signature;
+        } catch (e) {
+          console.error('[walletService] Nightly signMessage error:', e);
+          throw e;
+        }
+      } else {
+        throw new Error('Nightly Wallet signMessage not available.');
+      }
     }
-    throw new Error('No wallet connected or signMessage not supported');
+    throw new Error('Unsupported wallet type for signMessage.');
   },
 };
 

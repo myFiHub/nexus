@@ -3,9 +3,15 @@ import { useSelector, useDispatch } from 'react-redux';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import walletService from '../services/walletService';
-import { loginWithWallet, fetchOutposts } from '../services/podiumApiService';
+import { loginWithWallet, fetchOutposts, fetchUserPasses } from '../services/podiumApiService';
 import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
 import { RootState } from '../redux/store';
+import { 
+  selectWalletAddress, 
+  selectWalletType, 
+  selectWalletProvider 
+} from '../redux/walletSelectors';
+import store from '../redux/store';
 
 // Types for mock data (to be replaced with real data)
 interface UserPass {
@@ -25,8 +31,9 @@ interface Outpost {
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch();
   // Redux selectors for wallet and session state
-  const address = useSelector((state: RootState) => state.wallet.address);
-  // No walletType in Wallet type; use a generic label or infer from connection logic if needed
+  const address = useSelector(selectWalletAddress);
+  const walletType = useSelector(selectWalletType);
+  const provider = useSelector(selectWalletProvider);
   const isConnected = Boolean(address);
   const jwt = useSelector((state: RootState) => state.session.token);
   const sessionLoading = useSelector((state: RootState) => state.session.loading);
@@ -37,15 +44,33 @@ const Dashboard: React.FC = () => {
   const [outposts, setOutposts] = useState<Outpost[]>([]);
   const [dataLoading, setDataLoading] = useState(false);
   const [dataError, setDataError] = useState<string | null>(null);
+  // Prevent infinite login attempts
+  const [loginAttempted, setLoginAttempted] = useState(false);
+  // Provider rehydration state
+  const [providerSyncing, setProviderSyncing] = useState(false);
 
   // Wallet login/authentication effect
   useEffect(() => {
+    if (!isConnected || jwt || sessionLoading || loginAttempted) return;
+    if (!walletType || !provider || typeof provider.request !== 'function') {
+      // Try to rehydrate provider
+      setProviderSyncing(true);
+      walletService.syncWalletSession(dispatch).then(() => {
+        const newProvider = store.getState().wallet.provider;
+        setProviderSyncing(false);
+        if (!newProvider || typeof newProvider.request !== 'function') {
+          dispatch(setSessionError('Wallet provider not ready. Please reconnect your wallet.'));
+          setLoginAttempted(true);
+        }
+      });
+      return;
+    }
     const doLogin = async () => {
-      if (!address || jwt) return;
       dispatch(setSessionLoading(true));
       try {
+        console.debug('[Dashboard] Attempting login with wallet:', address, walletType);
         const loginMessage = `Sign in to Podium Nexus at ${new Date().toISOString()}`;
-        const signature = await walletService.signMessage(address, loginMessage);
+        const signature = await walletService.signMessage(address, loginMessage, walletType, provider);
         const result = await loginWithWallet(address, signature);
         if (result && result.token) {
           dispatch(setToken(result.token));
@@ -53,15 +78,16 @@ const Dashboard: React.FC = () => {
           dispatch(setSessionError('Login failed: No token returned'));
         }
       } catch (e: any) {
-        dispatch(setSessionError(e?.message || 'Login failed'));
+        console.error('[Dashboard] Login error:', e);
+        const errorMsg = (e && typeof e.message === 'string' && e.message) ? e.message : 'Login failed. Please reconnect your wallet.';
+        dispatch(setSessionError(errorMsg));
       } finally {
+        setLoginAttempted(true);
         dispatch(setSessionLoading(false));
       }
     };
-    if (isConnected && !jwt && !sessionLoading) {
-      doLogin();
-    }
-  }, [isConnected, jwt, address, dispatch, sessionLoading]);
+    doLogin();
+  }, [isConnected, jwt, sessionLoading, loginAttempted, walletType, provider, address, dispatch]);
 
   // Fetch user passes and outposts after authentication
   useEffect(() => {
@@ -71,12 +97,9 @@ const Dashboard: React.FC = () => {
       setDataError(null);
       try {
         // Fetch user passes
-        const passesRes = await fetch('/api/v1/podium-passes/my-passes', {
-          headers: { Authorization: `Bearer ${jwt}` },
-        });
-        const passesData = await passesRes.json();
-        // Map to UserPass[]
-        const passes: UserPass[] = (passesData.data || []).map((p: any, idx: number) => ({
+        console.debug('[Dashboard] Fetching user passes...');
+        const passesData = await fetchUserPasses();
+        const passes: UserPass[] = (passesData || []).map((p: any, idx: number) => ({
           id: idx,
           outpostName: p.outpost_name || p.outpostName || 'Unknown',
           balance: p.balance || 0,
@@ -85,8 +108,8 @@ const Dashboard: React.FC = () => {
         setUserPasses(passes);
 
         // Fetch outposts
+        console.debug('[Dashboard] Fetching outposts...');
         const outpostsData = await fetchOutposts();
-        // Map to Outpost[]
         const outpostsList: Outpost[] = (outpostsData || []).map((o: any) => ({
           address: o.address || o.uuid || '',
           name: o.name || 'Unknown',
@@ -95,6 +118,7 @@ const Dashboard: React.FC = () => {
         }));
         setOutposts(outpostsList);
       } catch (e: any) {
+        console.error('[Dashboard] Data fetch error:', e);
         setDataError(e?.message || 'Failed to fetch data');
       } finally {
         setDataLoading(false);
@@ -137,7 +161,20 @@ const Dashboard: React.FC = () => {
         {sessionError && (
           <div className="bg-[var(--color-error)] bg-opacity-10 border border-[var(--color-error)] text-[var(--color-error)] px-4 py-3 rounded mb-4">
             <strong className="font-bold">Error: </strong>
-            <span>{sessionError}</span>
+            <span>{sessionError ?? ''}</span>
+            <div className="mt-2">
+              <Button onClick={() => { setLoginAttempted(false); window.location.reload(); }}>
+                Reconnect Wallet
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Loading State (session login) */}
+        {providerSyncing && (
+          <div className="text-center py-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)] mx-auto"></div>
+            <p className="text-[var(--color-text-muted)] mt-2">Rehydrating wallet provider...</p>
           </div>
         )}
 

@@ -4,14 +4,14 @@ interface SessionState {
   token: string | null;
   isAuthenticated: boolean;
   loading: boolean;
-  error: string | null;
+  error: string;
 }
 
 const initialState: SessionState = {
   token: null,
   isAuthenticated: false,
   loading: false,
-  error: null,
+  error: '',
 };
 
 const sessionSlice = createSlice({
@@ -22,22 +22,22 @@ const sessionSlice = createSlice({
       state.token = action.payload;
       state.isAuthenticated = true;
       state.loading = false;
-      state.error = null;
+      state.error = '';
       console.debug('[sessionSlice] setToken', action.payload);
     },
     clearToken(state) {
       state.token = null;
       state.isAuthenticated = false;
       state.loading = false;
-      state.error = null;
+      state.error = '';
       console.debug('[sessionSlice] clearToken');
     },
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
       console.debug('[sessionSlice] setLoading', action.payload);
     },
-    setError(state, action: PayloadAction<string | null>) {
-      state.error = action.payload;
+    setError(state, action: PayloadAction<string>) {
+      state.error = action.payload || '';
       state.loading = false;
       console.error('[sessionSlice] setError', action.payload);
     },

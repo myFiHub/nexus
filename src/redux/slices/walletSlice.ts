@@ -8,6 +8,8 @@ const initialState: Wallet = {
   balance: '0',
   isConnecting: false,
   error: null,
+  walletType: null,
+  provider: null,
 };
 
 const walletSlice = createSlice({
@@ -19,10 +21,12 @@ const walletSlice = createSlice({
       state.error = null;
       console.debug('[walletSlice] startConnecting');
     },
-    setWallet(state, action: PayloadAction<{ address: string; chainId: number; balance: string }>) {
+    setWallet(state, action: PayloadAction<{ address: string; chainId: number; balance: string; walletType: string; provider?: any }>) {
       state.address = action.payload.address;
       state.chainId = action.payload.chainId;
       state.balance = action.payload.balance;
+      state.walletType = action.payload.walletType;
+      state.provider = action.payload.provider || null;
       state.isConnecting = false;
       state.error = null;
       console.debug('[walletSlice] setWallet', action.payload);
@@ -38,6 +42,8 @@ const walletSlice = createSlice({
       state.balance = '0';
       state.isConnecting = false;
       state.error = null;
+      state.walletType = null;
+      state.provider = null;
       console.debug('[walletSlice] disconnect');
     },
   },

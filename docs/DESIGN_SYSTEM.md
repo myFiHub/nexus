@@ -1,5 +1,99 @@
 # Podium Design System
 
+## Brand Identity & Visual System
+
+### Colors & Design Tokens
+- All colors are defined as CSS variables (see `src/index.css`)
+- Referenced in Tailwind config (`tailwind.config.mjs`) and used via utility classes: `[bg:var(--color-bg)]`, `[text:var(--color-text-main)]`, etc.
+- No legacy CSS or custom class-based styling for core layout or color.
+
+### Typography
+- Font: Inter, sans-serif (set globally)
+- Headings: Bold, large (`text-3xl`/`text-4xl`/`text-5xl`)
+- Subheadings: Subtle (`text-neutral-400`)
+- All font sizes and weights use Tailwind utility classes
+
+### Spacing & Layout
+- Use Tailwind spacing utilities (`py-16`, `mb-12`, `gap-8`, etc.)
+- Center content with `mx-auto`, `max-w-7xl`
+- Responsive, mobile-first layouts using Tailwind grid/flex utilities
+
+### Cards & Containers
+- Cards: `bg-[var(--color-surface)]`, `rounded-xl`, `shadow-lg`, `p-8`
+- All containers use utility classes for padding, margin, and background
+
+### Buttons
+- Consistent, bold button styles: `rounded-lg`, `px-6`, `py-3`, brand colors
+- Use utility classes directly in JSX
+
+### Section Separation
+- Use background color changes or gradients for visual separation
+
+### Responsiveness
+- All layouts are mobile-first and responsive using Tailwind grid/flex utilities
+
+### Accessibility
+- Ensure color contrast, keyboard navigation, and ARIA labels for all interactive elements
+- Alt text for all images/icons
+- Focus states: Use Tailwind focus utilities and custom focus rings
+- Test with screen readers
+
+---
+
+## Tailwind v4+ Best Practices
+- **No `@apply` for Tailwind utility classes in CSS:** Only use for custom classes or CSS variable syntax
+- **Global Styles:** Set global font and background in `src/index.css`
+- **Utility-First:** All styling is done with Tailwind utility classes in JSX, not custom CSS classes
+- **Custom Colors:** Use CSS variables for brand colors and reference in Tailwind config
+- **Section-by-Section Build:** Build and test each section visually before moving to the next
+- **Pitfalls:**
+  - Avoid mixing legacy CSS with Tailwind utilities
+  - Don't rely on custom classes for core layout or color
+  - Always check for color contrast and font readability on dark backgrounds
+
+---
+
+## Component Patterns
+- **Navigation:** Sticky dark navbar, utility classes for layout and color
+- **Wallet Connection:** Modern modal, utility classes, clear focus states
+- **Notifications:** Toasts for transaction status, errors, and success, using color and icons for status
+- **Cards:** Utility classes for background, border, shadow, and padding
+- **Forms:** Inputs and selects use full width, dark background, clear focus state
+
+---
+
+## Dark Mode
+- Use `[data-theme="dark"]` and CSS variables for dark mode
+- Tailwind config supports dark mode via `darkMode: 'class'`
+- All components adapt to dark mode using CSS variables
+
+---
+
+## Responsive Design
+- Use Tailwind's responsive utilities for all breakpoints
+- Font sizes and container widths adapt via Tailwind config
+
+---
+
+## Animation & Loading States
+- Use Tailwind's animate utilities for spinners, transitions
+- Skeleton loaders for async data
+
+---
+
+## Modern React Patterns
+- All components are function components using hooks
+- State and side effects managed via hooks and Redux
+- No class components or legacy patterns
+
+---
+
+## Summary
+- **All styling is via Tailwind utility classes and CSS variables**
+- **No custom CSS for layout, color, or core components**
+- **Design tokens are defined as CSS variables and referenced in Tailwind config**
+- **Dark mode, accessibility, and responsiveness are first-class citizens**
+
 ## Brand Identity
 
 ### Colors

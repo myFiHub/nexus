@@ -4,6 +4,11 @@ import walletService from '../../services/walletService';
 import { RootState } from '../../redux/store';
 import Card from '../Card';
 import Button from '../Button';
+import { 
+  selectWalletAddress, 
+  selectWalletIsConnecting, 
+  selectWalletError 
+} from '../../redux/walletSelectors';
 
 // Inline SVGs for wallet providers
 const GoogleIcon = () => (
@@ -26,20 +31,23 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
   const dispatch = useDispatch();
   const wallet = useSelector((state: RootState) => state.wallet);
   const [localLoading, setLocalLoading] = useState(false);
+  const address = useSelector(selectWalletAddress);
+  const isConnecting = useSelector(selectWalletIsConnecting);
+  const error = useSelector(selectWalletError);
 
   React.useEffect(() => {
     if (open) console.debug('[WalletConnectModal] Opened');
-    if (open && !wallet.address) {
+    if (open && !address) {
       walletService.syncWalletSession(dispatch);
     }
-  }, [open, wallet.address, dispatch]);
+  }, [open, address, dispatch]);
 
   React.useEffect(() => {
-    if (wallet.address && open) {
+    if (address && open) {
       console.debug('[WalletConnectModal] Wallet connected, closing modal');
       onClose();
     }
-  }, [wallet.address, open, onClose]);
+  }, [address, open, onClose]);
 
   const handleWeb3AuthClick = async (provider: 'google' | 'twitter' | 'email_passwordless') => {
     setLocalLoading(true);
@@ -79,7 +87,7 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
 
   if (!open) return null;
 
-  const isConnected = Boolean(wallet.address);
+  const isConnected = Boolean(address);
 
   return (
     <div
@@ -107,10 +115,10 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           />
         </div>
         {/* Show address if connected */}
-        {isConnected && wallet.address && (
+        {isConnected && address && (
           <div className="mb-4 text-center">
-            <div className="text-xs text-[var(--color-success)] mb-2">Connected: <span className="font-mono">{wallet.address}</span></div>
-            <Button variant="secondary" onClick={handleDisconnect} disabled={wallet.isConnecting || localLoading}>
+            <div className="text-xs text-[var(--color-success)] mb-2">Connected: <span className="font-mono">{address}</span></div>
+            <Button variant="secondary" onClick={handleDisconnect} disabled={isConnecting || localLoading}>
               Disconnect
             </Button>
           </div>
@@ -151,11 +159,11 @@ const WalletConnectModal: React.FC<{ open: boolean; onClose: () => void }> = ({ 
           <NightlyIcon /> Connect with Nightly Wallet
         </Button>
         {/* Show error if present */}
-        {wallet.error && (
-          <div className="text-[var(--color-error)] text-sm mb-2 text-center">{wallet.error}</div>
+        {error && (
+          <div className="text-[var(--color-error)] text-sm mb-2 text-center">{error}</div>
         )}
         {/* Loading state */}
-        {(wallet.isConnecting || localLoading) && (
+        {(isConnecting || localLoading) && (
           <div className="flex justify-center my-2">
             <span className="inline-block w-8 h-8 border-4 border-[var(--color-primary)] border-t-transparent rounded-full animate-spin" aria-label="Loading" />
             <span className="ml-2 text-[var(--color-text-muted)]">Connecting...</span>

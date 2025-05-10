@@ -44,7 +44,7 @@ const App: React.FC = () => {
         const wallet = JSON.parse(walletRaw);
         if (wallet && wallet.address) {
           console.debug('[App] Restoring wallet from localStorage:', wallet);
-          store.dispatch(setWallet(wallet));
+          store.dispatch(setWallet({ ...wallet, provider: null }));
           walletService.syncWalletSession(store.dispatch);
         }
       } catch (e) {

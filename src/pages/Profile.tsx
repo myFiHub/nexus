@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import { useSelector } from 'react-redux';
+import { selectWalletAddress, selectWalletType } from '../redux/walletSelectors';
 
 interface SocialLinks {
   twitter?: string;
@@ -41,10 +43,11 @@ const mockUserPasses: UserPass[] = [
 
 const Profile: React.FC = () => {
   const [profileData, setProfileData] = useState(mockProfile);
-  const [isConnected] = useState(mockIsConnected);
+  const address = useSelector(selectWalletAddress);
+  const walletType = useSelector(selectWalletType);
+  const isConnected = Boolean(address);
   const [isLoading] = useState(mockIsLoading);
   const [error] = useState<typeof mockError>(mockError);
-  const [wallet] = useState(mockWallet);
   const [userPasses] = useState<UserPass[]>(mockUserPasses);
 
   // Simulate fetching profile data
@@ -111,8 +114,8 @@ const Profile: React.FC = () => {
           <h3 className="text-xl font-semibold mb-4">Wallet Information</h3>
           {isConnected ? (
             <div className="bg-[var(--color-surface)] p-4 rounded-lg">
-              <p className="text-[var(--color-text-main)]">Address: <span className="font-mono">{wallet.address}</span></p>
-              <p className="text-[var(--color-text-muted)]">Wallet Type: {wallet.walletType === 'web3auth' ? 'Web3Auth (Social Login)' : 'Nightly Wallet'}</p>
+              <p className="text-[var(--color-text-main)]">Address: <span className="font-mono">{address}</span></p>
+              <p className="text-[var(--color-text-muted)]">Wallet Type: {walletType === 'web3auth' ? 'Web3Auth (Social Login)' : walletType === 'nightly' ? 'Nightly Wallet' : walletType || 'Unknown'}</p>
             </div>
           ) : (
             <p className="text-[var(--color-text-muted)]">Connect your wallet to view wallet information.</p>

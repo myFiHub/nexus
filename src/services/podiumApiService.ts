@@ -82,4 +82,16 @@ export async function fetchUserByAptosAddress(address: string) {
     console.error('[podiumApiService] fetchUserByAptosAddress error:', e);
     throw e;
   }
+}
+
+// Fetch user passes (authenticated)
+export async function fetchUserPasses() {
+  try {
+    const res = await podiumApi.get('/podium-passes/my-passes');
+    console.debug('[podiumApiService] fetchUserPasses:', res.data.data);
+    return res.data.data;
+  } catch (e) {
+    console.error('[podiumApiService] fetchUserPasses error:', e);
+    throw e;
+  }
 } 
