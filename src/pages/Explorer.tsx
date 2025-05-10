@@ -72,7 +72,7 @@ const Explorer: React.FC = () => {
     });
 
   return (
-    <Layout>
+    <>
       <section className="text-center py-12">
         <h1 className="text-4xl md:text-5xl font-bold mb-4 text-[var(--color-primary)]">Discover Creator Communities</h1>
         <p className="text-xl text-[var(--color-text-muted)] max-w-2xl mx-auto mb-2">
@@ -203,7 +203,7 @@ const Explorer: React.FC = () => {
           ))}
         </div>
       </section>
-    </Layout>
+    </>
   );
 };
 

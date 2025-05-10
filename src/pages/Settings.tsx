@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Layout from '../components/Layout';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Select from '../components/Select';
@@ -75,100 +74,98 @@ const Settings: React.FC = () => {
   };
 
   return (
-    <Layout>
-      <div className="max-w-3xl mx-auto space-y-8">
-        <Card>
-          <h1 className="text-3xl font-bold text-[var(--color-primary)] mb-6">Settings</h1>
+    <div className="max-w-3xl mx-auto space-y-8">
+      <Card>
+        <h1 className="text-3xl font-bold text-[var(--color-primary)] mb-6">Settings</h1>
 
-          {saveMessage && (
-            <div className="bg-[var(--color-success)] bg-opacity-10 border border-[var(--color-success)] text-[var(--color-success)] px-4 py-3 rounded mb-6">
-              {saveMessage}
-            </div>
-          )}
-
-          {/* Notifications */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Notifications</h2>
-            <div className="space-y-4">
-              {['email', 'push', 'marketing'].map((setting) => (
-                <div key={setting} className="flex items-center justify-between">
-                  <span className="text-[var(--color-text-main)] capitalize">{setting} Notifications</span>
-                  <button
-                    type="button"
-                    aria-pressed={settings.notifications[setting]}
-                    onClick={() => handleToggle('notifications', setting)}
-                    className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-200 focus:outline-none ${settings.notifications[setting] ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-surface)]'}`}
-                  >
-                    <span
-                      className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${settings.notifications[setting] ? 'translate-x-6' : ''}`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Display */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Display</h2>
-            <div className="space-y-4">
-              <div className="flex flex-col">
-                <label className="text-[var(--color-text-main)] mb-2">Theme</label>
-                <Select
-                  options={themeOptions}
-                  value={settings.display.theme}
-                  onChange={(e) => handleSelect('display', 'theme', e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="text-[var(--color-text-main)] mb-2">Currency</label>
-                <Select
-                  options={currencyOptions}
-                  value={settings.display.currency}
-                  onChange={(e) => handleSelect('display', 'currency', e.target.value)}
-                />
-              </div>
-              <div className="flex flex-col">
-                <label className="text-[var(--color-text-main)] mb-2">Language</label>
-                <Select
-                  options={languageOptions}
-                  value={settings.display.language}
-                  onChange={(e) => handleSelect('display', 'language', e.target.value)}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Privacy */}
-          <section className="mb-8">
-            <h2 className="text-xl font-semibold mb-4">Privacy</h2>
-            <div className="space-y-4">
-              {['showWalletAddress', 'showActivity', 'showProfile'].map((setting) => (
-                <div key={setting} className="flex items-center justify-between">
-                  <span className="text-[var(--color-text-main)] capitalize">{setting.replace('show', 'Show ')}</span>
-                  <button
-                    type="button"
-                    aria-pressed={settings.privacy[setting]}
-                    onClick={() => handleToggle('privacy', setting)}
-                    className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-200 focus:outline-none ${settings.privacy[setting] ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-surface)]'}`}
-                  >
-                    <span
-                      className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${settings.privacy[setting] ? 'translate-x-6' : ''}`}
-                    />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <div className="flex justify-end">
-            <Button onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Settings'}
-            </Button>
+        {saveMessage && (
+          <div className="bg-[var(--color-success)] bg-opacity-10 border border-[var(--color-success)] text-[var(--color-success)] px-4 py-3 rounded mb-6">
+            {saveMessage}
           </div>
-        </Card>
-      </div>
-    </Layout>
+        )}
+
+        {/* Notifications */}
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Notifications</h2>
+          <div className="space-y-4">
+            {['email', 'push', 'marketing'].map((setting) => (
+              <div key={setting} className="flex items-center justify-between">
+                <span className="text-[var(--color-text-main)] capitalize">{setting} Notifications</span>
+                <button
+                  type="button"
+                  aria-pressed={settings.notifications[setting]}
+                  onClick={() => handleToggle('notifications', setting)}
+                  className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-200 focus:outline-none ${settings.notifications[setting] ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-surface)]'}`}
+                >
+                  <span
+                    className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${settings.notifications[setting] ? 'translate-x-6' : ''}`}
+                  />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Display */}
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Display</h2>
+          <div className="space-y-4">
+            <div className="flex flex-col">
+              <label className="text-[var(--color-text-main)] mb-2">Theme</label>
+              <Select
+                options={themeOptions}
+                value={settings.display.theme}
+                onChange={(e) => handleSelect('display', 'theme', e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-[var(--color-text-main)] mb-2">Currency</label>
+              <Select
+                options={currencyOptions}
+                value={settings.display.currency}
+                onChange={(e) => handleSelect('display', 'currency', e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col">
+              <label className="text-[var(--color-text-main)] mb-2">Language</label>
+              <Select
+                options={languageOptions}
+                value={settings.display.language}
+                onChange={(e) => handleSelect('display', 'language', e.target.value)}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Privacy */}
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Privacy</h2>
+          <div className="space-y-4">
+            {['showWalletAddress', 'showActivity', 'showProfile'].map((setting) => (
+              <div key={setting} className="flex items-center justify-between">
+                <span className="text-[var(--color-text-main)] capitalize">{setting.replace('show', 'Show ')}</span>
+                <button
+                  type="button"
+                  aria-pressed={settings.privacy[setting]}
+                  onClick={() => handleToggle('privacy', setting)}
+                  className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-200 focus:outline-none ${settings.privacy[setting] ? 'bg-[var(--color-primary)]' : 'bg-[var(--color-surface)]'}`}
+                >
+                  <span
+                    className={`w-5 h-5 bg-white rounded-full shadow transform transition-transform duration-200 ${settings.privacy[setting] ? 'translate-x-6' : ''}`}
+                  />
+                </button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div className="flex justify-end">
+          <Button onClick={handleSave} disabled={isSaving}>
+            {isSaving ? 'Saving...' : 'Save Settings'}
+          </Button>
+        </div>
+      </Card>
+    </div>
   );
 };
 
