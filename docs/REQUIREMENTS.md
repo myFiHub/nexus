@@ -4,7 +4,7 @@
 Podium is a decentralized social platform that enables content creators to monetize their influence through a unique bonding curve mechanism and subscription tiers. The platform combines traditional subscription models with innovative tokenomics to create a sustainable creator economy.
 
 
-Absolutely! Here’s a **comprehensive visual and functional guide** for crafting a cutting-edge, fun, accessible, and profitable Podium Nexus SocialFi experience, leveraging your architecture, design system, and requirements. This guide is structured for both designers and developers, focusing on best practices for engagement, monetization, and clarity.
+Absolutely! Here's a **comprehensive visual and functional guide** for crafting a cutting-edge, fun, accessible, and profitable Podium Nexus SocialFi experience, leveraging your architecture, design system, and requirements. This guide is structured for both designers and developers, focusing on best practices for engagement, monetization, and clarity.
 
 ---
 
@@ -15,12 +15,12 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 ## 1. **Landing/Home Page**
 
 ### **Hero Section**
-- **Visual:** Large, bold, gradient headline (“Support What Interests You”), subheading, and two prominent call-to-action (CTA) buttons:  
+- **Visual:** Large, bold, gradient headline ("Support What Interests You"), subheading, and two prominent call-to-action (CTA) buttons:  
   - **Discover Creators** (primary, magenta/fuchsia)
   - **Start Your Outpost** (secondary, outlined magenta)
 - **Functionality:**  
-  - “Discover Creators” → Outpost Explorer  
-  - “Start Your Outpost” → Creator onboarding flow
+  - "Discover Creators" → Outpost Explorer  
+  - "Start Your Outpost" → Creator onboarding flow
 - **Best Practices:**  
   - Use emotional, aspirational language.
   - Keep CTAs above the fold and visually distinct.
@@ -36,10 +36,10 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
   - Keep copy concise and value-focused.
 
 ### **Trending Outposts**
-- **Visual:** Grid of trending outpost cards with avatars, stats, and “View All Outposts” link.
+- **Visual:** Grid of trending outpost cards with avatars, stats, and "View All Outposts" link.
 - **Functionality:**  
   - Clicking a card opens the outpost detail.
-  - “View All Outposts” → Explorer page.
+  - "View All Outposts" → Explorer page.
 - **Best Practices:**  
   - Show real-time stats (holders, price, volume).
   - Use skeleton loaders for async data.
@@ -84,14 +84,14 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 ### **Explorer Grid**
 - **Visual:**  
   - Responsive grid of outpost cards.
-  - Each card: avatar, name, stats (price, holders, volume), CTA (“View” or “Buy Pass”).
+  - Each card: avatar, name, stats (price, holders, volume), CTA ("View" or "Buy Pass").
 - **Functionality:**  
   - Filters (category, trending, new, price).
   - Search bar.
   - Pagination or infinite scroll.
 - **Best Practices:**  
   - Use hover effects for interactivity.
-  - Show “hot” or “new” badges for trending outposts.
+  - Show "hot" or "new" badges for trending outposts.
 
 ---
 
@@ -102,8 +102,8 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
   - Outpost avatar, name, creator info, social links.
   - Stats: price, market cap, holders, volume.
 - **Functionality:**  
-  - “Buy Pass” CTA (if not a holder), “Sell Pass” (if a holder).
-  - “Subscribe” to tiers (if available).
+  - "Buy Pass" CTA (if not a holder), "Sell Pass" (if a holder).
+  - "Subscribe" to tiers (if available).
 - **Best Practices:**  
   - Use clear, prominent CTAs.
   - Show price impact and fees before confirming transactions.
@@ -120,13 +120,13 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 
 ### **Subscription Tiers**
 - **Visual:**  
-  - Cards for each tier: name, price, duration, benefits, “Subscribe” button.
+  - Cards for each tier: name, price, duration, benefits, "Subscribe" button.
 - **Functionality:**  
-  - Show user’s current tier/status.
+  - Show user's current tier/status.
   - Allow upgrade/downgrade/cancel.
 - **Best Practices:**  
   - Highlight best value tier.
-  - Use badges for “Most Popular”, “Best Value”.
+  - Use badges for "Most Popular", "Best Value".
 
 ### **Community & Content**
 - **Visual:**  
@@ -135,7 +135,7 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
   - Only accessible to pass/subscription holders.
   - Allow comments, likes, or reactions.
 - **Best Practices:**  
-  - Encourage engagement with prompts (“Share your thoughts!”).
+  - Encourage engagement with prompts ("Share your thoughts!").
   - Use skeleton loaders for content.
 
 ---
@@ -152,7 +152,7 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
   - Notifications for price alerts, new content, expiring subscriptions.
 - **Best Practices:**  
   - Use charts for portfolio value.
-  - Show actionable insights (“Your pass value increased 10%!”).
+  - Show actionable insights ("Your pass value increased 10%!").
 
 ### **Creator Dashboard**
 - **Visual:**  
@@ -201,7 +201,7 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
   - Promo codes for discounts or exclusive access.
 - **Best Practices:**  
   - Use countdowns for limited-time offers.
-  - Highlight exclusivity (“Only 50 left!”).
+  - Highlight exclusivity ("Only 50 left!").
 
 ### **Community Engagement**
 - **Functionality:**  
@@ -233,10 +233,10 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 - **Always provide context:**  
   - Tooltips, modals, and onboarding flows explain features and next steps.
 - **Clear CTAs:**  
-  - Use action verbs (“Buy Pass”, “Join Community”, “Start Outpost”).
+  - Use action verbs ("Buy Pass", "Join Community", "Start Outpost").
   - Place CTAs where users expect them (top right, end of cards, after explanations).
 - **Progressive Disclosure:**  
-  - Don’t overwhelm; reveal advanced features as users engage more.
+  - Don't overwhelm; reveal advanced features as users engage more.
 
 ---
 
@@ -267,7 +267,7 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 ## 12. **Security & Trust**
 
 - **Visual cues for security:**  
-  - Lock icons, “verified creator” badges, clear transaction confirmations.
+  - Lock icons, "verified creator" badges, clear transaction confirmations.
 - **Best Practices:**  
   - Always show fees and slippage before confirming.
   - Use modals for sensitive actions (buy, sell, withdraw).
@@ -277,11 +277,11 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 # Example User Flows
 
 ### **User:**
-1. Lands on Home → Clicks “Discover Creators” → Browses Outposts → Buys a Pass → Joins Community → Gets badge for first purchase.
-2. Receives notification: “Your pass value increased!” → Shares on social → Invites friends for referral rewards.
+1. Lands on Home → Clicks "Discover Creators" → Browses Outposts → Buys a Pass → Joins Community → Gets badge for first purchase.
+2. Receives notification: "Your pass value increased!" → Shares on social → Invites friends for referral rewards.
 
 ### **Creator:**
-1. Connects wallet → Clicks “Start Your Outpost” → Fills out profile, sets tiers → Launches outpost.
+1. Connects wallet → Clicks "Start Your Outpost" → Fills out profile, sets tiers → Launches outpost.
 2. Posts exclusive content → Sells passes → Views analytics → Runs a merch drop for top supporters.
 
 ---
@@ -296,4 +296,32 @@ Absolutely! Here’s a **comprehensive visual and functional guide** for craftin
 
 ---
 
-**This guide should empower your team to build a world-class SocialFi experience on Podium Nexus—one that’s fun, profitable, and accessible for all. If you want wireframes, component breakdowns, or further detail on any section, just ask!**
+**This guide should empower your team to build a world-class SocialFi experience on Podium Nexus—one that's fun, profitable, and accessible for all. If you want wireframes, component breakdowns, or further detail on any section, just ask!**
+
+## Web3Auth + Aptos: Message Signing (Best Practice)
+
+- Web3Auth does **NOT** natively support `aptos_signMessage` via the provider for Aptos.
+- To sign messages (for authentication or transactions):
+  1. Retrieve the private key from the provider:
+     ```ts
+     const rawPrivateKey = await provider.request({ method: 'private_key' });
+     ```
+  2. Convert the hex string to a `Uint8Array` and construct an `Ed25519Account` (or `Account` from `@aptos-labs/ts-sdk`):
+     ```ts
+     const privateKeyUint8Array = new Uint8Array(
+       rawPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+     );
+     const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
+     const ed25519PrivateKey = new Ed25519PrivateKey(privateKeyUint8Array.slice(0, 32));
+     const aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
+     ```
+  3. Use the SDK to sign the message:
+     ```ts
+     const encoder = new TextEncoder();
+     const messageBuffer = encoder.encode(message);
+     const signature = aptosAccount.signBuffer(messageBuffer);
+     ```
+- **Do not use `aptos_signMessage` with Web3Auth provider for Aptos.**
+- This pattern is required for all authentication and transaction signing flows with Web3Auth + Aptos.
+
+See `src/services/web3authService.ts` for the robust implementation.

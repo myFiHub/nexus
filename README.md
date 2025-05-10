@@ -160,3 +160,31 @@ The platform supports multiple authentication methods:
 - Network: Movement Mainnet
 - Chain ID: 126
 - Protocol Address: 0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa
+
+## Web3Auth + Aptos: Message Signing (Best Practice)
+
+- Web3Auth does **NOT** natively support `aptos_signMessage` via the provider for Aptos.
+- To sign messages (for authentication or transactions):
+  1. Retrieve the private key from the provider:
+     ```ts
+     const rawPrivateKey = await provider.request({ method: 'private_key' });
+     ```
+  2. Convert the hex string to a `Uint8Array` and construct an `Ed25519Account` (or `Account` from `@aptos-labs/ts-sdk`):
+     ```ts
+     const privateKeyUint8Array = new Uint8Array(
+       rawPrivateKey.match(/.{1,2}/g).map((byte) => parseInt(byte, 16))
+     );
+     const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
+     const ed25519PrivateKey = new Ed25519PrivateKey(privateKeyUint8Array.slice(0, 32));
+     const aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
+     ```
+  3. Use the SDK to sign the message:
+     ```ts
+     const encoder = new TextEncoder();
+     const messageBuffer = encoder.encode(message);
+     const signature = aptosAccount.signBuffer(messageBuffer);
+     ```
+- **Do not use `aptos_signMessage` with Web3Auth provider for Aptos.**
+- This pattern is required for all authentication and transaction signing flows with Web3Auth + Aptos.
+
+See `src/services/web3authService.ts` for the robust implementation.

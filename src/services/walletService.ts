@@ -1,4 +1,4 @@
-import web3AuthService from './web3authService';
+import web3AuthService from './web3AuthService';
 import { AppDispatch } from '../redux/store';
 import { startConnecting, setWallet, setError, disconnect } from '../redux/slices/walletSlice';
 import { getAptosWallets, type NetworkInfo } from '@aptos-labs/wallet-standard';
