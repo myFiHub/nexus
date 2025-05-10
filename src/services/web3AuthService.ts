@@ -166,40 +166,30 @@ class Web3AuthService {
     if (!rawPrivateKey) {
       throw new Error('Web3Auth provider did not return a private key');
     }
-    // Step 2: Convert hex string to Uint8Array (32 bytes)
-    let privateKeyUint8Array: Uint8Array;
-    try {
-      privateKeyUint8Array = new Uint8Array(
-        rawPrivateKey.match(/.{1,2}/g)!.map((byte: any) => parseInt(byte, 16))
-      );
-      console.debug('[Web3AuthService] signMessage: Converted private key to Uint8Array', privateKeyUint8Array);
-    } catch (e) {
-      console.error('[Web3AuthService] signMessage: Failed to convert private key to Uint8Array', e);
-      throw new Error('Failed to convert private key to Uint8Array');
-    }
-    // Step 3: Construct Ed25519Account
-    let aptosAccount: any;
     try {
       const { Ed25519Account, Ed25519PrivateKey } = await import('@aptos-labs/ts-sdk');
-      const ed25519PrivateKey = new Ed25519PrivateKey(privateKeyUint8Array.slice(0, 32));
-      aptosAccount = new Ed25519Account({ privateKey: ed25519PrivateKey });
-      console.debug('[Web3AuthService] signMessage: Constructed Ed25519Account', aptosAccount);
-    } catch (e) {
-      console.error('[Web3AuthService] signMessage: Failed to construct Ed25519Account', e);
-      throw new Error('Failed to construct Ed25519Account');
-    }
-    // Step 4: Sign the message using the Aptos SDK
-    try {
-      // The signMessage method may differ depending on SDK version
-      // For @aptos-labs/ts-sdk, use signBuffer or signMessage
+      const privateKey = new Ed25519PrivateKey(rawPrivateKey);
+      const account = new Ed25519Account({ privateKey });
       const encoder = new TextEncoder();
       const messageBuffer = encoder.encode(message);
-      const signature = aptosAccount.signBuffer(messageBuffer);
-      console.debug('[Web3AuthService] signMessage: Signed message', signature);
-      // Return as hex string
-      return Buffer.from(signature).toString('hex');
+      const signature = account.sign(messageBuffer);
+      console.debug('[Web3AuthService] signMessage: Signature object', signature);
+      let signatureHex: string;
+      if (typeof signature.toString === 'function') {
+        signatureHex = signature.toString();
+      } else if (typeof signature.toUint8Array === 'function') {
+        signatureHex = Buffer.from(signature.toUint8Array()).toString('hex');
+      } else {
+        throw new Error('Unknown signature format');
+      }
+      // Optionally ensure it starts with 0x
+      if (!signatureHex.startsWith('0x')) {
+        signatureHex = '0x' + signatureHex;
+      }
+      console.debug('[Web3AuthService] signMessage: Signature hex', signatureHex);
+      return signatureHex;
     } catch (e) {
-      console.error('[Web3AuthService] signMessage: Failed to sign message', e);
+      console.error('[Web3AuthService] signMessage: Failed to sign message with Aptos account', e);
       throw new Error('Failed to sign message with Aptos account');
     }
   }
