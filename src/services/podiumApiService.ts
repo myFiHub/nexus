@@ -1,5 +1,7 @@
 import axios from 'axios';
 import store from '../redux/store';
+import { getEvmAddressFromPrivateKey } from './walletService';
+import { ethers, verifyMessage } from 'ethers';
 
 // Use environment variable for backend API base URL (best practice)
 const API_BASE = import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || 'https://prod.podium.myfihub.com/api/v1';
@@ -25,13 +27,59 @@ podiumApi.interceptors.request.use(
 );
 
 // Login with wallet (get JWT)
-export async function loginWithWallet(address: string, signature: string) {
+/**
+ * @param payload The login request payload (see LoginRequest structure)
+ */
+export async function loginWithWallet(payload: any) {
   try {
-    const res = await podiumApi.post('/auth/login', { address, signature });
-    console.debug('[podiumApiService] loginWithWallet:', res.data.data);
+    console.debug('[podiumApiService] loginWithWallet payload:', payload);
+    const res = await podiumApi.post('/auth/login', payload);
+    console.debug('[podiumApiService] loginWithWallet response:', res.data.data);
     return res.data.data;
   } catch (e) {
     console.error('[podiumApiService] loginWithWallet error:', e);
+    throw e;
+  }
+}
+
+// Login with Aptos wallet, using EVM-compatible address for authentication.
+/**
+ * @param address The user's Aptos address (Move address)
+ * @param signature (deprecated, ignored)
+ * @returns The login response (JWT, etc.)
+ */
+export async function loginWithAptosWallet(address: string, _signature: string, provider?: any) {
+  // Step 1: Get the private key from the provider
+  if (!provider || typeof provider.request !== 'function') {
+    throw new Error('Web3Auth provider is required and must support request method');
+  }
+  const rawPrivateKey = await provider.request({ method: 'private_key' });
+  if (!rawPrivateKey) {
+    throw new Error('Failed to get private key from provider');
+  }
+  // Step 2: Derive EVM and Aptos addresses
+  const evmAddress = getEvmAddressFromPrivateKey(rawPrivateKey);
+  const aptosAddress = address; // Already provided
+  // Step 3: Sign the EVM address with the private key (EVM signature)
+  const pk = rawPrivateKey.startsWith('0x') ? rawPrivateKey : '0x' + rawPrivateKey;
+  const wallet = new ethers.Wallet(pk);
+  const signature = await wallet.signMessage(evmAddress);
+  // Debug: Verify the signature locally before sending
+  const recovered = verifyMessage(evmAddress, signature);
+  console.debug('[podiumApiService] Signature verification: Recovered:', recovered, 'Expected:', evmAddress);
+  // Step 4: Build payload
+  const payload = {
+    username: evmAddress,
+    signature,
+    aptos_address: aptosAddress,
+  };
+  try {
+    console.debug('[podiumApiService] loginWithAptosWallet payload:', payload);
+    const res = await podiumApi.post('/auth/login', payload);
+    console.debug('[podiumApiService] loginWithAptosWallet response:', res.data.data);
+    return res.data.data;
+  } catch (e) {
+    console.error('[podiumApiService] loginWithAptosWallet error:', e);
     throw e;
   }
 }

@@ -4,6 +4,9 @@ import { startConnecting, setWallet, setError, disconnect } from '../redux/slice
 import { getAptosWallets, type NetworkInfo } from '@aptos-labs/wallet-standard';
 import { Network, Aptos, AptosConfig } from '@aptos-labs/ts-sdk';
 import { APTOS_NODE_URL } from '../config/config';
+import { ethers } from 'ethers';
+import { loginWithAptosWallet } from './podiumApiService';
+import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
 
 export interface WalletInfo {
   address: string;
@@ -231,5 +234,46 @@ const walletService = {
     throw new Error('Unsupported wallet type for signMessage.');
   },
 };
+
+/**
+ * Derives the EVM-compatible address from a hex private key.
+ * @param privateKey The private key as a hex string (with or without 0x prefix)
+ * @returns The EVM-compatible address (0x...)
+ */
+export function getEvmAddressFromPrivateKey(privateKey: string): string {
+  // Ensure the private key has 0x prefix
+  const pk = privateKey.startsWith('0x') ? privateKey : '0x' + privateKey;
+  const wallet = new ethers.Wallet(pk);
+  return wallet.address;
+}
+
+/**
+ * Centralized login flow for Web3Auth + Aptos: gets private key, derives addresses, signs, and authenticates.
+ * @param dispatch Redux dispatch
+ * @param provider Web3Auth provider object
+ * @param aptosAddress The user's Aptos address (Move address)
+ * @returns The login response (JWT, etc.)
+ */
+export async function loginWithWeb3AuthAndAptos(dispatch: any, provider: any, aptosAddress: string) {
+  dispatch(setSessionLoading(true));
+  try {
+    console.debug('[walletService] loginWithWeb3AuthAndAptos: Starting login flow', { aptosAddress, provider });
+    const result = await loginWithAptosWallet(aptosAddress, '', provider);
+    console.debug('[walletService] loginWithWeb3AuthAndAptos: loginWithAptosWallet result', result);
+    if (result && result.token) {
+      dispatch(setToken(result.token));
+    } else {
+      dispatch(setSessionError('Login failed: No token returned'));
+    }
+    return result;
+  } catch (e: any) {
+    console.error('[walletService] loginWithWeb3AuthAndAptos error:', e);
+    const errorMsg = (e && typeof e.message === 'string' && e.message) ? e.message : 'Login failed. Please reconnect your wallet.';
+    dispatch(setSessionError(errorMsg));
+    throw e;
+  } finally {
+    dispatch(setSessionLoading(false));
+  }
+}
 
 export default walletService; 

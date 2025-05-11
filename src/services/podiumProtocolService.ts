@@ -1,6 +1,8 @@
 // podiumProtocolService: Handles contract interactions for outposts, creators, passes, and subscriptions
 // Add methods for fetching, trading, subscribing, etc.
 
+import podiumProtocol from './podiumProtocol';
+
 const podiumProtocolService = {
   // Fetch outposts
   async fetchOutposts() {
@@ -37,5 +39,27 @@ const podiumProtocolService = {
     return null;
   },
 };
+
+// List of official Podium team member Aptos addresses (update as needed)
+export const podiumTeamMembersAptosAddresses: string[] = [
+  // Official Podium team member address
+  '0x18b91d9012b06fc7b9df498be6bfb6f75809febc421603683e4739967ca06743',
+  '0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2'
+];
+
+/**
+ * Checks if the user has a Podium Pass (ticket) from any official seller.
+ * @param myAptosAddress The user's Aptos address
+ * @returns Promise<boolean> true if user has a ticket, false otherwise
+ */
+export async function checkIfUserHasPodiumDefinedEntryTicket(myAptosAddress: string): Promise<boolean> {
+  const balancePromises = podiumTeamMembersAptosAddresses.map(
+    (sellerAddress) => podiumProtocol.getPassBalance(myAptosAddress, sellerAddress)
+  );
+  const balances = await Promise.all(balancePromises);
+  const hasTicket = balances.some(balance => balance && BigInt(balance) > 0n);
+  console.debug('[podiumProtocolService] checkIfUserHasPodiumDefinedEntryTicket:', { myAptosAddress, balances, hasTicket });
+  return hasTicket;
+}
 
 export default podiumProtocolService; 

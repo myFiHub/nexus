@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import walletService from '../services/walletService';
-import { loginWithWallet, fetchOutposts, fetchUserPasses } from '../services/podiumApiService';
+import walletService, { loginWithWeb3AuthAndAptos } from '../services/walletService';
+import { loginWithWallet, fetchOutposts, fetchUserPasses, loginWithAptosWallet } from '../services/podiumApiService';
 import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
 import { RootState } from '../redux/store';
 import { 
@@ -12,6 +12,7 @@ import {
   selectWalletProvider 
 } from '../redux/walletSelectors';
 import store from '../redux/store';
+import { checkIfUserHasPodiumDefinedEntryTicket } from '../services/podiumProtocolService';
 
 // Types for mock data (to be replaced with real data)
 interface UserPass {
@@ -66,24 +67,15 @@ const Dashboard: React.FC = () => {
       return;
     }
     const doLogin = async () => {
-      dispatch(setSessionLoading(true));
       try {
         console.debug('[Dashboard] Attempting login with wallet:', address, walletType);
-        const loginMessage = `Sign in to Podium Nexus at ${new Date().toISOString()}`;
-        const signature = await walletService.signMessage(address, loginMessage, walletType, provider);
-        const result = await loginWithWallet(address, signature);
-        if (result && result.token) {
-          dispatch(setToken(result.token));
-        } else {
-          dispatch(setSessionError('Login failed: No token returned'));
-        }
+        await loginWithWeb3AuthAndAptos(dispatch, provider, address || '');
       } catch (e: any) {
         console.error('[Dashboard] Login error:', e);
         const errorMsg = (e && typeof e.message === 'string' && e.message) ? e.message : 'Login failed. Please reconnect your wallet.';
         dispatch(setSessionError(errorMsg));
       } finally {
         setLoginAttempted(true);
-        dispatch(setSessionLoading(false));
       }
     };
     doLogin();
