@@ -316,6 +316,22 @@ class PodiumProtocol {
       return false;
     }
   }
+
+  // Get asset symbol for a podium pass (by target address)
+  async getAssetSymbol(targetAddress) {
+    const client = await this.getWorkingClient();
+    try {
+      const result = await client.view({
+        function: `${this.moduleAddress}::PodiumProtocol::get_asset_symbol`,
+        type_arguments: [],
+        arguments: [targetAddress]
+      });
+      return result[0] || '';
+    } catch (error) {
+      console.error('Error fetching asset symbol:', error);
+      return '';
+    }
+  }
 }
 
 export default new PodiumProtocol(); 

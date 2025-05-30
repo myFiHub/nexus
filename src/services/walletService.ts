@@ -3,7 +3,7 @@ import { AppDispatch } from '../redux/store';
 import { startConnecting, setWallet, setError, disconnect } from '../redux/slices/walletSlice';
 import { getAptosWallets, type NetworkInfo } from '@aptos-labs/wallet-standard';
 import { Network, Aptos, AptosConfig } from '@aptos-labs/ts-sdk';
-import { APTOS_NODE_URL } from '../config/config';
+import { APTOS_NODE_URL, MOVE_COIN_TYPES } from '../config/config';
 import { ethers } from 'ethers';
 import { loginWithAptosWallet } from './podiumApiService';
 import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
@@ -273,6 +273,32 @@ export async function loginWithWeb3AuthAndAptos(dispatch: any, provider: any, ap
     throw e;
   } finally {
     dispatch(setSessionLoading(false));
+  }
+}
+
+/**
+ * Fetch all MOVE balances (native and FA) for a given address.
+ * Returns an array of { type, balance } for each CoinStore that is a MOVE coin.
+ */
+export async function fetchAllMoveBalances(address: string): Promise<{ type: string; balance: string }[]> {
+  try {
+    const config = new AptosConfig({ network: Network.MAINNET, fullnode: APTOS_NODE_URL });
+    const aptos = new Aptos(config);
+    const resources = await aptos.account.getAccountResources({ accountAddress: address });
+    // Find all CoinStores for MOVE coins (by known types)
+    const moveCoinStores = resources.filter((r: any) => {
+      if (!r.type.startsWith('0x1::coin::CoinStore<')) return false;
+      const match = r.type.match(/^0x1::coin::CoinStore<(.+)>$/);
+      if (!match) return false;
+      return MOVE_COIN_TYPES.includes(match[1]);
+    });
+    return moveCoinStores.map((r: any) => ({
+      type: r.type,
+      balance: r.data?.coin?.value || '0',
+    }));
+  } catch (error) {
+    console.error('[walletService] Error fetching all MOVE balances:', error);
+    return [];
   }
 }
 

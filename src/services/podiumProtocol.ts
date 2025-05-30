@@ -49,6 +49,7 @@ export interface PodiumProtocolInterface {
     referralFee: number;
   }>;
   verifySubscription(subscriberAddress: string, outpostAddress: string, tierId: number): Promise<boolean>;
+  getAssetSymbol(targetAddress: string): Promise<string>;
 }
 
 // Import the JavaScript implementation

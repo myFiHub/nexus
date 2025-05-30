@@ -48,6 +48,18 @@ export const podiumTeamMembersAptosAddresses: string[] = [
 ];
 
 /**
+ * TEMPORARY: List of Podium Outpost addresses to check balances for.
+ * Replace or extend this list as needed for local/dev testing.
+ * When server or on-chain registry is available, this will be replaced.
+ */
+export const PODIUM_TARGET_ADDRESSES: string[] = [
+  // Example outpost addresses (replace with real ones as needed)
+  '0x18b91d9012b06fc7b9df498be6bfb6f75809febc421603683e4739967ca06743',
+  '0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2',
+  // Add more addresses here
+];
+
+/**
  * Checks if the user has a Podium Pass (ticket) from any official seller.
  * @param myAptosAddress The user's Aptos address
  * @returns Promise<boolean> true if user has a ticket, false otherwise

@@ -57,22 +57,27 @@ export async function loginWithAptosWallet(address: string, _signature: string, 
   if (!rawPrivateKey) {
     throw new Error('Failed to get private key from provider');
   }
-  // Step 2: Derive EVM and Aptos addresses
-  const evmAddress = getEvmAddressFromPrivateKey(rawPrivateKey);
-  const aptosAddress = address; // Already provided
-  // Step 3: Sign the EVM address with the private key (EVM signature)
-  const pk = rawPrivateKey.startsWith('0x') ? rawPrivateKey : '0x' + rawPrivateKey;
-  const wallet = new ethers.Wallet(pk);
+
+  // Step 2: Create an Ethereum wallet from the private key
+  const wallet = new ethers.Wallet(rawPrivateKey);
+  const evmAddress = wallet.address;
+
+  // Step 3: Sign the EVM address with the Ethereum wallet
   const signature = await wallet.signMessage(evmAddress);
-  // Debug: Verify the signature locally before sending
+
+  // Step 4: Verify the signature locally before sending
   const recovered = verifyMessage(evmAddress, signature);
-  console.debug('[podiumApiService] Signature verification: Recovered:', recovered, 'Expected:', evmAddress);
-  // Step 4: Build payload
+  console.debug('[podiumApiService] Signature verification:', { recovered, expected: evmAddress });
+
+  // Step 5: Build payload with proper format
   const payload = {
     username: evmAddress,
-    signature,
-    aptos_address: aptosAddress,
+    signature: signature,
+    aptos_address: address,
+    wallet_type: 'web3auth',
+    chain_id: 1
   };
+
   try {
     console.debug('[podiumApiService] loginWithAptosWallet payload:', payload);
     const res = await podiumApi.post('/auth/login', payload);

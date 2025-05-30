@@ -130,6 +130,10 @@ interface UiConfig {
   };
 }
 
+interface IndexerConfig {
+  GRAPHQL_URL: string;
+}
+
 // Environment variable validation
 const validateEnvVar = (name: string, value: string | undefined): string => {
   if (!value) {
@@ -212,15 +216,10 @@ export const CONTRACT_ADDRESSES: ContractAddresses = {
 // Podium Protocol configuration
 export const PODIUM_PROTOCOL_CONFIG: PodiumProtocolConfig = {
   CONTRACT_ADDRESS: import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS || "0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa",
-  RPC_URL: "https://mainnet.movementnetwork.xyz/v1",
-  PARTNER_RPC_URLS: [
-    "https://movement.blockpi.network/rpc/v1/public/v1",
-    "https://movement.lava.build/",
-    "https://movement-rpc.nodeops.network/v1",
-    "https://rpc.sentio.xyz/movement/v1",
-    "https://movement.hellomoon.io/v1",
-    "https://rpc.ankr.com/http/movement_mainnet/v1"
-  ]
+  RPC_URL: import.meta.env.DEV 
+    ? "https://cors-anywhere.herokuapp.com/https://mainnet.movementnetwork.xyz/v1"
+    : "https://mainnet.movementnetwork.xyz/v1",
+  PARTNER_RPC_URLS: []
 };
 
 // API configuration
@@ -285,6 +284,22 @@ export const DEFAULTS = {
 // Export the Aptos/Movement node URL from env
 export const APTOS_NODE_URL = import.meta.env.VITE_APTOS_NODE_URL || 'https://mainnet.movementnetwork.xyz/v1';
 
+/**
+ * List of known MOVE coin types (native, FA, etc.) for Movement and Aptos.
+ * Extend this list as new types are added to the ecosystem.
+ */
+export const MOVE_COIN_TYPES: string[] = [
+  '0x1::aptos_coin::AptosCoin', // Aptos native
+  '0x1::move::MOVE',            // Movement native
+  '0xa::move::MOVE',            // FA MOVE (example, update as needed)
+  '0x000000000000000000000000000000000000000000000000000000000000000a', // Movement mainnet MOVE
+  // Add more as needed from bridge docs
+];
+
+export const INDEXER_CONFIG = {
+  GRAPHQL_URL: import.meta.env.VITE_MOVEMENT_INDEXER_GRAPHQL_URL || "https://indexer.testnet.movementnetwork.xyz/v1/graphql",
+};
+
 export default {
   WEB3AUTH_CONFIG,
   PODIUM_PROTOCOL_CONFIG,
@@ -298,4 +313,5 @@ export default {
   FEATURE_FLAGS,
   UI_CONFIG,
   DEFAULTS,
+  INDEXER_CONFIG,
 }; 

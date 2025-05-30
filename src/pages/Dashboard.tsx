@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Card from '../components/Card';
 import Button from '../components/Button';
-import walletService, { loginWithWeb3AuthAndAptos } from '../services/walletService';
+import walletService, { loginWithWeb3AuthAndAptos, fetchAllMoveBalances } from '../services/walletService';
 import { loginWithWallet, fetchOutposts, fetchUserPasses, loginWithAptosWallet } from '../services/podiumApiService';
 import { setToken, setLoading as setSessionLoading, setError as setSessionError } from '../redux/slices/sessionSlice';
 import { RootState } from '../redux/store';
@@ -12,7 +12,11 @@ import {
   selectWalletProvider 
 } from '../redux/walletSelectors';
 import store from '../redux/store';
-import { checkIfUserHasPodiumDefinedEntryTicket } from '../services/podiumProtocolService';
+import { checkIfUserHasPodiumDefinedEntryTicket, PODIUM_TARGET_ADDRESSES } from '../services/podiumProtocolService';
+import podiumProtocol from '../services/podiumProtocol';
+import { PODIUM_PROTOCOL_CONFIG } from '../config/config';
+import { getUserTokenBalances } from '../services/movementIndexerService';
+import { MOVE_COIN_TYPES } from '../config/config';
 
 // Types for mock data (to be replaced with real data)
 interface UserPass {
@@ -28,6 +32,81 @@ interface Outpost {
   description: string;
   currentPrice: number;
 }
+
+// Types for on-chain data
+interface OnChainPass {
+  outpostAddress: string;
+  outpostName: string;
+  balance: number;
+  currentPrice: number;
+}
+
+// Helper to create a fallback label for a target address
+const fallbackLabel = (address: string) => `Podium Pass: ${address.slice(0, 6)}...${address.slice(-4)}`;
+
+// Helper to format MOVE/coin values (divide by 1e8, show up to 8 decimals, use commas)
+const formatMoveAmount = (value: number | string) =>
+  (Number(value) / 1e8).toLocaleString(undefined, { maximumFractionDigits: 8 });
+
+// Helper to label asset types
+const getAssetLabel = (assetType: string) => {
+  if (assetType === '0x000000000000000000000000000000000000000000000000000000000000000a') {
+    return 'MOVE';
+  }
+  return assetType;
+};
+
+// Utility: Copy to clipboard
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert('Copied to clipboard!');
+  } catch (e) {
+    alert('Failed to copy!');
+  }
+};
+
+// Utility: Shorten address
+const shortenAddress = (address: string) => address ? `${address.slice(0, 6)}...${address.slice(-4)}` : '';
+
+// Utility: Tooltip (simple hover)
+const Tooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
+  const [show, setShow] = React.useState(false);
+  return (
+    <span className="relative inline-block"
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+      tabIndex={0}
+      onFocus={() => setShow(true)}
+      onBlur={() => setShow(false)}
+    >
+      {children}
+      {show && (
+        <span className="absolute z-10 left-1/2 -translate-x-1/2 mt-2 px-3 py-1 rounded bg-[var(--color-surface)] text-xs text-[var(--color-text-main)] shadow-lg whitespace-nowrap">
+          {text}
+        </span>
+      )}
+    </span>
+  );
+};
+
+// Utility: Calculate total sell value for passes (calls contract)
+const calculateTotalSellValue = async (passAddress: string, amount: number) => {
+  if (!passAddress || !amount) return 0;
+  try {
+    // Use podiumProtocol.calculate_sell_price_with_fees if available
+    if (typeof podiumProtocol.calculate_sell_price_with_fees === 'function') {
+      const [price] = await podiumProtocol.calculate_sell_price_with_fees(passAddress, amount);
+      return price;
+    }
+    // Fallback: multiply by current price (not accurate for bonding curve)
+    const currentPrice = await podiumProtocol.getPassPrice(passAddress);
+    return currentPrice * amount;
+  } catch (e) {
+    console.error('[Dashboard] Error calculating total sell value:', e);
+    return 0;
+  }
+};
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch();
@@ -49,6 +128,20 @@ const Dashboard: React.FC = () => {
   const [loginAttempted, setLoginAttempted] = useState(false);
   // Provider rehydration state
   const [providerSyncing, setProviderSyncing] = useState(false);
+
+  // State for on-chain balances
+  const [moveBalance, setMoveBalance] = useState<string>('0');
+  const [onChainPasses, setOnChainPasses] = useState<OnChainPass[]>([]);
+  // moveBalances now includes metadata for each asset
+  const [moveBalances, setMoveBalances] = useState<{ type: string; balance: string; metadata?: any }[]>([]);
+
+  // Move these hooks outside the map function
+  const [buyPrices, setBuyPrices] = React.useState<Record<string, number | null>>({});
+  const [sellPrices, setSellPrices] = React.useState<Record<string, number | null>>({});
+  const [totalValues, setTotalValues] = React.useState<Record<string, number | null>>({});
+  const [showBuyModal, setShowBuyModal] = React.useState<Record<string, boolean>>({});
+  const [showSellModal, setShowSellModal] = React.useState<Record<string, boolean>>({});
+  const [tradeAmounts, setTradeAmounts] = React.useState<Record<string, number>>({});
 
   // Wallet login/authentication effect
   useEffect(() => {
@@ -121,6 +214,134 @@ const Dashboard: React.FC = () => {
     }
   }, [isConnected, jwt, sessionLoading]);
 
+  // Fetch MOVE balance and on-chain passes (prefer indexer)
+  useEffect(() => {
+    if (!isConnected || !address) return;
+    setDataLoading(true);
+    setDataError(null);
+    (async () => {
+      try {
+        let indexerBalances: any[] = [];
+        try {
+          indexerBalances = await getUserTokenBalances(address);
+          console.debug('[Dashboard] Indexer balances full:', indexerBalances);
+        } catch (e) {
+          console.error('[Dashboard] Indexer fetch failed, falling back to on-chain:', e);
+        }
+        if (indexerBalances && indexerBalances.length > 0) {
+          // MOVE balances (include metadata)
+          setMoveBalances(indexerBalances.filter((b: any) => MOVE_COIN_TYPES.includes(b.asset_type)).map((b: any) => ({ type: b.asset_type, balance: b.amount, metadata: b.metadata })));
+          // Podium Passes: project_uri === 'https://podium.fi/pass/'
+          const passResults: OnChainPass[] = indexerBalances
+            .filter((b: any) => b.metadata && b.metadata.project_uri === 'https://podium.fi/pass/')
+            .map((b: any) => ({
+              outpostAddress: b.asset_type,
+              outpostName: getAssetLabel(b.asset_type),
+              balance: Number(b.amount),
+              currentPrice: 0, // Price not available from indexer
+            }));
+          setOnChainPasses(passResults);
+          // For backward compatibility, set the first as moveBalance
+          const firstMove = indexerBalances.find((b: any) => MOVE_COIN_TYPES.includes(b.asset_type));
+          setMoveBalance(firstMove ? firstMove.amount : '0');
+        } else {
+          // Fallback to on-chain fetchAllMoveBalances
+          const allMoveBalances = await fetchAllMoveBalances(address);
+          // Add metadata: null for fallback balances
+          setMoveBalances(allMoveBalances.map((b: any) => ({ ...b, metadata: null })));
+          if (allMoveBalances.length === 0) {
+            setMoveBalance('0');
+          } else {
+            setMoveBalance(allMoveBalances[0].balance);
+          }
+          console.debug('[Dashboard] All MOVE balances (on-chain fallback):', allMoveBalances);
+          // Fallback: fetch passes on-chain as before
+          /*
+          const passResults: OnChainPass[] = [];
+          for (const targetAddress of PODIUM_TARGET_ADDRESSES) {
+            let targetName = '';
+            try {
+              targetName = await podiumProtocol.getAssetSymbol(targetAddress);
+              if (!targetName) {
+                targetName = fallbackLabel(targetAddress);
+                console.debug(`[Dashboard] No symbol for ${targetAddress}, using fallback.`);
+              } else {
+                console.debug(`[Dashboard] Got symbol for ${targetAddress}:`, targetName);
+              }
+            } catch (e) {
+              targetName = fallbackLabel(targetAddress);
+              console.debug(`[Dashboard] getAssetSymbol failed for ${targetAddress}, using fallback.`, e);
+            }
+            const balance = await podiumProtocol.getPassBalance(address, targetAddress);
+            if (balance && Number(balance) > 0) {
+              const currentPrice = await podiumProtocol.getPassPrice(targetAddress);
+              passResults.push({ outpostAddress: targetAddress, outpostName: targetName, balance: Number(balance), currentPrice: Number(currentPrice) });
+              console.debug(`[Dashboard] Pass for target ${targetName} (${targetAddress}): balance=${balance}, price=${currentPrice}`);
+            }
+          }
+          setOnChainPasses(passResults);
+          */
+        }
+      } catch (e: any) {
+        console.error('[Dashboard] On-chain/indexer data fetch error:', e);
+        setDataError(e?.message || 'Failed to fetch on-chain/indexer data');
+      } finally {
+        setDataLoading(false);
+      }
+    })();
+  }, [isConnected, address]);
+
+  // Fetch prices/values on mount
+  useEffect(() => {
+    const fetchPrices = async () => {
+      const newBuyPrices: Record<string, number | null> = {};
+      const newSellPrices: Record<string, number | null> = {};
+      const newTotalValues: Record<string, number | null> = {};
+
+      for (const pass of onChainPasses) {
+        if (typeof pass.outpostAddress === 'string') {
+          try {
+            const price = await podiumProtocol.getPassPrice(pass.outpostAddress);
+            newBuyPrices[pass.outpostAddress] = price;
+            newSellPrices[pass.outpostAddress] = price;
+            newTotalValues[pass.outpostAddress] = pass.balance * price;
+          } catch (e) {
+            console.error(`Error fetching price for ${pass.outpostAddress}:`, e);
+          }
+        }
+      }
+
+      setBuyPrices(newBuyPrices);
+      setSellPrices(newSellPrices);
+      setTotalValues(newTotalValues);
+    };
+
+    fetchPrices();
+  }, [onChainPasses]);
+
+  // Handlers
+  const handleBuy = async (passAddress: string) => {
+    if (!address) return;
+    try {
+      await podiumProtocol.buyPass(address, passAddress, tradeAmounts[passAddress] || 1);
+      alert('Buy transaction submitted!');
+    } catch (e) {
+      alert('Buy failed!');
+    }
+    setShowBuyModal(prev => ({ ...prev, [passAddress]: false }));
+  };
+
+  const handleSell = async (passAddress: string) => {
+    if (!address) return;
+    try {
+      await podiumProtocol.sellPass(address, passAddress, tradeAmounts[passAddress] || 1);
+      alert('Sell transaction submitted!');
+    } catch (e) {
+      alert('Sell failed!');
+    }
+    setShowSellModal(prev => ({ ...prev, [passAddress]: false }));
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <Card>
@@ -170,6 +391,25 @@ const Dashboard: React.FC = () => {
           </div>
         )}
 
+        {/* MOVE Balance Section */}
+        {isConnected && (
+          <section className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Your MOVE Balances</h2>
+            {moveBalances.length > 0 ? (
+              <ul className="space-y-1">
+                {moveBalances.map((mb, i) => (
+                  <li key={mb.type} className="font-mono text-[var(--color-success)]">
+                    {formatMoveAmount(mb.balance)} MOVE
+                    <span className="ml-2 text-xs text-[var(--color-text-muted)]">[{mb.type.slice(-30)}]</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-[var(--color-text-muted)]">No MOVE balances found.</p>
+            )}
+          </section>
+        )}
+
         {/* User Passes Section (placeholder) */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Your Passes</h2>
@@ -203,6 +443,99 @@ const Dashboard: React.FC = () => {
             </div>
           ) : (
             <p className="text-[var(--color-text-muted)]">No outposts available.</p>
+          )}
+        </section>
+
+        {/* On-Chain Passes Section (Refactored) */}
+        <section className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Your Podium Passes (On-Chain)</h2>
+          {onChainPasses.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {onChainPasses.map((pass) => {
+                const meta = moveBalances.find((b) => b.type === pass.outpostAddress)?.metadata || {};
+                const icon = meta.icon_uri || '/src/assets/images/podiumlogo.png';
+                const symbol = meta.symbol || shortenAddress(pass.outpostAddress);
+                const isPodiumPass = meta.project_uri === 'https://podium.fi/pass/';
+                const passAddress = typeof pass.outpostAddress === 'string' ? pass.outpostAddress : '';
+
+                return (
+                  <Card key={passAddress} className="bg-[var(--color-bg)] flex flex-col items-center text-center p-6">
+                    {/* Avatar/Icon */}
+                    <img src={icon} alt="Pass Icon" className="w-16 h-16 rounded-full mb-3 border-2 border-[var(--color-primary)] bg-[var(--color-surface)] object-cover" />
+                    {/* Symbol */}
+                    <div className="text-lg font-bold mb-1">{symbol}</div>
+                    {/* Balance */}
+                    <div className="text-sm text-[var(--color-success)] mb-2">Balance: {formatMoveAmount(pass.balance)}</div>
+                    {/* Target Address (copyable) */}
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <span className="font-mono text-xs text-[var(--color-text-muted)]">{shortenAddress(passAddress)}</span>
+                      <button onClick={() => copyToClipboard(passAddress)} aria-label="Copy target address" className="text-[var(--color-primary)] hover:underline text-xs">Copy</button>
+                    </div>
+                    {/* Pass FA Address (tooltip/copy) */}
+                    <div className="flex items-center justify-center gap-2 mb-2">
+                      <Tooltip text={passAddress}>
+                        <span className="font-mono text-xs text-[var(--color-text-muted)] cursor-pointer underline">FA Address</span>
+                      </Tooltip>
+                      <button onClick={() => copyToClipboard(passAddress)} aria-label="Copy FA address" className="text-[var(--color-primary)] hover:underline text-xs">Copy</button>
+                    </div>
+                    {/* Buy/Sell Prices and Total Value */}
+                    {isPodiumPass && (
+                      <>
+                        <div className="text-xs text-[var(--color-text-muted)] mb-1">Buy Price: <span className="text-[var(--color-primary)]">{buyPrices[passAddress] !== null ? formatMoveAmount(buyPrices[passAddress]!) : '...'}</span></div>
+                        <div className="text-xs text-[var(--color-text-muted)] mb-1">Sell Price: <span className="text-[var(--color-primary)]">{sellPrices[passAddress] !== null ? formatMoveAmount(sellPrices[passAddress]!) : '...'}</span></div>
+                        <div className="text-xs text-[var(--color-text-muted)] mb-2">Total Value (if sold): <span className="text-[var(--color-success)]">{totalValues[passAddress] !== null ? formatMoveAmount(totalValues[passAddress]!) : '...'}</span></div>
+                        {/* Buy/Sell Buttons */}
+                        <div className="flex gap-2 justify-center">
+                          <Button variant="primary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: true }))}>Buy</Button>
+                          <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: true }))}>Sell</Button>
+                        </div>
+                        {/* Buy Modal */}
+                        {showBuyModal[passAddress] && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
+                            <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
+                              <h3 className="text-lg font-bold mb-2">Buy Passes</h3>
+                              <input 
+                                type="number" 
+                                min={1} 
+                                value={tradeAmounts[passAddress] || 1} 
+                                onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
+                                className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
+                              />
+                              <div className="flex gap-2">
+                                <Button variant="primary" onClick={() => handleBuy(passAddress)}>Confirm</Button>
+                                <Button variant="secondary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        {/* Sell Modal */}
+                        {showSellModal[passAddress] && (
+                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
+                            <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
+                              <h3 className="text-lg font-bold mb-2">Sell Passes</h3>
+                              <input 
+                                type="number" 
+                                min={1} 
+                                max={pass.balance} 
+                                value={tradeAmounts[passAddress] || 1} 
+                                onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
+                                className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
+                              />
+                              <div className="flex gap-2">
+                                <Button variant="primary" onClick={() => handleSell(passAddress)}>Confirm</Button>
+                                <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </Card>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-[var(--color-text-muted)]">No on-chain passes found.</p>
           )}
         </section>
 
