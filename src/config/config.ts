@@ -216,9 +216,7 @@ export const CONTRACT_ADDRESSES: ContractAddresses = {
 // Podium Protocol configuration
 export const PODIUM_PROTOCOL_CONFIG: PodiumProtocolConfig = {
   CONTRACT_ADDRESS: import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS || "0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa",
-  RPC_URL: import.meta.env.DEV 
-    ? "https://cors-anywhere.herokuapp.com/https://mainnet.movementnetwork.xyz/v1"
-    : "https://mainnet.movementnetwork.xyz/v1",
+  RPC_URL: "https://mainnet.movementnetwork.xyz/v1",
   PARTNER_RPC_URLS: []
 };
 

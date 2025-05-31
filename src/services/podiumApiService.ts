@@ -1,7 +1,7 @@
 import axios from 'axios';
 import store from '../redux/store';
 import { getEvmAddressFromPrivateKey } from './walletService';
-import { ethers, verifyMessage } from 'ethers';
+import ethereumService from './ethereumService';
 
 // Use environment variable for backend API base URL (best practice)
 const API_BASE = import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || 'https://prod.podium.myfihub.com/api/v1';
@@ -58,34 +58,36 @@ export async function loginWithAptosWallet(address: string, _signature: string, 
     throw new Error('Failed to get private key from provider');
   }
 
-  // Step 2: Create an Ethereum wallet from the private key
-  const wallet = new ethers.Wallet(rawPrivateKey);
+  // Step 2: Create an Ethereum wallet and get the EVM address
+  const wallet = ethereumService.createWallet(rawPrivateKey);
   const evmAddress = wallet.address;
 
   // Step 3: Sign the EVM address with the Ethereum wallet
-  const signature = await wallet.signMessage(evmAddress);
+  const signature = await ethereumService.signMessage(rawPrivateKey, evmAddress);
 
   // Step 4: Verify the signature locally before sending
-  const recovered = verifyMessage(evmAddress, signature);
+  const recovered = ethereumService.verifySignature(evmAddress, signature);
   console.debug('[podiumApiService] Signature verification:', { recovered, expected: evmAddress });
 
-  // Step 5: Build payload with proper format
+  // Build the payload exactly as specified by the backend
   const payload = {
     username: evmAddress,
-    signature: signature,
-    aptos_address: address,
-    wallet_type: 'web3auth',
-    chain_id: 1
+    signature: signature
   };
+  console.debug(`[podiumApiService] loginWithAptosWallet payload:`, JSON.stringify(payload, null, 2));
 
   try {
-    console.debug('[podiumApiService] loginWithAptosWallet payload:', payload);
-    const res = await podiumApi.post('/auth/login', payload);
-    console.debug('[podiumApiService] loginWithAptosWallet response:', res.data.data);
-    return res.data.data;
-  } catch (e) {
-    console.error('[podiumApiService] loginWithAptosWallet error:', e);
-    throw e;
+    // Make the login request
+    const response = await podiumApi.post('/auth/login', payload);
+    console.debug(`[podiumApiService] Login response:`, JSON.stringify(response.data, null, 2));
+    return response.data.data;
+  } catch (error) {
+    console.error(`[podiumApiService] Login error details:`, {
+      status: error.response?.status,
+      data: error.response?.data,
+      headers: error.response?.headers
+    });
+    throw error;
   }
 }
 
