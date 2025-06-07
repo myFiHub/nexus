@@ -50,6 +50,12 @@ export interface PodiumProtocolInterface {
   }>;
   verifySubscription(subscriberAddress: string, outpostAddress: string, tierId: number): Promise<boolean>;
   getAssetSymbol(targetAddress: string): Promise<string>;
+  
+  // New price calculation methods
+  calculate_single_pass_price(supply: number): Promise<number>;
+  calculate_price(supply: number, amount: number, is_sell: boolean): Promise<number>;
+  calculate_buy_price_with_fees(targetAddress: string, amount: number, referrer: string | null): Promise<[number, number, number, number]>;
+  calculate_sell_price_with_fees(targetAddress: string, amount: number): Promise<[number, number, number]>;
 }
 
 // Import the JavaScript implementation

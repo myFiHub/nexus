@@ -17,6 +17,7 @@ import podiumProtocol from '../services/podiumProtocol';
 import { PODIUM_PROTOCOL_CONFIG } from '../config/config';
 import { getUserTokenBalances } from '../services/movementIndexerService';
 import { MOVE_COIN_TYPES } from '../config/config';
+import podiumProtocolService from '../services/podiumProtocolService';
 
 // Types for mock data (to be replaced with real data)
 interface UserPass {
@@ -142,6 +143,23 @@ const Dashboard: React.FC = () => {
   const [showBuyModal, setShowBuyModal] = React.useState<Record<string, boolean>>({});
   const [showSellModal, setShowSellModal] = React.useState<Record<string, boolean>>({});
   const [tradeAmounts, setTradeAmounts] = React.useState<Record<string, number>>({});
+
+  // Add new state for pass details
+  const [passDetails, setPassDetails] = useState<Record<string, {
+    symbol: string;
+    prices: {
+      singlePrice: number;
+      buyPrice: number;
+      sellPrice: number;
+      buyPriceWithFees: number;
+      sellPriceWithFees: number;
+      fees: {
+        buy: { protocol: number; subject: number; referral: number };
+        sell: { protocol: number; subject: number };
+      };
+    };
+    supply: number;
+  }>>({});
 
   // Wallet login/authentication effect
   useEffect(() => {
@@ -319,6 +337,27 @@ const Dashboard: React.FC = () => {
     fetchPrices();
   }, [onChainPasses]);
 
+  // Add new effect to fetch pass details
+  useEffect(() => {
+    const fetchPassDetails = async () => {
+      const details: Record<string, any> = {};
+      for (const pass of onChainPasses) {
+        try {
+          const passDetail = await podiumProtocolService.getPassDetails(pass.outpostAddress, pass.balance);
+          details[pass.outpostAddress] = passDetail;
+        } catch (error) {
+          console.error(`Error fetching details for pass ${pass.outpostAddress}:`, error);
+          // Show error toast or handle gracefully
+        }
+      }
+      setPassDetails(details);
+    };
+    
+    if (onChainPasses.length > 0) {
+      fetchPassDetails();
+    }
+  }, [onChainPasses]);
+
   // Handlers
   const handleBuy = async (passAddress: string) => {
     if (!address) return;
@@ -454,81 +493,109 @@ const Dashboard: React.FC = () => {
               {onChainPasses.map((pass) => {
                 const meta = moveBalances.find((b) => b.type === pass.outpostAddress)?.metadata || {};
                 const icon = meta.icon_uri || '/src/assets/images/podiumlogo.png';
-                const symbol = meta.symbol || shortenAddress(pass.outpostAddress);
-                const isPodiumPass = meta.project_uri === 'https://podium.fi/pass/';
                 const passAddress = typeof pass.outpostAddress === 'string' ? pass.outpostAddress : '';
+                const details = passDetails[passAddress];
+                const externalName = meta.name || fallbackLabel(passAddress);
 
                 return (
                   <Card key={passAddress} className="bg-[var(--color-bg)] flex flex-col items-center text-center p-6">
                     {/* Avatar/Icon */}
                     <img src={icon} alt="Pass Icon" className="w-16 h-16 rounded-full mb-3 border-2 border-[var(--color-primary)] bg-[var(--color-surface)] object-cover" />
-                    {/* Symbol */}
-                    <div className="text-lg font-bold mb-1">{symbol}</div>
+                    
+                    {/* Name and Symbol */}
+                    <div className="text-lg font-bold mb-1">
+                      {externalName} ({details?.symbol || '...'})
+                    </div>
+                    
                     {/* Balance */}
-                    <div className="text-sm text-[var(--color-success)] mb-2">Balance: {formatMoveAmount(pass.balance)}</div>
+                    <div className="text-sm text-[var(--color-success)] mb-2">
+                      Balance: {formatMoveAmount(pass.balance)}
+                    </div>
+                    
+                    {/* Supply */}
+                    <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                      Total Supply: {formatMoveAmount(details?.supply || 0)}
+                    </div>
+                    
+                    {/* Prices */}
+                    <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                      Current Price: {formatMoveAmount(details?.prices.singlePrice || 0)} MOVE
+                    </div>
+                    
+                    {/* Buy/Sell Value */}
+                    <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                      Buy Value: {formatMoveAmount(details?.prices.buyPriceWithFees || 0)} MOVE
+                    </div>
+                    <div className="text-xs text-[var(--color-text-muted)] mb-1">
+                      Sell Value: {formatMoveAmount(details?.prices.sellPriceWithFees || 0)} MOVE
+                    </div>
+                    
+                    {/* Fees */}
+                    <div className="text-xs text-[var(--color-text-muted)] mb-2">
+                      Fees: {formatMoveAmount(details?.prices.fees.buy.protocol || 0)} MOVE
+                    </div>
+                    
                     {/* Target Address (copyable) */}
                     <div className="flex items-center justify-center gap-2 mb-1">
                       <span className="font-mono text-xs text-[var(--color-text-muted)]">{shortenAddress(passAddress)}</span>
                       <button onClick={() => copyToClipboard(passAddress)} aria-label="Copy target address" className="text-[var(--color-primary)] hover:underline text-xs">Copy</button>
                     </div>
-                    {/* Pass FA Address (tooltip/copy) */}
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Tooltip text={passAddress}>
-                        <span className="font-mono text-xs text-[var(--color-text-muted)] cursor-pointer underline">FA Address</span>
-                      </Tooltip>
-                      <button onClick={() => copyToClipboard(passAddress)} aria-label="Copy FA address" className="text-[var(--color-primary)] hover:underline text-xs">Copy</button>
+                    
+                    {/* Buy/Sell Buttons */}
+                    <div className="flex gap-2 justify-center">
+                      <Button variant="primary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: true }))}>
+                        Buy
+                      </Button>
+                      <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: true }))}>
+                        Sell
+                      </Button>
                     </div>
-                    {/* Buy/Sell Prices and Total Value */}
-                    {isPodiumPass && (
-                      <>
-                        <div className="text-xs text-[var(--color-text-muted)] mb-1">Buy Price: <span className="text-[var(--color-primary)]">{buyPrices[passAddress] !== null ? formatMoveAmount(buyPrices[passAddress]!) : '...'}</span></div>
-                        <div className="text-xs text-[var(--color-text-muted)] mb-1">Sell Price: <span className="text-[var(--color-primary)]">{sellPrices[passAddress] !== null ? formatMoveAmount(sellPrices[passAddress]!) : '...'}</span></div>
-                        <div className="text-xs text-[var(--color-text-muted)] mb-2">Total Value (if sold): <span className="text-[var(--color-success)]">{totalValues[passAddress] !== null ? formatMoveAmount(totalValues[passAddress]!) : '...'}</span></div>
-                        {/* Buy/Sell Buttons */}
-                        <div className="flex gap-2 justify-center">
-                          <Button variant="primary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: true }))}>Buy</Button>
-                          <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: true }))}>Sell</Button>
+
+                    {/* Buy Modal */}
+                    {showBuyModal[passAddress] && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
+                        <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
+                          <h3 className="text-lg font-bold mb-2">Buy Passes</h3>
+                          <input 
+                            type="number" 
+                            min={1} 
+                            value={tradeAmounts[passAddress] || 1} 
+                            onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
+                            className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
+                          />
+                          <div className="text-xs text-[var(--color-text-muted)] mb-3">
+                            Total Cost: {formatMoveAmount(details?.prices.buyPriceWithFees || 0)} MOVE
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="primary" onClick={() => handleBuy(passAddress)}>Confirm</Button>
+                            <Button variant="secondary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
+                          </div>
                         </div>
-                        {/* Buy Modal */}
-                        {showBuyModal[passAddress] && (
-                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
-                            <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
-                              <h3 className="text-lg font-bold mb-2">Buy Passes</h3>
-                              <input 
-                                type="number" 
-                                min={1} 
-                                value={tradeAmounts[passAddress] || 1} 
-                                onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
-                                className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
-                              />
-                              <div className="flex gap-2">
-                                <Button variant="primary" onClick={() => handleBuy(passAddress)}>Confirm</Button>
-                                <Button variant="secondary" onClick={() => setShowBuyModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
-                              </div>
-                            </div>
+                      </div>
+                    )}
+
+                    {/* Sell Modal */}
+                    {showSellModal[passAddress] && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
+                        <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
+                          <h3 className="text-lg font-bold mb-2">Sell Passes</h3>
+                          <input 
+                            type="number" 
+                            min={1} 
+                            max={pass.balance} 
+                            value={tradeAmounts[passAddress] || 1} 
+                            onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
+                            className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
+                          />
+                          <div className="text-xs text-[var(--color-text-muted)] mb-3">
+                            Total Value: {formatMoveAmount(details?.prices.sellPriceWithFees || 0)} MOVE
                           </div>
-                        )}
-                        {/* Sell Modal */}
-                        {showSellModal[passAddress] && (
-                          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40" aria-modal="true" role="dialog" tabIndex={-1}>
-                            <div className="bg-[var(--color-surface)] rounded-lg shadow-lg p-6 w-full max-w-xs mx-2 flex flex-col items-center">
-                              <h3 className="text-lg font-bold mb-2">Sell Passes</h3>
-                              <input 
-                                type="number" 
-                                min={1} 
-                                max={pass.balance} 
-                                value={tradeAmounts[passAddress] || 1} 
-                                onChange={e => setTradeAmounts(prev => ({ ...prev, [passAddress]: Number(e.target.value) }))} 
-                                className="w-full px-3 py-2 rounded border border-[var(--color-primary)] mb-3 bg-[var(--color-bg)] text-[var(--color-text-main)]" 
-                              />
-                              <div className="flex gap-2">
-                                <Button variant="primary" onClick={() => handleSell(passAddress)}>Confirm</Button>
-                                <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
-                              </div>
-                            </div>
+                          <div className="flex gap-2">
+                            <Button variant="primary" onClick={() => handleSell(passAddress)}>Confirm</Button>
+                            <Button variant="secondary" onClick={() => setShowSellModal(prev => ({ ...prev, [passAddress]: false }))}>Cancel</Button>
                           </div>
-                        )}
-                      </>
+                        </div>
+                      </div>
                     )}
                   </Card>
                 );

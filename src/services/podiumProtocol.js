@@ -127,15 +127,25 @@ class PodiumProtocol {
   async getPassPrice(targetAddress) {
     const client = await this.getWorkingClient();
     try {
+      console.debug(`[PodiumProtocol] Getting total supply for ${targetAddress}`);
       const supply = await this.getTotalSupply(targetAddress);
+      console.debug(`[PodiumProtocol] Total supply for ${targetAddress}:`, supply);
+      
+      console.debug(`[PodiumProtocol] Calculating price for ${targetAddress} with supply ${supply}`);
       const price = await client.view({
         function: `${this.moduleAddress}::PodiumProtocol::calculate_single_pass_price`,
         type_arguments: [],
         arguments: [supply]
       });
+      console.debug(`[PodiumProtocol] Price for ${targetAddress}:`, price[0]);
       return price[0];
     } catch (error) {
-      console.error('Error fetching pass price:', error);
+      console.error('[PodiumProtocol] Error fetching pass price:', error);
+      console.error('[PodiumProtocol] Error details:', {
+        targetAddress,
+        errorMessage: error.message,
+        errorStack: error.stack
+      });
       throw error;
     }
   }
