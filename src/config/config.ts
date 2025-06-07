@@ -24,6 +24,17 @@ console.log('[DEBUG] VITE_PODIUM_PROTOCOL_APTOS_ADDRESS:', import.meta.env.VITE_
 console.log('[DEBUG] VITE_CHEERBOO_APTOS_ADDRESS:', import.meta.env.VITE_CHEERBOO_APTOS_ADDRESS);
 console.log('[DEBUG] VITE_APTOS_NODE_URL:', import.meta.env.VITE_APTOS_NODE_URL);
 
+// Add type declaration for Vite's import.meta.env
+interface ImportMetaEnv {
+  VITE_PODIUM_PROTOCOL_APTOS_ADDRESS?: string;
+  VITE_PODIUM_BACKEND_BASE_URL?: string;
+  // Add other env variables as needed
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 // Type definitions
 interface Web3AuthConfig {
   CLIENT_ID: string;
@@ -93,10 +104,11 @@ interface ContractAddresses {
   };
 }
 
-interface PodiumProtocolConfig {
+export interface PodiumProtocolConfig {
   CONTRACT_ADDRESS: string;
   RPC_URL: string;
   PARTNER_RPC_URLS: string[];
+  rpcUrl: string;
 }
 
 interface ApiConfig {
@@ -216,8 +228,9 @@ export const CONTRACT_ADDRESSES: ContractAddresses = {
 // Podium Protocol configuration
 export const PODIUM_PROTOCOL_CONFIG: PodiumProtocolConfig = {
   CONTRACT_ADDRESS: import.meta.env.VITE_PODIUM_PROTOCOL_APTOS_ADDRESS || "0xd2f0d0cf38a4c64620f8e9fcba104e0dd88f8d82963bef4ad57686c3ee9ed7aa",
-  RPC_URL: "https://mainnet.movementnetwork.xyz/v1",
-  PARTNER_RPC_URLS: []
+  RPC_URL: "/v1",
+  PARTNER_RPC_URLS: [],
+  rpcUrl: '/v1',
 };
 
 // API configuration

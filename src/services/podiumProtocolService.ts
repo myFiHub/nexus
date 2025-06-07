@@ -35,6 +35,35 @@ const debugLog = (section: string, message: string, data?: any) => {
   console.debug(`[${timestamp}] [podiumProtocolService:${section}] ${message}`, data || '');
 };
 
+// Retry utility
+const retry = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  delay: number = 1000
+): Promise<T> => {
+  let lastError: any;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      debugLog('retry', `Attempt ${i + 1} failed`, { error });
+      if (i < maxRetries - 1) {
+        await new Promise(resolve => setTimeout(resolve, delay * (i + 1)));
+      }
+    }
+  }
+  throw lastError;
+};
+
+// Cache for pass details to prevent repeated calls
+const passDetailsCache = new Map<string, {
+  details: PassDetails;
+  timestamp: number;
+}>();
+
+const CACHE_TTL = 30000; // 30 seconds
+
 const podiumProtocolService = {
   // Fetch outposts
   async fetchOutposts() {
@@ -77,14 +106,14 @@ const podiumProtocolService = {
     debugLog('calculatePassPrices', 'Starting price calculation', { targetAddress, amount });
 
     try {
-      // Get current supply
+      // Get current supply with retry
       debugLog('calculatePassPrices', 'Fetching total supply');
-      const supply = await podiumProtocol.getTotalSupply(targetAddress);
+      const supply = await retry(() => podiumProtocol.getTotalSupply(targetAddress));
       debugLog('calculatePassPrices', 'Total supply fetched', { supply });
       
-      // Get current price
+      // Get current price with retry
       debugLog('calculatePassPrices', 'Fetching current price');
-      const singlePrice = await podiumProtocol.getPassPrice(targetAddress);
+      const singlePrice = await retry(() => podiumProtocol.getPassPrice(targetAddress));
       debugLog('calculatePassPrices', 'Current price fetched', { singlePrice });
       
       // Calculate buy/sell prices
@@ -92,9 +121,9 @@ const podiumProtocolService = {
       const sellPrice = singlePrice * amount;
       debugLog('calculatePassPrices', 'Basic prices calculated', { buyPrice, sellPrice });
       
-      // Get protocol fees
+      // Get protocol fees with retry
       debugLog('calculatePassPrices', 'Fetching protocol fees');
-      const { buyFee, sellFee, referralFee } = await podiumProtocol.getProtocolFees();
+      const { buyFee, sellFee, referralFee } = await retry(() => podiumProtocol.getProtocolFees());
       debugLog('calculatePassPrices', 'Protocol fees fetched', { buyFee, sellFee, referralFee });
       
       // Calculate fees
@@ -133,10 +162,17 @@ const podiumProtocolService = {
     const startTime = performance.now();
     debugLog('getPassDetails', 'Starting pass details fetch', { targetAddress, amount });
 
+    // Check cache first
+    const cached = passDetailsCache.get(targetAddress);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      debugLog('getPassDetails', 'Returning cached details', { targetAddress });
+      return cached.details;
+    }
+
     try {
-      // Get supply
+      // Get supply with retry
       debugLog('getPassDetails', 'Fetching total supply');
-      const supply = await podiumProtocol.getTotalSupply(targetAddress);
+      const supply = await retry(() => podiumProtocol.getTotalSupply(targetAddress));
       debugLog('getPassDetails', 'Total supply fetched', { supply });
       
       // Calculate prices
@@ -144,25 +180,33 @@ const podiumProtocolService = {
       const prices = await this.calculatePassPrices(targetAddress, amount);
       debugLog('getPassDetails', 'Prices calculated', { prices });
       
-      // Get symbol
+      // Get symbol with retry
       debugLog('getPassDetails', 'Fetching asset symbol');
       let symbol;
       try {
-        symbol = await podiumProtocol.getAssetSymbol(targetAddress);
+        symbol = await retry(() => podiumProtocol.getAssetSymbol(targetAddress));
         debugLog('getPassDetails', 'Asset symbol fetched', { symbol });
       } catch (error) {
         symbol = `P${targetAddress.slice(-6)}`;
         debugLog('getPassDetails', 'Using fallback symbol', { symbol, error });
       }
       
-      const endTime = performance.now();
-      debugLog('getPassDetails', `Pass details fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
-
-      return {
+      const details = {
         symbol,
         prices,
         supply
       };
+
+      // Cache the results
+      passDetailsCache.set(targetAddress, {
+        details,
+        timestamp: Date.now()
+      });
+
+      const endTime = performance.now();
+      debugLog('getPassDetails', `Pass details fetch completed in ${(endTime - startTime).toFixed(2)}ms`);
+
+      return details;
     } catch (error) {
       const endTime = performance.now();
       debugLog('getPassDetails', `Error in pass details fetch after ${(endTime - startTime).toFixed(2)}ms`, error);
