@@ -343,7 +343,9 @@ const Dashboard: React.FC = () => {
       const details: Record<string, any> = {};
       for (const pass of onChainPasses) {
         try {
-          const passDetail = await podiumProtocolService.getPassDetails(pass.outpostAddress, pass.balance);
+          // Find metadata for this pass (if available)
+          const meta = moveBalances.find((b) => b.type === pass.outpostAddress)?.metadata;
+          const passDetail = await podiumProtocolService.getPassDetails(pass.outpostAddress, pass.balance, meta);
           details[pass.outpostAddress] = passDetail;
         } catch (error) {
           console.error(`Error fetching details for pass ${pass.outpostAddress}:`, error);
@@ -356,7 +358,42 @@ const Dashboard: React.FC = () => {
     if (onChainPasses.length > 0) {
       fetchPassDetails();
     }
-  }, [onChainPasses]);
+  }, [onChainPasses, moveBalances]);
+
+  // Add test function to check API responses
+  const testApiResponses = async () => {
+    if (!isConnected || !jwt) return;
+    
+    try {
+      console.debug('[Dashboard] Testing API responses...');
+      
+      // Test outposts endpoint
+      const outpostsData = await fetchOutposts();
+      console.debug('[Dashboard] Outposts data structure:', {
+        count: outpostsData?.length,
+        fields: outpostsData?.[0] ? Object.keys(outpostsData[0]) : [],
+        sample: outpostsData?.[0]
+      });
+      
+      // Test user passes endpoint
+      const passesData = await fetchUserPasses();
+      console.debug('[Dashboard] User passes data structure:', {
+        count: passesData?.length,
+        fields: passesData?.[0] ? Object.keys(passesData[0]) : [],
+        sample: passesData?.[0]
+      });
+      
+    } catch (error) {
+      console.error('[Dashboard] API test error:', error);
+    }
+  };
+
+  // Add effect to run API test
+  useEffect(() => {
+    if (isConnected && jwt && !sessionLoading) {
+      testApiResponses();
+    }
+  }, [isConnected, jwt, sessionLoading]);
 
   // Handlers
   const handleBuy = async (passAddress: string) => {
@@ -504,7 +541,7 @@ const Dashboard: React.FC = () => {
                     
                     {/* Name and Symbol */}
                     <div className="text-lg font-bold mb-1">
-                      {externalName} ({details?.symbol || '...'})
+                      {externalName} ({details?.symbol || 'N/A'})
                     </div>
                     
                     {/* Balance */}
@@ -514,25 +551,25 @@ const Dashboard: React.FC = () => {
                     
                     {/* Supply */}
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">
-                      Total Supply: {formatMoveAmount(details?.supply || 0)}
+                      Total Supply: {details?.supply !== undefined ? formatMoveAmount(details.supply) : 'N/A'}
                     </div>
                     
                     {/* Prices */}
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">
-                      Current Price: {formatMoveAmount(details?.prices.singlePrice || 0)} MOVE
+                      Current Price: {details?.prices?.singlePrice !== undefined ? formatMoveAmount(details.prices.singlePrice) : 'N/A'} MOVE
                     </div>
                     
                     {/* Buy/Sell Value */}
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">
-                      Buy Value: {formatMoveAmount(details?.prices.buyPriceWithFees || 0)} MOVE
+                      Buy Value: {details?.prices?.buyPriceWithFees !== undefined ? formatMoveAmount(details.prices.buyPriceWithFees) : 'N/A'} MOVE
                     </div>
                     <div className="text-xs text-[var(--color-text-muted)] mb-1">
-                      Sell Value: {formatMoveAmount(details?.prices.sellPriceWithFees || 0)} MOVE
+                      Sell Value: {details?.prices?.sellPriceWithFees !== undefined ? formatMoveAmount(details.prices.sellPriceWithFees) : 'N/A'} MOVE
                     </div>
                     
                     {/* Fees */}
                     <div className="text-xs text-[var(--color-text-muted)] mb-2">
-                      Fees: {formatMoveAmount(details?.prices.fees.buy.protocol || 0)} MOVE
+                      Fees: {details?.prices?.fees?.buy?.protocol !== undefined ? formatMoveAmount(details.prices.fees.buy.protocol) : 'N/A'} MOVE
                     </div>
                     
                     {/* Target Address (copyable) */}

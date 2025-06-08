@@ -4,7 +4,9 @@ import { getEvmAddressFromPrivateKey } from './walletService';
 import ethereumService from './ethereumService';
 
 // Use environment variable for backend API base URL (best practice)
-const API_BASE = import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || 'https://prod.podium.myfihub.com/api/v1';
+const API_BASE = import.meta.env.VITE_PODIUM_BACKEND_BASE_URL;
+
+console.log('[podiumApiService] API_BASE:', API_BASE);
 
 // Axios instance for Podium API
 export const podiumApi = axios.create({
@@ -49,53 +51,66 @@ export async function loginWithWallet(payload: any) {
  * @returns The login response (JWT, etc.)
  */
 export async function loginWithAptosWallet(address: string, _signature: string, provider?: any) {
-  // Step 1: Get the private key from the provider
-  if (!provider || typeof provider.request !== 'function') {
-    throw new Error('Web3Auth provider is required and must support request method');
-  }
-  const rawPrivateKey = await provider.request({ method: 'private_key' });
-  if (!rawPrivateKey) {
-    throw new Error('Failed to get private key from provider');
-  }
-
-  // Step 2: Create an Ethereum wallet and get the EVM address
-  const wallet = ethereumService.createWallet(rawPrivateKey);
-  const evmAddress = wallet.address;
-
-  // Step 3: Sign the EVM address with the Ethereum wallet
-  const signature = await ethereumService.signMessage(rawPrivateKey, evmAddress);
-
-  // Step 4: Verify the signature locally before sending
-  const recovered = ethereumService.verifySignature(evmAddress, signature);
-  console.debug('[podiumApiService] Signature verification:', { recovered, expected: evmAddress });
-
-  // Build the payload exactly as specified by the backend
-  const payload = {
-    username: evmAddress,
-    signature: signature
-  };
-  console.debug(`[podiumApiService] loginWithAptosWallet payload:`, JSON.stringify(payload, null, 2));
-
   try {
-    // Make the login request
-    const response = await podiumApi.post('/auth/login', payload);
-    console.debug(`[podiumApiService] Login response:`, JSON.stringify(response.data, null, 2));
-    return response.data.data;
-  } catch (error) {
-    console.error(`[podiumApiService] Login error details:`, {
-      status: error.response?.status,
-      data: error.response?.data,
-      headers: error.response?.headers
-    });
+    // Step 1: Get the private key from the provider
+    if (!provider || typeof provider.request !== 'function') {
+      throw new Error('Web3Auth provider is required and must support request method');
+    }
+    const rawPrivateKey = await provider.request({ method: 'private_key' });
+    if (!rawPrivateKey) {
+      throw new Error('Failed to get private key from provider');
+    }
+
+    // Step 2: Generate EVM address from the private key
+    const evmAddress = ethereumService.getAddressFromPrivateKey(rawPrivateKey);
+    console.debug('[podiumApiService] Generated EVM address:', evmAddress);
+
+    // Step 3: Sign the EVM address as the message (with 0x prefix to match backend address.as_str())
+    const messageToSign = evmAddress.toUpperCase(); // Keep 0x prefix and make uppercase
+    const signature = await ethereumService.signMessage(rawPrivateKey, messageToSign);
+    console.debug('[podiumApiService] Generated signature:', signature);
+
+    // Step 4: Verify signature locally first
+    const verification = await ethereumService.verifySignature(messageToSign, signature);
+    console.debug('[podiumApiService] Signature verification:', verification);
+
+    if (!verification.isValid) {
+      throw new Error('Local signature verification failed');
+    }
+
+    // Step 5: Construct payload - username must match exactly what we signed
+    const payload = {
+      username: messageToSign, // Same string we signed (with 0x prefix, uppercase)
+      signature: signature
+    };
+    console.debug('[podiumApiService] loginWithAptosWallet payload:', payload);
+
+    // Step 6: Send login request
+    console.debug('[podiumApiService] Sending login request to:', `${API_BASE}/auth/login`);
+    const response = await axios.post(`${API_BASE}/auth/login`, payload);
+    debugApiResponse('login', response.data);
+
+    return response.data;
+  } catch (error: any) {
+    console.error('[podiumApiService] Login error details:', error.response || error);
     throw error;
   }
 }
+
+// Debug utility to inspect API responses
+const debugApiResponse = (endpoint: string, data: any) => {
+  console.debug(`[podiumApiService] ${endpoint} response structure:`, {
+    fields: Object.keys(data),
+    sample: data[0] || data,
+    full: data
+  });
+};
 
 // Fetch all outposts
 export async function fetchOutposts() {
   try {
     const res = await podiumApi.get('/outposts');
-    console.debug('[podiumApiService] fetchOutposts:', res.data.data);
+    debugApiResponse('fetchOutposts', res.data.data);
     return res.data.data;
   } catch (e) {
     console.error('[podiumApiService] fetchOutposts error:', e);
@@ -106,7 +121,7 @@ export async function fetchOutposts() {
 // Fetch outpost detail by UUID
 export async function fetchOutpostDetail(uuid: string) {
   try {
-    const res = await podiumApi.get(`/outposts/detail?uuid=${uuid}`);
+    const res = await podiumApi.get(`/outposts/${uuid}`);
     console.debug('[podiumApiService] fetchOutpostDetail:', res.data.data);
     return res.data.data;
   } catch (e) {
@@ -118,7 +133,7 @@ export async function fetchOutpostDetail(uuid: string) {
 // Fetch user detail by UUID
 export async function fetchUserDetail(uuid: string) {
   try {
-    const res = await podiumApi.get(`/users/detail?uuid=${uuid}`);
+    const res = await podiumApi.get(`/users/${uuid}`);
     console.debug('[podiumApiService] fetchUserDetail:', res.data.data);
     return res.data.data;
   } catch (e) {
@@ -130,7 +145,7 @@ export async function fetchUserDetail(uuid: string) {
 // Fetch user by Aptos address
 export async function fetchUserByAptosAddress(address: string) {
   try {
-    const res = await podiumApi.get(`/users/detail/by-aptos-address`, { params: { aptos_address: address } });
+    const res = await podiumApi.get(`/users/by-aptos-address/${address}`);
     console.debug('[podiumApiService] fetchUserByAptosAddress:', res.data.data);
     return res.data.data;
   } catch (e) {
@@ -142,8 +157,8 @@ export async function fetchUserByAptosAddress(address: string) {
 // Fetch user passes (authenticated)
 export async function fetchUserPasses() {
   try {
-    const res = await podiumApi.get('/podium-passes/my-passes');
-    console.debug('[podiumApiService] fetchUserPasses:', res.data.data);
+    const res = await podiumApi.get('/users/passes');
+    debugApiResponse('fetchUserPasses', res.data.data);
     return res.data.data;
   } catch (e) {
     console.error('[podiumApiService] fetchUserPasses error:', e);

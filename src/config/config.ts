@@ -239,9 +239,9 @@ export const API_CONFIG: ApiConfig = {
   ALBY_API_KEY: validateEnvVar('VITE_ALBY_API_KEY', import.meta.env.VITE_ALBY_API_KEY),
   LUMA_API_KEY: validateEnvVar('VITE_LUMA_API_KEY', import.meta.env.VITE_LUMA_API_KEY),
   ONESIGNAL_API_KEY: validateEnvVar('VITE_ONESIGNAL_API_KEY', import.meta.env.VITE_ONESIGNAL_API_KEY),
-  BACKEND_BASE_URL: import.meta.env.VITE_PODIUM_BACKEND_BASE_URL || "https://prod.podium.myfihub.com/api/v1",
-  WEBSOCKET_ADDRESS: import.meta.env.VITE_WEBSOCKET_ADDRESS || "wss://ws.prod.podium.myfihub.com",
-  JITSI_SERVER_URL: import.meta.env.VITE_JITSI_SERVER_URL || "https://outposts.myfihub.com",
+  BACKEND_BASE_URL: validateEnvVar('VITE_PODIUM_BACKEND_BASE_URL', import.meta.env.VITE_PODIUM_BACKEND_BASE_URL),
+  WEBSOCKET_ADDRESS: validateEnvVar('VITE_WEBSOCKET_ADDRESS', import.meta.env.VITE_WEBSOCKET_ADDRESS),
+  JITSI_SERVER_URL: validateEnvVar('VITE_JITSI_SERVER_URL', import.meta.env.VITE_JITSI_SERVER_URL),
 };
 
 // Deep linking configuration

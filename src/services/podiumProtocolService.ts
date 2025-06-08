@@ -158,7 +158,7 @@ const podiumProtocolService = {
   },
 
   // Get complete pass details including symbol, prices, and supply
-  async getPassDetails(targetAddress: string, amount: number): Promise<PassDetails> {
+  async getPassDetails(targetAddress: string, amount: number, metadata?: any): Promise<PassDetails> {
     const startTime = performance.now();
     debugLog('getPassDetails', 'Starting pass details fetch', { targetAddress, amount });
 
@@ -180,15 +180,14 @@ const podiumProtocolService = {
       const prices = await this.calculatePassPrices(targetAddress, amount);
       debugLog('getPassDetails', 'Prices calculated', { prices });
       
-      // Get symbol with retry
-      debugLog('getPassDetails', 'Fetching asset symbol');
-      let symbol;
-      try {
-        symbol = await retry(() => podiumProtocol.getAssetSymbol(targetAddress));
-        debugLog('getPassDetails', 'Asset symbol fetched', { symbol });
-      } catch (error) {
-        symbol = `P${targetAddress.slice(-6)}`;
-        debugLog('getPassDetails', 'Using fallback symbol', { symbol, error });
+      // Get symbol from metadata or derive fallback
+      let symbol = '';
+      if (metadata && typeof metadata.symbol === 'string' && metadata.symbol.length > 0) {
+        symbol = metadata.symbol;
+        debugLog('getPassDetails', 'Symbol found in metadata', { symbol });
+      } else {
+        symbol = `PODIUM-${targetAddress.slice(-4)}`;
+        debugLog('getPassDetails', 'Symbol derived from address', { symbol });
       }
       
       const details = {
