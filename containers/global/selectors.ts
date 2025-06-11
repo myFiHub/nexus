@@ -10,6 +10,7 @@ export const GlobalDomains = {
   initialized: (state: RootState) => !!state.global?.web3Auth,
   logingIn: (state: RootState) => state.global?.logingIn,
   logingOut: (state: RootState) => state.global?.logingOut,
+  podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
 };
 
 export const GlobalSelectors = {
@@ -23,4 +24,5 @@ export const GlobalSelectors = {
   initialized: GlobalDomains.initialized,
   logingIn: GlobalDomains.logingIn,
   logingOut: GlobalDomains.logingOut,
+  podiumUserInfo: GlobalDomains.podiumUserInfo,
 };

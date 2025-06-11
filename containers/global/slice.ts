@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
+import { User } from "app/models/types";
 import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { globalSaga } from "./saga";
@@ -11,6 +12,7 @@ export interface GlobalState {
   web3Auth?: Web3Auth;
   web3AuthUserInfo?: Partial<UserInfo>;
   aptosAccount?: AptosAccount;
+  podiumUserInfo?: User;
 }
 
 const initialState: GlobalState = {
@@ -46,7 +48,10 @@ const globalSlice = createSlice({
     setAptosAccount(state, action: PayloadAction<AptosAccount | undefined>) {
       state.aptosAccount = action.payload;
     },
-    disconnectWeb3Auth(state) {},
+    logout() {},
+    setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
+      state.podiumUserInfo = action.payload;
+    },
   },
 });
 

@@ -7,6 +7,7 @@ import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../Button";
+import { Img } from "../Img";
 
 interface LoginButtonProps {
   size?: "sm" | "lg";
@@ -25,6 +26,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
   const dispatch = useDispatch();
   const aptosAccountAddress = useSelector(GlobalSelectors.aptosAccountAddress);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
+  const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
   const initializingWeb3Auth = useSelector(
     GlobalSelectors.initializingWeb3Auth
   );
@@ -38,7 +40,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
   };
 
   const disconnect = async () => {
-    dispatch(globalActions.disconnectWeb3Auth());
+    dispatch(globalActions.logout());
   };
   const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[150px]";
   return (
@@ -50,8 +52,17 @@ const Content = ({ size, className }: LoginButtonProps) => {
     >
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin" />
-      ) : isLoggedIn && aptosAccountAddress ? (
-        truncate(aptosAccountAddress)
+      ) : isLoggedIn && podiumUserInfo?.aptos_address ? (
+        <div className="flex items-center gap-2">
+          {podiumUserInfo.image && (
+            <Img
+              src={podiumUserInfo.image}
+              alt="profile"
+              className="w-6 h-6 rounded-full"
+            />
+          )}
+          <span>{truncate(podiumUserInfo.aptos_address)}</span>
+        </div>
       ) : (
         "Login"
       )}

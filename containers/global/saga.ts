@@ -5,10 +5,11 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
+import podiumApi from "app/models/api";
+import { AdditionalDataForLogin, LoginRequest, User } from "app/models/types";
 import { AptosAccount } from "aptos";
+import { ethers } from "ethers";
 import { all, put, select, takeLatest } from "redux-saga/effects";
-import { createWalletClient, custom } from "viem";
-import { mainnet } from "viem/chains";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
 
@@ -67,23 +68,67 @@ function* getAndSetAccount() {
 }
 
 function* afterConnect(userInfo: Partial<UserInfo>) {
-  const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-  const walletClient = createWalletClient({
-    chain: mainnet,
-    transport: custom(web3Auth.provider!),
-  });
-  const address: string = yield walletClient.getAddresses();
-  console.log({ address });
+  const {} = userInfo;
 
   const privateKey: string | undefined = yield getPrivateKey();
+
   if (privateKey) {
+    const evmWallet = new ethers.Wallet(privateKey);
+    const evmAddress = evmWallet.address;
+    const signedEvmAddress: string = yield evmWallet.signMessage(evmAddress);
     const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
     const account = new AptosAccount(privateKeyBytes);
+    const aptosAddress = account.address().hex();
+    let {
+      authConnection: loginType,
+      userId: identifierId,
+      name,
+      profileImage: image,
+      email,
+    } = userInfo;
+
+    if (!identifierId) {
+      console.log("Identifier ID is required");
+      return;
+    }
+    if (identifierId.includes("|")) {
+      identifierId = identifierId.split("|")[1];
+    }
+
+    const loginRequest: LoginRequest = {
+      signature: signedEvmAddress,
+      username: evmAddress,
+      aptos_address: aptosAddress,
+      has_ticket: true,
+      login_type_identifier: identifierId,
+    };
+    const additionalDataForLogin: AdditionalDataForLogin = {
+      loginType,
+    };
+    if (name) {
+      additionalDataForLogin.name = name;
+    }
+    if (image) {
+      additionalDataForLogin.image = image;
+    }
+    if (email) {
+      additionalDataForLogin.email = email;
+    }
+    const response: {
+      user: User | null;
+      error: string | null;
+      statusCode: number | null;
+    } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+    if (response?.user) {
+      yield put(globalActions.setPodiumUserInfo(response.user));
+    } else {
+      yield logout();
+    }
     yield put(globalActions.setAptosAccount(account));
   }
 }
 
-function* disconnectWeb3Auth() {
+function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
   try {
@@ -93,6 +138,7 @@ function* disconnectWeb3Auth() {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       put(globalActions.setAptosAccount(undefined)),
+      put(globalActions.setPodiumUserInfo(undefined)),
     ]);
   } catch (error) {
     console.error(error);
@@ -103,5 +149,5 @@ function* disconnectWeb3Auth() {
 export function* globalSaga() {
   yield takeLatest(globalActions.initialize, initialize);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
-  yield takeLatest(globalActions.disconnectWeb3Auth, disconnectWeb3Auth);
+  yield takeLatest(globalActions.logout, logout);
 }
