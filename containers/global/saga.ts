@@ -5,8 +5,12 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
-import podiumApi from "app/models/api";
-import { AdditionalDataForLogin, LoginRequest, User } from "app/models/types";
+import podiumApi from "app/services/api";
+import {
+  AdditionalDataForLogin,
+  LoginRequest,
+  User,
+} from "app/services/api/types";
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import { all, put, select, takeLatest } from "redux-saga/effects";
@@ -68,8 +72,6 @@ function* getAndSetAccount() {
 }
 
 function* afterConnect(userInfo: Partial<UserInfo>) {
-  const {} = userInfo;
-
   const privateKey: string | undefined = yield getPrivateKey();
 
   if (privateKey) {

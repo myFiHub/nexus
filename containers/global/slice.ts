@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
-import { User } from "app/models/types";
+import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { globalSaga } from "./saga";

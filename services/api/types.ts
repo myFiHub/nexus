@@ -106,39 +106,6 @@ export interface LiveMember {
   primary_aptos_address?: string;
 }
 
-export interface OutpostLiveData {
-  members: LiveMember[];
-}
-
-export interface Outpost {
-  uuid: string;
-  created_at: number;
-  creator_joined: boolean;
-  luma_event_id?: string;
-  creator_user_name: string;
-  creator_user_uuid: string;
-  creator_user_image: string;
-  enter_type: string;
-  has_adult_content: boolean;
-  image: string;
-  invites?: Invite[];
-  is_archived: boolean;
-  is_recordable: boolean;
-  last_active_at: number;
-  members?: LiveMember[];
-  members_count: number;
-  name: string;
-  scheduled_for: number;
-  speak_type: string;
-  subject: string;
-  tags: string[];
-  tickets_to_enter?: TicketToEnter[];
-  tickets_to_speak?: TicketToSpeak[];
-  online_users_count?: number;
-  i_am_member: boolean;
-  reminder_offset_minutes?: number;
-}
-
 export interface CreateOutpostRequest {
   name: string;
   subject: string;
@@ -223,4 +190,128 @@ export interface Buyer {
 export interface BuySellRequest {
   pass_uuid: string;
   price: number;
+}
+
+// PLACEHOLDER TYPES (user: please fix these as needed)
+export interface OutpostLiveData {
+  members: LiveMember[];
+}
+
+export interface InviteRequestModel {
+  can_speak: boolean;
+  invitee_user_uuid: string;
+  outpost_uuid: string;
+}
+
+export interface RejectInvitationRequest {
+  inviter_uuid: string;
+  outpost_uuid: string;
+}
+
+export interface SetOrRemoveReminderRequest {
+  uuid: string;
+  reminder_offset_minutes?: number;
+}
+
+export interface ConnectNewAccountRequest {
+  aptos_address: string;
+  current_address_signature: string;
+  image: string;
+  login_type: string;
+  login_type_identifier: string;
+  new_address: string;
+  new_address_signature: string;
+}
+
+export type TradeType = "buy" | "sell";
+export interface BuySellPodiumPassRequest {
+  count: number;
+  podium_pass_owner_address: string;
+  podium_pass_owner_uuid: string;
+  trade_type: TradeType;
+  tx_hash: string;
+}
+
+export type FollowUnfollowAction = "follow" | "unfollow";
+export interface FollowerModel {
+  address: string;
+  followed_by_me: boolean;
+  image: string;
+  name: string;
+  uuid: string;
+}
+
+export interface OutpostModel {
+  uuid: string;
+  created_at: number;
+  creator_joined: boolean;
+  luma_event_id?: string;
+  creator_user_name: string;
+  creator_user_uuid: string;
+  creator_user_image: string;
+  enter_type: string;
+  has_adult_content: boolean;
+  image: string;
+  invites?: InviteModel[];
+  is_archived: boolean;
+  is_recordable: boolean;
+  last_active_at: number;
+  members?: LiveMember[];
+  members_count?: number;
+  name: string;
+  scheduled_for: number;
+  speak_type: string;
+  subject: string;
+  tags: string[];
+  tickets_to_enter?: TicketToEnter[];
+  tickets_to_speak?: TicketToSpeak[];
+  online_users_count?: number;
+  i_am_member: boolean;
+  reminder_offset_minutes?: number;
+}
+
+export interface TagModel {
+  id: number;
+  name: string;
+}
+
+export interface PodiumPassBuyerModel {
+  address: string;
+  followed_by_me: boolean;
+  image: string;
+  name: string;
+  uuid: string;
+}
+
+export type NotificationTypes = "follow" | "invite";
+export interface NotificationModel {
+  created_at: number;
+  is_read: boolean;
+  message: string;
+  follow_metadata?: FollowMetadata;
+  invite_metadata?: InviteMetadata;
+  notification_type: NotificationTypes;
+  uuid: string;
+}
+
+export interface FollowMetadata {
+  follower_uuid: string;
+  follower_name: string;
+  follower_image: string;
+}
+
+export type InviteType = "enter" | "speak";
+export interface InviteMetadata {
+  inviter_uuid: string;
+  inviter_name: string;
+  inviter_image: string;
+  outpost_uuid: string;
+  outpost_name: string;
+  outpost_image: string;
+  action: InviteType;
+}
+
+export interface InviteModel {
+  invitee_uuid: string;
+  can_speak: boolean;
 }

@@ -7,8 +7,8 @@ export function TrendingSection() {
         Trending Outposts
       </h2>
       <AppLink
-        href="/outposts"
-        className="text-[var(--primary)] font-semibold hover:underline text-lg"
+        href="/all_outposts"
+        className="text-primary font-semibold hover:underline text-lg"
       >
         View All Outposts &rarr;
       </AppLink>

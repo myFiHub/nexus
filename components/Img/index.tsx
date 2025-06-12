@@ -22,9 +22,24 @@ export const Img = ({ src, alt, className, style }: ImgProps) => {
 
   // Reset states when src changes
   useEffect(() => {
-    setIsLoading(true);
-    setError(false);
-  }, [src]);
+    const img = new Image();
+    img.src = src || fallbackUrl;
+
+    if (img.complete) {
+      setIsLoading(false);
+    } else {
+      img.onload = () => setIsLoading(false);
+      img.onerror = () => {
+        setError(true);
+        setIsLoading(false);
+      };
+    }
+
+    return () => {
+      img.onload = null;
+      img.onerror = null;
+    };
+  }, [src, fallbackUrl]);
 
   return (
     <div className={`${styles.container} ${className || ""}`} style={style}>
@@ -36,11 +51,6 @@ export const Img = ({ src, alt, className, style }: ImgProps) => {
         src={error || !src ? fallbackUrl : src}
         alt={alt}
         className={`${styles.image} ${isLoading ? styles.loading : ""} `}
-        onLoad={() => setIsLoading(false)}
-        onError={() => {
-          setError(true);
-          setIsLoading(false);
-        }}
         draggable={false}
       />
     </div>
