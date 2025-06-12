@@ -152,19 +152,21 @@ function* buyPass(
       });
     if (response) {
       const success = response[0];
-      const error = response[1];
+      const errorOrHash = response[1];
       if (success) {
         yield put(
           assetsActions.getUserPassInfo({ address: user.aptos_address! })
         );
-        toast.success("Pass bought successfully");
-        yield getUserPassInfo({
-          payload: { address: user.aptos_address! },
-          type: assetsActions.getUserPassInfo.type,
+        yield podiumApi.buySellPodiumPass({
+          count: numberOfTickets,
+          podium_pass_owner_address: user.aptos_address!,
+          podium_pass_owner_uuid: user.uuid,
+          trade_type: "buy",
+          tx_hash: errorOrHash,
         });
-      }
-      if (error) {
-        toast.error(error);
+        toast.success("Pass bought successfully");
+      } else if (errorOrHash) {
+        toast.error(errorOrHash);
       }
     } else {
       errorToaset();
@@ -172,20 +174,6 @@ function* buyPass(
   } catch (error) {
     errorToaset();
   } finally {
-    const currentPassInfo = yield select(
-      AssetsSelectors.userPasses(user.aptos_address!)
-    );
-    yield put(
-      assetsActions.setUserPassInfo({
-        address: user.aptos_address!,
-        pass: {
-          loading: false,
-          price: currentPassInfo?.price ?? "0",
-          ownedNumber: currentPassInfo?.ownedNumber ?? 0,
-          error: undefined,
-        },
-      })
-    );
   }
 }
 
