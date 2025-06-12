@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { injectContainer } from "app/store";
+import { assetsSaga } from "./saga";
 
 export interface Balance {
   value: string;
@@ -40,6 +41,6 @@ export const useAssetsSlice = () => {
   injectContainer({
     name: name,
     reducer: assetsReducer,
-    saga: null, // Add saga if needed later
+    saga: assetsSaga, // Add saga if needed later
   });
 };
