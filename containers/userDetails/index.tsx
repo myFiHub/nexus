@@ -4,9 +4,9 @@ import {
   User,
 } from "app/services/api/types";
 import { ClientRedirecter } from "./components/clientRedirecter";
+import { UserTabs } from "./components/tabs";
 import { UserProfile } from "./components/UserProfile";
 import { UserStats } from "./components/UserStats";
-import { UserTabs } from "./components/tabs";
 
 interface UserDetailsProps {
   user: User;

@@ -26,11 +26,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function UserPage({ params }: Props) {
+  const { id } = await params;
+
   const [user, passBuyers, followers, followings] = await Promise.all([
-    podiumApi.getUserData(params.id),
-    podiumApi.podiumPassBuyers(params.id),
-    podiumApi.getFollowersOfUser(params.id),
-    podiumApi.getFollowingsOfUser(params.id),
+    podiumApi.getUserData(id),
+    podiumApi.podiumPassBuyers(id),
+    podiumApi.getFollowersOfUser(id),
+    podiumApi.getFollowingsOfUser(id),
   ]);
 
   if (!user) {
