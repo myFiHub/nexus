@@ -13,7 +13,8 @@ interface OutpostDetailsPageProps {
 export async function generateMetadata({
   params,
 }: OutpostDetailsPageProps): Promise<Metadata> {
-  const outpost = await podiumApi.getOutpost(params.id);
+  const { id } = await params;
+  const outpost = await podiumApi.getOutpost(id);
 
   if (!outpost) {
     return {

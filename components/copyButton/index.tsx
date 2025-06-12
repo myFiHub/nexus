@@ -1,9 +1,6 @@
+"use client";
 import { useState } from "react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "../../../components/Tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 
 interface CopyButtonProps {
   text: string;

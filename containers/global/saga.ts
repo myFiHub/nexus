@@ -80,6 +80,8 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
     const signedEvmAddress: string = yield evmWallet.signMessage(evmAddress);
     const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
     const account = new AptosAccount(privateKeyBytes);
+    yield put(globalActions.setAptosAccount(account));
+
     const aptosAddress = account.address().hex();
     let {
       authConnection: loginType,
@@ -126,7 +128,6 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
     } else {
       yield logout();
     }
-    yield put(globalActions.setAptosAccount(account));
   }
 }
 

@@ -1,4 +1,4 @@
-import { CopyButton } from "./CopyButton";
+import { CopyButton } from "../../../components/copyButton";
 
 interface InfoCardProps {
   title: string;

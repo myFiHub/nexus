@@ -9,7 +9,6 @@ import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { UserStats } from "./components/UserStats";
-import { myProfileSelectors } from "./selectors";
 import { profileActions, useProfileSlice } from "./slice";
 
 const LoadingSkeleton = () => (
@@ -54,9 +53,8 @@ const Content = () => {
   useProfileSlice();
   useAssetsSlice();
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
-  const user = useSelector(myProfileSelectors.user);
-  const loading = useSelector(myProfileSelectors.loading);
-  const userError = useSelector(myProfileSelectors.userError);
+  const user = useSelector(GlobalSelectors.podiumUserInfo);
+  const loading = useSelector(GlobalSelectors.logingIn);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -68,15 +66,6 @@ const Content = () => {
 
   if (loading || !user) {
     return <LoadingSkeleton />;
-  }
-  if (userError) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="bg-destructive/10 text-destructive p-4 rounded-lg">
-          {userError}
-        </div>
-      </div>
-    );
   }
 
   return (

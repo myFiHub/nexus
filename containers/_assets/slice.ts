@@ -8,11 +8,24 @@ export interface Balance {
   error?: string;
 }
 
+export interface Pass {
+  gettingPrice: boolean;
+  price: string;
+  gettingOwnedNumber: boolean;
+  ownedNumber: number;
+  error?: string;
+  errorGettingPrice?: string;
+  errorGettingOwnedNumber?: string;
+}
 export interface AssetsState {
   balance: Balance;
+  passes: {
+    [key: string]: Pass;
+  };
 }
 
 const initialState: AssetsState = {
+  passes: {},
   balance: {
     value: "",
     loading: false,
@@ -27,6 +40,14 @@ const assetsSlice = createSlice({
     getBalance() {},
     setBalance(state, action: PayloadAction<Balance>) {
       state.balance = action.payload;
+    },
+    getUserPassInfo(state, action: PayloadAction<{ address: string }>) {},
+    setUserPassInfo(
+      state,
+      action: PayloadAction<{ address: string; pass: Pass }>
+    ) {
+      const { address, pass } = action.payload;
+      state.passes[address] = pass;
     },
   },
 });

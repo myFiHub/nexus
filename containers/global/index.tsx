@@ -1,4 +1,5 @@
 "use client";
+import { Toaster } from "app/components/toast";
 import { ReduxProvider } from "app/store/Provider";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -14,7 +15,11 @@ const Container = () => {
       dispatch(globalActions.initialize());
     }
   }, []);
-  return <></>;
+  return (
+    <>
+      <Toaster richColors closeButton position="top-right" />
+    </>
+  );
 };
 
 export const GlobalContainer = memo(

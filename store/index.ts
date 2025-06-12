@@ -6,11 +6,12 @@ import {
   Store,
   UnknownAction,
 } from "@reduxjs/toolkit";
-import { GlobalState } from "app/containers/global/slice";
+import { type AssetsState } from "app/containers/_assets/slice";
+import { type GlobalState } from "app/containers/global/slice";
+import { type ProfileState } from "app/containers/profile/slice";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
-import { ProfileState } from "app/containers/profile/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -84,5 +85,6 @@ export const injectContainer = (container: {
 export type RootState = {
   global: GlobalState;
   profile: ProfileState;
+  assets: AssetsState;
 };
 export type AppDispatch = typeof store.dispatch;

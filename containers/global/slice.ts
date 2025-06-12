@@ -4,6 +4,7 @@ import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { globalSaga } from "./saga";
+import { movementService } from "app/services/move/aptosMovement";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -47,6 +48,9 @@ const globalSlice = createSlice({
     },
     setAptosAccount(state, action: PayloadAction<AptosAccount | undefined>) {
       state.aptosAccount = action.payload;
+      if (action.payload) {
+        movementService.setAccount(action.payload);
+      }
     },
     logout() {},
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {

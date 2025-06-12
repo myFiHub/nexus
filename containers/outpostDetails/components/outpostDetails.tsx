@@ -94,7 +94,7 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Shield className="w-5 h-5 text-[var(--primary)]" />
+                  <Shield className="w-5 h-5 text-primary" />
                   <div>
                     <p className="font-medium">Access Type</p>
                     <p className="text-[var(--muted-foreground)] capitalize">
