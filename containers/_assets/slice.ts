@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
-import { User } from "app/services/api/types";
 
 export interface Balance {
   value: string;

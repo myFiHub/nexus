@@ -35,13 +35,14 @@ function* getUserPassInfo(
   action: ReturnType<typeof assetsActions.getUserPassInfo>
 ): Generator<any, void, any> {
   const { address } = action.payload;
+  const currentPassInfo = yield select(AssetsSelectors.userPasses(address));
   yield put(
     assetsActions.setUserPassInfo({
       address,
       pass: {
         loading: true,
-        price: "0",
-        ownedNumber: 0,
+        price: currentPassInfo?.price ?? "0",
+        ownedNumber: currentPassInfo?.ownedNumber ?? 0,
         error: undefined,
       },
     })
@@ -74,8 +75,8 @@ function* getUserPassInfo(
         address,
         pass: {
           loading: false,
-          price: "0",
-          ownedNumber: 0,
+          price: currentPassInfo?.price ?? "0",
+          ownedNumber: currentPassInfo?.ownedNumber ?? 0,
           error: "Error, retry getting the Pass Info?",
         },
       })
@@ -139,6 +140,7 @@ function* buyPass(
       toast.error(
         `Insufficient balance, you need ${price} MOVE to buy ${numberOfTickets} Pass`
       );
+
       return;
     }
 
@@ -154,9 +156,6 @@ function* buyPass(
       const success = response[0];
       const errorOrHash = response[1];
       if (success) {
-        yield put(
-          assetsActions.getUserPassInfo({ address: user.aptos_address! })
-        );
         yield podiumApi.buySellPodiumPass({
           count: numberOfTickets,
           podium_pass_owner_address: user.aptos_address!,
@@ -174,6 +173,7 @@ function* buyPass(
   } catch (error) {
     errorToaset();
   } finally {
+    yield put(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
   }
 }
 
