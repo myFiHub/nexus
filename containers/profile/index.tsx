@@ -10,6 +10,7 @@ import { ConnectedAccounts } from "./components/ConnectedAccounts";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
+import { AssetsSelectors } from "../_assets/selectore";
 
 const LoadingSkeleton = () => (
   <div className="max-w-4xl mx-auto p-6">
@@ -55,6 +56,7 @@ const Content = () => {
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const user = useSelector(GlobalSelectors.podiumUserInfo);
   const loading = useSelector(GlobalSelectors.logingIn);
+  const balance = useSelector(AssetsSelectors.balance);
   const dispatch = useDispatch();
 
   useEffect(() => {

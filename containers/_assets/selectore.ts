@@ -4,6 +4,7 @@ import { RootState } from "app/store";
 export const AssetsDomains = {
   root: (state: RootState) => state.assets,
   pass: (state: RootState) => state.assets?.passes || {},
+  balance: (state: RootState) => state.assets?.balance || {},
 };
 
 export const AssetsSelectors = {
@@ -14,4 +15,5 @@ export const AssetsSelectors = {
       const pass = passes[id];
       return pass?.loading;
     }),
+  balance: AssetsDomains.balance,
 };

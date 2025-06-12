@@ -9,10 +9,10 @@ import {
 import { type AssetsState } from "app/containers/_assets/slice";
 import { type GlobalState } from "app/containers/global/slice";
 import { type ProfileState } from "app/containers/profile/slice";
+import { UserDetailsState } from "app/containers/userDetails/slice";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
-import { UserDetailsState } from "app/containers/userDetails/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -62,6 +62,7 @@ const injectReducer = (
   }) as Reducer<Record<string, any>, UnknownAction>;
 
   getStore().replaceReducer(combinedReducer);
+  console.log("injected reducer", key);
 };
 
 // Function to inject a saga
@@ -71,6 +72,7 @@ const injectSaga = (key: string, saga: any) => {
   }
   injectedSagas[key] = saga;
   sagaMiddleware.run(saga);
+  console.log("injected saga", key);
 };
 
 export const injectContainer = (container: {

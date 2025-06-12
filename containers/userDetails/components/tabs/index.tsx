@@ -14,7 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../components/Tabs";
-import { FollowFetcher } from "./followFetcher";
+import { UserDetailsSliceInjector } from "./sliceInjector";
 
 interface UserTabsProps {
   user: User;
@@ -41,21 +41,20 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
           </p>
         </div>
         <div className="flex-1"></div>
-        <FollowButton user={user} />
+        <FollowButton id={user.uuid} followed={user.followed_by_me} />
       </div>
     </div>
   );
 };
 
 export const UserTabs = ({
-  user,
   passBuyers,
   followers,
   followings,
 }: UserTabsProps) => {
   return (
     <>
-      <FollowFetcher user={user} />
+      <UserDetailsSliceInjector />
       <Tabs defaultValue="pass-holders" className="w-full mt-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pass-holders">Pass Holders</TabsTrigger>

@@ -1,31 +1,63 @@
 "use client";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { FollowerModel, PodiumPassBuyerModel } from "app/services/api/types";
+import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Subscription } from "rxjs";
 import { Button } from "../../../../components/Button";
-import { userDetailsSelectors } from "../../selectors";
+import { followStateSubject } from "../../../../lib/messenger";
 import { userDetailsActions } from "../../slice";
 
-const Content = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
+const Content = ({
+  id,
+  followed: initialFollowed,
+}: {
+  id: string;
+  followed: boolean;
+}) => {
   const dispatch = useDispatch();
-  const followedByMe = useSelector(
-    userDetailsSelectors.followedByMe(user.uuid)
-  );
+  const [loading, setLoading] = useState(false);
+  const [gettingUserData, setGettingUserData] = useState(false);
+  const [followed, setFollowed] = useState(initialFollowed);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  const isMyUser = myUser?.uuid === user.uuid;
-  const loadingFollowUnfollowId = useSelector(
-    userDetailsSelectors.loadingFollowUnfollowId
-  );
-  const isLoading = loadingFollowUnfollowId === user.uuid;
+  const isMyUser = myUser?.uuid === id;
+  const isLoading = loading || gettingUserData;
+
+  useEffect(() => {
+    let subscription: Subscription;
+
+    if (myUser) {
+      subscription = followStateSubject.subscribe((state) => {
+        if (state.id === id) {
+          if (state.loading !== undefined) {
+            setLoading(state.loading);
+          }
+          if (state.followed !== undefined) {
+            setFollowed(state.followed);
+          }
+        }
+      });
+      const getUserData = async () => {
+        setGettingUserData(true);
+        const user = await podiumApi.getUserData(id);
+        setGettingUserData(false);
+        setFollowed(user?.followed_by_me || false);
+      };
+      getUserData();
+    }
+
+    return () => subscription?.unsubscribe();
+  }, [id, myUser]);
+
   const handleFollowUnfollowClick = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     dispatch(
       userDetailsActions.followUnfollowUser({
-        id: user.uuid,
-        follow: !followedByMe,
+        id: id,
+        follow: !followed,
       })
     );
   };
@@ -39,11 +71,11 @@ const Content = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
       onClick={handleFollowUnfollowClick}
       disabled={isLoading}
       className="min-w-22"
-      colorScheme={followedByMe ? "danger" : "primary"}
+      colorScheme={followed ? "danger" : "primary"}
     >
       {isLoading ? (
         <Loader2 className="animate-spin" />
-      ) : followedByMe ? (
+      ) : followed ? (
         "Unfollow"
       ) : (
         "Follow"
@@ -52,13 +84,15 @@ const Content = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
   );
 };
 export const FollowButton = ({
-  user,
+  id,
+  followed,
 }: {
-  user: FollowerModel | PodiumPassBuyerModel;
+  id: string;
+  followed: boolean;
 }) => {
   return (
     <ReduxProvider>
-      <Content user={user} />
+      <Content id={id} followed={followed} />
     </ReduxProvider>
   );
 };
