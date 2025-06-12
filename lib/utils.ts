@@ -1,11 +1,14 @@
-import { type ClassValue, clsx } from "clsx";
+import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
-
-export const truncate = (text: string, length = 8) => {
-  // keeps from the start and end of the text, half of the length from the start and end
-  return text.slice(0, length / 2) + "..." + text.slice(-length / 2);
-};
+export function truncate(text: string, length: number = 10) {
+  // truncates the middle of the text
+  if (text.length <= length) {
+    return text;
+  }
+  const mid = Math.floor(length / 2);
+  return text.slice(0, mid) + "..." + text.slice(-mid);
+}

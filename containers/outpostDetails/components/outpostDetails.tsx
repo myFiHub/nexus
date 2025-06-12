@@ -18,8 +18,8 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
         {/* Header Image with Overlay */}
-        <div className="relative aspect-[16/9] w-full mb-8 rounded-xl overflow-hidden group">
-          <div className="w-full h-full rounded-[400px] group-hover:rounded-none transition-all duration-500 ease-in-out overflow-hidden">
+        <div className="relative w-full mb-8 rounded-xl overflow-hidden group flex justify-center">
+          <div className="w-full h-full rounded-[400px] group-hover:rounded-none transition-all duration-500 ease-in-out overflow-hidden max-w-xl">
             <Img
               src={outpost.image || logoUrl}
               alt={outpost.name}
@@ -28,7 +28,9 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
           </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-            <h1 className="text-4xl font-bold mb-2">{outpost.name}</h1>
+            <h1 className="text-lg lg:text-4xl font-bold mb-2 ">
+              {outpost.name}
+            </h1>
             <p className="text-xl opacity-90">{outpost.subject}</p>
           </div>
         </div>

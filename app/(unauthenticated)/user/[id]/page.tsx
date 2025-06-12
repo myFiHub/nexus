@@ -10,7 +10,8 @@ interface Props {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const user = await podiumApi.getUserData(params.id);
+  const { id } = await params;
+  const user = await podiumApi.getUserData(id);
 
   if (!user) {
     return {

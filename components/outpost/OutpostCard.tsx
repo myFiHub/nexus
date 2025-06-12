@@ -1,6 +1,5 @@
 import { logoUrl } from "../../lib/constants";
 import { OutpostModel } from "../../services/api/types";
-import { AppLink } from "../AppLink";
 import { Img } from "../Img";
 
 interface OutpostCardProps {
@@ -10,7 +9,7 @@ interface OutpostCardProps {
 export function OutpostCard({ outpost }: OutpostCardProps) {
   return (
     <div className="bg-[var(--card-bg)] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow h-full flex flex-col">
-      <div className="relative aspect-[16/9] w-full">
+      <div className="relative w-full">
         <Img
           src={outpost.image || logoUrl}
           alt={outpost.name}
@@ -25,19 +24,14 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
           {outpost.subject}
         </p>
         <div className="flex items-center justify-between mt-auto">
-          <AppLink
-            href={`/user/${outpost.creator_user_uuid}`}
-            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-          >
-            <Img
-              src={outpost.creator_user_image || logoUrl}
-              alt={outpost.creator_user_name}
-              className="w-6 h-6 rounded-full"
-            />
-            <span className="text-sm text-[var(--muted-foreground)] line-clamp-1">
-              {outpost.creator_user_name}
-            </span>
-          </AppLink>
+          <Img
+            src={outpost.creator_user_image || logoUrl}
+            alt={outpost.creator_user_name}
+            className="w-6 h-6 rounded-full"
+          />
+          <span className="text-sm text-[var(--muted-foreground)] line-clamp-1">
+            {outpost.creator_user_name}
+          </span>
           <span className="text-sm text-[var(--muted-foreground)]">
             {outpost.members_count || 0} members
           </span>

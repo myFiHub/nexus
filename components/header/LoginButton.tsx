@@ -24,7 +24,6 @@ export const LoginButton = ({ size, className }: LoginButtonProps) => {
 
 const Content = ({ size, className }: LoginButtonProps) => {
   const dispatch = useDispatch();
-  const aptosAccountAddress = useSelector(GlobalSelectors.aptosAccountAddress);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
   const initializingWeb3Auth = useSelector(
