@@ -141,7 +141,8 @@ export interface Follower {
 }
 
 export interface FollowUnfollowRequest {
-  user_uuid: string;
+  uuid: string;
+  action: "follow" | "unfollow";
 }
 
 // Notification related types

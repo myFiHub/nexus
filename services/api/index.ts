@@ -202,21 +202,12 @@ class PodiumApi {
   }
 
   // Follow methods
-  async followUser(
+  async followUnfollowUser(
     request: FollowUnfollowRequest
-  ): Promise<Follower | undefined> {
+  ): Promise<boolean> {
     try {
-      const response = await this.axiosInstance.post("/follow", request);
-      return response.data.data;
-    } catch (error) {
-      return undefined;
-    }
-  }
-
-  async unfollowUser(request: FollowUnfollowRequest): Promise<boolean> {
-    try {
-      await this.axiosInstance.delete("/follow", { data: request });
-      return true;
+      const response = await this.axiosInstance.post("/users/follow", request);
+      return response.status === 200;
     } catch (error) {
       return false;
     }

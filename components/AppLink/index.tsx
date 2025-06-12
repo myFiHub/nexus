@@ -9,9 +9,13 @@ const appLinkVariants = cva(
     variants: {
       variant: {
         default:
-          "text-white font-medium bg-transparent border-none shadow-none rounded-none hover:underline",
+          "text-white font-medium bg-transparent border-none shadow-none rounded-none",
         outline:
           "border border-primary text-primary bg-transparent hover:bg-primary-hover",
+      },
+      underline: {
+        true: "hover:underline",
+        false: "no-underline",
       },
       size: {
         default: "h-10 px-4 py-2",
@@ -22,6 +26,7 @@ const appLinkVariants = cva(
     defaultVariants: {
       variant: "default",
       size: "default",
+      underline: true,
     },
   }
 );
@@ -34,11 +39,11 @@ export interface AppLinkProps
 }
 
 const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
-  ({ className, variant, size, href, linkProps, ...props }, ref) => {
+  ({ className, variant, size, href, linkProps, underline, ...props }, ref) => {
     return (
       <Link
         href={href}
-        className={cn(appLinkVariants({ variant, size, className }))}
+        className={cn(appLinkVariants({ variant, size, className, underline }))}
         ref={ref}
         {...linkProps}
         {...props}

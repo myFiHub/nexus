@@ -12,6 +12,7 @@ import { type ProfileState } from "app/containers/profile/slice";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
+import { UserDetailsState } from "app/containers/userDetails/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -86,5 +87,6 @@ export type RootState = {
   global: GlobalState;
   profile: ProfileState;
   assets: AssetsState;
+  userDetails: UserDetailsState;
 };
 export type AppDispatch = typeof store.dispatch;

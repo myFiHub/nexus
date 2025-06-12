@@ -5,6 +5,7 @@ import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "./selectors";
 import { globalActions, useGlobalSlice } from "./slice";
+import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 
 const Container = () => {
   const dispatch = useDispatch();
@@ -18,6 +19,7 @@ const Container = () => {
   return (
     <>
       <Toaster richColors closeButton position="top-right" />
+      <ConfirmDialogProvider />
     </>
   );
 };

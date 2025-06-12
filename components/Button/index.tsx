@@ -3,22 +3,58 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+  "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
   {
     variants: {
       variant: {
-        default: "bg-primary text-white hover:bg-primary-hover",
-        outline:
-          "border border-primary text-primary bg-transparent hover:bg-primary-hover hover:text-white",
+        primary: "primary",
+        outline: "border bg-transparent",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-8 px-3",
         lg: "h-12 px-6",
       },
+      colorScheme: {
+        primary: "bg-primary hover:bg-primary-hover text-white",
+        danger: "bg-danger hover:bg-danger-hover text-white",
+        warning: "bg-warning hover:bg-warning-hover text-white",
+      },
     },
+    compoundVariants: [
+      // Default variant with color schemes
+      {
+        variant: "primary",
+        colorScheme: ["primary", "danger", "warning"],
+        className: "text-white",
+      },
+      // Outline variant with color schemes
+      {
+        variant: "outline",
+        colorScheme: "primary",
+        className:
+          "border-primary text-primary hover:bg-primary hover:text-white",
+      },
+      {
+        variant: "outline",
+        colorScheme: "danger",
+        className: "border-danger text-danger hover:bg-danger hover:text-white",
+      },
+      {
+        variant: "outline",
+        colorScheme: "warning",
+        className:
+          "border-warning text-warning hover:bg-warning hover:text-white",
+      },
+      // Ensure text is white for all color schemes
+      {
+        colorScheme: ["primary", "danger", "warning"],
+        className: "text-white",
+      },
+    ],
     defaultVariants: {
-      variant: "default",
+      colorScheme: "primary",
+      variant: "primary",
       size: "default",
     },
   }
@@ -29,10 +65,12 @@ export interface ButtonProps
     VariantProps<typeof buttonVariants> {}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
+  ({ className, variant, size, colorScheme, ...props }, ref) => {
     return (
       <button
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(
+          buttonVariants({ variant, size, className, colorScheme })
+        )}
         ref={ref}
         {...props}
       />

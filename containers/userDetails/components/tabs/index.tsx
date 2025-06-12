@@ -4,8 +4,8 @@ import {
   User,
 } from "app/services/api/types";
 
-import { FollowButton } from "app/components/followButton";
 import { Img } from "app/components/Img";
+import { FollowButton } from "app/containers/userDetails/components/tabs/followButton";
 import { truncate } from "app/lib/utils";
 import {
   Tabs,
@@ -13,6 +13,7 @@ import {
   TabsList,
   TabsTrigger,
 } from "../../../../components/Tabs";
+import { FollowFetcher } from "./followFetcher";
 
 interface UserTabsProps {
   user: User;
@@ -23,7 +24,7 @@ interface UserTabsProps {
 
 const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg mb-2">
+    <div className="flex items-center justify-between p-4 border  rounded-lg mb-2">
       <div className="flex items-center gap-3">
         <div className="relative w-10 h-10 rounded-full overflow-hidden">
           <Img
@@ -53,6 +54,7 @@ export const UserTabs = ({
 }: UserTabsProps) => {
   return (
     <>
+      <FollowFetcher user={user} />
       <Tabs defaultValue="pass-holders" className="w-full mt-6">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pass-holders">Pass Holders</TabsTrigger>

@@ -1,3 +1,4 @@
+import { confirmDialog } from "app/components/Dialog/confirmDialog";
 import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
@@ -252,18 +253,16 @@ class AptosMovement {
   }): Promise<[boolean | null, string | null]> {
     try {
       const isMyAccountActive = await this.isMyAccountActive();
-      console.log("isMyAccountActive", isMyAccountActive);
       if (!isMyAccountActive) return [false, "Account not active"];
-
       const referrerAddress = opts.referrer || "";
       const price = await this.getTicketPriceForPodiumPass({
         sellerAddress: opts.sellerAddress,
         numberOfTickets: opts.numberOfTickets,
       });
       if (price == null) return [false, "Error fetching price"];
-      const confirmed = await showConfirmPopup({
+      const confirmed = await confirmDialog({
         title: "Buy Podium Pass",
-        message: `Buy ${opts.numberOfTickets || 1} pass(es) from ${
+        content: `Buy ${opts.numberOfTickets || 1} pass(es) from ${
           opts.sellerName
         } for ${price} MOVE?`,
       });
