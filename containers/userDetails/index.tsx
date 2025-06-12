@@ -34,7 +34,7 @@ export const UserDetails = ({ user }: UserDetailsProps) => {
               </div>
             )}
           </div>
-          <PodiumPassButton address={user.aptos_address!} />
+          <PodiumPassButton user={user} />
         </div>
 
         <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">

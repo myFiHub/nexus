@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
+import { User } from "app/services/api/types";
 
 export interface Balance {
   value: string;
@@ -9,13 +10,10 @@ export interface Balance {
 }
 
 export interface Pass {
-  gettingPrice: boolean;
   price: string;
-  gettingOwnedNumber: boolean;
   ownedNumber: number;
   error?: string;
-  errorGettingPrice?: string;
-  errorGettingOwnedNumber?: string;
+  loading?: boolean;
 }
 export interface AssetsState {
   balance: Balance;
@@ -49,6 +47,10 @@ const assetsSlice = createSlice({
       const { address, pass } = action.payload;
       state.passes[address] = pass;
     },
+    buyPass(
+      state,
+      action: PayloadAction<{ user: User; numberOfTickets: number }>
+    ) {},
   },
 });
 

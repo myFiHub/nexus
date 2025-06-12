@@ -1,11 +1,6 @@
+import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
-
-// Placeholder for toast and popup
-const Toast = {
-  error: (msg: any) => console.error(msg),
-  info: (msg: any) => console.info(msg),
-};
 
 const showConfirmPopup = async (opts: any) => true; // Always confirm for now
 
@@ -17,9 +12,6 @@ const PODIUM_PROTOCOL_ADDRESS =
 const CHEER_BOO_ADDRESS = process.env.NEXT_PUBLIC_CHEER_BOO_ADDRESS || "";
 const PODIUM_PROTOCOL_NAME = "PodiumProtocol";
 const CHEER_BOO_NAME = "CheerOrBooPodium";
-
-// Placeholder for account management
-let aptosAccount: AptosAccount; // You should set this from your wallet logic
 
 function doubleToBigIntMoveForAptos(amount: number): bigint {
   // Implement conversion logic as needed
@@ -76,7 +68,8 @@ class AptosMovement {
 
   async isMyAccountActive() {
     try {
-      await this._client.getAccount(this.address);
+      const accountInfo = await this._client.getAccount(this.address);
+      console.log("accountInfo", accountInfo);
       return true;
     } catch {
       return false;
@@ -119,7 +112,7 @@ class AptosMovement {
       }
       return BigInt(0);
     } catch (e) {
-      Toast.error("Error fetching balance from indexer: " + e);
+      toast.error("Error fetching balance from indexer: " + e);
       return BigInt(0);
     }
   }
@@ -144,7 +137,7 @@ class AptosMovement {
     try {
       const b = await this.balance();
       if (b < doubleToBigIntMoveForAptos(opts.amount)) {
-        Toast.error("Insufficient balance");
+        toast.error("Insufficient balance");
         return [false, "Insufficient balance"];
       }
       const amountToSend = doubleToBigIntMoveForAptos(opts.amount).toString();
@@ -182,7 +175,7 @@ class AptosMovement {
       await this._client.waitForTransaction(hash, { checkSuccess: true });
       return [true, hash];
     } catch (e: any) {
-      Toast.error("Error submitting transaction: " + e);
+      toast.error("Error submitting transaction: " + e);
       return [false, e.toString()];
     }
   }
@@ -204,8 +197,8 @@ class AptosMovement {
       const pString = response[0].toString();
       const bigIntPrice = BigInt(pString);
       return bigIntCoinToMoveOnAptos(bigIntPrice);
-    } catch (e) {
-      Toast.error(e);
+    } catch (e: any) {
+      toast.error(e.toString());
       return null;
     }
   }
@@ -223,8 +216,8 @@ class AptosMovement {
       const pString = response[0].toString();
       const bigIntAmount = BigInt(pString);
       return bigIntAmount;
-    } catch (e) {
-      Toast.error(e);
+    } catch (e: any) {
+      toast.error(e.toString());
       return null;
     }
   }
@@ -244,8 +237,8 @@ class AptosMovement {
           { limit: 10 }
         );
         cb(events);
-      } catch (e) {
-        Toast.error("Error fetching events: " + e);
+      } catch (e: any) {
+        toast.error("Error fetching events: " + e.toString());
       }
     }, 5000);
   }
@@ -258,6 +251,10 @@ class AptosMovement {
     numberOfTickets?: number;
   }): Promise<[boolean | null, string | null]> {
     try {
+      const isMyAccountActive = await this.isMyAccountActive();
+      console.log("isMyAccountActive", isMyAccountActive);
+      if (!isMyAccountActive) return [false, "Account not active"];
+
       const referrerAddress = opts.referrer || "";
       const price = await this.getTicketPriceForPodiumPass({
         sellerAddress: opts.sellerAddress,
@@ -294,7 +291,7 @@ class AptosMovement {
       // Optionally call your backend here
       return [true, hash];
     } catch (e: any) {
-      Toast.error("Error buying ticket: " + e);
+      toast.error("Error buying Pass: " + e.toString());
       return [false, e.toString()];
     }
   }
@@ -310,8 +307,8 @@ class AptosMovement {
         arguments: [opts.sellerAddress, (opts.numberOfTickets || 1).toString()],
       });
       return BigInt(response[0].toString());
-    } catch (e) {
-      Toast.error(e);
+    } catch (e: any) {
+      toast.error(e.toString());
       return null;
     }
   }
@@ -353,7 +350,7 @@ class AptosMovement {
       // Optionally call your backend here
       return [true, hash];
     } catch (e: any) {
-      Toast.error("Error selling ticket: " + e);
+      toast.error("Error selling Pass: " + e.toString());
       return [false, e.toString()];
     }
   }

@@ -12,6 +12,6 @@ export const AssetsSelectors = {
   userPassesLoading: (id: string) =>
     createSelector([AssetsDomains.pass], (passes) => {
       const pass = passes[id];
-      return pass?.gettingOwnedNumber || pass?.gettingPrice;
+      return pass?.loading;
     }),
 };
