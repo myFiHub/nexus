@@ -77,7 +77,7 @@ function* getUserPassInfo(
           gettingOwnedNumber: false,
           price: "0",
           ownedNumber: 0,
-          errorGettingPrice: "Error while getting Podium pass info",
+          error: "Error, retry getting the Pass Info?",
         },
       })
     );

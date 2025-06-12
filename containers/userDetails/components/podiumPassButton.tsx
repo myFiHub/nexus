@@ -27,19 +27,26 @@ const Content = ({ address }: { address: string }) => {
     dispatch(assetsActions.getUserPassInfo({ address }));
   }, [address, aptosAccount]);
 
-  if (!loggedIn || !myUser) {
+  if (!loggedIn || !aptosAccount || !myUser) {
     return <></>;
   }
 
-  if (error) {
-    return <div className="text-red-500">{error}</div>;
-  }
+  const handleClick = () => {
+    if (error) {
+      dispatch(assetsActions.getUserPassInfo({ address }));
+    }
+  };
 
   return (
-    <Button>
-      {loadingPass ? <Loader2 className="w-4 h-4 animate-spin" /> : ""}
-      {pass?.price}
-      {pass?.ownedNumber}
+    <Button onClick={handleClick}>
+      {error ? <div className="text-red-500">{error}</div> : ""}
+      {!error && (
+        <>
+          {loadingPass ? <Loader2 className="w-4 h-4 animate-spin" /> : ""}
+          {pass?.price}
+          {pass?.ownedNumber}
+        </>
+      )}
     </Button>
   );
 };
