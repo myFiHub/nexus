@@ -6,6 +6,7 @@ import {
 
 import { Img } from "app/components/Img";
 import { FollowButton } from "app/containers/userDetails/components/tabs/followButton";
+import { defaultProfilePic } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
 import {
   Tabs,
@@ -28,7 +29,7 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
       <div className="flex items-center gap-3">
         <div className="relative w-10 h-10 rounded-full overflow-hidden">
           <Img
-            src={user.image || "/default-avatar.png"}
+            src={user.image || defaultProfilePic}
             alt={user.name || "User"}
             className="object-cover"
           />
