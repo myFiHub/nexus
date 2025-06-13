@@ -20,6 +20,10 @@ export interface AssetsState {
   passes: {
     [key: string]: Pass;
   };
+  myPasses: {
+    loading: boolean;
+    passes: Pass[];
+  };
 }
 
 const initialState: AssetsState = {
@@ -28,6 +32,10 @@ const initialState: AssetsState = {
     value: "",
     loading: false,
     error: undefined,
+  },
+  myPasses: {
+    loading: false,
+    passes: [],
   },
 };
 
@@ -40,6 +48,13 @@ const assetsSlice = createSlice({
       state.balance = action.payload;
     },
     getUserPassInfo(state, action: PayloadAction<{ address: string }>) {},
+    getMyPasses(state) {},
+    setIsGettingMyPasses(state, action: PayloadAction<boolean>) {
+      state.myPasses.loading = action.payload;
+    },
+    setMyPasses(state, action: PayloadAction<Pass[]>) {
+      state.myPasses.passes = action.payload;
+    },
     setUserPassInfo(
       state,
       action: PayloadAction<{ address: string; pass: Pass }>

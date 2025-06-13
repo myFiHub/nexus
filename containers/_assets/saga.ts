@@ -3,7 +3,7 @@ import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
-import { all, put, select, takeLatest } from "redux-saga/effects";
+import { all, delay, put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { AssetsSelectors } from "./selectore";
 import { assetsActions } from "./slice";
@@ -177,8 +177,20 @@ function* buyPass(
   }
 }
 
+function* getMyPasses() {
+  yield put(assetsActions.setIsGettingMyPasses(true));
+  try {
+    yield delay(1000);
+    yield put(assetsActions.setMyPasses([]));
+  } catch (error) {
+  } finally {
+    yield put(assetsActions.setIsGettingMyPasses(false));
+  }
+}
+
 export function* assetsSaga() {
   yield takeLatest(assetsActions.getBalance.type, getBalance);
   yield takeLatest(assetsActions.getUserPassInfo.type, getUserPassInfo);
   yield takeLatest(assetsActions.buyPass.type, buyPass);
+  yield takeLatest(assetsActions.getMyPasses.type, getMyPasses);
 }
