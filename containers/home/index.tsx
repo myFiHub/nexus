@@ -1,5 +1,6 @@
 import { FeaturesSection } from "./FeaturesSection";
 import { HeroSection } from "./HeroSection";
+import { HowItWorksSection } from "./HowItWorksSection";
 import { TrendingSection } from "./TrendingSection";
 
 export const HomeContainer = () => {
@@ -8,6 +9,7 @@ export const HomeContainer = () => {
       <HeroSection />
       <FeaturesSection />
       <TrendingSection />
+      <HowItWorksSection />
     </div>
   );
 };

@@ -5,6 +5,10 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
+import {
+  confirmDialog,
+  ConfirmDialogResult,
+} from "app/components/Dialog/confirmDialog";
 import podiumApi from "app/services/api";
 import {
   AdditionalDataForLogin,
@@ -32,6 +36,7 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
   const web3AuthContextConfig: Web3AuthContextConfig = {
     web3AuthOptions: {
       clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID!,
+
       web3AuthNetwork:
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
@@ -41,6 +46,17 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
   };
 
   const web3auth = new Web3Auth({
+    uiConfig: {
+      loginMethodsOrder: [
+        "twitter",
+        "google",
+        "apple",
+        "facebook",
+        "github",
+        "linkedin",
+        "email_passwordless",
+      ],
+    },
     clientId: web3AuthContextConfig.web3AuthOptions.clientId,
     web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
   });
@@ -72,62 +88,94 @@ function* getAndSetAccount() {
 }
 
 function* afterConnect(userInfo: Partial<UserInfo>) {
-  const privateKey: string | undefined = yield getPrivateKey();
+  try {
+    const privateKey: string | undefined = yield getPrivateKey();
+    if (privateKey) {
+      const evmWallet = new ethers.Wallet(privateKey);
+      const evmAddress = evmWallet.address;
+      const signedEvmAddress: string = yield evmWallet.signMessage(evmAddress);
+      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
+      const account = new AptosAccount(privateKeyBytes);
+      yield put(globalActions.setAptosAccount(account));
 
-  if (privateKey) {
-    const evmWallet = new ethers.Wallet(privateKey);
-    const evmAddress = evmWallet.address;
-    const signedEvmAddress: string = yield evmWallet.signMessage(evmAddress);
-    const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
-    const account = new AptosAccount(privateKeyBytes);
-    yield put(globalActions.setAptosAccount(account));
+      const aptosAddress = account.address().hex();
+      let {
+        authConnection: loginType,
+        userId: identifierId,
+        name,
+        profileImage: image,
+        email,
+      } = userInfo;
 
-    const aptosAddress = account.address().hex();
-    let {
-      authConnection: loginType,
-      userId: identifierId,
-      name,
-      profileImage: image,
-      email,
-    } = userInfo;
+      if (!identifierId) {
+        console.log("Identifier ID is required");
+        return;
+      }
+      if (identifierId.includes("|")) {
+        identifierId = identifierId.split("|")[1];
+      }
 
-    if (!identifierId) {
-      console.log("Identifier ID is required");
-      return;
-    }
-    if (identifierId.includes("|")) {
-      identifierId = identifierId.split("|")[1];
-    }
+      const loginRequest: LoginRequest = {
+        signature: signedEvmAddress,
+        username: evmAddress,
+        aptos_address: aptosAddress,
+        has_ticket: true,
+        login_type_identifier: identifierId,
+      };
+      const additionalDataForLogin: AdditionalDataForLogin = {
+        loginType,
+      };
+      if (name) {
+        additionalDataForLogin.name = name;
+      }
+      if (image) {
+        additionalDataForLogin.image = image;
+      }
+      if (email) {
+        additionalDataForLogin.email = email;
+      }
+      const response: {
+        user: User | null;
+        error: string | null;
+        statusCode: number | null;
+      } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+      let savedName = response.user?.name;
+      let canContinue = true;
+      if (!savedName) {
+        canContinue = false;
+        const { confirmed, enteredText }: ConfirmDialogResult =
+          yield confirmDialog({
+            title: "please enter your name",
+            content: "",
+            inputOpts: {
+              inputType: "text",
+              inputPlaceholder: "name",
+            },
+          });
+        if (confirmed && (enteredText?.trim().length || 0) > 0) {
+          const resultsForUpdate: User | undefined =
+            yield podiumApi.updateMyUserData({ name: enteredText });
+          if (resultsForUpdate) {
+            canContinue = true;
+            savedName = enteredText;
+          }
+        }
+      }
+      if (!canContinue) {
+        yield put(globalActions.logout());
+        return;
+      }
 
-    const loginRequest: LoginRequest = {
-      signature: signedEvmAddress,
-      username: evmAddress,
-      aptos_address: aptosAddress,
-      has_ticket: true,
-      login_type_identifier: identifierId,
-    };
-    const additionalDataForLogin: AdditionalDataForLogin = {
-      loginType,
-    };
-    if (name) {
-      additionalDataForLogin.name = name;
+      if (response?.user) {
+        yield put(
+          globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
+        );
+      } else {
+        yield put(globalActions.logout());
+      }
     }
-    if (image) {
-      additionalDataForLogin.image = image;
-    }
-    if (email) {
-      additionalDataForLogin.email = email;
-    }
-    const response: {
-      user: User | null;
-      error: string | null;
-      statusCode: number | null;
-    } = yield podiumApi.login(loginRequest, additionalDataForLogin);
-    if (response?.user) {
-      yield put(globalActions.setPodiumUserInfo(response.user));
-    } else {
-      yield logout();
-    }
+  } catch (error) {
+    yield put(globalActions.logout());
   }
 }
 

@@ -7,6 +7,7 @@ import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../Button";
+import { confirmDialog } from "../Dialog/confirmDialog";
 import { Img } from "../Img";
 
 interface LoginButtonProps {
@@ -39,7 +40,17 @@ const Content = ({ size, className }: LoginButtonProps) => {
   };
 
   const disconnect = async () => {
-    dispatch(globalActions.logout());
+    const confirmed = await confirmDialog({
+      title: "do you want to logout?",
+      content: "",
+      confirmOpts: {
+        confirmColorScheme: "danger",
+        confirmText: "Logout",
+      },
+    });
+    if (confirmed) {
+      dispatch(globalActions.logout());
+    }
   };
   const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[150px]";
   return (
