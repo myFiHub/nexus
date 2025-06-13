@@ -5,6 +5,7 @@ import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
 import { all, delay, put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
+import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
 import { AssetsSelectors } from "./selectore";
 import { assetsActions } from "./slice";
 
@@ -164,6 +165,7 @@ function* buyPass(
           tx_hash: errorOrHash,
         });
         toast.success("Pass bought successfully");
+        revalidateUserProfile(user.uuid);
       } else if (errorOrHash) {
         toast.error(errorOrHash);
       }

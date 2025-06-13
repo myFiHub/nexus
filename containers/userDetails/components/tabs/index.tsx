@@ -25,7 +25,7 @@ interface UserTabsProps {
 
 const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
   return (
-    <div className="flex items-center justify-between p-4 border  rounded-lg mb-2">
+    <div className="flex items-center justify-between p-4 border rounded-lg mb-2">
       <div className="flex items-center gap-3">
         <div className="relative w-10 h-10 rounded-full overflow-hidden">
           <Img

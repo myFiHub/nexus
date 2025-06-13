@@ -9,6 +9,7 @@ import {
   confirmDialog,
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
+import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
   AdditionalDataForLogin,
@@ -18,6 +19,7 @@ import {
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import { all, put, select, takeLatest } from "redux-saga/effects";
+import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
 
@@ -114,12 +116,15 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
       if (identifierId.includes("|")) {
         identifierId = identifierId.split("|")[1];
       }
+      const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
+        buyerAddress: aptosAddress,
+      });
 
       const loginRequest: LoginRequest = {
         signature: signedEvmAddress,
         username: evmAddress,
         aptos_address: aptosAddress,
-        has_ticket: true,
+        has_ticket: hasCreatorPass,
         login_type_identifier: identifierId,
       };
       const additionalDataForLogin: AdditionalDataForLogin = {
@@ -139,6 +144,11 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
         error: string | null;
         statusCode: number | null;
       } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+      if (!response.user && response.error) {
+        toast.error(response.error);
+        return;
+      }
+
       let savedName = response.user?.name;
       let canContinue = true;
       if (!savedName) {

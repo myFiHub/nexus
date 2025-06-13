@@ -2,6 +2,7 @@ import { CopyButton } from "app/components/copyButton";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
 import { PodiumPassButton } from "./podiumPassButton";
+import { FollowButton } from "./tabs/followButton";
 
 interface UserProfileProps {
   user: User;
@@ -31,6 +32,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         )}
       </div>
       <PodiumPassButton user={user} />
+      <FollowButton id={user.uuid} followed={!!user.followed_by_me} />
     </div>
   );
 };
