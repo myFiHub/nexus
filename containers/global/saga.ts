@@ -139,52 +139,86 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
       if (email) {
         additionalDataForLogin.email = email;
       }
-      const response: {
-        user: User | null;
-        error: string | null;
-        statusCode: number | null;
-      } = yield podiumApi.login(loginRequest, additionalDataForLogin);
-      if (!response.user && response.error) {
-        toast.error(response.error);
-        return;
-      }
-
-      let savedName = response.user?.name;
-      let canContinue = true;
-      if (!savedName) {
-        canContinue = false;
-        const { confirmed, enteredText }: ConfirmDialogResult =
-          yield confirmDialog({
-            title: "please enter your name",
-            content: "",
-            inputOpts: {
-              inputType: "text",
-              inputPlaceholder: "name",
-            },
-          });
-        if (confirmed && (enteredText?.trim().length || 0) > 0) {
-          const resultsForUpdate: User | undefined =
-            yield podiumApi.updateMyUserData({ name: enteredText });
-          if (resultsForUpdate) {
-            canContinue = true;
-            savedName = enteredText;
-          }
-        }
-      }
-      if (!canContinue) {
-        yield put(globalActions.logout());
-        return;
-      }
-
-      if (response?.user) {
-        yield put(
-          globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
-        );
-      } else {
-        yield put(globalActions.logout());
-      }
+      yield continueWithLoginRequestAndAdditionalData(
+        loginRequest,
+        additionalDataForLogin
+      );
     }
   } catch (error) {
+    yield put(globalActions.logout());
+  }
+}
+
+function* continueWithLoginRequestAndAdditionalData(
+  loginRequest: LoginRequest,
+  additionalDataForLogin: AdditionalDataForLogin,
+  retried = false
+): any {
+  const response: {
+    user: User | null;
+    error: string | null;
+    statusCode: number | null;
+  } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+  let referrerId = "";
+  if (response.statusCode === 428 && !retried) {
+    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
+      {
+        title: "do you have a referrer",
+        content: "",
+        inputOpts: {
+          inputType: "text",
+          inputPlaceholder: "referrer id",
+        },
+      }
+    );
+    if (confirmed && enteredText) {
+      referrerId = enteredText;
+      loginRequest.referrer_user_uuid = referrerId;
+      yield continueWithLoginRequestAndAdditionalData(
+        loginRequest,
+        additionalDataForLogin,
+        true
+      );
+      return;
+    }
+  } else if (!response.user && response.error) {
+    toast.error(response.error);
+    return;
+  }
+
+  let savedName = response.user?.name;
+  let canContinue = true;
+  if (!savedName) {
+    canContinue = false;
+    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
+      {
+        title: "please enter your name",
+        content: "",
+        inputOpts: {
+          inputType: "text",
+          inputPlaceholder: "name",
+        },
+      }
+    );
+    if (confirmed && (enteredText?.trim().length || 0) > 0) {
+      const resultsForUpdate: User | undefined =
+        yield podiumApi.updateMyUserData({ name: enteredText });
+      if (resultsForUpdate) {
+        canContinue = true;
+        savedName = enteredText;
+      }
+    }
+  }
+  if (!canContinue) {
+    yield put(globalActions.logout());
+    return;
+  }
+
+  if (response?.user) {
+    yield put(
+      globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
+    );
+  } else {
     yield put(globalActions.logout());
   }
 }
