@@ -12,9 +12,11 @@ import { userDetailsActions } from "../../slice";
 
 const Content = ({
   id,
+  address,
   followed: initialFollowed,
 }: {
   id: string;
+  address: string;
   followed: boolean;
 }) => {
   const dispatch = useDispatch();
@@ -28,7 +30,7 @@ const Content = ({
   useEffect(() => {
     let subscription: Subscription;
 
-    if (myUser) {
+    if (myUser && address !== myUser.address) {
       subscription = followStateSubject.subscribe((state) => {
         if (state.id === id) {
           if (state.loading !== undefined) {
@@ -41,15 +43,15 @@ const Content = ({
       });
       const getUserData = async () => {
         setGettingUserData(true);
-        const user = await podiumApi.getUserData(id);
+        const areFollowedByMe = await podiumApi.areFollowedByMe([address]);
         setGettingUserData(false);
-        setFollowed(user?.followed_by_me || false);
+        setFollowed(areFollowedByMe[address] || false);
       };
       getUserData();
     }
 
     return () => subscription?.unsubscribe();
-  }, [id, myUser]);
+  }, [address, myUser]);
 
   const handleFollowUnfollowClick = (
     e: React.MouseEvent<HTMLButtonElement>
@@ -86,13 +88,15 @@ const Content = ({
 export const FollowButton = ({
   id,
   followed,
+  address,
 }: {
   id: string;
   followed: boolean;
+  address: string;
 }) => {
   return (
     <ReduxProvider>
-      <Content id={id} followed={followed} />
+      <Content id={id} followed={followed} address={address} />
     </ReduxProvider>
   );
 };

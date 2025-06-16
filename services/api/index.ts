@@ -6,7 +6,6 @@ import {
   BuySellRequest,
   ConnectNewAccountRequest,
   CreateOutpostRequest,
-  Follower,
   FollowerModel,
   FollowUnfollowAction,
   FollowUnfollowRequest,
@@ -202,14 +201,26 @@ class PodiumApi {
   }
 
   // Follow methods
-  async followUnfollowUser(
-    request: FollowUnfollowRequest
-  ): Promise<boolean> {
+  async followUnfollowUser(request: FollowUnfollowRequest): Promise<boolean> {
     try {
       const response = await this.axiosInstance.post("/users/follow", request);
       return response.status === 200;
     } catch (error) {
       return false;
+    }
+  }
+
+  async areFollowedByMe(ids: string[]): Promise<Record<string, boolean>> {
+    try {
+      const response = await this.axiosInstance.post(
+        `/users/are-followed-by-me`,
+        {
+          addresses: ids,
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return {};
     }
   }
 

@@ -41,7 +41,11 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
           </p>
         </div>
         <div className="flex-1"></div>
-        <FollowButton id={user.uuid} followed={user.followed_by_me} />
+        <FollowButton
+          id={user.uuid}
+          followed={user.followed_by_me}
+          address={user.address}
+        />
       </div>
     </div>
   );

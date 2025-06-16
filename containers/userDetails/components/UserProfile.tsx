@@ -32,7 +32,11 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         )}
       </div>
       <PodiumPassButton user={user} />
-      <FollowButton id={user.uuid} followed={!!user.followed_by_me} />
+      <FollowButton
+        id={user.uuid}
+        followed={!!user.followed_by_me}
+        address={user.address}
+      />
     </div>
   );
 };
