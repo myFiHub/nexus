@@ -1,5 +1,5 @@
 import { OutpostModel } from "../../services/api/types";
-import { AppLink } from "../AppLink";
+import OutpostLink from "../AppLink/outpostLink";
 import { OutpostCard } from "./OutpostCard";
 
 interface OutpostsListProps {
@@ -18,13 +18,13 @@ export function OutpostsList({ outposts }: OutpostsListProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
       {outposts.map((outpost) => (
-        <AppLink
+        <OutpostLink
           key={outpost.uuid}
-          href={`/outpost_details/${outpost.uuid}`}
+          id={outpost.uuid}
           className="block h-full"
         >
           <OutpostCard outpost={outpost} />
-        </AppLink>
+        </OutpostLink>
       ))}
     </div>
   );

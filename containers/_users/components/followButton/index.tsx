@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Subscription } from "rxjs";
-import { Button } from "../../../../components/Button";
+import { Button, ButtonProps } from "../../../../components/Button";
 import { followStateSubject } from "../../../../lib/messenger";
 import { usersSelectors } from "../../selectors";
 
@@ -15,10 +15,12 @@ const Content = ({
   id,
   address,
   followed: initialFollowed,
+  size,
 }: {
   id: string;
   address: string;
   followed: boolean;
+  size?: ButtonProps["size"];
 }) => {
   useUsersSlice();
   const dispatch = useDispatch();
@@ -86,7 +88,7 @@ const Content = ({
   return (
     <Button
       variant="outline"
-      size="sm"
+      size={size}
       onClick={handleFollowUnfollowClick}
       disabled={isLoading}
       className="min-w-22"
@@ -106,14 +108,16 @@ export const FollowButton = ({
   id,
   followed,
   address,
+  size = "sm",
 }: {
   id: string;
   followed: boolean;
   address: string;
+  size?: ButtonProps["size"];
 }) => {
   return (
     <ReduxProvider>
-      <Content id={id} followed={followed} address={address} />
+      <Content id={id} followed={followed} address={address} size={size} />
     </ReduxProvider>
   );
 };

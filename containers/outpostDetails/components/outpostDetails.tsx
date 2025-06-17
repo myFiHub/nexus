@@ -4,6 +4,7 @@ import { AppLink } from "../../../components/AppLink";
 import { Img } from "../../../components/Img";
 import { logoUrl } from "../../../lib/constants";
 import { OutpostModel } from "../../../services/api/types";
+import UserLink from "app/components/AppLink/userLink";
 
 interface OutpostDetailsProps {
   outpost: OutpostModel;
@@ -41,8 +42,8 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
           <div className="lg:col-span-2 space-y-6">
             {/* Creator Info */}
             <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
-              <AppLink
-                href={`/user/${outpost.creator_user_uuid}`}
+              <UserLink
+                id={outpost.creator_user_uuid}
                 className="flex items-center gap-4 hover:opacity-80 transition-opacity"
               >
                 <Img
@@ -65,7 +66,7 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
                     ) : null}
                   </div>
                 </div>
-              </AppLink>
+              </UserLink>
             </div>
 
             {/* Event Details */}
@@ -144,9 +145,9 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {outpost.members.map((member) => (
-                    <AppLink
+                    <UserLink
                       key={member.uuid}
-                      href={`/user/${member.uuid}`}
+                      id={member.uuid}
                       className="flex items-center gap-3 p-3 rounded-lg bg-[var(--background)] hover:bg-[var(--background)]/80 transition-colors"
                     >
                       <Img
@@ -171,7 +172,7 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
                           )}
                         </div>
                       </div>
-                    </AppLink>
+                    </UserLink>
                   ))}
                 </div>
               </div>

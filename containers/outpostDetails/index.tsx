@@ -6,7 +6,7 @@ interface OutpostDetailsContainerProps {
   outpost: OutpostModel;
 }
 
-export const OutpostDetailsContainer = ({
+export const OutpostDetailsContainer = async ({
   outpost,
 }: OutpostDetailsContainerProps) => {
   return (

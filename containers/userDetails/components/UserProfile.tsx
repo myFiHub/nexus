@@ -34,6 +34,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
       <PodiumPassButton user={user} />
       <FollowButton
         id={user.uuid}
+        size="md"
         followed={!!user.followed_by_me}
         address={user.address}
       />

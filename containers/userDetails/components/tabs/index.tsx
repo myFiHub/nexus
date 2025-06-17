@@ -4,6 +4,7 @@ import {
   User,
 } from "app/services/api/types";
 
+import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
 import { FollowButton } from "app/containers/_users/components/followButton";
 import { defaultProfilePic } from "app/lib/constants";
@@ -25,27 +26,35 @@ interface UserTabsProps {
 
 const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
   return (
-    <div className="flex items-center justify-between p-4 border rounded-lg mb-2">
-      <div className="flex items-center gap-3">
-        <div className="relative w-10 h-10 rounded-full overflow-hidden">
+    <div className="flex items-center justify-between p-4 border rounded-lg mb-2 hover:bg-accent/5 transition-colors">
+      <div className="flex items-center gap-3 flex-1 min-w-0">
+        <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
           <Img
             src={user.image || defaultProfilePic}
             alt={user.name || "User"}
             className="object-cover"
           />
         </div>
-        <div>
-          <p className="font-medium">{user.name}</p>
-          <p className="text-sm text-muted-foreground">
+        <div className="min-w-0 flex-1">
+          <p className="font-medium truncate">{user.name}</p>
+          <p className="text-sm text-muted-foreground truncate">
             id: {truncate(user.uuid, 10)}
           </p>
         </div>
-        <div className="flex-1"></div>
-        <FollowButton
-          id={user.uuid}
-          followed={user.followed_by_me}
-          address={user.address}
-        />
+        <div className="flex items-center gap-3 ml-4">
+          <UserLink
+            id={user.uuid}
+            className="text-sm text-primary hover:text-primary/80 transition-colors"
+          >
+            View Profile
+          </UserLink>
+          <FollowButton
+            id={user.uuid}
+            size="xxs"
+            followed={user.followed_by_me}
+            address={user.address}
+          />
+        </div>
       </div>
     </div>
   );

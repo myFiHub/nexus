@@ -9,6 +9,8 @@ import {
   confirmDialog,
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
+import { CookieKeys } from "app/lib/cookies";
+import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -218,6 +220,7 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
+    yield setServerCookie(CookieKeys.myUserId, response.user.uuid);
   } else {
     yield put(globalActions.logout());
   }
@@ -235,6 +238,7 @@ function* logout() {
       put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
+    deleteServerCookie(CookieKeys.myUserId);
   } catch (error) {
     console.error(error);
   }
