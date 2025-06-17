@@ -282,6 +282,8 @@ export interface PodiumPassBuyerModel {
   image: string;
   name: string;
   uuid: string;
+  podium_pass_owner_address: string;
+  count: number;
 }
 
 export type NotificationTypes = "follow" | "invite";

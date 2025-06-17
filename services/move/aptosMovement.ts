@@ -69,8 +69,7 @@ class AptosMovement {
 
   async isMyAccountActive() {
     try {
-      const accountInfo = await this._client.getAccount(this.address);
-      console.log("accountInfo", accountInfo);
+      await this._client.getAccount(this.address);
       return true;
     } catch {
       return false;

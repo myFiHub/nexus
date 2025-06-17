@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { User } from "app/services/api/types";
+import { PodiumPassBuyerModel, User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
 
@@ -20,6 +20,12 @@ export interface AssetsState {
   passes: {
     [key: string]: Pass;
   };
+  passesListBoughtByMe: {
+    loading: boolean;
+    passes: PodiumPassBuyerModel[];
+    error?: string;
+    page: number;
+  };
   myPasses: {
     loading: boolean;
     passes: Pass[];
@@ -37,6 +43,12 @@ const initialState: AssetsState = {
     loading: false,
     passes: [],
   },
+  passesListBoughtByMe: {
+    loading: false,
+    passes: [],
+    error: undefined,
+    page: 0,
+  },
 };
 
 const assetsSlice = createSlice({
@@ -48,7 +60,7 @@ const assetsSlice = createSlice({
       state.balance = action.payload;
     },
     getUserPassInfo(state, action: PayloadAction<{ address: string }>) {},
-    getMyPasses(state) {},
+    getPassesBoughtByMe(state, action: PayloadAction<{ page: number }>) {},
     setIsGettingMyPasses(state, action: PayloadAction<boolean>) {
       state.myPasses.loading = action.payload;
     },
@@ -62,10 +74,31 @@ const assetsSlice = createSlice({
       const { address, pass } = action.payload;
       state.passes[address] = pass;
     },
-    buyPass(
+    buyPassFromUser(
       state,
       action: PayloadAction<{ user: User; numberOfTickets: number }>
     ) {},
+    sellOneOfMyBoughtPasses(
+      state,
+      action: PayloadAction<{ pass: PodiumPassBuyerModel }>
+    ) {},
+    setPassesListBoughtByMePage(state, action: PayloadAction<number>) {
+      state.passesListBoughtByMe.page = action.payload;
+    },
+    setPassesListBoughtByMe(
+      state,
+      action: PayloadAction<{
+        passes: PodiumPassBuyerModel[];
+      }>
+    ) {
+      state.passesListBoughtByMe.passes = action.payload.passes;
+    },
+    setPassesListBoughtByMeLoading(state, action: PayloadAction<boolean>) {
+      state.passesListBoughtByMe.loading = action.payload;
+    },
+    setPassesListBoughtByMeError(state, action: PayloadAction<string>) {
+      state.passesListBoughtByMe.error = action.payload;
+    },
   },
 });
 

@@ -19,7 +19,7 @@ export const GlobalSelectors = {
   aptosAccount: GlobalDomains.aptosAccount,
   aptosAccountAddress: (state: RootState) =>
     state.global?.aptosAccount?.address().hex(),
-  isLoggedIn: (state: RootState) => !!state.global?.aptosAccount,
+  isLoggedIn: (state: RootState) => !!state.global?.podiumUserInfo,
   initializingWeb3Auth: GlobalDomains.initializingWeb3Auth,
   initialized: GlobalDomains.initialized,
   logingIn: GlobalDomains.logingIn,

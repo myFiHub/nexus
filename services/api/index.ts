@@ -1,9 +1,7 @@
 import axios, { AxiosInstance } from "axios";
 import {
   AdditionalDataForLogin,
-  Buyer,
   BuySellPodiumPassRequest,
-  BuySellRequest,
   ConnectNewAccountRequest,
   CreateOutpostRequest,
   FollowerModel,
@@ -269,26 +267,6 @@ class PodiumApi {
       return response.data.data;
     } catch (error) {
       return [];
-    }
-  }
-
-  // Pass methods
-  async buyPass(request: BuySellRequest): Promise<Buyer | undefined> {
-    try {
-      const response = await this.axiosInstance.post("/passes/buy", request);
-      return response.data.data;
-    } catch (error) {
-      console.error("Buy pass error:", error);
-      return undefined;
-    }
-  }
-
-  async sellPass(request: BuySellRequest): Promise<boolean> {
-    try {
-      await this.axiosInstance.post("/passes/sell", request);
-      return true;
-    } catch (error) {
-      return false;
     }
   }
 
@@ -676,16 +654,20 @@ class PodiumApi {
         `/podium-passes/trade`,
         request
       );
+      console.log("response", response);
       return response.status === 200;
     } catch {
       return false;
     }
   }
 
-  async myPodiumPasses(
-    page?: number,
-    page_size?: number
-  ): Promise<PodiumPassBuyerModel[]> {
+  async myPodiumPasses({
+    page,
+    page_size,
+  }: {
+    page?: number;
+    page_size?: number;
+  }): Promise<PodiumPassBuyerModel[]> {
     try {
       const response = await this.axiosInstance.get(
         `/podium-passes/my-passes`,
@@ -706,6 +688,28 @@ class PodiumApi {
       const response = await this.axiosInstance.get(
         `/podium-passes/recent-holders`,
         { params: { uuid, page, page_size } }
+      );
+      return response.data.data;
+    } catch {
+      return [];
+    }
+  }
+
+  async getMyPasses({
+    page,
+    page_size,
+    address,
+    uuid,
+  }: {
+    page?: number;
+    page_size?: number;
+    address?: string;
+    uuid?: string;
+  }): Promise<PodiumPassBuyerModel[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/podium-passes/recent-holders`,
+        { params: { page, page_size, address, uuid } }
       );
       return response.data.data;
     } catch {

@@ -1,4 +1,6 @@
 import Header from "app/components/header";
+import { cookies } from "next/headers";
+
 import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -19,18 +21,22 @@ export const metadata: Metadata = {
   description: "Podium Nexus",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value || "dark"; // default to light
+
+  console.log("theme", theme);
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={theme}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <GlobalContainer />
-        <Header />
+        <Header theme={theme as "light" | "dark"} />
         {children}
       </body>
     </html>

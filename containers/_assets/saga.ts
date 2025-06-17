@@ -1,9 +1,9 @@
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { User } from "app/services/api/types";
+import { PodiumPassBuyerModel, User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
-import { all, delay, put, select, takeLatest } from "redux-saga/effects";
+import { all, put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
 import { AssetsSelectors } from "./selectore";
@@ -85,8 +85,8 @@ function* getUserPassInfo(
   }
 }
 
-function* buyPass(
-  action: ReturnType<typeof assetsActions.buyPass>
+function* buyPassFromUser(
+  action: ReturnType<typeof assetsActions.buyPassFromUser>
 ): Generator<any, void, any> {
   const { user, numberOfTickets } = action.payload;
   const correntPassInfo = yield select(
@@ -98,7 +98,9 @@ function* buyPass(
       action: {
         label: "Retry",
         onClick: () => {
-          getStore().dispatch(assetsActions.buyPass({ user, numberOfTickets }));
+          getStore().dispatch(
+            assetsActions.buyPassFromUser({ user, numberOfTickets })
+          );
         },
       },
     });
@@ -179,20 +181,59 @@ function* buyPass(
   }
 }
 
-function* getMyPasses() {
+function* getPassesBoughtByMe(
+  action: ReturnType<typeof assetsActions.getPassesBoughtByMe>
+): Generator<any, void, any> {
+  const { page } = action.payload;
   yield put(assetsActions.setIsGettingMyPasses(true));
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  const correntPassesList: {
+    loading: boolean;
+    passes: PodiumPassBuyerModel[];
+  } = yield select(AssetsSelectors.passesListBoughtByMe);
   try {
-    yield delay(1000);
-    yield put(assetsActions.setMyPasses([]));
+    if (correntPassesList.loading) {
+      return;
+    }
+    yield put(assetsActions.setPassesListBoughtByMeLoading(true));
+    if (!myUser) {
+      console.error("user is being read before login is complete");
+      return;
+    }
+    const response: PodiumPassBuyerModel[] = yield podiumApi.myPodiumPasses({
+      page: page,
+      page_size: 100,
+    });
+    yield put(assetsActions.setPassesListBoughtByMe({ passes: response }));
   } catch (error) {
+    yield put(
+      assetsActions.setPassesListBoughtByMeError(
+        "Error, while getting the Passes List. Please try again."
+      )
+    );
   } finally {
-    yield put(assetsActions.setIsGettingMyPasses(false));
+    yield put(assetsActions.setPassesListBoughtByMeLoading(false));
   }
+}
+
+function* sellOneOfMyBoughtPasses(
+  action: ReturnType<typeof assetsActions.sellOneOfMyBoughtPasses>
+): Generator<any, void, any> {
+  const { pass } = action.payload;
+  console.log("pass", pass);
 }
 
 export function* assetsSaga() {
   yield takeLatest(assetsActions.getBalance.type, getBalance);
   yield takeLatest(assetsActions.getUserPassInfo.type, getUserPassInfo);
-  yield takeLatest(assetsActions.buyPass.type, buyPass);
-  yield takeLatest(assetsActions.getMyPasses.type, getMyPasses);
+  yield takeLatest(assetsActions.buyPassFromUser.type, buyPassFromUser);
+  yield takeLatest(assetsActions.getPassesBoughtByMe.type, getPassesBoughtByMe);
+  yield takeLatest(
+    assetsActions.sellOneOfMyBoughtPasses.type,
+    sellOneOfMyBoughtPasses
+  );
+  yield takeLatest(
+    assetsActions.setPassesListBoughtByMePage.type,
+    getPassesBoughtByMe
+  );
 }

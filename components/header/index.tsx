@@ -7,15 +7,16 @@ import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
 import { LoginButton } from "./LoginButton";
 import { NavLink } from "./NavLink";
+import { ThemeToggle } from "./themeToggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/profile", label: "Profile" },
-  { href: "/settings", label: "Settings" },
+  // { href: "/settings", label: "Settings" },
 ];
 
-const Content = () => {
+const Content = ({ theme }: { theme: "light" | "dark" }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
   return (
@@ -37,7 +38,8 @@ const Content = () => {
             </NavLink>
           ))}
       </nav>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
+        <ThemeToggle initialValue={theme} />
         <LoginButton />
       </div>
       {/* Mobile hamburger */}
@@ -56,23 +58,28 @@ const Content = () => {
       </div>
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="absolute top-full left-0 w-full bg-[var(--header-bg)] flex flex-col items-center md:hidden z-50 py-4 gap-4 shadow-lg">
+        <nav className="md:hidden absolute top-full left-0 right-0 bg-[var(--header-bg)] p-4 shadow-md">
           {isLoggedIn &&
             navLinks.map((link) => (
-              <NavLink key={link.href} href={link.href}>
+              <NavLink
+                key={link.href}
+                href={link.href}
+                className="block py-2"
+                onClick={() => setMobileOpen(false)}
+              >
                 {link.label}
               </NavLink>
             ))}
-        </div>
+        </nav>
       )}
     </header>
   );
 };
 
-export default function Header() {
+export default function Header({ theme }: { theme: "light" | "dark" }) {
   return (
     <ReduxProvider>
-      <Content />
+      <Content theme={theme} />
     </ReduxProvider>
   );
 }

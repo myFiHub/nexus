@@ -7,6 +7,7 @@ import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
+import { MyPasses } from "./components/MyPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
@@ -61,6 +62,7 @@ const Content = () => {
     if (loggedIn) {
       dispatch(profileActions.fetchProfile());
       dispatch(assetsActions.getBalance());
+      dispatch(assetsActions.getPassesBoughtByMe({ page: 0 }));
     }
   }, [loggedIn]);
 
@@ -75,6 +77,7 @@ const Content = () => {
         <UserStats user={user} />
         <ConnectedAccounts accounts={user.accounts} />
         <AdditionalInfo user={user} />
+        <MyPasses />
       </div>
     </div>
   );

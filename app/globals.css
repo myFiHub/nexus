@@ -7,8 +7,8 @@
   /* #d500f9 in oklch is 0.835 0.835 280.000 */
   --primary: oklch(0.835 0.835 280.000);
   --primary-hover: oklch(0.835 0.835 280.000);
-  --header-bg: #232339;
-  --header-link: #fff;
+  --header-bg: var(--card);
+  --header-link: var(--foreground);
   --header-link-active: var(--primary);
   --button-bg: var(--primary);
   --button-bg-hover: var(--primary-hover);

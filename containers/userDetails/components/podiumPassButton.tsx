@@ -38,7 +38,7 @@ const Content = ({ user }: { user: User }) => {
     if (error) {
       dispatch(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
     } else {
-      dispatch(assetsActions.buyPass({ user, numberOfTickets: 1 }));
+      dispatch(assetsActions.buyPassFromUser({ user, numberOfTickets: 1 }));
     }
   };
 
