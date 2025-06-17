@@ -69,7 +69,6 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
   yield put(globalActions.setWeb3Auth(web3auth));
   try {
     const connected: boolean = yield web3auth.connected;
-    console.log({ connected });
     if (connected) {
       yield getAndSetAccount();
     }

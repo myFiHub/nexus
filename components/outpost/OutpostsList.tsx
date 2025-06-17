@@ -19,6 +19,7 @@ export function OutpostsList({ outposts }: OutpostsListProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
       {outposts.map((outpost) => (
         <OutpostLink
+          underline={false}
           key={outpost.uuid}
           id={outpost.uuid}
           className="block h-full"

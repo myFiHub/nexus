@@ -673,6 +673,7 @@ class PodiumApi {
         `/podium-passes/my-passes`,
         { params: { page, page_size } }
       );
+      console.log({ response });
       return response.data.data;
     } catch {
       return [];
@@ -681,8 +682,8 @@ class PodiumApi {
 
   async podiumPassBuyers(
     uuid: string,
-    page?: number,
-    page_size?: number
+    page = 0,
+    page_size = 50
   ): Promise<PodiumPassBuyerModel[]> {
     try {
       const response = await this.axiosInstance.get(
