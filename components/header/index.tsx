@@ -2,7 +2,7 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { ReduxProvider } from "app/store/Provider";
 import { Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
 import { LoginButton } from "./LoginButton";
@@ -18,9 +18,35 @@ const navLinks = [
 
 const Content = ({ theme }: { theme: "light" | "dark" }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [lastScrollY, setLastScrollY] = useState(0);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > lastScrollY) {
+        // Scrolling down
+        setIsVisible(false);
+      } else {
+        // Scrolling up
+        setIsVisible(true);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
   return (
-    <header className="w-full bg-[var(--header-bg)] px-6 py-3 flex items-center justify-between shadow-md relative">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] px-6 py-3 flex items-center justify-between shadow-md transition-transform duration-300 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
       <div className="flex items-center gap-2">
         <AppLink
           href="/"

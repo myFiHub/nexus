@@ -1,11 +1,11 @@
 "use client";
+import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { Toaster } from "app/components/toast";
 import { ReduxProvider } from "app/store/Provider";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "./selectors";
 import { globalActions, useGlobalSlice } from "./slice";
-import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 
 const Container = () => {
   const dispatch = useDispatch();

@@ -28,10 +28,6 @@ const userDetailsSlice = createSlice({
       state.followers = action.payload.followers;
       state.followings = action.payload.followings;
     },
-    followUnfollowUser: (
-      state,
-      action: PayloadAction<{ id: string; follow: boolean }>
-    ) => {},
   },
 });
 

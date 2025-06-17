@@ -1,4 +1,5 @@
 "use client";
+import { usersActions, useUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
@@ -8,7 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Subscription } from "rxjs";
 import { Button } from "../../../../components/Button";
 import { followStateSubject } from "../../../../lib/messenger";
-import { userDetailsActions } from "../../slice";
+import { usersSelectors } from "../../selectors";
 
 const Content = ({
   id,
@@ -19,10 +20,17 @@ const Content = ({
   address: string;
   followed: boolean;
 }) => {
+  useUsersSlice();
   const dispatch = useDispatch();
+  const isFollowedFromCache = useSelector(
+    usersSelectors.isFollowedFromCache(id)
+  );
+  const initial =
+    isFollowedFromCache === undefined ? initialFollowed : isFollowedFromCache;
+  const existsOnCache = isFollowedFromCache !== undefined;
   const [loading, setLoading] = useState(false);
   const [gettingUserData, setGettingUserData] = useState(false);
-  const [followed, setFollowed] = useState(initialFollowed);
+  const [followed, setFollowed] = useState(initial);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isMyUser = myUser?.uuid === id;
   const isLoading = loading || gettingUserData;
@@ -42,22 +50,31 @@ const Content = ({
         }
       });
       const getUserData = async () => {
+        if (existsOnCache) {
+          return;
+        }
         setGettingUserData(true);
         const areFollowedByMe = await podiumApi.areFollowedByMe([address]);
         setGettingUserData(false);
         setFollowed(areFollowedByMe[address] || false);
+        dispatch(
+          usersActions.updateFollowStatusCache({
+            id: id,
+            follow: areFollowedByMe[address] || false,
+          })
+        );
       };
       getUserData();
     }
 
     return () => subscription?.unsubscribe();
-  }, [address, myUser]);
+  }, [address, myUser, existsOnCache]);
 
   const handleFollowUnfollowClick = (
     e: React.MouseEvent<HTMLButtonElement>
   ) => {
     dispatch(
-      userDetailsActions.followUnfollowUser({
+      usersActions.followUnfollowUser({
         id: id,
         follow: !followed,
       })

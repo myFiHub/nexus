@@ -15,12 +15,14 @@ export const UserStats = ({ user }: UserStatsProps) => {
   return (
     <>
       <div className="mb-8">
-        <div className="bg-gradient-to-r from-blue-500 to-purple-600 p-6 rounded-lg shadow-lg">
-          <div className="text-sm text-blue-100">Available Balance</div>
+        <div className="bg-gradient-to-r from-primary to-primary-hover p-6 rounded-lg shadow-lg">
+          <div className="text-sm text-primary-foreground/80">
+            Available Balance
+          </div>
           {isLoading ? (
-            <div className="h-8 w-32 bg-blue-400/20 animate-pulse rounded mt-1" />
+            <div className="h-8 w-32 bg-primary-foreground/20 animate-pulse rounded mt-1" />
           ) : (
-            <div className="text-3xl font-bold text-white mt-1 h-8">
+            <div className="text-3xl font-bold text-primary-foreground mt-1 h-8">
               {balance?.value || "0"}
             </div>
           )}

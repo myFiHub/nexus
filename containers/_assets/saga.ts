@@ -161,7 +161,7 @@ function* buyPassFromUser(
       if (success) {
         yield podiumApi.buySellPodiumPass({
           count: numberOfTickets,
-          podium_pass_owner_address: user.aptos_address!,
+          podium_pass_owner_address: user.address!,
           podium_pass_owner_uuid: user.uuid,
           trade_type: "buy",
           tx_hash: errorOrHash,

@@ -14,7 +14,7 @@ export const DisplaySection = () => {
 
   return (
     <div>
-      <h3 className="font-semibold text-lg mb-2 text-white">Display</h3>
+      <h3 className="font-semibold text-lg mb-2 text-foreground">Display</h3>
       <SettingsOption
         label="Theme"
         value={theme}

@@ -1,8 +1,8 @@
 import { CopyButton } from "app/components/copyButton";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
+import { FollowButton } from "../../_users/components/followButton";
 import { PodiumPassButton } from "./podiumPassButton";
-import { FollowButton } from "./tabs/followButton";
 
 interface UserProfileProps {
   user: User;

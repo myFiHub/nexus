@@ -5,6 +5,7 @@ import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import LoadingIndicator from "app/app/loading-indicator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,12 +30,12 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const theme = cookieStore.get("theme")?.value || "dark"; // default to light
 
-  console.log("theme", theme);
   return (
     <html lang="en" className={theme}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <LoadingIndicator />
         <GlobalContainer />
         <Header theme={theme as "light" | "dark"} />
         {children}

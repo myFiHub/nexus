@@ -6,9 +6,9 @@ import { PrivacySection } from "./components/PrivacySection";
 
 export const Settings = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#191A23]">
-      <div className="bg-[#23243a] rounded-2xl p-8 w-full max-w-xl shadow-lg">
-        <h2 className="text-3xl font-bold text-[#c26bfa] mb-6">Settings</h2>
+    <div className="flex justify-center items-center min-h-screen bg-background">
+      <div className="bg-card rounded-2xl p-8 w-full max-w-xl shadow-lg">
+        <h2 className="text-3xl font-bold text-primary mb-6">Settings</h2>
         <div className="space-y-8">
           <NotificationsSection />
           <DisplaySection />
@@ -16,7 +16,7 @@ export const Settings = () => {
 
           {/* Save Button */}
           <div className="flex justify-end">
-            <Button className="bg-[#c26bfa] text-white px-6 py-2 rounded-lg hover:bg-[#a259d9]">
+            <Button className="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary-hover">
               Save Settings
             </Button>
           </div>

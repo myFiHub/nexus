@@ -71,7 +71,7 @@ const Content = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-4xl mx-auto p-6 mt-12">
       <div className="bg-card rounded-lg shadow-md p-6">
         <ProfileHeader user={user} />
         <UserStats user={user} />

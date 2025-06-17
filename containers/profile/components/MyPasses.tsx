@@ -19,7 +19,7 @@ const PassCard = ({ pass }: { pass: any }) => (
     {/* Header with image and name */}
     <div className="relative h-32 bg-gradient-to-r from-blue-500 to-purple-500">
       <div className="absolute inset-0 bg-black/20" />
-      <div className="absolute bottom-0 left-0 right-0 p-4">
+      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
         <div className="flex items-center gap-3">
           <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white">
             <Image
@@ -30,8 +30,10 @@ const PassCard = ({ pass }: { pass: any }) => (
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-white truncate">{pass.name}</h3>
-            <p className="text-sm text-white/80">
+            <h3 className="font-medium text-primary-foreground truncate">
+              {pass.name}
+            </h3>
+            <p className="text-sm text-primary-foreground/80">
               {pass.count} {pass.count === 1 ? "pass" : "passes"}
             </p>
           </div>

@@ -5,7 +5,7 @@ import {
 } from "app/services/api/types";
 
 import { Img } from "app/components/Img";
-import { FollowButton } from "app/containers/userDetails/components/tabs/followButton";
+import { FollowButton } from "app/containers/_users/components/followButton";
 import { defaultProfilePic } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
 import {

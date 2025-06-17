@@ -8,7 +8,7 @@ interface ConnectedAccountCardProps {
 export const ConnectedAccountCard = ({
   account,
 }: ConnectedAccountCardProps) => (
-  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+  <div className="bg-card p-4 rounded-lg shadow-md border border-border/50">
     <div className="flex items-center space-x-3">
       {account.image && (
         <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
@@ -20,14 +20,14 @@ export const ConnectedAccountCard = ({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <div className="font-medium text-gray-900 dark:text-white truncate">
+        <div className="font-medium text-foreground truncate">
           ID: {account.login_type_identifier}
         </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
+        <div className="text-sm text-muted-foreground truncate">
           {account.login_type}
         </div>
         {account.is_primary && (
-          <span className="text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-2 py-1 rounded-full">
+          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
             Primary
           </span>
         )}

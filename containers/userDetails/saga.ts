@@ -25,36 +25,6 @@ function* getTabsData(
   );
 }
 
-function* followUnfollowUser(
-  action: ReturnType<typeof userDetailsActions.followUnfollowUser>
-): Generator<any, void, any> {
-  const { id, follow } = action.payload;
-  sendFollowEvent({ id, loading: true });
-  const followUnfollowRequest: FollowUnfollowRequest = {
-    uuid: id,
-    action: follow ? "follow" : "unfollow",
-  };
-
-  const toastString = follow ? "Started following" : "Stopped following";
-  try {
-    const response = yield podiumApi.followUnfollowUser(followUnfollowRequest);
-    if (response === true) {
-      sendFollowEvent({ id, followed: follow });
-      toast.success(`${toastString} user`);
-      // invalidate user data
-      revalidateUserProfile(id);
-    } else {
-      sendFollowEvent({ id, loading: false });
-      toast.error(`Failed to ${toastString} user`);
-    }
-  } catch (error) {
-    toast.error(`Failed to ${toastString} user`);
-  } finally {
-    sendFollowEvent({ id, loading: false });
-  }
-}
-
 export function* userDetailsSaga() {
   yield takeLatest(userDetailsActions.getTabsData, getTabsData);
-  yield takeEvery(userDetailsActions.followUnfollowUser, followUnfollowUser);
 }
