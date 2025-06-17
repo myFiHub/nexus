@@ -41,20 +41,20 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
             id: {truncate(user.uuid, 10)}
           </p>
         </div>
-        <div className="flex items-center gap-3 ml-4">
-          <UserLink
-            id={user.uuid}
-            className="text-sm text-primary hover:text-primary/80 transition-colors"
-          >
-            View Profile
-          </UserLink>
-          <FollowButton
-            id={user.uuid}
-            size="xxs"
-            followed={user.followed_by_me}
-            address={user.address}
-          />
-        </div>
+      </div>
+      <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+        <UserLink
+          id={user.uuid}
+          className="text-sm text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
+        >
+          View Profile
+        </UserLink>
+        <FollowButton
+          id={user.uuid}
+          size="xxs"
+          followed={user.followed_by_me}
+          address={user.address}
+        />
       </div>
     </div>
   );

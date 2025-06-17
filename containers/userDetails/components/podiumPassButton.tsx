@@ -46,26 +46,26 @@ const Content = ({ user }: { user: User }) => {
     <Button
       onClick={handleClick}
       disabled={loadingPass}
-      className="flex items-center justify-center gap-3 px-6 py-2.5 w-md md:w-lg sm:w-full lg:w-xl hover:bg-opacity-90 transition-all cursor-pointer"
+      className="flex flex-wrap items-center justify-center gap-2 px-4 py-2.5 w-full sm:w-auto hover:bg-opacity-90 transition-all cursor-pointer content-center"
     >
       {error ? <div className="text-red-500">{error}</div> : ""}
       {!error && (
         <>
           {loadingPass ? <Loader2 className="w-4 h-4 animate-spin" /> : ""}
           {pass?.price && (
-            <div className="flex items-center gap-1.5 text-lg font-medium">
+            <div className="flex items-center gap-1.5 text-base sm:text-lg font-medium">
               <span className="text-green-500">price: {pass.price} MOVE</span>
               <Image
                 src="/movement_logo.svg"
                 alt="MOVE"
                 width={20}
                 height={20}
-                className="w-5 h-5"
+                className="w-4 h-4 sm:w-5 sm:h-5"
               />
             </div>
           )}
           {pass?.ownedNumber !== undefined && (
-            <div className="text-sm text-gray-400 border-l pl-3">
+            <div className="text-xs sm:text-sm text-gray-400 border-l pl-2 sm:pl-3">
               {pass.ownedNumber} {pass.ownedNumber === 1 ? "pass" : "passes"}{" "}
               owned
             </div>
