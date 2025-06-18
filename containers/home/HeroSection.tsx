@@ -20,7 +20,7 @@ export function HeroSection() {
           Discover Creators
         </AppLink>
         <AppLink
-          href="/outpost/new"
+          href="/create_outpost"
           variant="outline"
           size="default"
           className="border-[var(--primary)] text-[var(--primary)] px-6 py-2 rounded-full text-lg font-semibold hover:bg-[var(--primary)] hover:text-white transition"

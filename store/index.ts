@@ -14,6 +14,8 @@ import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
 import { UsersState } from "app/containers/_users/slice";
+import { OutpostDetailsState } from "app/containers/outpostDetails/slice";
+import { OnGoingOutpostState } from "app/containers/ongoingOutpost/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -92,5 +94,7 @@ export type RootState = {
   assets: AssetsState;
   userDetails: UserDetailsState;
   users: UsersState;
+  outpostDetails: OutpostDetailsState;
+  onGoingOutpost: OnGoingOutpostState;
 };
 export type AppDispatch = typeof store.dispatch;

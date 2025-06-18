@@ -1,6 +1,7 @@
 "use client";
 import { usersActions, useUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
@@ -16,11 +17,13 @@ const Content = ({
   address,
   followed: initialFollowed,
   size,
+  className,
 }: {
   id: string;
   address: string;
   followed: boolean;
   size?: ButtonProps["size"];
+  className?: string;
 }) => {
   useUsersSlice();
   const dispatch = useDispatch();
@@ -91,11 +94,13 @@ const Content = ({
       size={size}
       onClick={handleFollowUnfollowClick}
       disabled={isLoading}
-      className="min-w-22"
+      className={cn("min-w-22", className)}
       colorScheme={followed ? "danger" : "primary"}
     >
       {isLoading ? (
-        <Loader2 className="animate-spin" />
+        <div className="h-5 flex items-center justify-center">
+          <Loader2 className="animate-spin" size={15} />
+        </div>
       ) : followed ? (
         "Unfollow"
       ) : (
@@ -109,15 +114,23 @@ export const FollowButton = ({
   followed,
   address,
   size = "sm",
+  className,
 }: {
   id: string;
   followed: boolean;
   address: string;
   size?: ButtonProps["size"];
+  className?: string;
 }) => {
   return (
     <ReduxProvider>
-      <Content id={id} followed={followed} address={address} size={size} />
+      <Content
+        id={id}
+        followed={followed}
+        address={address}
+        size={size}
+        className={className}
+      />
     </ReduxProvider>
   );
 };

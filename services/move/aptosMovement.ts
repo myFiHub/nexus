@@ -286,7 +286,7 @@ class AptosMovement {
       const res = await this._client.submitSignedBCSTransaction(signedTxn);
       const hash = res.hash;
       await this._client.waitForTransaction(hash, { checkSuccess: true });
-      // Optionally call your backend here
+
       return [true, hash];
     } catch (e: any) {
       toast.error("Error buying Pass: " + e.toString());

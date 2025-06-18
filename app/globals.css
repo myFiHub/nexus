@@ -2,7 +2,9 @@
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
-
+.rti--container {
+  background: red;
+}
 :root {
   /* #d500f9 in oklch is 0.835 0.835 280.000 */
   --primary: oklch(0.835 0.835 280.000);
@@ -180,4 +182,5 @@
   body {
     @apply bg-background text-foreground;
   }
+
 }

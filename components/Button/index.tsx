@@ -9,6 +9,7 @@ const buttonVariants = cva(
       variant: {
         primary: "primary",
         outline: "border bg-transparent",
+        ghost: "bg-transparent hover:bg-transparent",
       },
       size: {
         xxs: "h-6 px-2 text-xs",
@@ -47,6 +48,22 @@ const buttonVariants = cva(
         colorScheme: "warning",
         className:
           "border-warning text-warning hover:bg-warning hover:text-white",
+      },
+      // Ghost variant with color schemes
+      {
+        variant: "ghost",
+        colorScheme: "primary",
+        className: "text-primary hover:bg-primary/10",
+      },
+      {
+        variant: "ghost",
+        colorScheme: "danger",
+        className: "text-danger hover:bg-danger/10",
+      },
+      {
+        variant: "ghost",
+        colorScheme: "warning",
+        className: "text-warning hover:bg-warning/10",
       },
       // Ensure text is white for all color schemes
       {
