@@ -1,14 +1,17 @@
 "use client";
-import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
+import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { OutpostModel } from "app/services/api/types";
+import { useRouter } from "next/navigation";
 import { Button } from "../../../components/Button";
-import { outpostDetailsSelectors } from "../selectors";
 
-interface JoinButtonProps {}
+interface JoinButtonProps {
+  outpost: OutpostModel;
+}
 
-export function JoinButton({}: JoinButtonProps) {
+export function JoinButton({ outpost }: JoinButtonProps) {
+  useOnGoingOutpostSlice();
   const router = useRouter();
-  const outpost = useSelector(outpostDetailsSelectors.outpost);
+
   if (!outpost) return null;
   const join = () => {
     router.push(`/ongoing_outpost/${outpost.uuid}`);

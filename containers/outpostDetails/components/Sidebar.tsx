@@ -13,7 +13,7 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
     <div className="space-y-6">
       {/* Join Button */}
       <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
-        <JoinButton />
+        <JoinButton outpost={outpost} />
       </div>
 
       {/* Additional Info */}
