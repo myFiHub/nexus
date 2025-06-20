@@ -1,11 +1,11 @@
 import Header from "app/components/header";
 import { cookies } from "next/headers";
 
+import LoadingIndicator from "app/app/loading-indicator";
 import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import LoadingIndicator from "app/app/loading-indicator";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
