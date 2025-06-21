@@ -147,14 +147,13 @@ function* buyPassFromUser(
       return;
     }
 
-    const response =
-      yield movementService.buyTicketFromTicketSellerOnPodiumPass({
-        referrer: referrerAddress,
-        numberOfTickets,
-        sellerAddress: user.aptos_address!,
-        sellerName: user.name ?? "",
-        sellerUuid: user.uuid,
-      });
+    const response = yield movementService.buyPodiumPassFromUser({
+      referrer: referrerAddress,
+      numberOfTickets,
+      sellerAddress: user.aptos_address!,
+      sellerName: user.name ?? "",
+      sellerUuid: user.uuid,
+    });
     if (response) {
       const success = response[0];
       const errorOrHash = response[1];

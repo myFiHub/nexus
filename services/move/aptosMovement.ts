@@ -243,7 +243,7 @@ class AptosMovement {
     }, 5000);
   }
 
-  async buyTicketFromTicketSellerOnPodiumPass(opts: {
+  async buyPodiumPassFromUser(opts: {
     sellerAddress: string;
     sellerName: string;
     sellerUuid: string;

@@ -12,31 +12,32 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
   return (
     <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
       <div className="space-y-4">
-        <UserLink
-          id={outpost.creator_user_uuid}
-          className="flex items-center gap-4 hover:opacity-80 transition-opacity"
-        >
-          <Img
-            src={outpost.creator_user_image || logoUrl}
-            alt={outpost.creator_user_name}
-            className="w-16 h-16 rounded-full border-2 border-[var(--primary)]"
-          />
-          <div>
-            <p className="font-semibold text-lg">
-              Hosted by {outpost.creator_user_name}
-            </p>
-            <div className="flex items-center gap-2 text-[var(--muted-foreground)]">
-              <Users className="w-4 h-4" />
-              <span>{outpost.members_count || 0} members</span>
-              {outpost.online_users_count ? (
-                <>
-                  <span>•</span>
-                  <span>{outpost.online_users_count} online</span>
-                </>
-              ) : null}
-            </div>
+        <div>
+          <div className="font-semibold text-lg flex items-center gap-2">
+            <p>Hosted by </p>
+            <Img
+              src={outpost.creator_user_image || logoUrl}
+              alt={outpost.creator_user_name}
+              className="w-6 h-6 rounded-full border-1 border-primary"
+            />
+            <UserLink
+              id={outpost.creator_user_uuid}
+              className="font-semibold text-lg m-0 p-0 h-fit"
+            >
+              {outpost.creator_user_name}
+            </UserLink>
           </div>
-        </UserLink>
+          <div className="flex items-center gap-2 text-[var(--muted-foreground)]">
+            <Users className="w-4 h-4" />
+            <span>{outpost.members_count || 0} members</span>
+            {outpost.online_users_count ? (
+              <>
+                <span>•</span>
+                <span>{outpost.online_users_count} online</span>
+              </>
+            ) : null}
+          </div>
+        </div>
 
         <div className="pt-4 border-t border-[var(--border)]">
           <p className="text-sm text-[var(--muted-foreground)]">

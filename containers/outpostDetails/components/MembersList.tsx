@@ -1,3 +1,4 @@
+import UserLink from "app/components/AppLink/userLink";
 import { FollowButton } from "app/containers/_users/components/followButton";
 import { Mic, Users } from "lucide-react";
 import { Img } from "../../../components/Img";
@@ -28,14 +29,19 @@ export function MembersList({ outpost }: MembersListProps) {
               alt={member.name}
               className="w-10 h-10 rounded-full border-2 border-[var(--primary)]"
             />
-            <div>
-              <p className="font-medium">{member.name}</p>
+            <div className="flex flex-col gap-1">
+              <UserLink
+                id={member.uuid}
+                className="font-medium m-0 p-0 h-fit text-base"
+              >
+                {member.name}
+              </UserLink>
               <FollowButton
                 id={member.uuid}
                 followed={member.followed_by_me ?? false}
                 address={member.address}
                 size="xxs"
-                className="max-h-[24px]"
+                className="max-h-[24px] max-w-[40px]"
               />
               <div className="flex items-center gap-2 text-sm text-[var(--muted-foreground)]">
                 {member.is_present && (
