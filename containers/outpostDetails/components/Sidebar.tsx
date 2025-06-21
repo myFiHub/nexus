@@ -25,8 +25,8 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
             <Video className="w-4 h-4 text-[var(--primary)]" />
             <span className="text-[var(--muted-foreground)]">
               {outpost.is_recordable
-                ? "Recording Enabled - This session will be recorded"
-                : "Recording Disabled - This session will not be recorded"}
+                ? "Recording Enabled"
+                : "Recording Disabled"}
             </span>
           </div>
 
@@ -35,7 +35,7 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
             <span className="text-[var(--muted-foreground)]">
               {outpost.has_adult_content
                 ? "Adult Content - 18+ Only"
-                : "All Ages - Suitable for Everyone"}
+                : "Suitable for Everyone"}
             </span>
           </div>
         </div>
