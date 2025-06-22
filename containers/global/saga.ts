@@ -119,13 +119,6 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
   try {
     const privateKey: string | undefined = yield getPrivateKey();
     if (privateKey) {
-      const evmWallet = new ethers.Wallet(privateKey);
-      const evmAddress = evmWallet.address;
-      const { signature: signedEvmAddress, timestampInUTCInSeconds } =
-        yield signMessageWithTimestamp({
-          privateKey,
-          message: evmAddress,
-        });
       const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
       const account = new AptosAccount(privateKeyBytes);
       yield put(globalActions.setAptosAccount(account));
@@ -150,8 +143,15 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
         buyerAddress: aptosAddress,
       });
 
+      const evmWallet = new ethers.Wallet(privateKey);
+      const evmAddress = evmWallet.address;
+      const { signature, timestampInUTCInSeconds } =
+        yield signMessageWithTimestamp({
+          privateKey,
+          message: evmAddress,
+        });
       const loginRequest: LoginRequest = {
-        signature: signedEvmAddress,
+        signature,
         username: evmAddress,
         timestamp: timestampInUTCInSeconds,
         aptos_address: aptosAddress,
@@ -213,12 +213,6 @@ function* continueWithLoginRequestAndAdditionalData(
       return;
     }
   } else if (!response.user && response.error) {
-    if (response.error.includes("signature")) {
-      toast.error("Please try again");
-      yield put(globalActions.logout());
-      yield put(globalActions.setLogingIn(false));
-      return;
-    }
     toast.error(response.error);
     return;
   }
