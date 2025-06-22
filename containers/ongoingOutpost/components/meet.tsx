@@ -3,6 +3,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
 
 export const Meet = () => {
@@ -1010,43 +1011,49 @@ export const Meet = () => {
             localSubject: outpost.name,
             autoJoin: true,
             disableModeratorIndicator: true,
+            defaultLogoUrl: logoUrl,
             lobby: {
               enabled: false,
             },
             prejoinPageEnabled: false,
             skipPrejoinPage: true,
+            toolbarButtons: [
+              // "microphone",
+              // "camera",
+              "closedcaptions",
+              "desktop",
+              "fullscreen",
+              "fodeviceselection",
+              // "hangup",
+              "chat",
+              // "recording",
+              "livestreaming",
+              "etherpad",
+              "sharedvideo",
+              // "settings",
+              "raisehand",
+              // "videoquality",
+              "filmstrip",
+              "feedback",
+              "stats",
+              // "shortcuts",
+              // "tileview",
+              // "videobackgroundblur",
+              // "download",
+              // "mute-everyone",
+              // "security",
+            ],
           }}
           interfaceConfigOverwrite={{
             DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
             SHOW_JITSI_WATERMARK: false,
             SHOW_WATERMARK_FOR_GUESTS: false,
-            SHOW_BRAND_WATERMARK: false,
+            SHOW_BRAND_WATERMARK: true,
             SHOW_POWERED_BY: false,
-            TOOLBAR_BUTTONS: [
-              "camera",
-              "closedcaptions",
-              "desktop",
-              "fullscreen",
-              "fodeviceselection",
-              "hangup",
-              "chat",
-              "recording",
-              "livestreaming",
-              "etherpad",
-              "sharedvideo",
-              "settings",
-              "raisehand",
-              "videoquality",
-              "filmstrip",
-              "feedback",
-              "stats",
-              "shortcuts",
-              "tileview",
-              "videobackgroundblur",
-              "download",
-              "mute-everyone",
-              "security",
-            ],
+            DEFAULT_WELCOME_PAGE_LOGO_URL: logoUrl,
+            BRAND_WATERMARK_LINK: logoUrl,
+            HIDE_INVITE_MORE_HEADER: true,
+            JITSI_WATERMARK_LINK: logoUrl,
           }}
           getIFrameRef={(parentNode: HTMLDivElement) => {
             const iframeRef = parentNode.querySelector(

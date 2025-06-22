@@ -11,6 +11,7 @@ import {
 } from "app/components/Dialog/confirmDialog";
 import { CookieKeys } from "app/lib/cookies";
 import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
+import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -24,6 +25,20 @@ import { all, put, select, takeLatest } from "redux-saga/effects";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
+
+const availableSocialLogins = [
+  "twitter",
+  "google",
+  "apple",
+  "facebook",
+  "github",
+  "linkedin",
+  "email_passwordless",
+];
+
+const stringContainsOneOfAvailableSocialLogins = (str: string) => {
+  return availableSocialLogins.some((login) => str.includes(login));
+};
 
 export function* getPrivateKey() {
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
@@ -51,20 +66,11 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
 
   const web3auth = new Web3Auth({
     uiConfig: {
-      loginMethodsOrder: [
-        "twitter",
-        "google",
-        "apple",
-        "facebook",
-        "github",
-        "linkedin",
-        "email_passwordless",
-      ],
+      loginMethodsOrder: availableSocialLogins,
     },
     clientId: web3AuthContextConfig.web3AuthOptions.clientId,
     web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
   });
-
   yield web3auth.init();
   yield put(globalActions.setWeb3Auth(web3auth));
   try {
@@ -80,14 +86,33 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
 }
 
 function* getAndSetAccount() {
-  yield put(globalActions.setLogingIn(true));
-  const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-  const user: IProvider | null = yield web3Auth.connect();
-  if (user) {
-    const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
-    yield afterConnect(userInfo);
+  try {
+    yield put(globalActions.setLogingIn(true));
+    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
+    const user: IProvider | null = yield web3Auth.connect();
+    if (user) {
+      const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
+      if (
+        userInfo.authConnection &&
+        !stringContainsOneOfAvailableSocialLogins(userInfo.authConnection)
+      ) {
+        yield web3Auth.logout();
+        yield web3Auth.clearCache();
+        toast.error("Only social login is supported for now");
+        return;
+      }
+      yield afterConnect(userInfo);
+    }
+    yield put(globalActions.setLogingIn(false));
+  } catch (error) {
+    yield put(globalActions.setLogingIn(false));
+    yield all([
+      put(globalActions.setWeb3AuthUserInfo(undefined)),
+      put(globalActions.setAptosAccount(undefined)),
+      put(globalActions.setPodiumUserInfo(undefined)),
+    ]);
+    deleteServerCookie(CookieKeys.myUserId);
   }
-  yield put(globalActions.setLogingIn(false));
 }
 
 function* afterConnect(userInfo: Partial<UserInfo>) {
@@ -96,7 +121,11 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
     if (privateKey) {
       const evmWallet = new ethers.Wallet(privateKey);
       const evmAddress = evmWallet.address;
-      const signedEvmAddress: string = yield evmWallet.signMessage(evmAddress);
+      const { signature: signedEvmAddress, timestampInUTCInSeconds } =
+        yield signMessageWithTimestamp({
+          privateKey,
+          message: evmAddress,
+        });
       const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
       const account = new AptosAccount(privateKeyBytes);
       yield put(globalActions.setAptosAccount(account));
@@ -124,6 +153,7 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
       const loginRequest: LoginRequest = {
         signature: signedEvmAddress,
         username: evmAddress,
+        timestamp: timestampInUTCInSeconds,
         aptos_address: aptosAddress,
         has_ticket: hasCreatorPass,
         login_type_identifier: identifierId,
@@ -183,6 +213,12 @@ function* continueWithLoginRequestAndAdditionalData(
       return;
     }
   } else if (!response.user && response.error) {
+    if (response.error.includes("signature")) {
+      toast.error("Please try again");
+      yield put(globalActions.logout());
+      yield put(globalActions.setLogingIn(false));
+      return;
+    }
     toast.error(response.error);
     return;
   }
@@ -229,15 +265,14 @@ function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
   try {
-    yield web3Auth?.logout();
-    yield web3Auth?.clearCache();
-
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookie(CookieKeys.myUserId);
+    yield web3Auth?.logout();
+    yield web3Auth?.clearCache();
   } catch (error) {
     console.error(error);
   }

@@ -41,6 +41,7 @@ export interface User {
 // Auth related types
 export interface LoginRequest {
   signature: string;
+  timestamp: number;
   username: string;
   aptos_address: string;
   has_ticket: boolean;

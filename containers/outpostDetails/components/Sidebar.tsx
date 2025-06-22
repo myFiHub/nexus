@@ -12,18 +12,18 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
   return (
     <div className="space-y-6">
       {/* Join Button */}
-      <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
+      <div className="bg-card p-6 rounded-xl shadow-sm">
         <JoinButton outpost={outpost} />
       </div>
 
       {/* Additional Info */}
-      <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm space-y-4">
+      <div className="bg-card p-6 rounded-xl shadow-sm space-y-4">
         <h3 className="font-semibold text-lg mb-2">Additional Information</h3>
 
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Video className="w-4 h-4 text-[var(--primary)]" />
-            <span className="text-[var(--muted-foreground)]">
+            <Video className="w-4 h-4 text-primary" />
+            <span className="text-muted-foreground">
               {outpost.is_recordable
                 ? "Recording Enabled"
                 : "Recording Disabled"}
@@ -31,8 +31,8 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
           </div>
 
           <div className="flex items-center gap-2">
-            <Shield className="w-4 h-4 text-[var(--primary)]" />
-            <span className="text-[var(--muted-foreground)]">
+            <Shield className="w-4 h-4 text-primary" />
+            <span className="text-muted-foreground">
               {outpost.has_adult_content
                 ? "Adult Content - 18+ Only"
                 : "Suitable for Everyone"}
@@ -42,7 +42,7 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
       </div>
 
       {/* Share Section */}
-      <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
+      <div className="bg-card p-6 rounded-xl shadow-sm">
         <h3 className="font-semibold text-lg mb-4">Share This Event</h3>
         <div className="flex gap-3">
           <Button variant="primary" colorScheme="primary" className="flex-1">

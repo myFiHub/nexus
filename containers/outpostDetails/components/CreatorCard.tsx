@@ -10,7 +10,7 @@ interface CreatorCardProps {
 
 export function CreatorCard({ outpost }: CreatorCardProps) {
   return (
-    <div className="bg-[var(--card-bg)] p-6 rounded-xl shadow-sm">
+    <div className="bg-card p-6 rounded-xl shadow-sm">
       <div className="space-y-4">
         <div>
           <div className="font-semibold text-lg flex items-center gap-2">
@@ -27,7 +27,7 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
               {outpost.creator_user_name}
             </UserLink>
           </div>
-          <div className="flex items-center gap-2 text-[var(--muted-foreground)]">
+          <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="w-4 h-4" />
             <span>{outpost.members_count || 0} members</span>
             {outpost.online_users_count ? (
@@ -39,8 +39,8 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
           </div>
         </div>
 
-        <div className="pt-4 border-t border-[var(--border)]">
-          <p className="text-sm text-[var(--muted-foreground)]">
+        <div className="pt-4 border-t border-border">
+          <p className="text-sm text-muted-foreground">
             This event is organized by {outpost.creator_user_name}. Join to
             connect with other members and participate in the discussion.
           </p>

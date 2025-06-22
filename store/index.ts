@@ -16,6 +16,7 @@ import { rootSaga } from "./rootSaga";
 import { UsersState } from "app/containers/_users/slice";
 import { OutpostDetailsState } from "app/containers/outpostDetails/slice";
 import { OnGoingOutpostState } from "app/containers/ongoingOutpost/slice";
+import { MyOutpostsState } from "app/containers/myOutposts/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -96,5 +97,6 @@ export type RootState = {
   users: UsersState;
   outpostDetails: OutpostDetailsState;
   onGoingOutpost: OnGoingOutpostState;
+  myOutposts: MyOutpostsState;
 };
 export type AppDispatch = typeof store.dispatch;

@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/", label: "Home" },
   { href: "/dashboard", label: "Dashboard" },
   { href: "/profile", label: "Profile" },
+  { href: "/my_outposts", label: "My Outposts" },
   // { href: "/settings", label: "Settings" },
 ];
 
@@ -69,19 +70,21 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
         <LoginButton />
       </div>
       {/* Mobile hamburger */}
-      <div className="md:hidden flex items-center">
-        <button
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={mobileOpen ? "Close mobile menu" : "Open mobile menu"}
-          className="text-2xl text-[var(--header-link)] focus:outline-none"
-        >
-          {mobileOpen ? (
-            <X className="w-7 h-7" />
-          ) : (
-            <Menu className="w-7 h-7" />
-          )}
-        </button>
-      </div>
+      {isLoggedIn && (
+        <div className="md:hidden flex items-center ">
+          <button
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? "Close mobile menu" : "Open mobile menu"}
+            className="text-2xl text-[var(--header-link)] focus:outline-none"
+          >
+            {mobileOpen ? (
+              <X className="w-7 h-7" />
+            ) : (
+              <Menu className="w-7 h-7" />
+            )}
+          </button>
+        </div>
+      )}
       {/* Mobile menu */}
       {mobileOpen && (
         <nav className="md:hidden absolute top-full left-0 right-0 bg-[var(--header-bg)] p-4 shadow-md">
