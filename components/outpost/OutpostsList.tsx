@@ -4,13 +4,29 @@ import { OutpostCard } from "./OutpostCard";
 
 interface OutpostsListProps {
   outposts: OutpostModel[];
+  loading?: boolean;
+  error?: string;
+  noOutpostComponent?: React.ReactNode;
 }
 
-export function OutpostsList({ outposts }: OutpostsListProps) {
+export function OutpostsList({
+  outposts,
+  loading,
+  error,
+  noOutpostComponent,
+}: OutpostsListProps) {
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   if (!outposts.length) {
     return (
       <div className="text-center py-12">
-        <p className="text-[var(--muted-foreground)]">No outposts found</p>
+        {noOutpostComponent ?? "No outposts"}
       </div>
     );
   }
