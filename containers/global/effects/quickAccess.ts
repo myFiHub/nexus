@@ -1,13 +1,21 @@
-import { User } from "app/services/api/types";
-import { select } from "redux-saga/effects";
-import { GlobalDomains } from "../selectors";
+import { getStore } from "app/store";
 
 export class EasyAccess {
-  static *myUser(): Generator<any, User, any> {
-    const user: User = yield select(GlobalDomains.podiumUserInfo);
-    if (!user) {
-      throw new Error("User not found - user must be logged in");
+  private static instance: EasyAccess;
+
+  private constructor() {}
+
+  static getInstance(): EasyAccess {
+    if (!EasyAccess.instance) {
+      EasyAccess.instance = new EasyAccess();
     }
+    return EasyAccess.instance;
+  }
+
+  get myUser() {
+    const user = getStore().getState().global.podiumUserInfo!;
     return user;
   }
 }
+
+export const easyAccess = EasyAccess.getInstance();

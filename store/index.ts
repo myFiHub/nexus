@@ -18,21 +18,18 @@ import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
 
-let store: Store<Record<string, any>, AnyAction>;
+let store: Store<RootState, AnyAction>;
 // Create the saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
 // Create an object to store injected reducers
-const injectedReducers: Record<
-  string,
-  Reducer<Record<string, any>, AnyAction>
-> = {};
+const injectedReducers: Record<string, Reducer<any, AnyAction>> = {};
 
 // Create an object to store injected sagas
 const injectedSagas: Record<string, any> = {};
 
 // Function to get or create store
-export const getStore = (): any => {
+export const getStore = (): Store<RootState, AnyAction> => {
   if (!store) {
     // Configure the store
     store = configureStore({
@@ -51,19 +48,19 @@ export const getStore = (): any => {
 };
 
 // Function to inject a reducer
-const injectReducer = (
-  key: string,
-  reducer: Reducer<Record<string, any>, UnknownAction>
-) => {
+const injectReducer = (key: string, reducer: Reducer<any, UnknownAction>) => {
   if (injectedReducers[key]) {
     return;
   }
 
   injectedReducers[key] = reducer;
-  const combinedReducer = combineReducers<Record<string, any>>({
-    ...rootReducer,
-    ...injectedReducers,
-  }) as Reducer<Record<string, any>, UnknownAction>;
+  const combinedReducer = combineReducers<RootState>(
+    // @ts-ignore
+    {
+      ...rootReducer,
+      ...injectedReducers,
+    }
+  ) as Reducer<RootState, UnknownAction>;
 
   getStore().replaceReducer(combinedReducer);
   console.log("injected reducer", key);
