@@ -24,7 +24,7 @@ const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
   const joining = joiningId === outpost.uuid;
   if (!outpost) return null;
   const join = () => {
-    dispatch(globalActions.joinOutpost(outpost));
+    dispatch(globalActions.joinOutpost({ outpost }));
   };
 
   if (!myUser && !logingIn) return <LoginButton className="w-full" />;

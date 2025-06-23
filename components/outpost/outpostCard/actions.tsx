@@ -14,7 +14,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const isLoading = outpost.uuid == loadingOutpost;
 
   const handleOpenClick = () => {
-    dispatch(globalActions.joinOutpost(outpost));
+    dispatch(globalActions.joinOutpost({ outpost }));
   };
 
   if (!myUser) {

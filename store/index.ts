@@ -7,16 +7,16 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 import { type AssetsState } from "app/containers/_assets/slice";
+import { UsersState } from "app/containers/_users/slice";
 import { type GlobalState } from "app/containers/global/slice";
+import { MyOutpostsState } from "app/containers/myOutposts/slice";
+import { OnGoingOutpostState } from "app/containers/ongoingOutpost/slice";
+import { OutpostDetailsState } from "app/containers/outpostDetails/slice";
 import { type ProfileState } from "app/containers/profile/slice";
 import { UserDetailsState } from "app/containers/userDetails/slice";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
-import { UsersState } from "app/containers/_users/slice";
-import { OutpostDetailsState } from "app/containers/outpostDetails/slice";
-import { OnGoingOutpostState } from "app/containers/ongoingOutpost/slice";
-import { MyOutpostsState } from "app/containers/myOutposts/slice";
 
 let store: Store<Record<string, any>, AnyAction>;
 // Create the saga middleware
@@ -86,6 +86,10 @@ export const injectContainer = (container: {
 }) => {
   injectReducer(container.name, container.reducer);
   injectSaga(container.name, container.saga);
+};
+
+export const isSliceInjected = ({ name }: { name: string }) => {
+  return !!injectedReducers[name] && !!injectedSagas[name];
 };
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

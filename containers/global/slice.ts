@@ -62,7 +62,7 @@ const globalSlice = createSlice({
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
       state.podiumUserInfo = action.payload;
     },
-    joinOutpost(state, action: PayloadAction<OutpostModel>) {},
+    joinOutpost(state, action: PayloadAction<{ outpost: OutpostModel }>) {},
     setJoiingOutpostId(state, action: PayloadAction<string | undefined>) {
       state.joiningOutpostId = action.payload;
     },
