@@ -1,6 +1,5 @@
 import { OutpostModel } from "../../services/api/types";
-import OutpostLink from "../AppLink/outpostLink";
-import { OutpostCard } from "./OutpostCard";
+import { OutpostCard } from "./outpostCard";
 
 interface OutpostsListProps {
   outposts: OutpostModel[];
@@ -34,14 +33,7 @@ export function OutpostsList({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
       {outposts.map((outpost) => (
-        <OutpostLink
-          underline={false}
-          key={outpost.uuid}
-          id={outpost.uuid}
-          className="block h-full"
-        >
-          <OutpostCard outpost={outpost} />
-        </OutpostLink>
+        <OutpostCard key={outpost.uuid} outpost={outpost} />
       ))}
     </div>
   );

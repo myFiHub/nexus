@@ -2,6 +2,7 @@
 
 import { LoginButton } from "app/components/header/LoginButton";
 import { OutpostsList } from "app/components/outpost/OutpostsList";
+import { EmptyOutposts } from "app/containers/myOutposts/components/emptyState";
 import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -40,6 +41,7 @@ const Content = () => {
         outposts={outposts}
         loading={isLoadingOutposts}
         error={errorLoadingOutposts}
+        noOutpostComponent={<EmptyOutposts />}
       />
     </div>
   );
