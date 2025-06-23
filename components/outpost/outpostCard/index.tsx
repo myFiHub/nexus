@@ -1,16 +1,22 @@
-import { Button } from "app/components/Button";
 import { Img } from "app/components/Img";
 import { logoUrl } from "app/lib/constants";
-import { truncate } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { OutpostCardActions } from "./actions";
+import { DetailsButton } from "./detailsButton";
 
 interface OutpostCardProps {
   outpost: OutpostModel;
 }
 
+// Helper function to truncate Aptos address
+const truncateAddress = (address: string, startLength = 6, endLength = 4) => {
+  if (!address || address.length <= startLength + endLength) return address;
+  return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
+};
+
 export function OutpostCard({ outpost }: OutpostCardProps) {
-  const creatorId = outpost.creator_user_uuid;
+  // Placeholder for creator's Aptos address - you'll need to add this to the OutpostModel
+  const creatorAptosAddress = outpost.creator_user_uuid; // This is a placeholder
 
   return (
     <div className="bg-[var(--card-bg)] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-[var(--border)]">
@@ -23,10 +29,13 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
         />
         {/* Overlay gradient for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-
+        <div>
+          <DetailsButton outpost={outpost} />
+        </div>
         {/* Members count badge */}
         <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-          {outpost.members_count || 0} members
+          {outpost.members_count || 0} member
+          {(outpost.members_count ?? 0) > 1 ? "s" : ""}
         </div>
       </div>
 
@@ -57,7 +66,7 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
                 {outpost.creator_user_name}
               </h4>
               <p className="text-xs text-[var(--muted-foreground)] font-mono">
-                {truncate(creatorId)}
+                {truncateAddress(creatorAptosAddress)}
               </p>
             </div>
           </div>
@@ -81,6 +90,7 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
             </div>
           )}
         </div>
+
         <OutpostCardActions outpost={outpost} />
       </div>
     </div>

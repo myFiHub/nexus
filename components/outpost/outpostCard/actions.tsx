@@ -1,12 +1,21 @@
 "use client";
 import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { globalActions } from "app/containers/global/slice";
 import { OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
-import { useSelector } from "react-redux";
+import { Loader2 } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
+  const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+  const loadingOutpost = useSelector(GlobalSelectors.joiningOutpostId);
+  const isLoading = outpost.uuid == loadingOutpost;
+
+  const handleOpenClick = () => {
+    dispatch(globalActions.joinOutpost(outpost));
+  };
 
   if (!myUser) {
     return <div className="h-8 w-full" />;
@@ -16,39 +25,11 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
       <Button
         size="sm"
         colorScheme="primary"
+        disabled={isLoading}
         className="flex-1 text-xs"
-        onClick={() => {
-          // TODO: Implement join functionality
-          console.log("Join outpost:", outpost.uuid);
-        }}
+        onClick={handleOpenClick}
       >
-        Join
-      </Button>
-
-      <Button
-        size="sm"
-        variant="outline"
-        colorScheme="warning"
-        className="text-xs"
-        onClick={() => {
-          // TODO: Implement archive functionality
-          console.log("Archive outpost:", outpost.uuid);
-        }}
-      >
-        Archive
-      </Button>
-
-      <Button
-        size="sm"
-        variant="outline"
-        colorScheme="danger"
-        className="text-xs"
-        onClick={() => {
-          // TODO: Implement leave functionality
-          console.log("Leave outpost:", outpost.uuid);
-        }}
-      >
-        Leave
+        {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Open"}
       </Button>
     </div>
   );

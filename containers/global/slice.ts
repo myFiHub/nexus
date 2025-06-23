@@ -1,10 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
-import { User } from "app/services/api/types";
+import { OutpostModel, User } from "app/services/api/types";
+import { movementService } from "app/services/move/aptosMovement";
 import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { movementService } from "app/services/move/aptosMovement";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -14,6 +15,8 @@ export interface GlobalState {
   web3AuthUserInfo?: Partial<UserInfo>;
   aptosAccount?: AptosAccount;
   podiumUserInfo?: User;
+  joiningOutpostId?: string;
+  router?: AppRouterInstance;
 }
 
 const initialState: GlobalState = {
@@ -27,6 +30,9 @@ const globalSlice = createSlice({
   initialState,
   reducers: {
     initialize() {},
+    setRouter(state, action: PayloadAction<AppRouterInstance>) {
+      state.router = action.payload;
+    },
     setLogingIn(state, action: PayloadAction<boolean>) {
       state.logingIn = action.payload;
     },
@@ -55,6 +61,10 @@ const globalSlice = createSlice({
     logout() {},
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
       state.podiumUserInfo = action.payload;
+    },
+    joinOutpost(state, action: PayloadAction<OutpostModel>) {},
+    setJoiingOutpostId(state, action: PayloadAction<string | undefined>) {
+      state.joiningOutpostId = action.payload;
     },
   },
 });

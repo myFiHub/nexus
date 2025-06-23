@@ -21,7 +21,8 @@ import {
 } from "app/services/api/types";
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
-import { all, put, select, takeLatest } from "redux-saga/effects";
+import { all, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
@@ -277,4 +278,5 @@ export function* globalSaga() {
   yield takeLatest(globalActions.initialize, initialize);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.logout, logout);
+  yield takeEvery(globalActions.joinOutpost, joinOutpost);
 }

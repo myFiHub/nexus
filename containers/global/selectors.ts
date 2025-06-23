@@ -2,6 +2,7 @@ import { RootState } from "app/store";
 
 export const GlobalDomains = {
   root: (state: RootState) => state,
+  router: (state: RootState) => state.global?.router,
   web3Auth: (state: RootState) => state.global?.web3Auth,
   web3AuthUserInfo: (state: RootState) => state.global?.web3AuthUserInfo,
   aptosAccount: (state: RootState) => state.global?.aptosAccount,
@@ -11,9 +12,11 @@ export const GlobalDomains = {
   logingIn: (state: RootState) => state.global?.logingIn,
   logingOut: (state: RootState) => state.global?.logingOut,
   podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
+  joiningOutpostId: (state: RootState) => state.global?.joiningOutpostId,
 };
 
 export const GlobalSelectors = {
+  router: GlobalDomains.router,
   web3Auth: GlobalDomains.web3Auth,
   web3AuthUserInfo: GlobalDomains.web3AuthUserInfo,
   aptosAccount: GlobalDomains.aptosAccount,
@@ -25,4 +28,5 @@ export const GlobalSelectors = {
   logingIn: GlobalDomains.logingIn,
   logingOut: GlobalDomains.logingOut,
   podiumUserInfo: GlobalDomains.podiumUserInfo,
+  joiningOutpostId: GlobalDomains.joiningOutpostId,
 };
