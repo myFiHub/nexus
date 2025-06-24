@@ -46,6 +46,14 @@ const Content = () => {
     if (myUser && !outpost) {
       dispatch(onGoingOutpostActions.getOutpost({ id: id as string }));
     }
+    return () => {
+      dispatch(
+        onGoingOutpostActions.setOutpostAccesses({
+          canEnter: false,
+          canSpeak: false,
+        })
+      );
+    };
   }, [id, myUser]);
   return (
     <div className="container mx-auto px-4 py-8 mt-12">

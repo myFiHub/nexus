@@ -12,6 +12,8 @@ import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
 import { EasyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
+import { detached_checkPass } from "app/containers/_assets/saga";
+import { useAssetsSlice } from "app/containers/_assets/slice";
 
 const BuyableTicketTypes = {
   onlyFriendTechTicketHolders: "friend_tech_key_holders",
@@ -44,8 +46,13 @@ export function* joinOutpost(
       toast.error("Outpost not found");
       return;
     }
-    const accesses: OutpostAccesses = yield getOutpostAccesses({ outpost });
-    console.log({ accesses });
+    const accesses: OutpostAccesses = yield getOutpostAccesses({
+      outpost,
+      joiningByLink: false,
+    });
+    if (accesses && accesses.canEnter) {
+      yield openOutpost({ outpost, accesses });
+    }
   } catch (error) {
     toast.error("error while getting outpost data");
   } finally {
@@ -55,8 +62,10 @@ export function* joinOutpost(
 
 function* getOutpostAccesses({
   outpost,
+  joiningByLink,
 }: {
   outpost: OutpostModel;
+  joiningByLink: boolean;
 }): Generator<any, OutpostAccesses | undefined, any> {
   const myUser = EasyAccess.getInstance().myUser;
   ///////////////////////////////////////////////////
@@ -83,31 +92,82 @@ function* getOutpostAccesses({
   }
   ////////////////////////////////////////////////////
 
-  /*
-
-
-    if (accessIsBuyableByTicket(outpost) || speakIsBuyableByTicket(outpost)) {
-      final OutpostAccesses? accesses = await checkTicket(outpost: outpost);
-      if (accesses?.canEnter == false) {
-        Toast.error(
-          title: "Error",
-          message: "You need a ticket to join this Outpost",
-        );
-        return OutpostAccesses(canEnter: false, canSpeak: false);
-      } else {
-        return accesses != null
-            ? accesses
-            : OutpostAccesses(canEnter: false, canSpeak: false);
-      }
+  if (accessIsBuyableByTicket(outpost) || speakIsBuyableByTicket(outpost)) {
+    useAssetsSlice();
+    const accesses: OutpostAccesses | undefined = yield detached_checkPass({
+      outpost,
+    });
+    if (accesses?.canEnter == false) {
+      toast.error("You need a Podium Pass to join this Outpost");
+      return {
+        canEnter: false,
+        canSpeak: false,
+      };
+    } else {
+      return accesses !== undefined
+        ? accesses
+        : {
+            canEnter: false,
+            canSpeak: false,
+          };
     }
+  }
+  //////////////////////////////////////////////////
 
-*/
+  if (outpost.i_am_member)
+    return {
+      canEnter: true,
+      canSpeak: canISpeakWithoutTicket(outpost),
+    };
+  if (outpost.enter_type == FreeOutpostAccessTypes.public)
+    return {
+      canEnter: true,
+      canSpeak: canISpeakWithoutTicket(outpost),
+    };
+  if (outpost.enter_type == FreeOutpostAccessTypes.onlyLink) {
+    if (joiningByLink == true) {
+      return {
+        canEnter: true,
+        canSpeak: canISpeakWithoutTicket(outpost),
+      };
+    } else {
+      toast.error("This is a private Outpost, you need an invite link to join");
+      return { canEnter: false, canSpeak: false };
+    }
+  }
+  //////////////////////////////////////////////////
+
+  const invitedMembers = outpost.invites;
+  if (outpost.enter_type == FreeOutpostAccessTypes.invited_users) {
+    if (
+      invitedMembers?.map((e) => e.invitee_uuid).includes(myUser.uuid) == true
+    ) {
+      return {
+        canEnter: true,
+        canSpeak: canISpeakWithoutTicket(outpost),
+      };
+    } else {
+      toast.error("You need an invite to join this Outpost");
+      return { canEnter: false, canSpeak: false };
+    }
+  }
+  return {
+    canEnter: false,
+    canSpeak: false,
+  };
 }
 
-function* openOutpost({ outpost }: { outpost: OutpostModel }) {
+function* openOutpost({
+  outpost,
+  accesses,
+}: {
+  outpost: OutpostModel;
+  accesses: OutpostAccesses;
+}) {
   useOnGoingOutpostSlice();
   const router: AppRouterInstance = yield select(GlobalDomains.router);
   yield put(onGoingOutpostActions.setOutpost(outpost));
+
   router.push(`/ongoing_outpost/${outpost.uuid}`);
 }
 
@@ -140,4 +200,23 @@ export const canEnterWithoutATicket = (outpost: OutpostModel): boolean => {
     return true;
   }
   return false;
+};
+
+export const canISpeakWithoutTicket = (outpost: OutpostModel): boolean => {
+  const myId = EasyAccess.getInstance().myUser.uuid;
+  const iAmTheCreator = outpost.creator_user_uuid === myId;
+  if (iAmTheCreator) return true;
+  if (outpost.speak_type === FreeOutpostAccessTypes.invited_users) {
+    // check if I am invited and am invited to speak
+    const invitedMember = (outpost.invites ?? []).find(
+      (element) => element.invitee_uuid === myId
+    );
+    if (invitedMember && invitedMember.can_speak === true) return true;
+    return false;
+  }
+
+  const iAmAllowedToSpeak =
+    outpost.speak_type === FreeOutpostAccessTypes.public;
+
+  return iAmAllowedToSpeak;
 };

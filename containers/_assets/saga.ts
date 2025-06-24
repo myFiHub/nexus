@@ -1,9 +1,14 @@
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { PodiumPassBuyerModel, User } from "app/services/api/types";
+import {
+  OutpostModel,
+  PodiumPassBuyerModel,
+  User,
+} from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
 import { all, put, select, takeLatest } from "redux-saga/effects";
+import { OutpostAccesses } from "../global/effects/types";
 import { GlobalSelectors } from "../global/selectors";
 import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
 import { AssetsSelectors } from "./selectore";
@@ -220,6 +225,17 @@ function* sellOneOfMyBoughtPasses(
 ): Generator<any, void, any> {
   const { pass } = action.payload;
   console.log("pass", pass);
+}
+
+export function* detached_checkPass({
+  outpost,
+}: {
+  outpost: OutpostModel;
+}): Generator<any, OutpostAccesses | undefined, any> {
+  return {
+    canEnter: false,
+    canSpeak: false,
+  };
 }
 
 export function* assetsSaga() {

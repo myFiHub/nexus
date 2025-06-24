@@ -85,7 +85,7 @@ export const injectContainer = (container: {
   injectSaga(container.name, container.saga);
 };
 
-export const isSliceInjected = ({ name }: { name: string }) => {
+export const isRegisteredSlice = ({ name }: { name: string }) => {
   return !!injectedReducers[name] && !!injectedSagas[name];
 };
 

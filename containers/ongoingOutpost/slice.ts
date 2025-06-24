@@ -2,14 +2,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { OutpostModel } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { onGoingOutpostSaga } from "./saga";
+import { OutpostAccesses } from "../global/effects/types";
 
 export interface OnGoingOutpostState {
   outpost?: OutpostModel;
+  accesses: OutpostAccesses;
   isGettingOutpost: boolean;
 }
 
-const initialState: OnGoingOutpostState = {
+export const initialState: OnGoingOutpostState = {
   isGettingOutpost: false,
+  accesses: { canEnter: false, canSpeak: false },
 };
 
 const onGoingOutpostSlice = createSlice({
@@ -24,6 +27,9 @@ const onGoingOutpostSlice = createSlice({
     },
     setOutpost(state, action: PayloadAction<OutpostModel>) {
       state.outpost = action.payload;
+    },
+    setOutpostAccesses(state, actions: PayloadAction<OutpostAccesses>) {
+      state.accesses = actions.payload;
     },
   },
 });
