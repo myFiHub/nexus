@@ -46,7 +46,7 @@ const Content = ({ outpost }: { outpost?: OutpostModel }) => {
   }
 
   // No passes available
-  if (!passSellers?.passes || passSellers.passes.length === 0) {
+  if (!passSellers?.sellers || passSellers.sellers.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4">
         <Users className="w-8 h-8 text-muted-foreground mb-4" />
@@ -60,7 +60,7 @@ const Content = ({ outpost }: { outpost?: OutpostModel }) => {
   return (
     <div className="max-h-96 overflow-y-auto">
       <div className="space-y-1">
-        {passSellers.passes.map((passSeller) => (
+        {passSellers.sellers.map((passSeller) => (
           <PassSellerItem
             key={passSeller.uuid}
             passSeller={passSeller}

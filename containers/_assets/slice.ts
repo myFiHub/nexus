@@ -50,7 +50,7 @@ export interface AssetsState {
   outpostPassSellers: {
     [outpostId: string]: {
       loading: boolean;
-      passes: PassSeller[];
+      sellers: PassSeller[];
       error?: string;
     };
   };
@@ -101,7 +101,11 @@ const assetsSlice = createSlice({
     },
     buyPassFromUser(
       state,
-      action: PayloadAction<{ user: User; numberOfTickets: number }>
+      action: PayloadAction<{
+        user: User;
+        numberOfTickets: number;
+        buyingToHaveAccessToOutpostWithId?: string;
+      }>
     ) {},
     sellOneOfMyBoughtPasses(
       state,
@@ -138,7 +142,7 @@ const assetsSlice = createSlice({
       const { outpost, passes } = action.payload;
       state.outpostPassSellers[outpost.uuid] = {
         loading: false,
-        passes,
+        sellers: passes,
         error: undefined,
       };
     },
@@ -149,7 +153,7 @@ const assetsSlice = createSlice({
       const { outpostId, pass } = action.payload;
       const outpostPassSellers = state.outpostPassSellers[outpostId];
       if (!outpostPassSellers) return;
-      outpostPassSellers.passes = outpostPassSellers.passes.map((p) =>
+      outpostPassSellers.sellers = outpostPassSellers.sellers.map((p) =>
         p.uuid === pass.uuid ? pass : p
       );
     },
@@ -161,7 +165,7 @@ const assetsSlice = createSlice({
       if (!state.outpostPassSellers[outpostId]) {
         state.outpostPassSellers[outpostId] = {
           loading: true,
-          passes: [],
+          sellers: [],
           error: undefined,
         };
       } else {

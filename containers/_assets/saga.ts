@@ -64,7 +64,7 @@ function* getUserPassInfo(
       movementService.getMyBalanceOnPodiumPass({
         sellerAddress: address,
       }),
-      movementService.getTicketPriceForPodiumPass({
+      movementService.getPodiumPassPrice({
         sellerAddress: address,
         numberOfTickets: 1,
       }),
@@ -99,7 +99,8 @@ function* getUserPassInfo(
 function* buyPassFromUser(
   action: ReturnType<typeof assetsActions.buyPassFromUser>
 ): Generator<any, void, any> {
-  const { user, numberOfTickets } = action.payload;
+  const { user, numberOfTickets, buyingToHaveAccessToOutpostWithId } =
+    action.payload;
   const correntPassInfo = yield select(
     AssetsSelectors.userPasses(user.aptos_address!)
   );
@@ -136,7 +137,7 @@ function* buyPassFromUser(
     let referrerAddress = fihubAddress;
     const callArray: any = [
       movementService.balance(),
-      movementService.getTicketPriceForPodiumPass({
+      movementService.getPodiumPassPrice({
         sellerAddress: user.aptos_address!,
         numberOfTickets,
       }),
@@ -171,12 +172,46 @@ function* buyPassFromUser(
       if (success) {
         yield podiumApi.buySellPodiumPass({
           count: numberOfTickets,
-          podium_pass_owner_address: user.address!,
+          podium_pass_owner_address: user.aptos_address!,
           podium_pass_owner_uuid: user.uuid,
           trade_type: "buy",
           tx_hash: errorOrHash,
         });
         toast.success("Pass bought successfully");
+        if (buyingToHaveAccessToOutpostWithId) {
+          const outpostThatSellsThisPass = yield select(
+            AssetsSelectors.outpostPassSellers(
+              buyingToHaveAccessToOutpostWithId
+            )
+          );
+          if (outpostThatSellsThisPass) {
+            const passSellers: PassSeller[] = outpostThatSellsThisPass.sellers;
+            const seller = passSellers.find(
+              (item) => item.aptos_address == user.aptos_address
+            );
+            if (seller) {
+              const newPriceForSeller: number | null =
+                yield movementService.getPodiumPassPrice({
+                  sellerAddress: seller.aptos_address,
+                  numberOfTickets: 1,
+                });
+              yield put(
+                assetsActions.updateOutpostPassSeller({
+                  outpostId: buyingToHaveAccessToOutpostWithId,
+                  pass: {
+                    ...seller,
+                    bought: true,
+                    buying: false,
+                    ...(newPriceForSeller
+                      ? { price: newPriceForSeller.toString() }
+                      : {}),
+                  },
+                })
+              );
+            }
+          }
+        }
+
         revalidateUserProfile(user.uuid);
       } else if (errorOrHash) {
         toast.error(errorOrHash);
@@ -293,7 +328,6 @@ function* getOutpostPassSellers(
     // Fetch user data for all IDs
     const userDataPromises = allUserIds.map((id) => podiumApi.getUserData(id));
     const userDataResults: User[] = yield all(userDataPromises);
-    console.log({ userDataResults });
     // Create a map for quick lookup
     const userDataMap = new Map<string, User>();
     userDataResults.forEach((user) => {
@@ -372,7 +406,7 @@ function* getOutpostPassSellers(
       priceObjectToCall.push({
         uid: seller.uuid,
         toCall: () =>
-          movementService.getTicketPriceForPodiumPass({
+          movementService.getPodiumPassPrice({
             sellerAddress: seller.aptos_address,
             numberOfTickets: 1,
           }),
@@ -395,8 +429,6 @@ function* getOutpostPassSellers(
         ? Number(numberOfOwnedPasses) > 0
         : false;
     });
-
-    console.log({ ownedResults, priceResults, passSellers });
 
     yield put(
       assetsActions.setOutpostPassSellers({

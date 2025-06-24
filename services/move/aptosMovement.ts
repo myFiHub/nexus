@@ -180,7 +180,7 @@ class AptosMovement {
     }
   }
 
-  async getTicketPriceForPodiumPass(opts: {
+  async getPodiumPassPrice(opts: {
     sellerAddress: string;
     numberOfTickets?: number;
   }): Promise<number | null> {
@@ -254,7 +254,7 @@ class AptosMovement {
       const isMyAccountActive = await this.isMyAccountActive();
       if (!isMyAccountActive) return [false, "Account not active"];
       const referrerAddress = opts.referrer || "";
-      const price = await this.getTicketPriceForPodiumPass({
+      const price = await this.getPodiumPassPrice({
         sellerAddress: opts.sellerAddress,
         numberOfTickets: opts.numberOfTickets,
       });
