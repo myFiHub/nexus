@@ -72,15 +72,22 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
     clientId: web3AuthContextConfig.web3AuthOptions.clientId,
     web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
   });
-  yield web3auth.init();
-  yield put(globalActions.setWeb3Auth(web3auth));
   try {
+    yield web3auth.init();
+    yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
     if (connected) {
       yield getAndSetAccount();
     }
   } catch (error) {
-    console.log(error);
+    yield put(globalActions.setLogingIn(false));
+    yield all([
+      put(globalActions.setWeb3AuthUserInfo(undefined)),
+      put(globalActions.setAptosAccount(undefined)),
+      put(globalActions.setPodiumUserInfo(undefined)),
+    ]);
+    deleteServerCookie(CookieKeys.myUserId);
+    toast.error("Failed to initialize the app");
   } finally {
     yield put(globalActions.setInitializingWeb3Auth(false));
   }

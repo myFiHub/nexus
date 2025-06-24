@@ -1,3 +1,7 @@
+import {
+  confirmDialog,
+  ConfirmDialogResult,
+} from "app/components/Dialog/confirmDialog";
 import { detached_checkPass } from "app/containers/_assets/saga";
 import { useAssetsSlice } from "app/containers/_assets/slice";
 import {
@@ -6,7 +10,7 @@ import {
 } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { OutpostModel } from "app/services/api/types";
+import { LiveMember, OutpostModel } from "app/services/api/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select } from "redux-saga/effects";
 import { GlobalDomains } from "../selectors";
@@ -46,6 +50,7 @@ export function* joinOutpost(
       toast.error("Outpost not found");
       return;
     }
+
     const accesses: OutpostAccesses = yield getOutpostAccesses({
       outpost,
       joiningByLink: false,
@@ -84,6 +89,35 @@ function* getOutpostAccesses({
       canSpeak: false,
     };
   }
+
+  //////////////////////////////////////////////////
+  if (
+    outpost.has_adult_content &&
+    !EasyAccess.getInstance().myUser.is_over_18
+  ) {
+    const res: ConfirmDialogResult = yield confirmDialog({
+      title: "Adult Content",
+      content: "This Outpost has adult content, are you sure you want to join?",
+      confirmOpts: {
+        confirmText: "I am over 18",
+        confirmColorScheme: "warning",
+      },
+      cancelOpts: {
+        cancelText: "cancel",
+      },
+    });
+    if (!res.confirmed) {
+      yield put(globalActions.setMyUserIsOver18(false));
+      return {
+        canEnter: false,
+        canSpeak: false,
+      };
+    } else {
+      yield put(globalActions.setMyUserIsOver18(true));
+    }
+  }
+  //////////////////////////////////////////////////
+
   ////////////////////////////////////////////////////
   const lumaAccessResponse: OutpostAccesses | undefined =
     yield _checkLumaAccess({ outpost });
@@ -166,6 +200,17 @@ function* openOutpost({
 }) {
   useOnGoingOutpostSlice();
   const router: AppRouterInstance = yield select(GlobalDomains.router);
+  const currentMembers: LiveMember[] = outpost.members ?? [];
+  const iAmMember: LiveMember | undefined = currentMembers.find(
+    (member) => member.uuid === EasyAccess.getInstance().myUser.uuid
+  );
+  if (!iAmMember) {
+    const added: boolean = yield podiumApi.addMeAsMember(outpost.uuid);
+    if (!added) {
+      toast.error("Failed to add you as a member");
+      return;
+    }
+  }
   yield put(onGoingOutpostActions.setOutpost(outpost));
   yield put(onGoingOutpostActions.setAccesses(accesses));
 

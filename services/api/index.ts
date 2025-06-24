@@ -1,4 +1,5 @@
 import axios, { AxiosInstance } from "axios";
+import { wsClient } from "../wsClient/client";
 import {
   AdditionalDataForLogin,
   BuySellPodiumPassRequest,
@@ -58,6 +59,10 @@ class PodiumApi {
       const response = await this.axiosInstance.post("/auth/login", request);
       if (response.status === 200) {
         this.token = response.data.data.token;
+        await wsClient.connect(
+          this.token!,
+          process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!
+        );
         const userData = await this.getMyUserData(additionalData);
         return {
           user: userData,

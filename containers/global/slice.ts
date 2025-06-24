@@ -66,6 +66,9 @@ const globalSlice = createSlice({
     setJoiingOutpostId(state, action: PayloadAction<string | undefined>) {
       state.joiningOutpostId = action.payload;
     },
+    setMyUserIsOver18(state, action: PayloadAction<boolean>) {
+      state.podiumUserInfo!.is_over_18 = action.payload;
+    },
   },
 });
 
