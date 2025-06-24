@@ -28,6 +28,9 @@ const onGoingOutpostSlice = createSlice({
     setOutpost(state, action: PayloadAction<OutpostModel>) {
       state.outpost = action.payload;
     },
+    setAccesses(state, actions: PayloadAction<OutpostAccesses>) {
+      state.accesses = actions.payload;
+    },
     setOutpostAccesses(state, actions: PayloadAction<OutpostAccesses>) {
       state.accesses = actions.payload;
     },

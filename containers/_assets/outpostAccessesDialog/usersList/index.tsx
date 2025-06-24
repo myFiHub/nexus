@@ -1,11 +1,10 @@
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { AlertCircle, Loader2, Users } from "lucide-react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../selectore";
 import { PassSellerItem } from "./PassSellerItem";
 
-const Content = ({ outpost }: { outpost?: OutpostModel }) => {
+export const UsersList = ({ outpost }: { outpost?: OutpostModel }) => {
   const passSellers = useSelector(
     AssetsSelectors.outpostPassSellers(outpost?.uuid)
   );
@@ -69,13 +68,5 @@ const Content = ({ outpost }: { outpost?: OutpostModel }) => {
         ))}
       </div>
     </div>
-  );
-};
-
-export const UsersList = ({ outpost }: { outpost?: OutpostModel }) => {
-  return (
-    <ReduxProvider>
-      <Content outpost={outpost} />
-    </ReduxProvider>
   );
 };

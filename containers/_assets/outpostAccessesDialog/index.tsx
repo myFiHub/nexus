@@ -2,7 +2,9 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { OutpostModel } from "app/services/api/types";
+import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   Dialog,
   DialogFooter,
@@ -13,6 +15,7 @@ import {
 } from "../../../components/Dialog/index";
 import { cn } from "../../../lib/utils";
 import { OutpostAccesses } from "../../global/effects/types";
+import { AssetsSelectors } from "../selectore";
 import { ConfirmButton } from "./confirmButton";
 import { UsersList } from "./usersList";
 
@@ -22,7 +25,7 @@ interface OutpostAccessesDialogProps {
 
 export type OutpostAccessesDialogResult = {
   confirmed: boolean;
-  accesses?: OutpostAccesses;
+  accesses: OutpostAccesses;
 };
 
 let resolvePromise: ((value: OutpostAccessesDialogResult) => void) | null =
@@ -43,13 +46,14 @@ export const openOutpostPassCheckDialog = ({
   });
 };
 
-export const OutpostAccessesDialogProvider = () => {
+const Content = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [incomingData, setIncomingData] = useState<
     OutpostAccessesDialogProps | undefined
   >(undefined);
-  const [accesses, setAccesses] = useState<OutpostAccesses | undefined>(
-    undefined
+
+  const accesses: OutpostAccesses = useSelector(
+    AssetsSelectors.accesses(incomingData?.outpost?.uuid ?? "")
   );
 
   useEffect(() => {
@@ -58,7 +62,6 @@ export const OutpostAccessesDialogProvider = () => {
     ) => {
       setIncomingData(event.detail);
       setIsOpen(true);
-      setAccesses(undefined);
     };
 
     window.addEventListener(
@@ -80,7 +83,6 @@ export const OutpostAccessesDialogProvider = () => {
       accesses,
     });
     resolvePromise = null;
-    setAccesses(undefined);
   };
 
   const handleOpenChange = (open: boolean) => {
@@ -89,10 +91,9 @@ export const OutpostAccessesDialogProvider = () => {
       // Dialog was closed without confirmation
       resolvePromise({
         confirmed: false,
-        accesses: undefined,
+        accesses,
       });
       resolvePromise = null;
-      setAccesses(undefined);
     }
   };
 
@@ -112,10 +113,21 @@ export const OutpostAccessesDialogProvider = () => {
           </DialogHeader>
           <UsersList outpost={incomingData?.outpost} />
           <DialogFooter>
-            <ConfirmButton onClick={handleConfirm} />
+            <ConfirmButton
+              onClick={handleConfirm}
+              outpostId={incomingData?.outpost?.uuid ?? ""}
+            />
           </DialogFooter>
         </DialogPrimitive.Content>
       </DialogPortal>
     </Dialog>
+  );
+};
+
+export const OutpostAccessesDialogProvider = () => {
+  return (
+    <ReduxProvider>
+      <Content />
+    </ReduxProvider>
   );
 };

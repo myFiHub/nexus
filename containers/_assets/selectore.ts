@@ -1,6 +1,20 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
 import { RootState } from "app/store";
+import { OutpostAccesses } from "../global/effects/types";
+
+// Create a stable reference for default accesses
+const DEFAULT_ACCESSES: OutpostAccesses = {
+  canEnter: false,
+  canSpeak: false,
+};
+
+// Create stable references for common access combinations
+const ACCESS_COMBINATIONS = {
+  enterOnly: { canEnter: true, canSpeak: false },
+  speakOnly: { canEnter: false, canSpeak: true },
+  both: { canEnter: true, canSpeak: true },
+} as const;
 
 export const AssetsDomains = {
   root: (state: RootState) => state.assets,
@@ -65,4 +79,34 @@ export const AssetsSelectors = {
       if (!id) return undefined;
       return outpostPassSellers[id]?.error;
     }),
+
+  accesses: (outpostId: string) => (state: RootState) => {
+    if (!outpostId) return DEFAULT_ACCESSES;
+    const sellers =
+      state.assets?.outpostPassSellers?.[outpostId]?.sellers || [];
+
+    if (!sellers.length) return DEFAULT_ACCESSES;
+
+    const canEnter = sellers.some(
+      (seller) =>
+        seller.bought &&
+        (seller.accessIfIBuy === "enter" ||
+          seller.accessIfIBuy === "enterAndSpeak")
+    );
+    const canSpeak = sellers.some(
+      (seller) =>
+        seller.bought &&
+        (seller.accessIfIBuy === "speak" ||
+          seller.accessIfIBuy === "enterAndSpeak")
+    );
+
+    // Return stable references to prevent creating new objects
+    if (!canEnter && !canSpeak) return DEFAULT_ACCESSES;
+    if (canEnter && canSpeak) return ACCESS_COMBINATIONS.both;
+    if (canEnter && !canSpeak) return ACCESS_COMBINATIONS.enterOnly;
+    if (!canEnter && canSpeak) return ACCESS_COMBINATIONS.speakOnly;
+
+    // Fallback (should never reach here)
+    return DEFAULT_ACCESSES;
+  },
 };

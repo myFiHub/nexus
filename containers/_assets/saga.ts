@@ -13,10 +13,14 @@ import {
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
 import { all, put, select, takeLatest } from "redux-saga/effects";
+import { canISpeakWithoutTicket } from "../global/effects/joinOutpost";
 import { OutpostAccesses } from "../global/effects/types";
 import { GlobalSelectors } from "../global/selectors";
 import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
-import { openOutpostPassCheckDialog } from "./outpostAccessesDialog";
+import {
+  openOutpostPassCheckDialog,
+  OutpostAccessesDialogResult,
+} from "./outpostAccessesDialog";
 import { AssetsSelectors } from "./selectore";
 import { assetsActions, PassSeller } from "./slice";
 
@@ -273,23 +277,22 @@ export function* detached_checkPass({
 }: {
   outpost: OutpostModel;
 }): Generator<any, OutpostAccesses | undefined, any> {
-  yield put(
-    assetsActions.getOutpostPassSellers({
-      outpost,
-    })
-  );
-  const results = yield openOutpostPassCheckDialog({ outpost });
-  console.log({ results });
-  return {
-    canEnter: false,
-    canSpeak: false,
-  };
+  const accesses: OutpostAccesses = yield detached_getAccesses({
+    outpost,
+  });
+  if (!accesses.canEnter || !accesses.canSpeak) {
+    const results: OutpostAccessesDialogResult =
+      yield openOutpostPassCheckDialog({ outpost });
+    return results.accesses;
+  }
+  return accesses;
 }
 
-function* getOutpostPassSellers(
-  action: ReturnType<typeof assetsActions.getOutpostPassSellers>
-): Generator<any, void, any> {
-  const { outpost } = action.payload;
+export function* detached_getAccesses({
+  outpost,
+}: {
+  outpost: OutpostModel;
+}): Generator<any, OutpostAccesses, any> {
   try {
     yield put(
       assetsActions.setIsGettingOutpostPassSellers({
@@ -430,12 +433,32 @@ function* getOutpostPassSellers(
         : false;
     });
 
+    const canIEnter = passSellers.some(
+      (seller) =>
+        (seller.bought &&
+          (seller.accessIfIBuy === "enter" ||
+            seller.accessIfIBuy === "enterAndSpeak")) ||
+        canISpeakWithoutTicket(outpost)
+    );
+    const canISpeak = passSellers.some(
+      (seller) =>
+        (seller.bought &&
+          (seller.accessIfIBuy === "speak" ||
+            seller.accessIfIBuy === "enterAndSpeak")) ||
+        canISpeakWithoutTicket(outpost)
+    );
+
     yield put(
       assetsActions.setOutpostPassSellers({
         outpost,
         passes: passSellers,
       })
     );
+
+    return {
+      canEnter: canIEnter,
+      canSpeak: canISpeak,
+    };
   } catch (error) {
     yield put(
       assetsActions.setOutpostPassSellersError({
@@ -443,6 +466,10 @@ function* getOutpostPassSellers(
         error: "Error, while getting the Passes List. Please try again.",
       })
     );
+    return {
+      canEnter: false,
+      canSpeak: false,
+    };
   } finally {
     yield put(
       assetsActions.setIsGettingOutpostPassSellers({
@@ -465,9 +492,5 @@ export function* assetsSaga() {
   yield takeLatest(
     assetsActions.setPassesListBoughtByMePage.type,
     getPassesBoughtByMe
-  );
-  yield takeLatest(
-    assetsActions.getOutpostPassSellers.type,
-    getOutpostPassSellers
   );
 }

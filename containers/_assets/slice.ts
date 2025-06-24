@@ -128,10 +128,7 @@ const assetsSlice = createSlice({
     setPassesListBoughtByMeError(state, action: PayloadAction<string>) {
       state.passesListBoughtByMe.error = action.payload;
     },
-    getOutpostPassSellers(
-      state,
-      action: PayloadAction<{ outpost: OutpostModel }>
-    ) {},
+
     setOutpostPassSellers(
       state,
       action: PayloadAction<{

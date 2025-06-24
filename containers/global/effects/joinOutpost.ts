@@ -167,6 +167,7 @@ function* openOutpost({
   useOnGoingOutpostSlice();
   const router: AppRouterInstance = yield select(GlobalDomains.router);
   yield put(onGoingOutpostActions.setOutpost(outpost));
+  yield put(onGoingOutpostActions.setAccesses(accesses));
 
   router.push(`/ongoing_outpost/${outpost.uuid}`);
 }
