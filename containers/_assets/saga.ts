@@ -1,3 +1,8 @@
+import {
+  CallObject,
+  CallObjectResponse,
+  promiseWithUid,
+} from "app/lib/promiseWithUid";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -11,8 +16,9 @@ import { all, put, select, takeLatest } from "redux-saga/effects";
 import { OutpostAccesses } from "../global/effects/types";
 import { GlobalSelectors } from "../global/selectors";
 import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
+import { openOutpostPassCheckDialog } from "./outpostAccessesDialog";
 import { AssetsSelectors } from "./selectore";
-import { assetsActions } from "./slice";
+import { assetsActions, PassSeller } from "./slice";
 
 function* getBalance() {
   yield put(assetsActions.setBalance({ value: "100", loading: true }));
@@ -232,10 +238,187 @@ export function* detached_checkPass({
 }: {
   outpost: OutpostModel;
 }): Generator<any, OutpostAccesses | undefined, any> {
+  yield put(
+    assetsActions.getOutpostPassSellers({
+      outpost,
+    })
+  );
+  const results = yield openOutpostPassCheckDialog({ outpost });
+  console.log({ results });
   return {
     canEnter: false,
     canSpeak: false,
   };
+}
+
+function* getOutpostPassSellers(
+  action: ReturnType<typeof assetsActions.getOutpostPassSellers>
+): Generator<any, void, any> {
+  const { outpost } = action.payload;
+  try {
+    yield put(
+      assetsActions.setIsGettingOutpostPassSellers({
+        outpostId: outpost.uuid,
+        loading: true,
+      })
+    );
+    const rawPassSellerIdsToBuyFromInOrderToHaveAccess: string[] =
+      outpost.tickets_to_enter
+        ?.map((ticket) => ticket.user_uuid)
+        .filter((id): id is string => id !== undefined) ?? [];
+    const rawPassSellerIdsToBuyFromInOrderToSpeak: string[] =
+      outpost.tickets_to_speak
+        ?.map((ticket) => ticket.user_uuid)
+        .filter((id): id is string => id !== undefined) ?? [];
+    const commonPassSellersBetweenSpeakAndEnter: string[] =
+      rawPassSellerIdsToBuyFromInOrderToHaveAccess?.filter((id) =>
+        rawPassSellerIdsToBuyFromInOrderToSpeak?.includes(id)
+      ) ?? [];
+    const passSellerIdsToBuyFromInOrderToHaveAccess: string[] =
+      rawPassSellerIdsToBuyFromInOrderToHaveAccess?.filter(
+        (id) => !commonPassSellersBetweenSpeakAndEnter?.includes(id)
+      ) ?? [];
+    const passSellerIdsToBuyFromInOrderToSpeak: string[] =
+      rawPassSellerIdsToBuyFromInOrderToSpeak?.filter(
+        (id) => !commonPassSellersBetweenSpeakAndEnter?.includes(id)
+      ) ?? [];
+
+    // Get all unique user IDs
+    const allUserIds = [
+      ...commonPassSellersBetweenSpeakAndEnter,
+      ...passSellerIdsToBuyFromInOrderToHaveAccess,
+      ...passSellerIdsToBuyFromInOrderToSpeak,
+    ];
+
+    // Fetch user data for all IDs
+    const userDataPromises = allUserIds.map((id) => podiumApi.getUserData(id));
+    const userDataResults: User[] = yield all(userDataPromises);
+    console.log({ userDataResults });
+    // Create a map for quick lookup
+    const userDataMap = new Map<string, User>();
+    userDataResults.forEach((user) => {
+      if (user && user.uuid) {
+        userDataMap.set(user.uuid, user);
+      }
+    });
+
+    // Construct PassSeller objects
+    const passSellers: PassSeller[] = [];
+
+    // Add common pass sellers (enter and speak)
+    commonPassSellersBetweenSpeakAndEnter.forEach((userId) => {
+      const user = userDataMap.get(userId);
+      if (user) {
+        passSellers.push({
+          uuid: user.uuid,
+          name: user.name || "Unknown User",
+          image: user.image || "",
+          aptos_address: user.aptos_address || "",
+          accessIfIBuy: "enterAndSpeak",
+          price: "0", // This should be fetched from the movement service
+          buying: false,
+          bought: false,
+          userInfo: user,
+        });
+      }
+    });
+
+    // Add enter-only pass sellers
+    passSellerIdsToBuyFromInOrderToHaveAccess.forEach((userId) => {
+      const user = userDataMap.get(userId);
+      if (user) {
+        passSellers.push({
+          uuid: user.uuid,
+          name: user.name || "Unknown User",
+          image: user.image || "",
+          aptos_address: user.aptos_address || "",
+          accessIfIBuy: "enter",
+          price: "0", // This should be fetched from the movement service
+          buying: false,
+          bought: false,
+          userInfo: user,
+        });
+      }
+    });
+
+    // Add speak-only pass sellers
+    passSellerIdsToBuyFromInOrderToSpeak.forEach((userId) => {
+      const user = userDataMap.get(userId);
+      if (user) {
+        passSellers.push({
+          uuid: user.uuid,
+          name: user.name || "Unknown User",
+          image: user.image || "",
+          aptos_address: user.aptos_address || "",
+          accessIfIBuy: "speak",
+          price: "0", // This should be fetched from the movement service
+          buying: false,
+          bought: false,
+          userInfo: user,
+        });
+      }
+    });
+
+    const numberOfOwnedPassesByMeObjectToCall: CallObject<bigint | null>[] = [];
+    const priceObjectToCall: CallObject<number | null>[] = [];
+    passSellers.forEach((seller) => {
+      numberOfOwnedPassesByMeObjectToCall.push({
+        uid: seller.uuid,
+        toCall: () =>
+          movementService.getMyBalanceOnPodiumPass({
+            sellerAddress: seller.aptos_address,
+          }),
+      });
+      priceObjectToCall.push({
+        uid: seller.uuid,
+        toCall: () =>
+          movementService.getTicketPriceForPodiumPass({
+            sellerAddress: seller.aptos_address,
+            numberOfTickets: 1,
+          }),
+      });
+    });
+
+    const [ownedResults, priceResults]: [
+      CallObjectResponse<bigint | null>,
+      CallObjectResponse<number | null>
+    ] = yield all([
+      promiseWithUid(numberOfOwnedPassesByMeObjectToCall),
+      promiseWithUid(priceObjectToCall),
+    ]);
+
+    passSellers.forEach((seller) => {
+      const numberOfOwnedPasses = ownedResults[seller.uuid]?.response;
+      const price = priceResults[seller.uuid]?.response;
+      seller.price = price?.toString() ?? "0";
+      seller.bought = numberOfOwnedPasses
+        ? Number(numberOfOwnedPasses) > 0
+        : false;
+    });
+
+    console.log({ ownedResults, priceResults, passSellers });
+
+    yield put(
+      assetsActions.setOutpostPassSellers({
+        outpost,
+        passes: passSellers,
+      })
+    );
+  } catch (error) {
+    yield put(
+      assetsActions.setOutpostPassSellersError({
+        outpostId: outpost.uuid,
+        error: "Error, while getting the Passes List. Please try again.",
+      })
+    );
+  } finally {
+    yield put(
+      assetsActions.setIsGettingOutpostPassSellers({
+        outpostId: outpost.uuid,
+        loading: false,
+      })
+    );
+  }
 }
 
 export function* assetsSaga() {
@@ -250,5 +433,9 @@ export function* assetsSaga() {
   yield takeLatest(
     assetsActions.setPassesListBoughtByMePage.type,
     getPassesBoughtByMe
+  );
+  yield takeLatest(
+    assetsActions.getOutpostPassSellers.type,
+    getOutpostPassSellers
   );
 }

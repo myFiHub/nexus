@@ -1,96 +1,24 @@
-import { Img } from "app/components/Img";
-import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
+import { AccessAndSpeakIndicators } from "./access_speak_indicators";
 import { OutpostCardActions } from "./actions";
-import { DetailsButton } from "./detailsButton";
+import { ContentSection } from "./ContentSection";
+import { CreatorSection } from "./CreatorSection";
+import { ImageSection } from "./ImageSection";
 
 interface OutpostCardProps {
   outpost: OutpostModel;
 }
 
-// Helper function to truncate Aptos address
-const truncateAddress = (address: string, startLength = 6, endLength = 4) => {
-  if (!address || address.length <= startLength + endLength) return address;
-  return `${address.slice(0, startLength)}...${address.slice(-endLength)}`;
-};
-
 export function OutpostCard({ outpost }: OutpostCardProps) {
-  // Placeholder for creator's Aptos address - you'll need to add this to the OutpostModel
-  const creatorAptosAddress = outpost.creator_user_uuid; // This is a placeholder
-
   return (
-    <div className="bg-[var(--card-bg)] rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 h-full flex flex-col border border-[var(--border)]">
-      {/* Image Section */}
-      <div className="relative w-full h-48">
-        <Img
-          src={outpost.image || logoUrl}
-          alt={outpost.name}
-          className="w-full h-full object-cover"
-        />
-        {/* Overlay gradient for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-        <div>
-          <DetailsButton outpost={outpost} />
-        </div>
-        {/* Members count badge */}
-        <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs font-medium">
-          {outpost.members_count || 0} member
-          {(outpost.members_count ?? 0) > 1 ? "s" : ""}
-        </div>
-      </div>
+    <div className="bg-card rounded-xl shadow-lg overflow-hidden hover:shadow-xl h-full flex flex-col border border-border">
+      <ImageSection outpost={outpost} />
 
       {/* Content Section */}
       <div className="p-5 flex-1 flex flex-col">
-        {/* Title and Subject */}
-        <h3 className="text-xl font-bold mb-2 text-[var(--primary)] line-clamp-1">
-          {outpost.name}
-        </h3>
-        <p className="text-[var(--muted-foreground)] mb-4 line-clamp-2 flex-1 text-sm leading-relaxed">
-          {outpost.subject}
-        </p>
-
-        {/* Creator Information Section */}
-        <div className="mb-4 p-3 bg-[var(--muted)]/30 rounded-lg border border-[var(--border)]">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="relative">
-              <Img
-                src={outpost.creator_user_image || logoUrl}
-                alt={outpost.creator_user_name}
-                className="w-10 h-10 rounded-full border-2 border-[var(--border)]"
-              />
-              {/* Online indicator */}
-              <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-[var(--card-bg)]"></div>
-            </div>
-            <div className="flex-1 min-w-0">
-              <h4 className="font-semibold text-[var(--foreground)] line-clamp-1">
-                {outpost.creator_user_name}
-              </h4>
-              <p className="text-xs text-[var(--muted-foreground)] font-mono">
-                {truncateAddress(creatorAptosAddress)}
-              </p>
-            </div>
-          </div>
-
-          {/* Tags */}
-          {outpost.tags && outpost.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2">
-              {outpost.tags.slice(0, 3).map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-2 py-1 bg-[var(--primary)]/10 text-[var(--primary)] text-xs rounded-md font-medium"
-                >
-                  {tag}
-                </span>
-              ))}
-              {outpost.tags.length > 3 && (
-                <span className="px-2 py-1 bg-[var(--muted)] text-[var(--muted-foreground)] text-xs rounded-md">
-                  +{outpost.tags.length - 3}
-                </span>
-              )}
-            </div>
-          )}
-        </div>
-
+        <ContentSection name={outpost.name} subject={outpost.subject} />
+        <CreatorSection outpost={outpost} />
+        <AccessAndSpeakIndicators outpost={outpost} />
         <OutpostCardActions outpost={outpost} />
       </div>
     </div>

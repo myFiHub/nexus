@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { PodiumPassBuyerModel, User } from "app/services/api/types";
+import {
+  OutpostModel,
+  PodiumPassBuyerModel,
+  User,
+} from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
 
@@ -7,6 +11,19 @@ export interface Balance {
   value: string;
   loading: boolean;
   error?: string;
+}
+
+export interface PassSeller {
+  uuid: string;
+  name: string;
+  image: string;
+  aptos_address: string;
+  accessIfIBuy: "enter" | "speak" | "enterAndSpeak";
+  price: string;
+  buying: boolean;
+  bought: boolean;
+  error?: string;
+  userInfo: User;
 }
 
 export interface Pass {
@@ -30,6 +47,13 @@ export interface AssetsState {
     loading: boolean;
     passes: Pass[];
   };
+  outpostPassSellers: {
+    [outpostId: string]: {
+      loading: boolean;
+      passes: PassSeller[];
+      error?: string;
+    };
+  };
 }
 
 const initialState: AssetsState = {
@@ -49,6 +73,7 @@ const initialState: AssetsState = {
     error: undefined,
     page: 0,
   },
+  outpostPassSellers: {},
 };
 
 const assetsSlice = createSlice({
@@ -98,6 +123,57 @@ const assetsSlice = createSlice({
     },
     setPassesListBoughtByMeError(state, action: PayloadAction<string>) {
       state.passesListBoughtByMe.error = action.payload;
+    },
+    getOutpostPassSellers(
+      state,
+      action: PayloadAction<{ outpost: OutpostModel }>
+    ) {},
+    setOutpostPassSellers(
+      state,
+      action: PayloadAction<{
+        outpost: OutpostModel;
+        passes: PassSeller[];
+      }>
+    ) {
+      const { outpost, passes } = action.payload;
+      state.outpostPassSellers[outpost.uuid] = {
+        loading: false,
+        passes,
+        error: undefined,
+      };
+    },
+    updateOutpostPassSeller(
+      state,
+      action: PayloadAction<{ outpostId: string; pass: PassSeller }>
+    ) {
+      const { outpostId, pass } = action.payload;
+      const outpostPassSellers = state.outpostPassSellers[outpostId];
+      if (!outpostPassSellers) return;
+      outpostPassSellers.passes = outpostPassSellers.passes.map((p) =>
+        p.uuid === pass.uuid ? pass : p
+      );
+    },
+    setIsGettingOutpostPassSellers(
+      state,
+      action: PayloadAction<{ outpostId: string; loading: boolean }>
+    ) {
+      const { outpostId, loading } = action.payload;
+      if (!state.outpostPassSellers[outpostId]) {
+        state.outpostPassSellers[outpostId] = {
+          loading: true,
+          passes: [],
+          error: undefined,
+        };
+      } else {
+        state.outpostPassSellers[outpostId].loading = loading;
+      }
+    },
+    setOutpostPassSellersError(
+      state,
+      action: PayloadAction<{ outpostId: string; error: string }>
+    ) {
+      const { outpostId, error } = action.payload;
+      state.outpostPassSellers[outpostId].error = error;
     },
   },
 });

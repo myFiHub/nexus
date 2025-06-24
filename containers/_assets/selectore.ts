@@ -8,6 +8,8 @@ export const AssetsDomains = {
   balance: (state: RootState) => state.assets?.balance || {},
   passesListBoughtByMe: (state: RootState) =>
     state.assets?.passesListBoughtByMe || {},
+  outpostPassSellers: (state: RootState) =>
+    state.assets?.outpostPassSellers || {},
 };
 
 export const AssetsSelectors = {
@@ -48,4 +50,19 @@ export const AssetsSelectors = {
     [AssetsDomains.passesListBoughtByMe],
     (passesListBoughtByMe) => passesListBoughtByMe.error
   ),
+  outpostPassSellers: (id?: string) =>
+    createSelector([AssetsDomains.outpostPassSellers], (outpostPassSellers) => {
+      if (!id) return undefined;
+      return outpostPassSellers[id];
+    }),
+  outpostPassSellersLoading: (id?: string) =>
+    createSelector([AssetsDomains.outpostPassSellers], (outpostPassSellers) => {
+      if (!id) return true;
+      return outpostPassSellers[id]?.loading;
+    }),
+  outpostPassSellersError: (id?: string) =>
+    createSelector([AssetsDomains.outpostPassSellers], (outpostPassSellers) => {
+      if (!id) return undefined;
+      return outpostPassSellers[id]?.error;
+    }),
 };

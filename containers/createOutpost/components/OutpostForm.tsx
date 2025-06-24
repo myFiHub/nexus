@@ -10,42 +10,12 @@ import {
 } from "../../../components/Popover";
 import { Switch } from "../../../components/Switch";
 import { TagsInput } from "./TagsInput";
-
-const BuyableTicketTypes = {
-  onlyFriendTechTicketHolders: "friend_tech_key_holders",
-  onlyArenaTicketHolders: "arena_ticket_holders",
-  onlyPodiumPassHolders: "podium_pass_holders",
-} as const;
-
-const FreeOutpostAccessTypes = {
-  public: "everyone",
-  onlyLink: "having_link",
-  invited_users: "invited_users",
-} as const;
-
-const FreeOutpostSpeakerTypes = {
-  everyone: FreeOutpostAccessTypes.public,
-  invited_users: FreeOutpostAccessTypes.invited_users,
-} as const;
-
-const allowedToEnterOptions = [
-  { value: FreeOutpostAccessTypes.public, text: "Everyone" },
-  { value: FreeOutpostAccessTypes.onlyLink, text: "Users Having the Link" },
-  { value: FreeOutpostAccessTypes.invited_users, text: "Only Invited Users" },
-  {
-    value: BuyableTicketTypes.onlyPodiumPassHolders,
-    text: "Podium Pass Holders",
-  },
-];
-
-const allowedToSpeakOptions = [
-  { value: FreeOutpostSpeakerTypes.everyone, text: "Everyone" },
-  { value: FreeOutpostSpeakerTypes.invited_users, text: "Only Invited Users" },
-  {
-    value: BuyableTicketTypes.onlyPodiumPassHolders,
-    text: "Podium Pass Holders",
-  },
-];
+import {
+  allowedToEnterOptions,
+  allowedToSpeakOptions,
+  FreeOutpostAccessTypes,
+  FreeOutpostSpeakerTypes,
+} from "app/components/outpost/types";
 
 const schema = z.object({
   name: z.string().min(2, "Name is required").max(64),

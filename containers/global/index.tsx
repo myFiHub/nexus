@@ -1,6 +1,7 @@
 "use client";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { Toaster } from "app/components/toast";
+import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
 import { ReduxProvider } from "app/store/Provider";
 import { useRouter } from "next/navigation";
 import { memo, useEffect } from "react";
@@ -29,6 +30,7 @@ const Container = () => {
     <>
       <Toaster richColors closeButton position="top-right" />
       <ConfirmDialogProvider />
+      <OutpostAccessesDialogProvider />
     </>
   );
 };
