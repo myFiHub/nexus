@@ -25,7 +25,6 @@ import { onGoingOutpostDomains, onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions } from "./slice";
 
 // Add type definition for cheerBoo parameters
-type CheerBooParams = Parameters<typeof movementService.cheerBoo>[0];
 
 function* getOutpost(
   action: ReturnType<typeof onGoingOutpostActions.getOutpost>
@@ -34,7 +33,6 @@ function* getOutpost(
     const { id } = action.payload;
     yield put(onGoingOutpostActions.isGettingOutpost(true));
     const outpost: OutpostModel | undefined = yield podiumApi.getOutpost(id);
-    console.log("Outpost:", outpost);
     if (outpost) {
       yield put(onGoingOutpostActions.setOutpost(outpost));
     }
@@ -254,7 +252,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       targetUserAptosAddress = process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!;
       rawReceiverAddresses = [process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!];
     }
-    const scCallOpts: CheerBooParams = {
+    const scCallOpts: Parameters<typeof movementService.cheerBoo>[0] = {
       target: targetUserAptosAddress,
       receiverAddresses: rawReceiverAddresses,
       amount: Number(amount),
