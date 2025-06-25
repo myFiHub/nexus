@@ -10,6 +10,8 @@ export interface OnGoingOutpostState {
   accesses?: OutpostAccesses;
   isGettingOutpost: boolean;
   isGettingLiveMembers: boolean;
+  isCheeringAddress?: string;
+  isBooingAddress?: string;
   liveMembers: {
     [address: string]: LiveMember;
   };
@@ -45,12 +47,19 @@ const onGoingOutpostSlice = createSlice({
         cheer: boolean;
       }>
     ) {},
+    setIsCheeringAddress(state, action: PayloadAction<{ address?: string }>) {
+      state.isCheeringAddress = action.payload.address;
+    },
+    setIsBooingAddress(state, action: PayloadAction<{ address?: string }>) {
+      state.isBooingAddress = action.payload.address;
+    },
 
     dislike(state, action: PayloadAction<{ targetUserAddress: string }>) {},
     startSpeaking() {},
     stopSpeaking() {},
     startRecording() {},
     getLiveMembers() {},
+
     isGettingLiveMembers(state, action: PayloadAction<boolean>) {
       state.isGettingLiveMembers = action.payload;
     },

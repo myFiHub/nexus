@@ -14,18 +14,19 @@ import {
 interface ConfirmDialogProps {
   title: ReactNode;
   content: ReactNode;
-  cancleColorScheme?: ButtonProps["colorScheme"];
   inputOpts?: {
     inputType?: "text" | "password" | "email" | "number" | "tel" | "url";
     inputPlaceholder?: string;
   };
   confirmOpts?: {
-    confirmColorScheme?: ButtonProps["colorScheme"];
-    confirmText?: string;
+    colorScheme?: ButtonProps["colorScheme"];
+    text?: string;
+    variant?: ButtonProps["variant"];
   };
   cancelOpts?: {
-    cancelColorScheme?: ButtonProps["colorScheme"];
-    cancelText?: string;
+    colorScheme?: ButtonProps["colorScheme"];
+    text?: string;
+    variant?: ButtonProps["variant"];
   };
 }
 
@@ -103,7 +104,15 @@ export const ConfirmDialogProvider = () => {
   const inputOpts = dialogContent?.inputOpts;
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) {
+          // When dialog is closed (by clicking outside, pressing escape, etc.), treat as cancel
+          handleCancel();
+        }
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{dialogContent?.title}</DialogTitle>
@@ -121,17 +130,18 @@ export const ConfirmDialogProvider = () => {
         )}
         <DialogFooter>
           <Button
-            variant="outline"
-            colorScheme={cancelOpts?.cancelColorScheme || "primary"}
+            colorScheme={cancelOpts?.colorScheme || "primary"}
             onClick={handleCancel}
+            variant={cancelOpts?.variant || "ghost"}
           >
-            {cancelOpts?.cancelText || "Cancel"}
+            {cancelOpts?.text || "Cancel"}
           </Button>
           <Button
             onClick={handleConfirm}
-            colorScheme={confirmOpts?.confirmColorScheme || "primary"}
+            colorScheme={confirmOpts?.colorScheme || "primary"}
+            variant={confirmOpts?.variant || "primary"}
           >
-            {confirmOpts?.confirmText || "Confirm"}
+            {confirmOpts?.text || "Confirm"}
           </Button>
         </DialogFooter>
       </DialogContent>

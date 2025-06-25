@@ -150,109 +150,157 @@ function* startRecording(
 
 function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
   const { user, cheer } = action.payload;
-  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
-  if (!myUser) {
-    toast.error("you are not logged in");
-    return;
-  }
-  const targetUserAddress = user.address;
-  let targetUserAptosAddress = user.primary_aptos_address || user.aptos_address;
-
-  if (!targetUserAptosAddress) {
-    toast.error("No movement address found");
-    return;
-  }
-
-  const outpost: OutpostModel | undefined = yield select(
-    onGoingOutpostSelectors.outpost
-  );
-  if (!outpost) {
-    console.error("Outpost not found to boo");
-    return;
-  }
-  let amount = "0";
-  const results: ConfirmDialogResult = yield confirmDialog({
-    title: `${cheer ? "cheer" : "boo"}`,
-    content: `How much do you want to pay to ${cheer ? "cheer" : "boo"}?`,
-    confirmOpts: {
-      confirmText: "Boo",
-    },
-    inputOpts: {
-      inputType: "number",
-      inputPlaceholder: "Enter amount",
-    },
-  });
-
-  if (results.confirmed) {
-    amount = results.enteredText ?? "0";
-  }
-  if (amount === "0") {
-    toast.error("Amount is 0");
-    return;
-  }
-
-  const liveMembers: LiveMember[] = yield detatched_getLiveMembers();
-  if (liveMembers.length == 0) {
-    toast.error("No live members");
-    yield put(onGoingOutpostActions.leaveOutpost(outpost));
-    return;
-  }
-
-  let rawReceiverAddresses: (string | undefined)[] = liveMembers
-    .map((member) => member.primary_aptos_address || member.aptos_address)
-    .filter((address): address is string => address !== undefined);
-
-  const isSelfReaction =
-    targetUserAddress === EasyAccess.getInstance().myUser?.address;
-  const isBoo = !cheer;
-
-  if (isSelfReaction && cheer) {
-    const myAptosAddress = myUser.aptos_address;
-    const myPrimaryAptosAddress =
-      liveMembers.find((member) => member.uuid === myUser.uuid)
-        ?.primary_aptos_address || myUser.aptos_address;
-    // remove both this addresses from rawReceiverAddresses
-    rawReceiverAddresses = rawReceiverAddresses.filter(
-      (address) =>
-        address !== myAptosAddress && address !== myPrimaryAptosAddress
+  try {
+    if (cheer) {
+      yield put(
+        onGoingOutpostActions.setIsCheeringAddress({ address: user.address })
+      );
+    } else {
+      yield put(
+        onGoingOutpostActions.setIsBooingAddress({ address: user.address })
+      );
+    }
+    const myUser: User | undefined = yield select(
+      GlobalSelectors.podiumUserInfo
     );
-
-    if (rawReceiverAddresses.length == 0) {
-      toast.error("No receiver addresses");
+    if (!myUser) {
+      toast.error("you are not logged in");
       return;
     }
-  }
+    const targetUserAddress = user.address;
+    let targetUserAptosAddress =
+      user.primary_aptos_address || user.aptos_address;
 
-  if (rawReceiverAddresses.length == 0) {
-    targetUserAptosAddress = process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!;
-    rawReceiverAddresses = [process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!];
-  }
+    if (!targetUserAptosAddress) {
+      toast.error("No movement address found");
+      return;
+    }
 
-  const scCallOpts: CheerBooParams = {
-    target: targetUserAptosAddress,
-    receiverAddresses: [],
-    amount: Number(amount),
-    cheer: cheer,
-    outpostId: outpost.uuid,
-  };
-
-  const resultFromScInteraction: [boolean | null, string | null] =
-    yield movementService.cheerBoo(scCallOpts);
-
-  if (resultFromScInteraction[0] === true) {
-    toast.success(`${cheer ? "Cheer" : "Boo"} successful`);
-    const booMessage: OutgoingMessage = {
-      message_type: cheer ? OutgoingMessageType.CHEER : OutgoingMessageType.BOO,
-      outpost_uuid: outpost.uuid,
-      data: {
-        chain_id: 126,
-        react_to_user_address: targetUserAddress,
-        tx_hash: resultFromScInteraction[1]!,
+    const outpost: OutpostModel | undefined = yield select(
+      onGoingOutpostSelectors.outpost
+    );
+    if (!outpost) {
+      console.error("Outpost not found to boo");
+      return;
+    }
+    const isSelfReaction =
+      targetUserAddress === EasyAccess.getInstance().myUser?.address;
+    let amount = "0";
+    const results: ConfirmDialogResult = yield confirmDialog({
+      title: `${cheer ? "cheer" : "boo"}`,
+      content: `Enter the amount of ${cheer ? "cheer" : "boo"} in MOVE`,
+      confirmOpts: {
+        text:
+          cheer && isSelfReaction ? "Cheer yourself " : cheer ? "Cheer" : "Boo",
       },
+      cancelOpts: {
+        text: "Cancel",
+        variant: "ghost",
+      },
+      inputOpts: {
+        inputType: "number",
+        inputPlaceholder: "Enter amount",
+      },
+    });
+    console.log(results);
+    if (results.confirmed) {
+      amount = results.enteredText ?? "0";
+    }
+    if (amount === "0") {
+      if (cheer) {
+        yield put(
+          onGoingOutpostActions.setIsCheeringAddress({ address: undefined })
+        );
+      } else {
+        yield put(
+          onGoingOutpostActions.setIsBooingAddress({ address: undefined })
+        );
+      }
+      return;
+    }
+    // amount is absolute value
+    amount = Math.abs(Number(amount)).toString();
+
+    const liveMembers: LiveMember[] = yield detatched_getLiveMembers();
+    if (liveMembers.length == 0) {
+      toast.error("No live members");
+      yield put(onGoingOutpostActions.leaveOutpost(outpost));
+      return;
+    }
+
+    let rawReceiverAddresses: (string | undefined)[] = liveMembers
+      .map((member) => member.primary_aptos_address || member.aptos_address)
+      .filter((address): address is string => address !== undefined);
+
+    if (isSelfReaction && cheer) {
+      const myAptosAddress = myUser.aptos_address;
+      const myPrimaryAptosAddress =
+        liveMembers.find((member) => member.uuid === myUser.uuid)
+          ?.primary_aptos_address || myUser.aptos_address;
+      // remove both this addresses from rawReceiverAddresses
+      rawReceiverAddresses = rawReceiverAddresses.filter(
+        (address) =>
+          address !== myAptosAddress && address !== myPrimaryAptosAddress
+      );
+
+      if (rawReceiverAddresses.length == 0) {
+        toast.error("No receiver addresses");
+        return;
+      }
+    }
+
+    if (rawReceiverAddresses.length == 0) {
+      targetUserAptosAddress = process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!;
+      rawReceiverAddresses = [process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!];
+    }
+
+    const scCallOpts: CheerBooParams = {
+      target: targetUserAptosAddress,
+      receiverAddresses: [],
+      amount: Number(amount),
+      cheer: cheer,
+      outpostId: outpost.uuid,
     };
-    wsClient.send(booMessage);
-  } else {
-    toast.error("Boo failed");
+
+    const resultFromScInteraction: [boolean | null, string | null] =
+      yield movementService.cheerBoo(scCallOpts);
+
+    if (resultFromScInteraction[0] === true) {
+      toast.success(
+        `${
+          cheer && isSelfReaction
+            ? "you cheered yourself"
+            : cheer
+            ? "Cheer"
+            : "Boo"
+        } successful`
+      );
+      const booMessage: OutgoingMessage = {
+        message_type: cheer
+          ? OutgoingMessageType.CHEER
+          : OutgoingMessageType.BOO,
+        outpost_uuid: outpost.uuid,
+        data: {
+          chain_id: 126,
+          react_to_user_address: targetUserAddress,
+          tx_hash: resultFromScInteraction[1]!,
+        },
+      };
+      wsClient.send(booMessage);
+    } else {
+      toast.error("Boo failed");
+    }
+  } catch (error) {
+  } finally {
+    if (cheer) {
+      yield put(
+        onGoingOutpostActions.setIsCheeringAddress({ address: undefined })
+      );
+    } else {
+      yield put(
+        onGoingOutpostActions.setIsBooingAddress({ address: undefined })
+      );
+    }
   }
 }
 

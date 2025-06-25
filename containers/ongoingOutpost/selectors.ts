@@ -10,6 +10,9 @@ export const onGoingOutpostDomains = {
     state.onGoingOutpost.isGettingLiveMembers,
   accesses: (state: RootState) => state.onGoingOutpost?.accesses,
   members: (state: RootState) => state.onGoingOutpost?.liveMembers || {},
+  isCheeringAddress: (state: RootState) =>
+    state.onGoingOutpost.isCheeringAddress,
+  isBooingAddress: (state: RootState) => state.onGoingOutpost.isBooingAddress,
 };
 
 export const onGoingOutpostSelectors = {
@@ -62,4 +65,6 @@ export const onGoingOutpostSelectors = {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }),
+  isCheeringAddress: onGoingOutpostDomains.isCheeringAddress,
+  isBooingAddress: onGoingOutpostDomains.isBooingAddress,
 };

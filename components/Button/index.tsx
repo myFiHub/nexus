@@ -19,17 +19,27 @@ const buttonVariants = cva(
         lg: "h-12 px-6",
       },
       colorScheme: {
-        primary: "bg-primary hover:bg-primary-hover text-white",
-        danger: "bg-danger hover:bg-danger-hover text-white",
-        warning: "bg-warning hover:bg-warning-hover text-white",
+        primary: "text-white",
+        danger: "text-white",
+        warning: "text-white",
       },
     },
     compoundVariants: [
       // Default variant with color schemes
       {
         variant: "primary",
-        colorScheme: ["primary", "danger", "warning"],
-        className: "text-white",
+        colorScheme: "primary",
+        className: "bg-primary hover:bg-primary-hover text-white",
+      },
+      {
+        variant: "primary",
+        colorScheme: "danger",
+        className: "bg-danger hover:bg-danger-hover text-white",
+      },
+      {
+        variant: "primary",
+        colorScheme: "warning",
+        className: "bg-warning hover:bg-warning-hover text-white",
       },
       // Outline variant with color schemes
       {
@@ -64,11 +74,6 @@ const buttonVariants = cva(
         variant: "ghost",
         colorScheme: "warning",
         className: "text-warning hover:bg-warning/10",
-      },
-      // Ensure text is white for all color schemes
-      {
-        colorScheme: ["primary", "danger", "warning"],
-        className: "text-white",
       },
     ],
     defaultVariants: {

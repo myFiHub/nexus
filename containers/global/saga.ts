@@ -21,6 +21,7 @@ import {
   User,
 } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
+import { getStore } from "app/store";
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import {
@@ -108,7 +109,12 @@ function* getAndSetAccount() {
   try {
     const initialized: boolean = yield select(GlobalSelectors.initialized);
     if (!initialized) {
-      toast.error("app is not initialized, check your connection please");
+      toast.error("app is not initialized, check your connection please", {
+        action: {
+          label: "retry?",
+          onClick: () => getStore().dispatch(globalActions.initialize()),
+        },
+      });
       return;
     }
     yield put(globalActions.setLogingIn(true));

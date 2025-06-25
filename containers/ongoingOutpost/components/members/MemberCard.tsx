@@ -9,35 +9,18 @@ import { onGoingOutpostSelectors } from "../../selectors";
 import { onGoingOutpostActions } from "../../slice";
 import { IsTalkingIndicator } from "./isTalkingIndicator";
 import { RemainingTimeText } from "./remainingTimeText";
+import { LikeAndDislike } from "./likeAndDislike";
+import { CheerAndBoo } from "./cheerAndBoo";
 
 interface MemberCardProps {
   address: string;
 }
 
 export const MemberCard = ({ address }: MemberCardProps) => {
-  const dispatch = useDispatch();
   const member = useSelector(onGoingOutpostSelectors.member(address));
   if (!member) return null;
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isCurrentUser = address === myUser?.address;
-
-  const handleLike = () => {
-    dispatch(onGoingOutpostActions.like({ targetUserAddress: member.address }));
-  };
-
-  const handleDislike = () => {
-    dispatch(
-      onGoingOutpostActions.dislike({ targetUserAddress: member.address })
-    );
-  };
-
-  const handleCheer = () => {
-    dispatch(onGoingOutpostActions.cheerBoo({ user: member, cheer: true }));
-  };
-
-  const handleBoo = () => {
-    dispatch(onGoingOutpostActions.cheerBoo({ user: member, cheer: false }));
-  };
 
   return (
     <div
@@ -60,9 +43,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
             alt={member.name}
             className="w-12 h-12 rounded-full border-2 border-primary/20"
           />
-          {member.is_speaking && (
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse" />
-          )}
+
           {!member.is_present && (
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-400 rounded-full border-2 border-background" />
           )}
@@ -83,7 +64,11 @@ export const MemberCard = ({ address }: MemberCardProps) => {
       {/* Status and time info */}
       <div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
         {member.remaining_time > 0 ? (
-          <div className="flex items-center gap-1">
+          <div
+            className={`flex items-center gap-1 ${
+              member.remaining_time < 60 ? "text-red-500" : ""
+            }`}
+          >
             <Clock className="w-3 h-3" />
             <span>
               <RemainingTimeText address={address} />
@@ -119,38 +104,11 @@ export const MemberCard = ({ address }: MemberCardProps) => {
 
       {/* Action buttons */}
       <div className="flex gap-1">
-        <Button
-          onClick={handleLike}
-          size="xs"
-          className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-600 rounded transition-colors"
-          title="Like"
-        >
-          <ThumbsUp className="w-3 h-3" />
-        </Button>
-        <Button
-          onClick={handleDislike}
-          size="xs"
-          className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded transition-colors"
-          title="Dislike"
-        >
-          <ThumbsDown className="w-3 h-3" />
-        </Button>
-        <Button
-          onClick={handleCheer}
-          size="xs"
-          className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 rounded transition-colors"
-          title="Cheer"
-        >
-          <Heart className="w-3 h-3" />
-        </Button>
-        <Button
-          onClick={handleBoo}
-          size="xs"
-          className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 rounded transition-colors"
-          title="Boo"
-        >
-          <XCircle className="w-3 h-3" />
-        </Button>
+        <LikeAndDislike like address={member.address} />
+        <LikeAndDislike like={false} address={member.address} />
+
+        <CheerAndBoo cheer address={member.address} />
+        <CheerAndBoo cheer={false} address={member.address} />
       </div>
     </div>
   );
