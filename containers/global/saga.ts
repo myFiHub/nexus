@@ -22,7 +22,14 @@ import {
 import { wsClient } from "app/services/wsClient/client";
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
-import { all, put, select, takeEvery, takeLatest } from "redux-saga/effects";
+import {
+  all,
+  delay,
+  put,
+  select,
+  takeEvery,
+  takeLatest,
+} from "redux-saga/effects";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { GlobalSelectors } from "./selectors";
@@ -289,9 +296,17 @@ function* logout() {
   yield put(globalActions.setLogingOut(false));
 }
 
+function* startTicker() {
+  while (true) {
+    yield put(globalActions.increaseTick_());
+    yield delay(1000);
+  }
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.initialize, initialize);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);
+  yield takeEvery(globalActions.startTicker, startTicker);
 }

@@ -1,3 +1,4 @@
+import { EasyAccess } from "app/containers/global/effects/quickAccess";
 import { WebSocketService } from "./client";
 import { IncomingMessage, IncomingMessageType } from "./types";
 
@@ -60,8 +61,7 @@ export class WebSocketMessageRouter {
   }
 
   private static handleUserJoined(message: IncomingMessage): void {
-    // TODO: Get user address from your user store
-    const myUserAddress = "TODO: Get user address from store";
+    const myUserAddress = EasyAccess.getInstance().myUser?.address;
 
     if (message.data.address === myUserAddress) {
       const joinId = `join-${myUserAddress}`;

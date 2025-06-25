@@ -1,5 +1,6 @@
 import { ConnectionManager } from "./connectionManager";
 import { JoinRequestManager } from "./joinRequestManager";
+import { WebSocketMessageRouter } from "./messageRouter";
 import {
   ConnectionState,
   ConnectionStatus,
@@ -316,10 +317,7 @@ export class WebSocketService {
         }
         return;
       }
-
-      // TODO: Parse incoming message properly
-      // const incomingMessage = IncomingMessage.fromJson(jsoned);
-      // WebSocketMessageRouter.routeMessage(incomingMessage);
+      WebSocketMessageRouter.routeMessage(jsoned);
     } catch (error) {
       if (isDev) {
         console.error(

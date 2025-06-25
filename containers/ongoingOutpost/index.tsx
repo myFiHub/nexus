@@ -1,5 +1,5 @@
 "use client";
-import { OutpostModel, User } from "app/services/api/types";
+import { User } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -10,11 +10,9 @@ import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
 
 const OngoingOutpostContent = ({
-  outpost,
   myUser,
   loading,
 }: {
-  outpost?: OutpostModel;
   myUser?: User;
   loading: boolean;
 }) => {
@@ -32,9 +30,9 @@ const OngoingOutpostContent = ({
 };
 
 const Content = () => {
+  useOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const { id } = useParams();
-  useOnGoingOutpostSlice();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const gettingMyUser = useSelector(GlobalSelectors.logingIn);
   const isGettingOutpost = useSelector(
@@ -42,26 +40,18 @@ const Content = () => {
   );
   const loading = gettingMyUser || isGettingOutpost;
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
+  const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
   useEffect(() => {
     if (myUser && !outpost) {
       dispatch(onGoingOutpostActions.getOutpost({ id: id as string }));
     }
-    return () => {
-      dispatch(
-        onGoingOutpostActions.setOutpostAccesses({
-          canEnter: false,
-          canSpeak: false,
-        })
-      );
-    };
   }, [id, myUser]);
+  if (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid) {
+    return <div>Joining outpost...</div>;
+  }
   return (
     <div className="container mx-auto px-4 py-8 mt-12">
-      <OngoingOutpostContent
-        outpost={outpost}
-        myUser={myUser}
-        loading={loading}
-      />
+      <OngoingOutpostContent myUser={myUser} loading={loading} />
     </div>
   );
 };

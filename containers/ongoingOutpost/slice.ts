@@ -6,7 +6,7 @@ import { onGoingOutpostSaga } from "./saga";
 
 export interface OnGoingOutpostState {
   outpost?: OutpostModel;
-  accesses: OutpostAccesses;
+  accesses?: OutpostAccesses;
   isGettingOutpost: boolean;
 }
 
@@ -23,14 +23,15 @@ const onGoingOutpostSlice = createSlice({
     isGettingOutpost(state, action: PayloadAction<boolean>) {
       state.isGettingOutpost = action.payload;
     },
-    setOutpost(state, action: PayloadAction<OutpostModel>) {
+    setOutpost(state, action: PayloadAction<OutpostModel | undefined>) {
       state.outpost = action.payload;
     },
     setAccesses(state, actions: PayloadAction<OutpostAccesses>) {
       state.accesses = actions.payload;
     },
-    setOutpostAccesses(state, actions: PayloadAction<OutpostAccesses>) {
-      state.accesses = actions.payload;
+    leaveOutpost(state) {
+      state.outpost = undefined;
+      state.accesses = undefined;
     },
   },
 });

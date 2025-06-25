@@ -17,12 +17,14 @@ export interface GlobalState {
   podiumUserInfo?: User;
   joiningOutpostId?: string;
   router?: AppRouterInstance;
+  tick: number;
 }
 
 const initialState: GlobalState = {
   initializingWeb3Auth: true,
   logingIn: false,
   logingOut: false,
+  tick: 0,
 };
 
 const globalSlice = createSlice({
@@ -30,6 +32,10 @@ const globalSlice = createSlice({
   initialState,
   reducers: {
     initialize() {},
+    startTicker() {},
+    increaseTick_(state) {
+      state.tick++;
+    },
     setRouter(state, action: PayloadAction<AppRouterInstance>) {
       state.router = action.payload;
     },

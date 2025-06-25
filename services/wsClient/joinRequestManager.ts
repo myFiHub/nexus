@@ -1,3 +1,4 @@
+import { EasyAccess } from "app/containers/global/effects/quickAccess";
 import { WebSocketService } from "./client";
 
 const isDev = process.env.NODE_ENV === "development";
@@ -17,8 +18,7 @@ export class JoinRequestManager {
   }
 
   generateJoinId(): string {
-    // TODO: Replace with actual user address from your user store
-    const userAddress = "TODO: Get user address from store";
+    const userAddress = EasyAccess.getInstance().myUser?.address;
     return `join-${userAddress}`;
   }
 
@@ -197,7 +197,6 @@ export class JoinRequestManager {
     // Dispatch event for join stream
     const event = new CustomEvent("join", { detail: joinId });
     this.joinSubject.dispatchEvent(event);
-
     if (this.joinRequests.has(joinId)) {
       if (isDev) {
         console.log(

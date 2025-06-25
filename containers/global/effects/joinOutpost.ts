@@ -193,13 +193,14 @@ function* getOutpostAccesses({
 }
 
 function* openOutpost({
-  outpost,
+  outpost: receivedOutpost,
   accesses,
 }: {
   outpost: OutpostModel;
   accesses: OutpostAccesses;
 }) {
   useOnGoingOutpostSlice();
+  const outpost = { ...receivedOutpost };
   const router: AppRouterInstance = yield select(GlobalDomains.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const iAmMember: LiveMember | undefined = currentMembers.find(
@@ -211,13 +212,20 @@ function* openOutpost({
       toast.error("Failed to add you as a member");
       return;
     }
+    outpost.i_am_member = true;
+    outpost.members_count = currentMembers.length + 1;
   }
-  yield put(onGoingOutpostActions.setOutpost(outpost));
-  yield put(onGoingOutpostActions.setAccesses(accesses));
+  if (!accesses.canEnter) {
+    toast.error("You don't have access to this Outpost");
+    return;
+  }
+
   const success: boolean = yield wsClient.asyncJoinOutpostWithRetry(
     outpost.uuid
   );
   if (success) {
+    yield put(onGoingOutpostActions.setOutpost(outpost));
+    yield put(onGoingOutpostActions.setAccesses(accesses));
     router.push(`/ongoing_outpost/${outpost.uuid}`);
   } else {
     toast.error("Failed to join Outpost");
