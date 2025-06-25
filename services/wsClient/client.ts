@@ -246,7 +246,7 @@ export class WebSocketService {
       clearInterval(this.pongTimer);
     }
     this.pong();
-    this.pongTimer = window.setInterval(() => this.pong(), 19000); // 19 seconds
+    this.pongTimer = window.setInterval(() => this.pong(), 10000); // 19 seconds
   }
 
   private setupMessageListener(): void {

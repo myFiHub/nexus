@@ -11,6 +11,7 @@ import {
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel } from "app/services/api/types";
+import { wsClient } from "app/services/wsClient/client";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select } from "redux-saga/effects";
 import { GlobalDomains } from "../selectors";
@@ -213,8 +214,14 @@ function* openOutpost({
   }
   yield put(onGoingOutpostActions.setOutpost(outpost));
   yield put(onGoingOutpostActions.setAccesses(accesses));
-
-  router.push(`/ongoing_outpost/${outpost.uuid}`);
+  const success: boolean = yield wsClient.asyncJoinOutpostWithRetry(
+    outpost.uuid
+  );
+  if (success) {
+    router.push(`/ongoing_outpost/${outpost.uuid}`);
+  } else {
+    toast.error("Failed to join Outpost");
+  }
 }
 
 export const accessIsBuyableByTicket = (outpost: OutpostModel): boolean => {

@@ -13,7 +13,11 @@ export const Meet = () => {
   const [isVideoMuted, setIsVideoMuted] = useState(false);
 
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
+  const accesses = useSelector(onGoingOutpostSelectors.accesses);
+
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+  const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
+  const isRecordable = iAmCreator && outpost?.is_recordable;
   const apiRef = useRef<any>(null);
 
   if (!outpost || !myUser) {
@@ -1018,24 +1022,24 @@ export const Meet = () => {
             prejoinPageEnabled: false,
             skipPrejoinPage: true,
             toolbarButtons: [
-              // "microphone",
+              ...(accesses.canSpeak ? ["microphone"] : []),
               // "camera",
               "closedcaptions",
               "desktop",
-              "fullscreen",
-              "fodeviceselection",
+              // "fullscreen",
+              // "fodeviceselection",
               // "hangup",
               "chat",
-              // "recording",
+              ...(isRecordable ? ["recording"] : []),
               "livestreaming",
               "etherpad",
               "sharedvideo",
               // "settings",
-              "raisehand",
+              // "raisehand",
               // "videoquality",
               "filmstrip",
               "feedback",
-              "stats",
+              // "stats",
               // "shortcuts",
               // "tileview",
               // "videobackgroundblur",
