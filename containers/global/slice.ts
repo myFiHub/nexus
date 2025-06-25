@@ -18,6 +18,7 @@ export interface GlobalState {
   joiningOutpostId?: string;
   router?: AppRouterInstance;
   tick: number;
+  checkingOutpostForPass?: OutpostModel;
 }
 
 const initialState: GlobalState = {
@@ -74,6 +75,16 @@ const globalSlice = createSlice({
     },
     setMyUserIsOver18(state, action: PayloadAction<boolean>) {
       state.podiumUserInfo!.is_over_18 = action.payload;
+    },
+    checkIfIHavePass(
+      state,
+      action: PayloadAction<{ outpost: OutpostModel }>
+    ) {},
+    setCheckingOutpostForPass(
+      state,
+      action: PayloadAction<OutpostModel | undefined>
+    ) {
+      state.checkingOutpostForPass = action.payload;
     },
   },
 });

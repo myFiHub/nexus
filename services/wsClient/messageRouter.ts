@@ -1,6 +1,14 @@
 import { EasyAccess } from "app/containers/global/effects/quickAccess";
+import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
+import { getStore } from "app/store";
 import { WebSocketService } from "./client";
 import { IncomingMessage, IncomingMessageType } from "./types";
+
+export type IncomingReactionType =
+  | IncomingMessageType.USER_BOOED
+  | IncomingMessageType.USER_CHEERED
+  | IncomingMessageType.USER_DISLIKED
+  | IncomingMessageType.USER_LIKED;
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -73,65 +81,58 @@ export class WebSocketMessageRouter {
       }
       WebSocketService.instance.completeJoinRequest(joinId);
     }
-
-    // TODO: Call outpost call controller to fetch live data
-    // this.withController<OutpostCallController>((controller) => {
-    //   joinOrLeftDebounce.debounce(() => controller.fetchLiveData());
-    // });
+    const store = getStore();
+    store.dispatch(onGoingOutpostActions.getLiveMembers());
   }
 
   private static handleUserLeft(message: IncomingMessage): void {
-    // TODO: Call outpost call controller to fetch live data
-    // this.withController<OutpostCallController>((controller) => {
-    //   if (message.data.address != myUser.address) {
-    //     controller.fetchLiveData();
-    //   }
-    // });
+    const userAddress = message.data.address;
+    const store = getStore();
+    if (userAddress !== EasyAccess.getInstance().myUser?.address) {
+      store.dispatch(onGoingOutpostActions.getLiveMembers());
+    }
   }
 
   private static handleRemainingTimeUpdated(message: IncomingMessage): void {
-    // TODO: Call ongoing outpost call controller to update user remaining time
-    // this.withController<OngoingOutpostCallController>((controller) => {
-    //   controller.updateUserRemainingTime(
-    //     address: message.data.address!,
-    //     newTimeInSeconds: message.data.remaining_time!,
-    //   );
-    // });
+    const store = getStore();
+    store.dispatch(
+      onGoingOutpostActions.updateRemainingTime({
+        userAddress: message.data.address!,
+        remainingTime: message.data.remaining_time!,
+      })
+    );
   }
 
   private static handleUserSpeaking(
     message: IncomingMessage,
     isTalking: boolean
   ): void {
-    // TODO: Call ongoing outpost call controller to update user talking state
-    // this.withController<OngoingOutpostCallController>((controller) => {
-    //   controller.updateUserIsTalking(
-    //     address: message.data.address!,
-    //     isTalking: isTalking,
-    //   );
-    // });
+    const store = getStore();
+    store.dispatch(
+      onGoingOutpostActions.updateUserIsTalking({
+        userAddress: message.data.address!,
+        isTalking: isTalking,
+      })
+    );
   }
 
   private static handleUserReaction(message: IncomingMessage): void {
-    // TODO: Handle user reactions
-    // if (!Get.isRegistered<OngoingOutpostCallController>() ||
-    //     !Get.isRegistered<OutpostCallController>()) {
-    //   if (isDev) {
-    //     console.warn("[WARN] Required controllers not registered, cannot process user reaction");
-    //   }
-    //   return;
-    // }
-    // const ongoingController = Get.find<OngoingOutpostCallController>();
-    // const outpostController = Get.find<OutpostCallController>();
-    // outpostController.updateReactionsMapByWsEvent(message);
-    // ongoingController.handleIncomingReaction(message);
+    const store = getStore();
+    store.dispatch(
+      onGoingOutpostActions.incomingUserReaction({
+        userAddress: message.data.address!,
+        reaction: message.name as IncomingReactionType,
+      })
+    );
   }
 
   private static handleTimeIsUp(message: IncomingMessage): void {
-    // TODO: Call ongoing outpost call controller to handle time is up
-    // this.withController<OngoingOutpostCallController>((controller) => {
-    //   controller.handleTimeIsUp(message);
-    // });
+    const store = getStore();
+    store.dispatch(
+      onGoingOutpostActions.handleTimeIsUp({
+        userAddress: message.data.address!,
+      })
+    );
   }
 
   private static handleNotification(message: IncomingMessage): void {

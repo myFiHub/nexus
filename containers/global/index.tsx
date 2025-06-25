@@ -22,6 +22,7 @@ const Container = () => {
   }, [router]);
 
   useEffect(() => {
+    dispatch(globalActions.startTicker());
     if (!initialized) {
       dispatch(globalActions.initialize());
     }

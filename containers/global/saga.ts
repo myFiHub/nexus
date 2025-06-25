@@ -17,6 +17,7 @@ import podiumApi from "app/services/api";
 import {
   AdditionalDataForLogin,
   LoginRequest,
+  OutpostModel,
   User,
 } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
@@ -30,8 +31,10 @@ import {
   takeEvery,
   takeLatest,
 } from "redux-saga/effects";
+import { detached_checkPass } from "../_assets/saga";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
+import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
 
@@ -296,17 +299,43 @@ function* logout() {
   yield put(globalActions.setLogingOut(false));
 }
 
-function* startTicker() {
-  while (true) {
-    yield put(globalActions.increaseTick_());
-    yield delay(1000);
+function* startTicker(): any {
+  yield put(globalActions.increaseTick_());
+  yield delay(1000);
+  yield startTicker();
+}
+
+function* checkIfIHavePass(
+  action: ReturnType<typeof globalActions.checkIfIHavePass>
+) {
+  const incomingOutpost = action.payload.outpost;
+  yield put(globalActions.setCheckingOutpostForPass(incomingOutpost));
+  const outpostDetails: OutpostModel = yield podiumApi.getOutpost(
+    action.payload.outpost.uuid
+  );
+  try {
+    const accesses: OutpostAccesses = yield detached_checkPass({
+      outpost: outpostDetails,
+    });
+    if (!accesses.canEnter) {
+      toast.error("You don't have a pass");
+    } else if (!accesses.canSpeak) {
+      toast.error("you can enter but can not speak");
+    } else {
+      toast.success("You have a full pass");
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    yield put(globalActions.setCheckingOutpostForPass(undefined));
   }
 }
 
 export function* globalSaga() {
+  yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initialize, initialize);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);
-  yield takeEvery(globalActions.startTicker, startTicker);
+  yield takeLatest(globalActions.checkIfIHavePass, checkIfIHavePass);
 }

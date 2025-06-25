@@ -6,6 +6,7 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
+import { OngoingOutpostMembers } from "./members";
 
 export const Meet = memo(
   () => {
@@ -19,7 +20,6 @@ export const Meet = memo(
 
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
-    const isRecordable = (iAmCreator && outpost?.is_recordable) ?? false;
     const apiRef = useRef<any>(null);
     useEffect(() => {
       if (outpost?.uuid && !accesses?.canEnter) {
@@ -96,11 +96,11 @@ export const Meet = memo(
               autoJoin: true,
               disableModeratorIndicator: true,
               defaultLogoUrl: logoUrl,
-              //   filmstrip: {
-              //     disabled: true,
-              //     disableStageFilmstrip: true,
-              //     disableTopPanel: true,
-              //   },
+              filmstrip: {
+                disabled: true,
+                disableStageFilmstrip: true,
+                disableTopPanel: true,
+              },
               disableFilmstripAutohiding: true,
               lobby: {
                 enabled: false,
@@ -112,7 +112,7 @@ export const Meet = memo(
                 "closedcaptions",
                 "desktop",
                 "chat",
-                ...(isRecordable ? ["recording"] : []),
+                ...(iAmCreator && outpost?.is_recordable ? ["recording"] : []),
                 "livestreaming",
                 "etherpad",
                 "sharedvideo",
@@ -147,6 +147,7 @@ export const Meet = memo(
             onApiReady={handleApiReady}
           />
         </div>
+        <OngoingOutpostMembers />
       </div>
     );
   },

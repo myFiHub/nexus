@@ -11,8 +11,6 @@ import { userDetailsReducer } from "app/containers/userDetails/slice";
 // Import your feature reducers here
 // Example: import authReducer from './features/auth/authSlice';
 
-const initialState: Record<string, any> = {};
-
 export const rootReducer: Reducer = combineReducers({
   global: globalReducer,
   profile: profileReducer,

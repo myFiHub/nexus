@@ -14,6 +14,8 @@ export const GlobalDomains = {
   podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
   joiningOutpostId: (state: RootState) => state.global?.joiningOutpostId,
   tick: (state: RootState) => state.global?.tick ?? 0,
+  checkingOutpostForPass: (state: RootState) =>
+    state.global?.checkingOutpostForPass,
 };
 
 export const GlobalSelectors = {
@@ -31,4 +33,5 @@ export const GlobalSelectors = {
   podiumUserInfo: GlobalDomains.podiumUserInfo,
   joiningOutpostId: GlobalDomains.joiningOutpostId,
   tick: GlobalDomains.tick,
+  checkingOutpostForPass: GlobalDomains.checkingOutpostForPass,
 };

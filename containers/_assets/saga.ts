@@ -330,6 +330,7 @@ export function* detached_getAccesses({
 
     // Fetch user data for all IDs
     const userDataPromises = allUserIds.map((id) => podiumApi.getUserData(id));
+
     const userDataResults: User[] = yield all(userDataPromises);
     // Create a map for quick lookup
     const userDataMap = new Map<string, User>();
@@ -457,7 +458,7 @@ export function* detached_getAccesses({
 
     return {
       canEnter: canIEnter,
-      canSpeak: canISpeak,
+      canSpeak: canIEnter ? canISpeak : false,
     };
   } catch (error) {
     yield put(

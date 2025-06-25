@@ -1,13 +1,14 @@
 import { OutpostModel } from "app/services/api/types";
 import { Lock, Mic, MicOff, Unlock } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../../Tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../../../Tooltip";
 import {
   allowedToEnterOptions,
   allowedToSpeakOptions,
   BuyableTicketTypes,
   FreeOutpostAccessTypes,
   FreeOutpostSpeakerTypes,
-} from "../types";
+} from "../../types";
+import { LockActionIcon } from "./lockActionIcon";
 
 const tooltipExplanation = {
   // Access types
@@ -42,11 +43,17 @@ export const AccessAndSpeakIndicators = ({
       {/* Access Type */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center gap-2 text-[var(--muted-foreground)] cursor-help">
+          <div
+            className={`flex items-center gap-2 text-[var(--muted-foreground)] ${
+              outpost.enter_type !== BuyableTicketTypes.onlyPodiumPassHolders
+                ? "cursor-help"
+                : ""
+            }`}
+          >
             {outpost.enter_type === FreeOutpostAccessTypes.public ? (
               <Unlock className="w-4 h-4 text-green-500" />
             ) : (
-              <Lock className="w-4 h-4 text-orange-500" />
+              <LockActionIcon outpost={outpost} />
             )}
             <span className="capitalize">
               {

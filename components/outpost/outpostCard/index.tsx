@@ -1,5 +1,5 @@
 import { OutpostModel } from "app/services/api/types";
-import { AccessAndSpeakIndicators } from "./access_speak_indicators";
+import { AccessAndSpeakIndicators } from "./accessAndSpeakIndicators";
 import { OutpostCardActions } from "./actions";
 import { ContentSection } from "./ContentSection";
 import { CreatorSection } from "./CreatorSection";
