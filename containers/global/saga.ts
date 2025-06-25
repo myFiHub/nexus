@@ -19,6 +19,7 @@ import {
   LoginRequest,
   User,
 } from "app/services/api/types";
+import { wsClient } from "app/services/wsClient/client";
 import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import { all, put, select, takeEvery, takeLatest } from "redux-saga/effects";
@@ -197,6 +198,7 @@ function* continueWithLoginRequestAndAdditionalData(
     user: User | null;
     error: string | null;
     statusCode: number | null;
+    token: string | null;
   } = yield podiumApi.login(loginRequest, additionalDataForLogin);
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
@@ -258,6 +260,12 @@ function* continueWithLoginRequestAndAdditionalData(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
     yield setServerCookie(CookieKeys.myUserId, response.user.uuid);
+    if (response.token) {
+      yield wsClient.connect(
+        response.token,
+        process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!
+      );
+    }
   } else {
     yield put(globalActions.logout());
   }

@@ -54,26 +54,25 @@ class PodiumApi {
     user: User | undefined;
     error: string | undefined;
     statusCode: number | undefined;
+    token: string | null;
   }> {
     try {
       const response = await this.axiosInstance.post("/auth/login", request);
       if (response.status === 200) {
         this.token = response.data.data.token;
-        await wsClient.connect(
-          this.token!,
-          process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!
-        );
         const userData = await this.getMyUserData(additionalData);
         return {
           user: userData,
           error: undefined,
           statusCode: response.status,
+          token: this.token,
         };
       }
       return {
         user: undefined,
         error: "User not found",
         statusCode: response.status,
+        token: null,
       };
     } catch (error: any) {
       console.error("Login error:", error);
@@ -81,6 +80,7 @@ class PodiumApi {
         user: undefined,
         error: error.response?.data?.message || "Login failed",
         statusCode: error.response?.status,
+        token: null,
       };
     }
   }
