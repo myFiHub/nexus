@@ -19,7 +19,8 @@ import {
 import { put, select, takeLatest } from "redux-saga/effects";
 import { EasyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
-import { onGoingOutpostSelectors } from "./selectors";
+import { globalActions } from "../global/slice";
+import { onGoingOutpostDomains, onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions } from "./slice";
 
 // Add type definition for cheerBoo parameters
@@ -285,6 +286,30 @@ function* detatched_getLiveMembers() {
   return liveData.members;
 }
 
+function* clockTicked() {
+  const liveMembers: { [address: string]: LiveMember } = yield select(
+    onGoingOutpostDomains.members
+  );
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    return;
+  }
+  for (const member of Object.values(liveMembers)) {
+    const isCreator = member.uuid === outpost.creator_user_uuid;
+    const remainingTime = member.remaining_time;
+    if (member.is_speaking && !isCreator && remainingTime > 0) {
+      yield put(
+        onGoingOutpostActions.updateRemainingTime({
+          userAddress: member.address,
+          remainingTime: member.remaining_time - 1,
+        })
+      );
+    }
+  }
+}
+
 export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.getOutpost, getOutpost);
   yield takeLatest(onGoingOutpostActions.leaveOutpost, leaveOutpost);
@@ -295,4 +320,5 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
   yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield takeLatest(globalActions.increaseTick_, clockTicked);
 }

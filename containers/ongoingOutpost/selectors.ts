@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import { GlobalDomains } from "../global/selectors";
 
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
@@ -17,6 +18,15 @@ export const onGoingOutpostSelectors = {
   isGettingLiveMembers: onGoingOutpostDomains.isGettingLiveMembers,
   accesses: onGoingOutpostDomains.accesses,
   members: onGoingOutpostDomains.members,
+  myUserInOutpostMembers: createSelector(
+    [onGoingOutpostDomains.members, GlobalDomains.podiumUserInfo],
+    (members, myUser) => {
+      if (!myUser) {
+        return undefined;
+      }
+      return members[myUser.address];
+    }
+  ),
   membersList: createSelector([onGoingOutpostDomains.members], (members) => {
     const list = Object.values(members);
     //sort by last_speaked_at_timestamp desc
@@ -33,7 +43,6 @@ export const onGoingOutpostSelectors = {
   ),
   member: (id: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {
-      console.log({ liveMembers });
       return liveMembers[id];
     }),
   isTalking: (id: string) =>

@@ -6,14 +6,18 @@ import { memo, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
+import { onGoingOutpostActions } from "../slice";
 import { OngoingOutpostMembers } from "./members";
+import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 
 export const Meet = memo(
   () => {
     const dispatch = useDispatch();
     const router = useRouter();
     const [showIframe, setShowIframe] = useState(true);
-    const [isAudioMuted, setIsAudioMuted] = useState(false);
+
+    const joined = useRef(false);
+    const firstTimeUnmuted = useRef(true);
 
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const accesses = useSelector(onGoingOutpostSelectors.accesses);
@@ -49,18 +53,32 @@ export const Meet = memo(
       apiRef.current = apiObj;
       apiObj.addListener("videoConferenceJoined", () => {
         console.log("Conference joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        joined.current = true;
       });
 
       apiObj.addListener("videoConferenceLeft", () => {
         console.log("Conference left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         setShowIframe(false);
+        joined.current = false;
         router.replace(`/outpost_details/${outpost.uuid}`);
       });
       // Listen to audio mute status changes
-      apiObj.addListener("audioMuteStatusChanged", (isMuted: boolean) => {
-        console.log("Audio mute status changed:", isMuted);
-        setIsAudioMuted(isMuted);
-      });
+      apiObj.addListener(
+        "audioMuteStatusChanged",
+        ({ muted: isMuted }: { muted: boolean }) => {
+          console.log("Audio mute status changed:", isMuted);
+          if (firstTimeUnmuted.current) {
+            firstTimeUnmuted.current = false;
+            return;
+          } else {
+            if (isMuted && joined.current) {
+              dispatch(onGoingOutpostActions.stopSpeaking());
+            } else if (!isMuted && joined.current) {
+              dispatch(onGoingOutpostActions.startSpeaking());
+            }
+          }
+        }
+      );
 
       apiObj.addListener("participantLeft", (id: string) => {
         console.log("Participant left:", id);
@@ -83,7 +101,7 @@ export const Meet = memo(
             roomName={outpost.uuid}
             userInfo={{
               displayName: myUser.name ?? "",
-              email: myUser.email ?? "",
+              email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
             configOverwrite={{
               startWithAudioMuted: true,

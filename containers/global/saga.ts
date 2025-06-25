@@ -106,6 +106,11 @@ function* initialize(action: ReturnType<typeof globalActions.initialize>) {
 
 function* getAndSetAccount() {
   try {
+    const initialized: boolean = yield select(GlobalSelectors.initialized);
+    if (!initialized) {
+      toast.error("app is not initialized, check your connection please");
+      return;
+    }
     yield put(globalActions.setLogingIn(true));
     const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
     const user: IProvider | null = yield web3Auth.connect();

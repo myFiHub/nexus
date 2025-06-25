@@ -1,3 +1,4 @@
+import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { Clock, Heart, ThumbsDown, ThumbsUp, XCircle } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
@@ -97,7 +98,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
       </div>
 
       {/* Reaction counts */}
-
+      {/* 
       <div className="flex items-center gap-2 mb-3 text-xs text-muted-foreground">
         <div className="flex items-center gap-1">
           <ThumbsUp className="w-3 h-3 text-green-500" />
@@ -114,38 +115,42 @@ export const MemberCard = ({ address }: MemberCardProps) => {
         <div className="flex items-center gap-1">
           <XCircle className="w-3 h-3 text-orange-500" />
         </div>
-      </div>
+      </div> */}
 
       {/* Action buttons */}
       <div className="flex gap-1">
-        <button
+        <Button
           onClick={handleLike}
+          size="xs"
           className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-600 rounded transition-colors"
           title="Like"
         >
           <ThumbsUp className="w-3 h-3" />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleDislike}
+          size="xs"
           className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded transition-colors"
           title="Dislike"
         >
           <ThumbsDown className="w-3 h-3" />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleCheer}
+          size="xs"
           className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-pink-500/10 hover:bg-pink-500/20 text-pink-600 rounded transition-colors"
           title="Cheer"
         >
           <Heart className="w-3 h-3" />
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleBoo}
+          size="xs"
           className="flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-orange-500/10 hover:bg-orange-500/20 text-orange-600 rounded transition-colors"
           title="Boo"
         >
           <XCircle className="w-3 h-3" />
-        </button>
+        </Button>
       </div>
     </div>
   );
