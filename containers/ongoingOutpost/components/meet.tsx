@@ -1,6 +1,7 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 import { useRouter } from "next/navigation";
 import { memo, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +9,6 @@ import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
 import { OngoingOutpostMembers } from "./members";
-import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 
 export const Meet = memo(
   () => {
@@ -60,7 +60,7 @@ export const Meet = memo(
         console.log("Conference left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         setShowIframe(false);
         joined.current = false;
-        router.replace(`/outpost_details/${outpost.uuid}`);
+        dispatch(onGoingOutpostActions.leaveOutpost(outpost));
       });
       // Listen to audio mute status changes
       apiObj.addListener(

@@ -117,6 +117,12 @@ export class WebSocketMessageRouter {
   }
 
   private static handleUserReaction(message: IncomingMessage): void {
+    if (isDev) {
+      console.log(
+        `%c[DEBUG] User reaction: ${message.name}`,
+        "color: #2196F3; font-weight: bold;"
+      );
+    }
     const store = getStore();
     store.dispatch(
       onGoingOutpostActions.incomingUserReaction({
@@ -162,14 +168,13 @@ export class WebSocketMessageRouter {
     message: IncomingMessage,
     isRecording: boolean
   ): void {
-    // TODO: Call ongoing outpost call controller to handle recording state
-    // this.withController<OngoingOutpostCallController>((controller) => {
-    //   if (isRecording) {
-    //     controller.onUserStartedRecording(message);
-    //   } else {
-    //     controller.onUserStoppedRecording(message);
-    //   }
-    // });
+    const store = getStore();
+    store.dispatch(
+      onGoingOutpostActions.updateUserIsRecording({
+        userAddress: message.data.address!,
+        isRecording: isRecording,
+      })
+    );
   }
 
   // private static withController<T>(action: (controller: T) => void): void {

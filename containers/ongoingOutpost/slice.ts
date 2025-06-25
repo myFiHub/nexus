@@ -90,6 +90,15 @@ const onGoingOutpostSlice = createSlice({
         is_speaking: action.payload.isTalking,
       };
     },
+    updateUserIsRecording(
+      state,
+      action: PayloadAction<{ userAddress: string; isRecording: boolean }>
+    ) {
+      state.liveMembers[action.payload.userAddress] = {
+        ...state.liveMembers[action.payload.userAddress],
+        is_recording: action.payload.isRecording,
+      };
+    },
     incomingUserReaction(
       state,
       action: PayloadAction<{

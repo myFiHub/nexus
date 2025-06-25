@@ -16,6 +16,7 @@ import {
   OutgoingMessage,
   OutgoingMessageType,
 } from "app/services/wsClient/types";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select, takeLatest } from "redux-saga/effects";
 import { EasyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
@@ -57,6 +58,8 @@ function* leaveOutpost(
     outpost_uuid: outpost.uuid,
   };
   wsClient.send(leaveMessage);
+  const router: AppRouterInstance = yield select(GlobalSelectors.router);
+  router.replace(`/outpost_details/${outpost.uuid}`);
 }
 
 function* like(action: ReturnType<typeof onGoingOutpostActions.like>) {
@@ -202,7 +205,6 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
         inputPlaceholder: "Enter amount",
       },
     });
-    console.log(results);
     if (results.confirmed) {
       amount = results.enteredText ?? "0";
     }
@@ -228,9 +230,9 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       return;
     }
 
-    let rawReceiverAddresses: (string | undefined)[] = liveMembers
+    let rawReceiverAddresses: string[] = liveMembers
       .map((member) => member.primary_aptos_address || member.aptos_address)
-      .filter((address): address is string => address !== undefined);
+      .filter((address): address is string => !!address);
 
     if (isSelfReaction && cheer) {
       const myAptosAddress = myUser.aptos_address;
@@ -244,19 +246,17 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       );
 
       if (rawReceiverAddresses.length == 0) {
-        toast.error("No receiver addresses");
-        return;
+        targetUserAptosAddress = process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!;
+        rawReceiverAddresses = [process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!];
       }
     }
-
     if (rawReceiverAddresses.length == 0) {
       targetUserAptosAddress = process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!;
       rawReceiverAddresses = [process.env.NEXT_PUBLIC_FIHUB_ADDRESS_APTOS!];
     }
-
     const scCallOpts: CheerBooParams = {
       target: targetUserAptosAddress,
-      receiverAddresses: [],
+      receiverAddresses: rawReceiverAddresses,
       amount: Number(amount),
       cheer: cheer,
       outpostId: outpost.uuid,
@@ -288,7 +288,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       };
       wsClient.send(booMessage);
     } else {
-      toast.error("Boo failed");
+      toast.error(`${cheer ? "Cheer" : "Boo"} failed`);
     }
   } catch (error) {
   } finally {
