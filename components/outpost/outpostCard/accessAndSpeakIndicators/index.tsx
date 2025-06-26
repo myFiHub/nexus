@@ -1,12 +1,12 @@
 import { OutpostModel } from "app/services/api/types";
-import { Lock, Mic, MicOff, Unlock } from "lucide-react";
+import { Mic, MicOff, Unlock } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../Tooltip";
 import {
-  allowedToEnterOptions,
-  allowedToSpeakOptions,
   BuyableTicketTypes,
   FreeOutpostAccessTypes,
   FreeOutpostSpeakerTypes,
+  serverAccessTypeToText,
+  serverSpeakerTypeToText,
 } from "../../types";
 import { LockActionIcon } from "./lockActionIcon";
 
@@ -56,11 +56,7 @@ export const AccessAndSpeakIndicators = ({
               <LockActionIcon outpost={outpost} />
             )}
             <span className="capitalize">
-              {
-                allowedToEnterOptions.find(
-                  (item) => item.value == outpost.enter_type
-                )?.text
-              }
+              {serverAccessTypeToText(outpost.enter_type)}
             </span>
           </div>
         </TooltipTrigger>
@@ -85,11 +81,7 @@ export const AccessAndSpeakIndicators = ({
               <MicOff className="w-4 h-4 text-orange-500" />
             )}
             <span className="capitalize">
-              {
-                allowedToSpeakOptions.find(
-                  (item) => item.value == outpost.speak_type
-                )?.text
-              }
+              {serverSpeakerTypeToText(outpost.speak_type)}
             </span>
           </div>
         </TooltipTrigger>

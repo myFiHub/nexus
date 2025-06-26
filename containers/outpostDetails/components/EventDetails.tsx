@@ -1,3 +1,9 @@
+import {
+  FreeOutpostAccessTypes,
+  FreeOutpostSpeakerTypes,
+  serverAccessTypeToText,
+  serverSpeakerTypeToText,
+} from "app/components/outpost/types";
 import { formatDistanceToNow } from "date-fns";
 import { Calendar, Clock, Mic, Shield } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
@@ -41,25 +47,33 @@ export function EventDetails({ outpost }: EventDetailsProps) {
         </div>
 
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-primary mt-1" />
+          <Shield
+            className={`w-5 h-5 text-primary mt-1 ${
+              outpost.enter_type === FreeOutpostAccessTypes.public
+                ? "text-green-500"
+                : "text-red-500"
+            }`}
+          />
           <div>
             <p className="font-medium">Access Type</p>
             <p className="text-muted-foreground capitalize">
-              {outpost.enter_type === "public"
-                ? "Open to Everyone"
-                : "Invitation Only"}
+              {serverAccessTypeToText(outpost.enter_type)}
             </p>
           </div>
         </div>
 
-        <div className="flex items-start gap-3">
-          <Mic className="w-5 h-5 text-primary mt-1" />
+        <div className="flex items-start gap-3 text-red-600">
+          <Mic
+            className={`w-5 h-5 text-primary mt-1 ${
+              outpost.speak_type === FreeOutpostSpeakerTypes.everyone
+                ? "text-green-500"
+                : "text-red-500"
+            }`}
+          />
           <div>
             <p className="font-medium">Speaking Type</p>
             <p className="text-muted-foreground capitalize">
-              {outpost.speak_type === "public"
-                ? "Anyone Can Speak"
-                : "Host Only"}
+              {serverSpeakerTypeToText(outpost.speak_type)}
             </p>
           </div>
         </div>

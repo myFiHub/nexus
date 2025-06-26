@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { wsClient } from "../wsClient/client";
 import {
   AdditionalDataForLogin,
   BuySellPodiumPassRequest,
@@ -170,24 +169,25 @@ class PodiumApi {
     request: CreateOutpostRequest
   ): Promise<OutpostModel | undefined> {
     try {
-      const response = await this.axiosInstance.post("/outposts", request);
+      const response = await this.axiosInstance.post(
+        "/outposts/create",
+        request
+      );
       return response.data.data;
     } catch (error) {
       return undefined;
     }
   }
 
-  async updateOutpost(
-    request: UpdateOutpostRequest
-  ): Promise<OutpostModel | undefined> {
+  async updateOutpost(request: UpdateOutpostRequest): Promise<boolean> {
     try {
-      const response = await this.axiosInstance.put(
-        `/outposts/${request.uuid}`,
+      const response = await this.axiosInstance.post(
+        `/outposts/update`,
         request
       );
-      return response.data.data;
+      return response.status === 200;
     } catch (error) {
-      return undefined;
+      return false;
     }
   }
 

@@ -15,7 +15,7 @@ import { useCreateOutpostSlice } from "./slice";
 const Content = () => {
   useCreateOutpostSlice();
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 py-12 px-4 pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 px-4 pt-20">
       <div className="max-w-6xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-12">
@@ -28,11 +28,11 @@ const Content = () => {
         </div>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-3 gap-8 items-start">
+        <div className="grid lg:grid-cols-3 gap-3 items-start">
           {/* Image Selector Section */}
           <div className="lg:col-span-1">
             <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-6 border border-white/10 shadow-2xl">
-              <h2 className="text-xl font-semibold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 bg-blue-400 rounded-full"></span>
                 Outpost Image
               </h2>
@@ -42,13 +42,13 @@ const Content = () => {
 
           {/* Form Section */}
           <div className="lg:col-span-2">
-            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10 shadow-2xl max-w-2xl">
+            <div className="bg-white/5 backdrop-blur-sm rounded-3xl p-6 lg:p-6 border border-white/10 shadow-2xl max-w-lg mx-3">
               <h2 className="text-xl font-semibold text-white mb-6 flex items-center gap-2">
                 <span className="w-2 h-2 bg-purple-400 rounded-full"></span>
                 Outpost Details
               </h2>
 
-              <div className="space-y-6">
+              <div className="space-y-6 w-full">
                 <NameField />
                 <SubjectField />
                 <TagsField />

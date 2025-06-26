@@ -115,23 +115,18 @@ export interface CreateOutpostRequest {
   enter_type: string;
   speak_type: string;
   has_adult_content: boolean;
+  tickets_to_enter: TicketToEnter[];
+  tickets_to_speak: TicketToSpeak[];
   is_recordable: boolean;
   tags: string[];
   reminder_offset_minutes?: number;
 }
 
 export interface UpdateOutpostRequest {
-  uuid: string;
-  name?: string;
-  subject?: string;
+  luma_event_id?: string;
   scheduled_for?: number;
   image?: string;
-  enter_type?: string;
-  speak_type?: string;
-  has_adult_content?: boolean;
-  is_recordable?: boolean;
-  tags?: string[];
-  reminder_offset_minutes?: number;
+  uuid: string;
 }
 
 // Follow related types

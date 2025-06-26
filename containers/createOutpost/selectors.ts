@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 
 export const createOutpostDomains = {
@@ -10,8 +11,11 @@ export const createOutpostDomains = {
   allowedToEnter: (store: RootState) => store.createOutpost.allowedToEnter,
   allowedToSpeak: (store: RootState) => store.createOutpost.allowedToSpeak,
   scheduled: (store: RootState) => store.createOutpost.scheduled,
+  scheduledFor: (store: RootState) => store.createOutpost.scheduledFor,
   adults: (store: RootState) => store.createOutpost.adults,
   recordable: (store: RootState) => store.createOutpost.recordable,
+  reminderOffsetMinutes: (store: RootState) =>
+    store.createOutpost.reminder_offset_minutes,
 };
 export const createOutpostSelectors = {
   image: createOutpostDomains.image,
@@ -25,4 +29,41 @@ export const createOutpostSelectors = {
   scheduled: createOutpostDomains.scheduled,
   adults: createOutpostDomains.adults,
   recordable: createOutpostDomains.recordable,
+  reminderOffsetMinutes: createOutpostDomains.reminderOffsetMinutes,
+  fieldError: (field: "name" | "subject" | "tags") =>
+    createSelector([createOutpostDomains.error], (error) => error?.[field]),
+  allFields: createSelector(
+    [
+      createOutpostDomains.name,
+      createOutpostDomains.subject,
+      createOutpostDomains.tags,
+      createOutpostDomains.allowedToEnter,
+      createOutpostDomains.allowedToSpeak,
+      createOutpostDomains.adults,
+      createOutpostDomains.recordable,
+      createOutpostDomains.scheduledFor,
+      createOutpostDomains.image,
+    ],
+    (
+      name,
+      subject,
+      tags,
+      allowedToEnter,
+      allowedToSpeak,
+      adults,
+      recordable,
+      scheduledFor,
+      image
+    ) => ({
+      name,
+      subject,
+      scheduled_for: scheduledFor,
+      image,
+      enter_type: allowedToEnter,
+      speak_type: allowedToSpeak,
+      has_adult_content: adults,
+      is_recordable: recordable,
+      tags,
+    })
+  ),
 };

@@ -1,12 +1,12 @@
 "use client";
 import { allowedToSpeakOptions } from "app/components/outpost/types";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../../../components/Popover";
-import { useDispatch, useSelector } from "react-redux";
 import { createOutpostSelectors } from "../selectors";
 import { createOutpostActions } from "../slice";
 
@@ -24,7 +24,7 @@ export const SpeakField = () => {
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="w-full bg-[#181f29] text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-[#232b36] focus:bg-[#232b36] transition-colors outline-none"
+            className="w-full bg-white/60 text-slate-900 dark:bg-[#181f29] dark:text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-slate-200 dark:hover:bg-[#232b36] focus:bg-slate-200 dark:focus:bg-[#232b36] transition-colors outline-none cursor-pointer"
           >
             {
               allowedToSpeakOptions.find((item) => item.value == allowedToSpeak)

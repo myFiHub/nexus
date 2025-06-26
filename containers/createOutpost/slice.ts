@@ -13,11 +13,17 @@ export interface CreateOutpostState {
   allowedToEnter: string;
   allowedToSpeak: string;
   scheduled: boolean;
+  scheduledFor: number;
   adults: boolean;
   recordable: boolean;
   selectedImage?: File;
   isCreating: boolean;
-  error?: string;
+  reminder_offset_minutes?: number;
+  error?: {
+    name?: string;
+    subject?: string;
+    tags?: string;
+  };
 }
 
 const initialState: CreateOutpostState = {
@@ -27,6 +33,7 @@ const initialState: CreateOutpostState = {
   allowedToEnter: FreeOutpostAccessTypes.public,
   allowedToSpeak: FreeOutpostSpeakerTypes.everyone,
   scheduled: false,
+  scheduledFor: 0,
   adults: false,
   recordable: false,
 
@@ -40,10 +47,37 @@ const createOutpostSlice = createSlice({
   initialState,
   reducers: {
     setName: (state, action: PayloadAction<string>) => {
-      state.name = action.payload;
+      const name = action.payload;
+
+      if (name.length > 50) {
+        state.error = {
+          ...state.error,
+          name: "Name must be less than 50 characters",
+        };
+        return;
+      } else {
+        state.error = {
+          ...state.error,
+          name: undefined,
+        };
+      }
+
+      state.name = name;
     },
     setSubject: (state, action: PayloadAction<string>) => {
-      state.subject = action.payload;
+      const subject = action.payload;
+      if (subject.length > 50) {
+        state.error = {
+          ...state.error,
+          subject: "Subject must be less than 50 characters",
+        };
+      } else {
+        state.error = {
+          ...state.error,
+          subject: undefined,
+        };
+        state.subject = subject;
+      }
     },
     setTags: (state, action: PayloadAction<string[]>) => {
       state.tags = action.payload;
@@ -57,6 +91,9 @@ const createOutpostSlice = createSlice({
     setScheduled: (state, action: PayloadAction<boolean>) => {
       state.scheduled = action.payload;
     },
+    setScheduledFor: (state, action: PayloadAction<number>) => {
+      state.scheduledFor = action.payload;
+    },
     setAdults: (state, action: PayloadAction<boolean>) => {
       state.adults = action.payload;
     },
@@ -69,13 +106,32 @@ const createOutpostSlice = createSlice({
     setIsCreating: (state, action: PayloadAction<boolean>) => {
       state.isCreating = action.payload;
     },
-    setError: (state, action: PayloadAction<string>) => {
-      state.error = action.payload;
+    setError: (
+      state,
+      action: PayloadAction<{
+        field: "name" | "subject" | "tags";
+        message: string;
+      }>
+    ) => {
+      const field = action.payload.field;
+      if (state.error) {
+        state.error[field] = action.payload.message;
+      } else {
+        state.error = {
+          [field]: action.payload.message,
+        };
+      }
     },
     setIsSubmitting: (state, action: PayloadAction<boolean>) => {
       state.isCreating = action.payload;
     },
+    setReminderOffsetMinutes: (state, action: PayloadAction<number>) => {
+      state.reminder_offset_minutes = action.payload;
+    },
     submit: () => {},
+    reset: () => {
+      return initialState;
+    },
   },
 });
 

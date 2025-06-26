@@ -33,3 +33,24 @@ export const allowedToSpeakOptions = [
     text: "Podium Pass Holders",
   },
 ];
+
+export const serverAccessTypeToText = (accessType: string) => {
+  if (accessType === FreeOutpostAccessTypes.public) {
+    return "Everyone";
+  } else if (accessType === FreeOutpostAccessTypes.onlyLink) {
+    return "Users Having the Link";
+  } else if (accessType === FreeOutpostAccessTypes.invited_users) {
+    return "Only Invited Users";
+  } else if (accessType === BuyableTicketTypes.onlyPodiumPassHolders) {
+    return "Podium Pass Holders";
+  }
+};
+export const serverSpeakerTypeToText = (accessType: string) => {
+  if (accessType === FreeOutpostSpeakerTypes.everyone) {
+    return "Everyone";
+  } else if (accessType === FreeOutpostSpeakerTypes.invited_users) {
+    return "Only Invited Users";
+  } else if (accessType === BuyableTicketTypes.onlyPodiumPassHolders) {
+    return "Podium Pass Holders";
+  }
+};

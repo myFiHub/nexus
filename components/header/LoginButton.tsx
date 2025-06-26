@@ -51,8 +51,8 @@ const Content = ({ size, className }: LoginButtonProps) => {
       title: "do you want to logout?",
       content: "",
       confirmOpts: {
-        confirmColorScheme: "danger",
-        confirmText: "Logout",
+        colorScheme: "danger",
+        text: "Logout",
       },
     });
     if (confirmed) {
@@ -60,7 +60,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
     }
   };
 
-  const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[150px]";
+  const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[154px]";
 
   // Don't render until mounted to prevent hydration mismatch
   if (!isMounted) {

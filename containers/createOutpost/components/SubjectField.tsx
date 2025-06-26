@@ -10,13 +10,20 @@ export const SubjectField = () => {
   const handleChange = (value: string) => {
     dispatch(createOutpostActions.setSubject(value));
   };
+  const error = useSelector(createOutpostSelectors.fieldError("subject"));
   return (
-    <div className="w-full max-w-[400px]">
+    <div className="w-full max-w-[400px] relative">
       <Input
         value={subject || ""}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Main Subject (optional)"
+        className={`${error ? "border-red-500" : ""}`}
       />
+      {error && (
+        <p className="text-red-500 text-sm absolute bottom-0 right-0">
+          {error}
+        </p>
+      )}
     </div>
   );
 };
