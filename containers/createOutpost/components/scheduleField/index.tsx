@@ -1,8 +1,8 @@
 "use client";
 import { useDispatch, useSelector } from "react-redux";
-import { Switch } from "../../../components/Switch";
-import { createOutpostActions } from "../slice";
-import { createOutpostSelectors } from "../selectors";
+import { Switch } from "../../../../components/Switch";
+import { createOutpostSelectors } from "../../selectors";
+import { createOutpostActions } from "../../slice";
 
 export const ScheduledField = () => {
   const dispatch = useDispatch();

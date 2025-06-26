@@ -6,7 +6,7 @@ import { EnterTypeField } from "./components/enterTypeField";
 import ImageSelector from "./components/ImageSelector";
 import { NameField } from "./components/NameField";
 import { RecordableField } from "./components/RecordableField";
-import { ScheduledField } from "./components/ScheduledField";
+import { ScheduledField } from "./components/scheduleField";
 import { SpeakField } from "./components/speakTypeField";
 import { SubjectField } from "./components/SubjectField";
 import { TagsField } from "./components/TagsField";
