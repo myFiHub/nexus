@@ -12,19 +12,23 @@ import {
 } from "../../../../components/Popover";
 import { createOutpostSelectors } from "../../selectors";
 import { createOutpostActions } from "../../slice";
+import { SelectUserButton } from "../enterTypeField/selectUserButton";
 
 export const SpeakField = () => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const allowedToSpeak = useSelector(createOutpostSelectors.allowedToSpeak);
+  const allowedToSpeak = useSelector(createOutpostSelectors.allowedToSpeakType);
   const handleChange = (value: string) => {
     dispatch(createOutpostActions.setAllowedToSpeak(value));
   };
   return (
-    <div className="w-full max-w-[400px]">
-      <div className="font-medium text-[15px] mb-1 relative">
-        Allowed to Speak
-      </div>
+    <div className="w-full max-w-[400px] relative">
+      <SelectUserButton
+        typeSelector={createOutpostSelectors.allowedToSpeakType}
+        sellerSelector={createOutpostSelectors.passSellersRequiredToSpeak}
+        actionToCallOnDone={createOutpostActions.setPassSellersRequiredToSpeak}
+      />
+      <div className="font-medium text-[15px] mb-1 ">Allowed to Speak</div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button

@@ -1,3 +1,4 @@
+import { BuyableTicketTypes } from "app/components/outpost/types";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -54,10 +55,16 @@ function* createOutpost(
     const params: CreateOutpostRequest = yield select(
       createOutpostSelectors.allFields
     );
-    if (!params.tickets_to_enter) {
+    if (
+      !params.tickets_to_enter ||
+      params.enter_type !== BuyableTicketTypes.onlyPodiumPassHolders
+    ) {
       params.tickets_to_enter = [];
     }
-    if (!params.tickets_to_speak) {
+    if (
+      !params.tickets_to_speak ||
+      params.speak_type !== BuyableTicketTypes.onlyPodiumPassHolders
+    ) {
       params.tickets_to_speak = [];
     }
     const validated: boolean = yield validateFields(params);

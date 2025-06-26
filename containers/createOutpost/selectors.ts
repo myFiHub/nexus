@@ -1,4 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
+import { BuyableTicketTypes } from "app/components/outpost/types";
+import { TicketToEnter, TicketToSpeak } from "app/services/api/types";
 import { RootState } from "app/store";
 
 export const createOutpostDomains = {
@@ -8,8 +10,8 @@ export const createOutpostDomains = {
   name: (store: RootState) => store.createOutpost.name,
   subject: (store: RootState) => store.createOutpost.subject,
   tags: (store: RootState) => store.createOutpost.tags,
-  allowedToEnter: (store: RootState) => store.createOutpost.allowedToEnter,
-  allowedToSpeak: (store: RootState) => store.createOutpost.allowedToSpeak,
+  allowedToEnterType: (store: RootState) => store.createOutpost.allowedToEnter,
+  allowedToSpeakType: (store: RootState) => store.createOutpost.allowedToSpeak,
   scheduled: (store: RootState) => store.createOutpost.scheduled,
   scheduledFor: (store: RootState) => store.createOutpost.scheduledFor,
   adults: (store: RootState) => store.createOutpost.adults,
@@ -28,8 +30,8 @@ export const createOutpostSelectors = {
   name: createOutpostDomains.name,
   subject: createOutpostDomains.subject,
   tags: createOutpostDomains.tags,
-  allowedToEnter: createOutpostDomains.allowedToEnter,
-  allowedToSpeak: createOutpostDomains.allowedToSpeak,
+  allowedToEnterType: createOutpostDomains.allowedToEnterType,
+  allowedToSpeakType: createOutpostDomains.allowedToSpeakType,
   scheduled: createOutpostDomains.scheduled,
   adults: createOutpostDomains.adults,
   recordable: createOutpostDomains.recordable,
@@ -43,12 +45,14 @@ export const createOutpostSelectors = {
       createOutpostDomains.name,
       createOutpostDomains.subject,
       createOutpostDomains.tags,
-      createOutpostDomains.allowedToEnter,
-      createOutpostDomains.allowedToSpeak,
+      createOutpostDomains.allowedToEnterType,
+      createOutpostDomains.allowedToSpeakType,
       createOutpostDomains.adults,
       createOutpostDomains.recordable,
       createOutpostDomains.scheduledFor,
       createOutpostDomains.image,
+      createOutpostDomains.passSellersRequiredToSpeak,
+      createOutpostDomains.passSellersRequiredToEnter,
     ],
     (
       name,
@@ -59,7 +63,9 @@ export const createOutpostSelectors = {
       adults,
       recordable,
       scheduledFor,
-      image
+      image,
+      passSellersRequiredToSpeak,
+      passSellersRequiredToEnter
     ) => ({
       name,
       subject,
@@ -70,6 +76,26 @@ export const createOutpostSelectors = {
       has_adult_content: adults,
       is_recordable: recordable,
       tags,
+      tickets_to_speak: Object.values(passSellersRequiredToSpeak || {}).map(
+        (user) => {
+          const ticket: TicketToSpeak = {
+            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
+            address: user.address,
+            user_uuid: user.uuid,
+          };
+          return ticket;
+        }
+      ),
+      tickets_to_enter: Object.values(passSellersRequiredToEnter || {}).map(
+        (user) => {
+          const ticket: TicketToEnter = {
+            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
+            address: user.address,
+            user_uuid: user.uuid,
+          };
+          return ticket;
+        }
+      ),
     })
   ),
 };

@@ -12,19 +12,23 @@ import {
 } from "../../../../components/Popover";
 import { createOutpostSelectors } from "../../selectors";
 import { createOutpostActions } from "../../slice";
+import { SelectUserButton } from "./selectUserButton";
 
 export const EnterTypeField = () => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
-  const allowedToEnter = useSelector(createOutpostSelectors.allowedToEnter);
+  const allowedToEnter = useSelector(createOutpostSelectors.allowedToEnterType);
   const handleChange = (value: string) => {
     dispatch(createOutpostActions.setAllowedToEnter(value));
   };
   return (
-    <div className="w-full max-w-[400px]">
-      <div className="font-medium text-[15px] mb-1 relative">
-        Allowed to Enter
-      </div>
+    <div className="w-full max-w-[400px] relative">
+      <SelectUserButton
+        typeSelector={createOutpostSelectors.allowedToEnterType}
+        sellerSelector={createOutpostSelectors.passSellersRequiredToEnter}
+        actionToCallOnDone={createOutpostActions.setPassSellersRequiredToEnter}
+      />
+      <div className="font-medium text-[15px] mb-1 ">Allowed to Enter</div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button

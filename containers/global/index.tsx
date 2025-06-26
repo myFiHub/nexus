@@ -1,4 +1,5 @@
 "use client";
+import { UserSelectDialogProvider } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { Toaster } from "app/components/toast";
 import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
@@ -31,6 +32,7 @@ const Container = () => {
     <>
       <Toaster richColors closeButton position="top-right" />
       <ConfirmDialogProvider />
+      <UserSelectDialogProvider />
       <OutpostAccessesDialogProvider />
     </>
   );

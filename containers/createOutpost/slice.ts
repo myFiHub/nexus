@@ -150,6 +150,18 @@ const createOutpostSlice = createSlice({
         state.passSellersRequiredToEnter[action.payload.uuid] = action.payload;
       }
     },
+    setPassSellersRequiredToSpeak: (
+      state,
+      action: PayloadAction<{ [uuid: string]: User }>
+    ) => {
+      state.passSellersRequiredToSpeak = action.payload;
+    },
+    setPassSellersRequiredToEnter: (
+      state,
+      action: PayloadAction<{ [uuid: string]: User }>
+    ) => {
+      state.passSellersRequiredToEnter = action.payload;
+    },
 
     submit: () => {},
 
