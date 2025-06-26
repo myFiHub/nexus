@@ -1,5 +1,5 @@
-import { OutpostHeaderActions } from "./actions";
-import { MuteUnmuteButton } from "./controlls/mute_unmute_button";
+import { Controlls } from "./actions";
+import { MuteUnmuteButton } from "./actions/mute_unmute_button";
 import { MyTimer } from "./myTimer";
 import { TitleAndDescription } from "./titleAndDescription";
 
@@ -27,7 +27,7 @@ export const OutpostHeader = () => {
 
           {/* Right side - Actions */}
           <div className="flex justify-center lg:justify-end lg:col-span-1 min-w-0">
-            <OutpostHeaderActions />
+            <Controlls />
           </div>
         </div>
       </div>

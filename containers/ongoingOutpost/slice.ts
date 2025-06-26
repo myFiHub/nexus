@@ -4,6 +4,7 @@ import { IncomingReactionType } from "app/services/wsClient/messageRouter";
 import { injectContainer } from "app/store";
 import { OutpostAccesses } from "../global/effects/types";
 import { onGoingOutpostSaga } from "./saga";
+import { confettiEventBus } from "./eventBusses/confetti";
 
 export interface OnGoingOutpostState {
   outpost?: OutpostModel;

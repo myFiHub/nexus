@@ -1,3 +1,4 @@
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../selectors";
@@ -5,10 +6,22 @@ import { onGoingOutpostActions } from "../slice";
 
 export const MeetEventListeners = () => {
   const dispatch = useDispatch();
+  const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
   const joined = useSelector(onGoingOutpostSelectors.joined);
   const firstTimeUnmuted = useRef(true);
+
+  const remainingTimeInSeconds = useSelector(
+    onGoingOutpostSelectors.remainingTimeInSeconds(myUser?.address)
+  );
+  const remainingTimeRef = useRef(remainingTimeInSeconds);
+
+  useEffect(() => {
+    if (remainingTimeInSeconds) {
+      remainingTimeRef.current = remainingTimeInSeconds;
+    }
+  }, [remainingTimeInSeconds]);
 
   const handleJoined = (joined: boolean) => {
     dispatch(onGoingOutpostActions.setJoined(joined));
@@ -38,6 +51,13 @@ export const MeetEventListeners = () => {
           firstTimeUnmuted.current = false;
           return;
         } else {
+          if (!isMuted) {
+            if (remainingTimeRef.current && remainingTimeRef.current <= 0) {
+              apiObj.executeCommand("toggleAudio");
+              return;
+            }
+          }
+
           dispatch(onGoingOutpostActions.setAmIMuted(isMuted));
           if (isMuted && joined) {
             dispatch(onGoingOutpostActions.stopSpeaking());

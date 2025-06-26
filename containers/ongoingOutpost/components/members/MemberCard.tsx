@@ -11,6 +11,7 @@ import { IsTalkingIndicator } from "./isTalkingIndicator";
 import { RemainingTimeText } from "./remainingTimeText";
 import { LikeAndDislike } from "./likeAndDislike";
 import { CheerAndBoo } from "./cheerAndBoo";
+import { ConfettiContainer } from "./confettiContainer";
 
 interface MemberCardProps {
   address: string;
@@ -30,6 +31,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
         isCurrentUser && "ring-2 ring-secondary/50"
       )}
     >
+      <ConfettiContainer address={address} />
       {/* IsTalkingIndicator in top-right corner */}
       <div className="absolute top-2 right-2 z-10">
         <IsTalkingIndicator address={address} />

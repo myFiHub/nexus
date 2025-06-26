@@ -7,7 +7,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
-import { Controlls } from "./header/controlls";
 import { MeetEventListeners } from "./listener";
 import { OngoingOutpostMembers } from "./members";
 

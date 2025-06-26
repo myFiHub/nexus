@@ -74,6 +74,15 @@ export const onGoingOutpostSelectors = {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
     }),
+  remainingTimeInSeconds: (id?: string) =>
+    createSelector([onGoingOutpostDomains.members], (liveMembers) => {
+      if (!id) {
+        return 0;
+      }
+      const member = liveMembers[id];
+      if (!member) return 0;
+      return member.remaining_time;
+    }),
   isCheeringAddress: onGoingOutpostDomains.isCheeringAddress,
   isBooingAddress: onGoingOutpostDomains.isBooingAddress,
   joined: onGoingOutpostDomains.joined,

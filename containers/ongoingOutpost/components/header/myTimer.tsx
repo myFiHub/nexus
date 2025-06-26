@@ -7,6 +7,8 @@ export const MyTimer = () => {
   const myRemainingTime = useSelector(
     onGoingOutpostSelectors.remainingTime(myUser?.address)
   );
+  const outpost = useSelector(onGoingOutpostSelectors.outpost);
+  const iAmCreator = myUser?.uuid === outpost?.creator_user_uuid;
 
   // Convert time string (HH:MM:SS) to total seconds
   const getTimeInSeconds = (timeString: string | number) => {
@@ -33,14 +35,14 @@ export const MyTimer = () => {
     <div className={`px-4 py-3 ${isLessThanOneMinute ? "animate-pulse" : ""}`}>
       <div className="text-center">
         <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
-          Remaining Time
+          {!iAmCreator ? "Remaining Time" : ""}
         </div>
         <div
           className={`text-lg sm:text-xl lg:text-2xl font-mono font-bold ${
             isLessThanOneMinute ? "text-red-500" : "text-foreground"
           }`}
         >
-          {myRemainingTime || "00:00:00"}
+          {iAmCreator ? "Creator" : myRemainingTime || "00:00:00"}
         </div>
       </div>
     </div>

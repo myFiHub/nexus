@@ -21,6 +21,7 @@ import { all, put, select, takeLatest } from "redux-saga/effects";
 import { EasyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
+import { confettiEventBus } from "./eventBusses/confetti";
 import { onGoingOutpostDomains, onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions } from "./slice";
 
@@ -363,6 +364,13 @@ function* clockTicked() {
   }
 }
 
+function* incomingUserReaction(
+  action: ReturnType<typeof onGoingOutpostActions.incomingUserReaction>
+) {
+  const { userAddress: address, reaction } = action.payload;
+  confettiEventBus.next({ address, type: reaction });
+}
+
 export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.getOutpost, getOutpost);
   yield takeLatest(onGoingOutpostActions.leaveOutpost, leaveOutpost);
@@ -373,5 +381,9 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
   yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield takeLatest(
+    onGoingOutpostActions.incomingUserReaction,
+    incomingUserReaction
+  );
   yield takeLatest(globalActions.increaseTick_, clockTicked);
 }

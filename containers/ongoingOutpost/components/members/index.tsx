@@ -24,7 +24,7 @@ export const OngoingOutpostMembers = memo(
     // Show loading state when getting live members
     if (isGettingLiveMembers || numberOfMembers === 0) {
       return (
-        <div className="absolute top-0 left-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-50">
+        <div className="absolute top-0 right-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-50">
           <div className="flex items-center gap-2 mb-3">
             <Users className="w-5 h-5 text-primary" />
             <h3 className="font-semibold text-sm">Live Members</h3>
