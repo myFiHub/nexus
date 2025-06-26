@@ -1,9 +1,14 @@
+import {
+  reminderDialog,
+  ReminderDialogResult,
+} from "app/components/Dialog/reminder";
 import { BuyableTicketTypes } from "app/components/outpost/types";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
   CreateOutpostRequest,
   OutpostModel,
+  SetOrRemoveReminderRequest,
   UpdateOutpostRequest,
 } from "app/services/api/types";
 import { outpostImageService } from "app/services/imageUpload";
@@ -95,6 +100,36 @@ function* createOutpost(
       );
       if (!updatedOutpost) {
         toast.error("Failed to upload the image, change it later");
+      }
+
+      if (params.scheduled_for) {
+        const reminderMinutes: ReminderDialogResult = yield reminderDialog({
+          title: "Set Reminder",
+          content: "Do you want to be reminded to attend this outpost?",
+          scheduledFor: params.scheduled_for,
+          confirmOpts: {
+            text: "confirm",
+          },
+          cancelOpts: {
+            text: "close",
+          },
+        });
+        if (reminderMinutes.confirmed) {
+          const minutesBefore = reminderMinutes.reminderMinutes ?? 0;
+
+          const remindRequest: SetOrRemoveReminderRequest = {
+            uuid: outpost.uuid,
+            reminder_offset_minutes:
+              // -1 means remove the reminder
+              minutesBefore !== -1 ? minutesBefore : undefined,
+          };
+          const isSetReminder: boolean = yield podiumApi.setOrRemoveReminder(
+            remindRequest
+          );
+          if (!isSetReminder) {
+            toast.error("Failed to set reminder");
+          }
+        }
       }
       yield put(createOutpostActions.setIsSubmitting(false));
       yield put(createOutpostActions.reset());

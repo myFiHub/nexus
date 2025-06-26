@@ -33,6 +33,7 @@ export const createOutpostSelectors = {
   allowedToEnterType: createOutpostDomains.allowedToEnterType,
   allowedToSpeakType: createOutpostDomains.allowedToSpeakType,
   scheduled: createOutpostDomains.scheduled,
+  scheduledFor: createOutpostDomains.scheduledFor,
   adults: createOutpostDomains.adults,
   recordable: createOutpostDomains.recordable,
   reminderOffsetMinutes: createOutpostDomains.reminderOffsetMinutes,

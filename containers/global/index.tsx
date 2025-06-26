@@ -1,6 +1,8 @@
 "use client";
+import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
 import { UserSelectDialogProvider } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
+import { ReminderDialogProvider } from "app/components/Dialog/reminder";
 import { Toaster } from "app/components/toast";
 import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
 import { ReduxProvider } from "app/store/Provider";
@@ -34,6 +36,8 @@ const Container = () => {
       <ConfirmDialogProvider />
       <UserSelectDialogProvider />
       <OutpostAccessesDialogProvider />
+      <DateTimePickerDialogProvider />
+      <ReminderDialogProvider />
     </>
   );
 };
