@@ -53,17 +53,24 @@ var boo = confetti.shapeFromPath({
   path: "M13 13c-2.757 0 -5 2.243 -5 5c0 2.757 2.243 5 5 5c2.757 0 5 -2.243 5 -5c0 -2.757 -2.243 -5 -5 -5l0 0zM13 21c-1.657 0 -3 -1.343 -3 -3c0 -1.657 1.343 -3 3 -3c1.657 0 3 1.343 3 3c0 1.657 -1.343 3 -3 3l0 0zM31 13c-2.757 0 -5 2.243 -5 5c0 2.757 2.243 5 5 5c2.757 0 5 -2.243 5 -5c0 -2.757 -2.243 -5 -5 -5l0 0zM31 21c-1.657 0 -3 -1.343 -3 -3c0 -1.657 1.343 -3 3 -3c1.657 0 3 1.343 3 3c0 1.657 -1.343 3 -3 3l0 0zM22 0c-12.131 0 -22 9.869 -22 22c0 12.131 9.869 22 22 22c12.131 0 22 -9.869 22 -22c0 -12.131 -9.869 -22 -22 -22l0 0zM23.948 11.258l6.381 -5.77c0.41 -0.369 1.041 -0.338 1.413 0.072c0.37 0.41 0.338 1.042 -0.071 1.413l-6.381 5.769c-0.191 0.173 -0.432 0.258 -0.671 0.258c-0.272 0 -0.544 -0.111 -0.742 -0.329c-0.37 -0.41 -0.338 -1.042 0.071 -1.413l0 0zM12.258 5.56c0.373 -0.41 1.004 -0.441 1.413 -0.072l7.723 5.698c0.41 0.371 0.442 1.003 0.072 1.413c-0.198 0.218 -0.47 0.329 -0.742 0.329c-0.239 0 -0.48 -0.085 -0.671 -0.258l-6.381 -5.769c-0.41 -0.371 -0.442 -1.003 -0.072 -1.413l0 0zM6 18c0 -3.859 3.141 -7 7 -7c3.859 0 7 3.141 7 7c0 3.859 -3.141 7 -7 7c-3.859 0 -7 -3.141 -7 -7l0 0zM22 38c-3.309 0 -6 -2.691 -6 -6c0 -3.309 2.691 -6 6 -6c3.309 0 6 2.691 6 6c0 3.309 -2.691 6 -6 6l0 0zM31 25c-3.859 0 -7 -3.141 -7 -7c0 -3.859 3.141 -7 7 -7c3.859 0 7 3.141 7 7c0 3.859 -3.141 7 -7 7l0 0z",
   matrix: [0.025, 0, 0, 0.025, -1.1, -0.55],
 });
+
+const likeColors = ["#4CAF50", "#45a049", "#66BB6A"];
+const dislikeColors = ["#f44336", "#d32f2f", "#ef5350"];
+const cheerColors = ["#4CAF50", "#45a049", "#66BB6A"];
+const booColors = ["#f44336", "#d32f2f", "#ef5350"];
+const heartColors = ["#f93963", "#a10864", "#ee0b93"];
+
 function randomInRange(min: number, max: number) {
   return Math.random() * (max - min) + min;
 }
+
 var defaults: confetti.Options = {
   angle: randomInRange(55, 125),
-  particleCount: 10,
+  particleCount: 5,
   scalar: 45,
 
   spread: 360,
   ticks: 50,
-  gravity: 0,
   decay: 0.94,
   startVelocity: 5,
 
@@ -71,7 +78,32 @@ var defaults: confetti.Options = {
 };
 
 export const ConfettiContainer = ({ address }: { address: string }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  // Event tracking for special effects - persist across renders
+
+  function getConfettiConfig(type: IncomingMessageType): {
+    shapes: any[];
+    colors: string[];
+    gravity: number;
+  } {
+    switch (type) {
+      case IncomingMessageType.USER_LIKED:
+        return { shapes: [like, "star"], colors: likeColors, gravity: -1 };
+      case IncomingMessageType.USER_DISLIKED:
+        return {
+          shapes: [dislike, "star"],
+          colors: dislikeColors,
+          gravity: 1,
+        };
+      case IncomingMessageType.USER_CHEERED:
+        return { shapes: [cheer, "star"], colors: cheerColors, gravity: -1 };
+      case IncomingMessageType.USER_BOOED:
+        return { shapes: [boo, "star"], colors: booColors, gravity: 1 };
+      default:
+        return { shapes: [heart], colors: heartColors, gravity: 1 };
+    }
+  }
+
   useEffect(() => {
     let subscription: Subscription;
     if (address) {
@@ -81,37 +113,21 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
         if (address === address) {
           const shoot = () => {
             const canvas = canvasRef.current!;
-            const canvasConfetti = confetti.create(canvas, { resize: true });
-            let confettiShape;
-            let confettiColors;
 
-            switch (type) {
-              case IncomingMessageType.USER_LIKED:
-                confettiShape = [like];
-                confettiColors = ["#4CAF50", "#45a049", "#66BB6A"];
-                break;
-              case IncomingMessageType.USER_DISLIKED:
-                confettiShape = [dislike];
-                confettiColors = ["#f44336", "#d32f2f", "#ef5350"];
-                break;
-              case IncomingMessageType.USER_CHEERED:
-                confettiShape = [cheer];
-                confettiColors = ["#4CAF50", "#45a049", "#66BB6A"];
-                break;
-              case IncomingMessageType.USER_BOOED:
-                confettiShape = [boo];
-                confettiColors = ["#f44336", "#d32f2f", "#ef5350"];
-                break;
-              default:
-                confettiShape = [heart];
-                confettiColors = ["#f93963", "#a10864", "#ee0b93"];
-                break;
-            }
+            const canvasConfetti = confetti.create(canvas, {
+              resize: false,
+              useWorker: false,
+            });
+
+            // If special effect should be triggered, do that instead
+
+            const { shapes, colors, gravity } = getConfettiConfig(type);
 
             canvasConfetti({
               ...defaults,
-              shapes: confettiShape,
-              colors: confettiColors,
+              gravity,
+              shapes,
+              colors,
             });
           };
           shoot();
@@ -122,13 +138,6 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
       subscription?.unsubscribe();
     };
   }, [address]);
-
-  const shoot = () => {
-    confettiEventBus.next({
-      address,
-      type: IncomingMessageType.USER_LIKED,
-    });
-  };
 
   return (
     <div className="absolute top-0 left-0 w-full h-full">
