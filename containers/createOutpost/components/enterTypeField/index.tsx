@@ -1,16 +1,19 @@
 "use client";
-import { allowedToEnterOptions } from "app/components/outpost/types";
+import {
+  allowedToEnterOptions,
+  serverEnterTypeToText,
+} from "app/components/outpost/types";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "../../../components/Popover";
-import { createOutpostSelectors } from "../selectors";
-import { createOutpostActions } from "../slice";
+} from "../../../../components/Popover";
+import { createOutpostSelectors } from "../../selectors";
+import { createOutpostActions } from "../../slice";
 
-export const AccessField = () => {
+export const EnterTypeField = () => {
   const [open, setOpen] = useState(false);
   const dispatch = useDispatch();
   const allowedToEnter = useSelector(createOutpostSelectors.allowedToEnter);
@@ -19,17 +22,16 @@ export const AccessField = () => {
   };
   return (
     <div className="w-full max-w-[400px]">
-      <div className="font-medium text-[15px] mb-1">Allowed to Enter</div>
+      <div className="font-medium text-[15px] mb-1 relative">
+        Allowed to Enter
+      </div>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <button
             type="button"
             className="w-full bg-white/60 text-slate-900 dark:bg-[#181f29] dark:text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-slate-200 dark:hover:bg-[#232b36] focus:bg-slate-200 dark:focus:bg-[#232b36] transition-colors outline-none cursor-pointer"
           >
-            {
-              allowedToEnterOptions.find((item) => item.value == allowedToEnter)
-                ?.text
-            }
+            {serverEnterTypeToText(allowedToEnter)}
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start" sideOffset={4}>

@@ -1,13 +1,13 @@
 "use client";
 import { ReduxProvider } from "app/store/Provider";
-import { AccessField } from "./components/AccessField";
 import { AdultsField } from "./components/AdultsField";
 import CreateButton from "./components/CreateButton";
+import { EnterTypeField } from "./components/enterTypeField";
 import ImageSelector from "./components/ImageSelector";
 import { NameField } from "./components/NameField";
 import { RecordableField } from "./components/RecordableField";
 import { ScheduledField } from "./components/ScheduledField";
-import { SpeakField } from "./components/SpeakField";
+import { SpeakField } from "./components/speakTypeField";
 import { SubjectField } from "./components/SubjectField";
 import { TagsField } from "./components/TagsField";
 import { useCreateOutpostSlice } from "./slice";
@@ -52,7 +52,7 @@ const Content = () => {
                 <NameField />
                 <SubjectField />
                 <TagsField />
-                <AccessField />
+                <EnterTypeField />
                 <SpeakField />
                 <ScheduledField />
                 <AdultsField />

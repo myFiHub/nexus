@@ -21,8 +21,6 @@ import { EasyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
 
 const BuyableTicketTypes = {
-  onlyFriendTechTicketHolders: "friend_tech_key_holders",
-  onlyArenaTicketHolders: "arena_ticket_holders",
   onlyPodiumPassHolders: "podium_pass_holders",
 } as const;
 
@@ -234,20 +232,12 @@ function* openOutpost({
 
 export const accessIsBuyableByTicket = (outpost: OutpostModel): boolean => {
   const groupAccessType = outpost.enter_type;
-  return (
-    groupAccessType === BuyableTicketTypes.onlyArenaTicketHolders ||
-    groupAccessType === BuyableTicketTypes.onlyFriendTechTicketHolders ||
-    groupAccessType === BuyableTicketTypes.onlyPodiumPassHolders
-  );
+  return groupAccessType === BuyableTicketTypes.onlyPodiumPassHolders;
 };
 
 export const speakIsBuyableByTicket = (outpost: OutpostModel): boolean => {
   const groupSpeakType = outpost.speak_type;
-  return (
-    groupSpeakType === BuyableTicketTypes.onlyArenaTicketHolders ||
-    groupSpeakType === BuyableTicketTypes.onlyFriendTechTicketHolders ||
-    groupSpeakType === BuyableTicketTypes.onlyPodiumPassHolders
-  );
+  return groupSpeakType === BuyableTicketTypes.onlyPodiumPassHolders;
 };
 
 export const canEnterWithoutATicket = (outpost: OutpostModel): boolean => {

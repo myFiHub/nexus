@@ -1,24 +1,22 @@
 export const BuyableTicketTypes = {
-  onlyFriendTechTicketHolders: "friend_tech_key_holders",
-  onlyArenaTicketHolders: "arena_ticket_holders",
   onlyPodiumPassHolders: "podium_pass_holders",
 } as const;
 
-export const FreeOutpostAccessTypes = {
+export const FreeOutpostEnterTypes = {
   public: "everyone",
   onlyLink: "having_link",
   invited_users: "invited_users",
 } as const;
 
 export const FreeOutpostSpeakerTypes = {
-  everyone: FreeOutpostAccessTypes.public,
-  invited_users: FreeOutpostAccessTypes.invited_users,
+  everyone: FreeOutpostEnterTypes.public,
+  invited_users: FreeOutpostEnterTypes.invited_users,
 } as const;
 
 export const allowedToEnterOptions = [
-  { value: FreeOutpostAccessTypes.public, text: "Everyone" },
-  { value: FreeOutpostAccessTypes.onlyLink, text: "Users Having the Link" },
-  { value: FreeOutpostAccessTypes.invited_users, text: "Only Invited Users" },
+  { value: FreeOutpostEnterTypes.public, text: "Everyone" },
+  { value: FreeOutpostEnterTypes.onlyLink, text: "Users Having the Link" },
+  { value: FreeOutpostEnterTypes.invited_users, text: "Only Invited Users" },
   {
     value: BuyableTicketTypes.onlyPodiumPassHolders,
     text: "Podium Pass Holders",
@@ -34,12 +32,12 @@ export const allowedToSpeakOptions = [
   },
 ];
 
-export const serverAccessTypeToText = (accessType: string) => {
-  if (accessType === FreeOutpostAccessTypes.public) {
+export const serverEnterTypeToText = (accessType: string) => {
+  if (accessType === FreeOutpostEnterTypes.public) {
     return "Everyone";
-  } else if (accessType === FreeOutpostAccessTypes.onlyLink) {
+  } else if (accessType === FreeOutpostEnterTypes.onlyLink) {
     return "Users Having the Link";
-  } else if (accessType === FreeOutpostAccessTypes.invited_users) {
+  } else if (accessType === FreeOutpostEnterTypes.invited_users) {
     return "Only Invited Users";
   } else if (accessType === BuyableTicketTypes.onlyPodiumPassHolders) {
     return "Podium Pass Holders";

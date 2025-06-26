@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import {
-  FreeOutpostAccessTypes,
+  FreeOutpostEnterTypes,
   FreeOutpostSpeakerTypes,
 } from "app/components/outpost/types";
+import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { createOutpostSaga } from "./saga";
 
@@ -19,6 +20,12 @@ export interface CreateOutpostState {
   selectedImage?: File;
   isCreating: boolean;
   reminder_offset_minutes?: number;
+  passSellersRequiredToSpeak: {
+    [uuid: string]: User;
+  };
+  passSellersRequiredToEnter: {
+    [uuid: string]: User;
+  };
   error?: {
     name?: string;
     subject?: string;
@@ -30,13 +37,14 @@ const initialState: CreateOutpostState = {
   name: "",
   subject: "",
   tags: [],
-  allowedToEnter: FreeOutpostAccessTypes.public,
+  allowedToEnter: FreeOutpostEnterTypes.public,
   allowedToSpeak: FreeOutpostSpeakerTypes.everyone,
   scheduled: false,
   scheduledFor: 0,
   adults: false,
   recordable: false,
-
+  passSellersRequiredToSpeak: {},
+  passSellersRequiredToEnter: {},
   selectedImage: undefined,
   isCreating: false,
   error: undefined,
@@ -128,7 +136,23 @@ const createOutpostSlice = createSlice({
     setReminderOffsetMinutes: (state, action: PayloadAction<number>) => {
       state.reminder_offset_minutes = action.payload;
     },
+    togglePassSellerRequiredToSpeak: (state, action: PayloadAction<User>) => {
+      if (state.passSellersRequiredToSpeak[action.payload.uuid]) {
+        delete state.passSellersRequiredToSpeak[action.payload.uuid];
+      } else {
+        state.passSellersRequiredToSpeak[action.payload.uuid] = action.payload;
+      }
+    },
+    togglePassSellerRequiredToEnter: (state, action: PayloadAction<User>) => {
+      if (state.passSellersRequiredToEnter[action.payload.uuid]) {
+        delete state.passSellersRequiredToEnter[action.payload.uuid];
+      } else {
+        state.passSellersRequiredToEnter[action.payload.uuid] = action.payload;
+      }
+    },
+
     submit: () => {},
+
     reset: () => {
       return initialState;
     },

@@ -16,6 +16,10 @@ export const createOutpostDomains = {
   recordable: (store: RootState) => store.createOutpost.recordable,
   reminderOffsetMinutes: (store: RootState) =>
     store.createOutpost.reminder_offset_minutes,
+  passSellersRequiredToSpeak: (store: RootState) =>
+    store.createOutpost.passSellersRequiredToSpeak,
+  passSellersRequiredToEnter: (store: RootState) =>
+    store.createOutpost.passSellersRequiredToEnter,
 };
 export const createOutpostSelectors = {
   image: createOutpostDomains.image,
@@ -32,6 +36,8 @@ export const createOutpostSelectors = {
   reminderOffsetMinutes: createOutpostDomains.reminderOffsetMinutes,
   fieldError: (field: "name" | "subject" | "tags") =>
     createSelector([createOutpostDomains.error], (error) => error?.[field]),
+  passSellersRequiredToSpeak: createOutpostDomains.passSellersRequiredToSpeak,
+  passSellersRequiredToEnter: createOutpostDomains.passSellersRequiredToEnter,
   allFields: createSelector(
     [
       createOutpostDomains.name,

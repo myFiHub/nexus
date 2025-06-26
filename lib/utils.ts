@@ -37,7 +37,7 @@ export function getTimerInfo(
     const secs = seconds % 60;
 
     if (days > 0) {
-      return `${days.toString().padStart(2, "0")}d ${hours
+      return `${days.toString()} days ${hours
         .toString()
         .padStart(2, "0")}:${minutes.toString().padStart(2, "0")}:${secs
         .toString()

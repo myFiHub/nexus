@@ -1,8 +1,8 @@
 import { OutpostModel } from "app/services/api/types";
-import { AccessAndSpeakIndicators } from "./accessAndSpeakIndicators";
 import { OutpostCardActions } from "./actions";
 import { ContentSection } from "./ContentSection";
 import { CreatorSection } from "./CreatorSection";
+import { EnterAndSpeakIndicators } from "./enterAndSpeakIndicators";
 import { ImageSection } from "./ImageSection";
 
 interface OutpostCardProps {
@@ -18,7 +18,7 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
       <div className="p-5 flex-1 flex flex-col">
         <ContentSection name={outpost.name} subject={outpost.subject} />
         <CreatorSection outpost={outpost} />
-        <AccessAndSpeakIndicators outpost={outpost} />
+        <EnterAndSpeakIndicators outpost={outpost} />
         <OutpostCardActions outpost={outpost} />
       </div>
     </div>

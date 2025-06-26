@@ -1,7 +1,7 @@
 import {
-  FreeOutpostAccessTypes,
+  FreeOutpostEnterTypes,
   FreeOutpostSpeakerTypes,
-  serverAccessTypeToText,
+  serverEnterTypeToText,
   serverSpeakerTypeToText,
 } from "app/components/outpost/types";
 import { formatDistanceToNow } from "date-fns";
@@ -21,35 +21,43 @@ export function EventDetails({ outpost }: EventDetailsProps) {
       <h2 className="text-2xl font-semibold mb-4">Event Details</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="flex items-start gap-3">
-          <Calendar className="w-5 h-5 text-primary mt-1" />
-          <div>
-            <p className="font-medium">Scheduled For</p>
-            <p className="text-muted-foreground">
-              {scheduledDate.toLocaleString(undefined, {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+        {outpost.scheduled_for ? (
+          <div className="flex items-start gap-3">
+            <Calendar className="w-5 h-5 text-primary mt-1" />
+            <div>
+              <p className="font-medium">Scheduled For</p>
+              <p className="text-muted-foreground">
+                {scheduledDate.toLocaleString(undefined, {
+                  weekday: "long",
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
 
-        <div className="flex items-start gap-3">
-          <Clock className="w-5 h-5 text-primary mt-1" />
-          <div>
-            <p className="font-medium">Time Until</p>
-            <p className="text-muted-foreground">{timeUntil}</p>
+        {outpost.scheduled_for ? (
+          <div className="flex items-start gap-3">
+            <Clock className="w-5 h-5 text-primary mt-1" />
+            <div>
+              <p className="font-medium">Time Until</p>
+              <p className="text-muted-foreground">{timeUntil}</p>
+            </div>
           </div>
-        </div>
+        ) : (
+          <></>
+        )}
 
         <div className="flex items-start gap-3">
           <Shield
-            className={`w-5 h-5 text-primary mt-1 ${
-              outpost.enter_type === FreeOutpostAccessTypes.public
+            className={`w-5 h-5  mt-1 ${
+              outpost.enter_type === FreeOutpostEnterTypes.public
                 ? "text-green-500"
                 : "text-red-500"
             }`}
@@ -57,14 +65,14 @@ export function EventDetails({ outpost }: EventDetailsProps) {
           <div>
             <p className="font-medium">Access Type</p>
             <p className="text-muted-foreground capitalize">
-              {serverAccessTypeToText(outpost.enter_type)}
+              {serverEnterTypeToText(outpost.enter_type)}
             </p>
           </div>
         </div>
 
-        <div className="flex items-start gap-3 text-red-600">
+        <div className="flex items-start gap-3 ">
           <Mic
-            className={`w-5 h-5 text-primary mt-1 ${
+            className={`w-5 h-5  mt-1 ${
               outpost.speak_type === FreeOutpostSpeakerTypes.everyone
                 ? "text-green-500"
                 : "text-red-500"

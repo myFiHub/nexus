@@ -3,26 +3,22 @@ import { Mic, MicOff, Unlock } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../../../Tooltip";
 import {
   BuyableTicketTypes,
-  FreeOutpostAccessTypes,
+  FreeOutpostEnterTypes,
   FreeOutpostSpeakerTypes,
-  serverAccessTypeToText,
+  serverEnterTypeToText,
   serverSpeakerTypeToText,
 } from "../../types";
 import { LockActionIcon } from "./lockActionIcon";
 
 const tooltipExplanation = {
   // Access types
-  [FreeOutpostAccessTypes.public]: "Everyone can enter this outpost",
-  [FreeOutpostAccessTypes.onlyLink]:
+  [FreeOutpostEnterTypes.public]: "Everyone can enter this outpost",
+  [FreeOutpostEnterTypes.onlyLink]:
     "Only users with the link can enter this outpost",
-  [FreeOutpostAccessTypes.invited_users]:
+  [FreeOutpostEnterTypes.invited_users]:
     "Only invited users can enter this outpost",
   [BuyableTicketTypes.onlyPodiumPassHolders]:
     "Only Podium Pass holders can enter this outpost",
-  [BuyableTicketTypes.onlyFriendTechTicketHolders]:
-    "Only Friend Tech key holders can enter this outpost",
-  [BuyableTicketTypes.onlyArenaTicketHolders]:
-    "Only Arena ticket holders can enter this outpost",
 };
 
 const speakTooltipExplanation = {
@@ -33,7 +29,7 @@ const speakTooltipExplanation = {
     "Only Podium Pass holders can speak in this outpost",
 };
 
-export const AccessAndSpeakIndicators = ({
+export const EnterAndSpeakIndicators = ({
   outpost,
 }: {
   outpost: OutpostModel;
@@ -50,13 +46,13 @@ export const AccessAndSpeakIndicators = ({
                 : ""
             }`}
           >
-            {outpost.enter_type === FreeOutpostAccessTypes.public ? (
+            {outpost.enter_type === FreeOutpostEnterTypes.public ? (
               <Unlock className="w-4 h-4 text-green-500" />
             ) : (
               <LockActionIcon outpost={outpost} />
             )}
             <span className="capitalize">
-              {serverAccessTypeToText(outpost.enter_type)}
+              {serverEnterTypeToText(outpost.enter_type)}
             </span>
           </div>
         </TooltipTrigger>
