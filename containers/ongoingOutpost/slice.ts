@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { LiveMember, OutpostModel } from "app/services/api/types";
+import { LiveMember, OutpostModel, User } from "app/services/api/types";
 import { IncomingReactionType } from "app/services/wsClient/messageRouter";
 import { injectContainer } from "app/store";
 import { OutpostAccesses } from "../global/effects/types";
@@ -12,6 +12,12 @@ export interface OnGoingOutpostState {
   isGettingLiveMembers: boolean;
   isCheeringAddress?: string;
   isBooingAddress?: string;
+  amIMuted: boolean;
+  meetApiObj?: any;
+  raisedHandUsers: {
+    [address: string]: LiveMember;
+  };
+  joined: boolean;
   liveMembers: {
     [address: string]: LiveMember;
   };
@@ -22,6 +28,9 @@ export const initialState: OnGoingOutpostState = {
   isGettingLiveMembers: false,
   accesses: { canEnter: false, canSpeak: false },
   liveMembers: {},
+  amIMuted: true,
+  joined: false,
+  raisedHandUsers: {},
 };
 
 const onGoingOutpostSlice = createSlice({
@@ -111,6 +120,24 @@ const onGoingOutpostSlice = createSlice({
         ...state.liveMembers[action.payload.userAddress],
         is_speaking: false,
       };
+    },
+    setAmIMuted(state, action: PayloadAction<boolean>) {
+      state.amIMuted = action.payload;
+    },
+    setMeetApiObj(state, action: PayloadAction<any>) {
+      state.meetApiObj = action.payload;
+    },
+    setJoined(state, action: PayloadAction<boolean>) {
+      state.joined = action.payload;
+    },
+    addToRaisedHand(
+      state,
+      action: PayloadAction<{ address: string; user: LiveMember }>
+    ) {
+      state.raisedHandUsers[action.payload.address] = action.payload.user;
+    },
+    removeFromRaisedHand(state, action: PayloadAction<string>) {
+      delete state.raisedHandUsers[action.payload];
     },
   },
 });

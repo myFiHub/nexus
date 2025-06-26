@@ -13,10 +13,16 @@ export const onGoingOutpostDomains = {
   isCheeringAddress: (state: RootState) =>
     state.onGoingOutpost.isCheeringAddress,
   isBooingAddress: (state: RootState) => state.onGoingOutpost.isBooingAddress,
+  amIMuted: (state: RootState) => state.onGoingOutpost.amIMuted,
+  meetApiObj: (state: RootState) => state.onGoingOutpost.meetApiObj,
+  joined: (state: RootState) => state.onGoingOutpost.joined,
+  raisedHandUsers: (state: RootState) => state.onGoingOutpost.raisedHandUsers,
 };
 
 export const onGoingOutpostSelectors = {
   outpost: onGoingOutpostDomains.outpost,
+  amIMuted: onGoingOutpostDomains.amIMuted,
+  meetApiObj: onGoingOutpostDomains.meetApiObj,
   isGettingOutpost: onGoingOutpostDomains.isGettingOutpost,
   isGettingLiveMembers: onGoingOutpostDomains.isGettingLiveMembers,
   accesses: onGoingOutpostDomains.accesses,
@@ -53,8 +59,11 @@ export const onGoingOutpostSelectors = {
       [onGoingOutpostDomains.members],
       (liveMembers) => liveMembers[id]?.is_speaking ?? false
     ),
-  remainingTime: (id: string) =>
+  remainingTime: (id?: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {
+      if (!id) {
+        return 0;
+      }
       const member = liveMembers[id];
       if (!member) return 0;
       // remaining time is in seconds, so formatted remaining time in hours, minutes and seconds
@@ -67,4 +76,16 @@ export const onGoingOutpostSelectors = {
     }),
   isCheeringAddress: onGoingOutpostDomains.isCheeringAddress,
   isBooingAddress: onGoingOutpostDomains.isBooingAddress,
+  joined: onGoingOutpostDomains.joined,
+  raisedHandUsers: onGoingOutpostDomains.raisedHandUsers,
+  isHandRaised: (address?: string) =>
+    createSelector(
+      [onGoingOutpostDomains.raisedHandUsers],
+      (raisedHandUsers) => {
+        if (!address) {
+          return false;
+        }
+        return raisedHandUsers[address] !== undefined;
+      }
+    ),
 };

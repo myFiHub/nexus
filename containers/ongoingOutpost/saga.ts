@@ -17,7 +17,7 @@ import {
   OutgoingMessageType,
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { put, select, takeLatest } from "redux-saga/effects";
+import { all, put, select, takeLatest } from "redux-saga/effects";
 import { EasyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
@@ -47,10 +47,16 @@ function* leaveOutpost(
   action: ReturnType<typeof onGoingOutpostActions.leaveOutpost>
 ) {
   const outpost = action.payload;
-  yield put(onGoingOutpostActions.setOutpost(undefined));
-  yield put(
-    onGoingOutpostActions.setAccesses({ canEnter: false, canSpeak: false })
-  );
+
+  yield all([
+    put(onGoingOutpostActions.setOutpost(undefined)),
+    put(
+      onGoingOutpostActions.setAccesses({ canEnter: false, canSpeak: false })
+    ),
+    put(onGoingOutpostActions.setMeetApiObj(undefined)),
+    put(onGoingOutpostActions.setJoined(false)),
+    put(onGoingOutpostActions.setAmIMuted(true)),
+  ]);
   const leaveMessage: OutgoingMessage = {
     message_type: OutgoingMessageType.LEAVE,
     outpost_uuid: outpost.uuid,
@@ -280,6 +286,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
         outpost_uuid: outpost.uuid,
         data: {
           chain_id: 126,
+          amount: Number(amount),
           react_to_user_address: targetUserAddress,
           tx_hash: resultFromScInteraction[1]!,
         },

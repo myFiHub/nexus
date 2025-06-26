@@ -2,29 +2,25 @@ import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
-import { useRouter } from "next/navigation";
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
+import { Controlls } from "./header/controlls";
+import { MeetEventListeners } from "./listener";
 import { OngoingOutpostMembers } from "./members";
 
 export const Meet = memo(
   () => {
     const dispatch = useDispatch();
-    const router = useRouter();
-    const [showIframe, setShowIframe] = useState(true);
-
-    const joined = useRef(false);
-    const firstTimeUnmuted = useRef(true);
 
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const accesses = useSelector(onGoingOutpostSelectors.accesses);
 
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+    const joined = useSelector(onGoingOutpostSelectors.joined);
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
-    const apiRef = useRef<any>(null);
     useEffect(() => {
       if (outpost?.uuid && !accesses?.canEnter) {
         dispatch(globalActions.joinOutpost({ outpost }));
@@ -49,53 +45,18 @@ export const Meet = memo(
     }
 
     const handleApiReady = (apiObj: any) => {
-      console.log("Outpost API is ready");
-      apiRef.current = apiObj;
-      apiObj.addListener("videoConferenceJoined", () => {
-        console.log("Conference joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        joined.current = true;
-      });
-
-      apiObj.addListener("videoConferenceLeft", () => {
-        console.log("Conference left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        setShowIframe(false);
-        joined.current = false;
-        dispatch(onGoingOutpostActions.leaveOutpost(outpost));
-      });
-      // Listen to audio mute status changes
-      apiObj.addListener(
-        "audioMuteStatusChanged",
-        ({ muted: isMuted }: { muted: boolean }) => {
-          console.log("Audio mute status changed:", isMuted);
-          if (firstTimeUnmuted.current) {
-            firstTimeUnmuted.current = false;
-            return;
-          } else {
-            if (isMuted && joined.current) {
-              dispatch(onGoingOutpostActions.stopSpeaking());
-            } else if (!isMuted && joined.current) {
-              dispatch(onGoingOutpostActions.startSpeaking());
-            }
-          }
-        }
-      );
-
-      apiObj.addListener("participantLeft", (id: string) => {
-        console.log("Participant left:", id);
-      });
-
-      apiObj.addListener("participantJoined", (id: string) => {
-        console.log("Participant joined:", id);
-      });
+      // set apiObj to redux to be read and listened to in Listener component
+      dispatch(onGoingOutpostActions.setMeetApiObj(apiObj));
     };
 
-    const showIframeClassName = showIframe ? "opacity-100" : "opacity-0";
+    const showIframeClassName = joined ? "opacity-100" : "opacity-0";
     return (
       <div className="space-y-4">
-        {/* Jitsi Meeting */}
         <div
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >
+          <MeetEventListeners />
+          <OngoingOutpostMembers />
           <JitsiMeeting
             domain={process.env.NEXT_PUBLIC_OUTPOST_SERVER}
             roomName={outpost.uuid}
@@ -165,7 +126,6 @@ export const Meet = memo(
             onApiReady={handleApiReady}
           />
         </div>
-        <OngoingOutpostMembers />
       </div>
     );
   },

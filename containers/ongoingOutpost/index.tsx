@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
+import { OutpostHeader } from "./components/header";
 import { Meet } from "./components/meet";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
@@ -23,7 +24,8 @@ const OngoingOutpostContent = ({
     return <div>Please login to view this page</div>;
   }
   return (
-    <div>
+    <div className="space-y-6">
+      <OutpostHeader />
       <Meet />
     </div>
   );
