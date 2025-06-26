@@ -10,6 +10,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { revalidateAllOutpostsPage } from "../userDetails/serverActions/revalidateAllOutpostsPage";
+import { revalidateOutpostDetailsPage } from "../userDetails/serverActions/revalidateOutpostDetailsPage";
 import { createOutpostSelectors } from "./selectors";
 import { createOutpostActions } from "./slice";
 function* validateFields(
@@ -24,7 +25,7 @@ function* validateFields(
     );
     return false;
   }
-  if (!params.subject || params.subject.length > 50) {
+  if (params.subject.length > 50) {
     yield put(
       createOutpostActions.setError({
         field: "subject",
@@ -33,7 +34,7 @@ function* validateFields(
     );
     return false;
   }
-  if (!params.tags || params.tags.length > 10) {
+  if (params.tags.length > 10) {
     yield put(
       createOutpostActions.setError({
         field: "tags",
@@ -91,8 +92,9 @@ function* createOutpost(
       yield put(createOutpostActions.setIsSubmitting(false));
       yield put(createOutpostActions.reset());
       const router: AppRouterInstance = yield select(GlobalSelectors.router);
-      router.replace(`/outpost_details/${outpost.uuid}`);
       revalidateAllOutpostsPage();
+      revalidateOutpostDetailsPage(outpost.uuid);
+      router.replace(`/outpost_details/${outpost.uuid}`);
     }
   } catch (error) {
   } finally {

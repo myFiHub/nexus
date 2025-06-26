@@ -470,14 +470,14 @@ class PodiumApi {
   async getOutposts(
     page?: number,
     page_size?: number
-  ): Promise<OutpostModel[]> {
+  ): Promise<OutpostModel[] | Error> {
     try {
       const response = await this.axiosInstance.get(`/outposts`, {
         params: { page, page_size },
       });
       return response.data.data;
     } catch {
-      return [];
+      return Error();
     }
   }
 

@@ -31,25 +31,6 @@ export function CreatorSection({ outpost }: CreatorSectionProps) {
           </p>
         </div>
       </div>
-
-      {/* Tags */}
-      {outpost.tags && outpost.tags.length > 0 && (
-        <div className="flex flex-wrap gap-1 mt-2">
-          {outpost.tags.slice(0, 3).map((tag, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-md font-medium"
-            >
-              {tag}
-            </span>
-          ))}
-          {outpost.tags.length > 3 && (
-            <span className="px-2 py-1 bg-muted text-muted-foreground text-xs rounded-md">
-              +{outpost.tags.length - 3}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

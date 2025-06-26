@@ -3,6 +3,7 @@ import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { DetailsButton } from "./detailsButton";
 import { MembersBadge } from "./MembersBadge";
+import { Tags } from "./tags";
 
 interface ImageSectionProps {
   outpost: OutpostModel;
@@ -18,9 +19,13 @@ export function ImageSection({ outpost }: ImageSectionProps) {
       />
       {/* Overlay gradient for better text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-      <div>
+
+      {/* Action buttons positioned at top-left */}
+      <div className="absolute top-3 left-3 z-10 flex gap-2">
         <DetailsButton outpost={outpost} />
+        <Tags outpost={outpost} />
       </div>
+
       <MembersBadge membersCount={outpost.members_count} />
     </div>
   );
