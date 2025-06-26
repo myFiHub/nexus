@@ -1,7 +1,26 @@
 "use client";
-import { Img } from "../../..//components/Img";
+import { useOutpostImageUpload } from "app/services/imageUpload/useOutpostImageUpload";
+import { Button } from "../../../components/Button";
+import { Img } from "../../../components/Img";
+import { logoUrl } from "../../../lib/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { createOutpostSelectors } from "../selectors";
+import { createOutpostActions } from "../slice";
 
 const ImageSelector = () => {
+  const dispatch = useDispatch();
+  const selectedImage = useSelector(createOutpostSelectors.image);
+  const { pickImage } = useOutpostImageUpload();
+
+  const handleImagePick = async () => {
+    const file = await pickImage();
+    if (file) {
+      // Create a preview URL for the selected image
+
+      dispatch(createOutpostActions.setSelectedImage(file));
+    }
+  };
+
   return (
     <div
       style={{
@@ -9,43 +28,58 @@ const ImageSelector = () => {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        gap: 16,
       }}
     >
+      {/* Image Preview */}
       <div
         style={{
-          width: 72,
-          height: 72,
-          borderRadius: 16,
+          position: "relative",
+          width: "200px",
+          height: "200px",
+          borderRadius: "12px",
           overflow: "hidden",
-          background: "#232b36",
+          border: "2px dashed #e5e7eb",
+          backgroundColor: "#f9fafb",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          marginBottom: 12,
         }}
       >
         <Img
-          src={undefined}
+          src={selectedImage ? URL.createObjectURL(selectedImage) : logoUrl}
           alt="Outpost image"
-          style={{ width: 56, height: 56 }}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
         />
       </div>
-      <button
+
+      {/* Upload Button */}
+      <Button
+        onClick={handleImagePick}
+        variant="outline"
+        size="md"
         style={{
-          background: "none",
-          border: "none",
-          color: "#fff",
-          fontWeight: 500,
-          fontSize: 18,
-          marginBottom: 2,
-          cursor: "pointer",
+          minWidth: "140px",
         }}
       >
-        Select image from gallery
-      </button>
-      <div style={{ color: "#b0b8c1", fontSize: 13 }}>
-        Select image from gallery
-      </div>
+        Choose Image
+      </Button>
+
+      {/* Help text */}
+      <p
+        style={{
+          fontSize: "14px",
+          color: "#6b7280",
+          textAlign: "center",
+          margin: 0,
+        }}
+      >
+        Select an image for your outpost. Recommended size: 400x400px
+      </p>
     </div>
   );
 };

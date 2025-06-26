@@ -1,12 +1,15 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import { Switch } from "../../../components/Switch";
+import { createOutpostActions } from "../slice";
+import { createOutpostSelectors } from "../selectors";
 
-interface ScheduledFieldProps {
-  value: boolean;
-  onChange: (value: boolean) => void;
-}
-
-export const ScheduledField = ({ value, onChange }: ScheduledFieldProps) => {
+export const ScheduledField = () => {
+  const dispatch = useDispatch();
+  const scheduled = useSelector(createOutpostSelectors.scheduled);
+  const handleChange = (value: boolean) => {
+    dispatch(createOutpostActions.setScheduled(value));
+  };
   return (
     <div className="flex items-center justify-between mt-2 w-full max-w-[400px]">
       <div>
@@ -15,7 +18,7 @@ export const ScheduledField = ({ value, onChange }: ScheduledFieldProps) => {
           Organize and notify in advance.
         </div>
       </div>
-      <Switch checked={value} onCheckedChange={onChange} />
+      <Switch checked={scheduled} onCheckedChange={handleChange} />
     </div>
   );
 };

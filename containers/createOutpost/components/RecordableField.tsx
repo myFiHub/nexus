@@ -1,12 +1,15 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import { Switch } from "../../../components/Switch";
+import { createOutpostSelectors } from "../selectors";
+import { createOutpostActions } from "../slice";
 
-interface RecordableFieldProps {
-  value: boolean;
-  onChange: (value: boolean) => void;
-}
-
-export const RecordableField = ({ value, onChange }: RecordableFieldProps) => {
+export const RecordableField = () => {
+  const dispatch = useDispatch();
+  const recordable = useSelector(createOutpostSelectors.recordable);
+  const handleChange = (value: boolean) => {
+    dispatch(createOutpostActions.setRecordable(value));
+  };
   return (
     <div className="flex items-center justify-between w-full max-w-[400px]">
       <div>
@@ -15,7 +18,7 @@ export const RecordableField = ({ value, onChange }: RecordableFieldProps) => {
           Outpost sessions can be recorded by you
         </div>
       </div>
-      <Switch checked={value} onCheckedChange={onChange} />
+      <Switch checked={recordable} onCheckedChange={handleChange} />
     </div>
   );
 };

@@ -6,15 +6,17 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "../../../components/Popover";
+import { useDispatch, useSelector } from "react-redux";
+import { createOutpostSelectors } from "../selectors";
+import { createOutpostActions } from "../slice";
 
-interface AccessFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-}
-
-export const AccessField = ({ value, onChange }: AccessFieldProps) => {
+export const AccessField = () => {
   const [open, setOpen] = useState(false);
-
+  const dispatch = useDispatch();
+  const allowedToEnter = useSelector(createOutpostSelectors.allowedToEnter);
+  const handleChange = (value: string) => {
+    dispatch(createOutpostActions.setAllowedToEnter(value));
+  };
   return (
     <div className="w-full max-w-[400px]">
       <div className="font-medium text-[15px] mb-1">Allowed to Enter</div>
@@ -24,7 +26,10 @@ export const AccessField = ({ value, onChange }: AccessFieldProps) => {
             type="button"
             className="w-full bg-[#181f29] text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-[#232b36] focus:bg-[#232b36] transition-colors outline-none"
           >
-            {allowedToEnterOptions.find((item) => item.value == value)?.text}
+            {
+              allowedToEnterOptions.find((item) => item.value == allowedToEnter)
+                ?.text
+            }
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-[200px] p-0" align="start" sideOffset={4}>
@@ -35,7 +40,7 @@ export const AccessField = ({ value, onChange }: AccessFieldProps) => {
                 type="button"
                 className="block w-full text-left px-2 py-1 hover:bg-primary/10"
                 onClick={() => {
-                  onChange(option.value);
+                  handleChange(option.value);
                   setOpen(false);
                 }}
               >

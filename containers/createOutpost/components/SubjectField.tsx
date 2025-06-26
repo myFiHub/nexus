@@ -1,22 +1,22 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import { Input } from "../../../components/Input";
+import { createOutpostSelectors } from "../selectors";
+import { createOutpostActions } from "../slice";
 
-interface SubjectFieldProps {
-  value: string | undefined;
-  onChange: (value: string) => void;
-  error?: string;
-}
-
-export const SubjectField = ({ value, onChange, error }: SubjectFieldProps) => {
+export const SubjectField = () => {
+  const dispatch = useDispatch();
+  const subject = useSelector(createOutpostSelectors.subject);
+  const handleChange = (value: string) => {
+    dispatch(createOutpostActions.setSubject(value));
+  };
   return (
     <div className="w-full max-w-[400px]">
       <Input
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
+        value={subject || ""}
+        onChange={(e) => handleChange(e.target.value)}
         placeholder="Main Subject (optional)"
-        aria-invalid={!!error}
       />
-      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
     </div>
   );
 };

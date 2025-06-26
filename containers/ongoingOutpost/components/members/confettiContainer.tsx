@@ -140,7 +140,7 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
   }, [address]);
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full">
+    <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
       <canvas
         ref={canvasRef}
         className="absolute top-0 left-0 w-full h-full pointer-events-none"

@@ -1,13 +1,29 @@
 import { Button } from "app/components/Button";
-import { PhoneOff } from "lucide-react";
+import { confirmDialog } from "app/components/Dialog/confirmDialog";
+import { Loader2, PhoneOff } from "lucide-react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../../selectors";
 
 export const HangupButton = () => {
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
-  const handleHangup = () => {
+  const [isHangingUp, setIsHangingUp] = useState(false);
+  const handleHangup = async () => {
     if (apiObj) {
-      apiObj.executeCommand("hangup");
+      setIsHangingUp(true);
+      const response = await confirmDialog({
+        title: "Leavint the outpost",
+        content: "Do you want to leave the outpost?",
+        confirmOpts: {
+          text: "LEAVE",
+          colorScheme: "danger",
+        },
+      });
+      if (response.confirmed) {
+        apiObj.executeCommand("hangup");
+      } else {
+        setIsHangingUp(false);
+      }
     }
   };
 
@@ -17,7 +33,11 @@ export const HangupButton = () => {
       colorScheme="danger"
       className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl min-w-[108px]"
     >
-      <PhoneOff className="w-4 h-4" />
+      {isHangingUp ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <PhoneOff className="w-4 h-4" />
+      )}
       <span className="hidden sm:inline">Hangup</span>
     </Button>
   );

@@ -1,21 +1,22 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import { TagsInput } from "./TagsInput";
+import { createOutpostActions } from "../slice";
+import { createOutpostSelectors } from "../selectors";
 
-interface TagsFieldProps {
-  value: string[];
-  onChange: (value: string[]) => void;
-  error?: string;
-}
-
-export const TagsField = ({ value, onChange, error }: TagsFieldProps) => {
+export const TagsField = () => {
+  const dispatch = useDispatch();
+  const tags = useSelector(createOutpostSelectors.tags);
+  const handleChange = (value: string[]) => {
+    dispatch(createOutpostActions.setTags(value));
+  };
   return (
     <div className="w-full max-w-[400px]">
       <TagsInput
-        value={value || []}
-        onChange={onChange}
+        value={tags || []}
+        onChange={handleChange}
         placeholder="Enter a tag (optional)..."
       />
-      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
     </div>
   );
 };

@@ -27,14 +27,11 @@ export const MuteUnmuteButton = () => {
     <Button
       onClick={handleMuteUnmute}
       colorScheme={amIMuted ? "danger" : "primary"}
-      className={`w-full h-full px-4 py-3 rounded-none font-medium transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-lg border-0 shadow-none min-w-[108px] ${
-        amIMuted
-          ? "bg-red-500 hover:bg-red-600 text-white"
-          : "bg-green-500 hover:bg-green-600 text-white animate-pulse"
+      className={`w-full h-full px-4 py-3 rounded-none font-medium transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-lg border-0 shadow-none min-w-[108px] bg-green-500 hover:bg-green-600 text-white ${
+        amIMuted ? "" : " animate-pulse"
       }`}
     >
       {amIMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-      <span className="hidden sm:inline">{amIMuted ? "Unmute" : "Mute"}</span>
     </Button>
   );
 };

@@ -1,22 +1,24 @@
 "use client";
+import { useDispatch, useSelector } from "react-redux";
 import { Input } from "../../../components/Input";
+import { createOutpostSelectors } from "../selectors";
+import { createOutpostActions } from "../slice";
 
-interface NameFieldProps {
-  value: string;
-  onChange: (value: string) => void;
-  error?: string;
-}
+export const NameField = () => {
+  const dispatch = useDispatch();
 
-export const NameField = ({ value, onChange, error }: NameFieldProps) => {
+  const name = useSelector(createOutpostSelectors.name);
+  const handleChange = (value: string) => {
+    dispatch(createOutpostActions.setName(value));
+  };
+
   return (
     <div className="w-full max-w-[400px]">
       <Input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder="Outpost Name"
-        aria-invalid={!!error}
+        value={name}
+        onChange={(e) => handleChange(e.target.value)}
+        placeholder="Outpost Name (required)"
       />
-      {error && <div className="text-red-500 text-xs mt-1">{error}</div>}
     </div>
   );
 };
