@@ -164,13 +164,14 @@ export const UserSelectDialogProvider = () => {
   };
 
   const allUsers = {
-    ...(myUser ? { [myUser.uuid]: myUser } : {}),
     ...Object.fromEntries(
       Object.entries(dialogContent?.selectedUsers || {}).filter(
         ([uuid]) => uuid !== myUser?.uuid
       )
     ),
-    ...searchResults,
+    ...Object.fromEntries(
+      Object.entries(searchResults).filter(([uuid]) => uuid !== myUser?.uuid)
+    ),
   };
 
   return (

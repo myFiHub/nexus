@@ -135,22 +135,19 @@ export async function LumaEventDetails({ eventId }: LumaEventDetailsProps) {
             </div>
           )}
 
-          {/* Meeting URL */}
-          {event.meeting_url && (
-            <div>
-              <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-                Meeting Link
-              </p>
-              <a
-                href={event.meeting_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 dark:text-blue-400 hover:underline text-sm break-all"
-              >
-                {event.meeting_url}
-              </a>
-            </div>
-          )}
+          <div>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
+              Event Link
+            </p>
+            <a
+              href={event.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 dark:text-blue-400 hover:underline text-sm break-all"
+            >
+              {event.url}
+            </a>
+          </div>
         </div>
       </div>
     );

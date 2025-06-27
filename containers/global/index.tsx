@@ -6,6 +6,7 @@ import {
 } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { ReminderDialogProvider } from "app/components/Dialog/reminder";
+import { UserSelectToInviteDialogProvider } from "app/components/Dialog/userSelectToInvite";
 import { Toaster } from "app/components/toast";
 import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
 import { ReduxProvider } from "app/store/Provider";
@@ -42,6 +43,7 @@ const Container = () => {
       <DateTimePickerDialogProvider />
       <ReminderDialogProvider />
       <LumaUserDialogProvider />
+      <UserSelectToInviteDialogProvider />
     </>
   );
 };

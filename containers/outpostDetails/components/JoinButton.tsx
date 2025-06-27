@@ -34,7 +34,7 @@ const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
   const loading = joining || logingIn;
   return (
     <Button
-      className={`w-full ${!isPassed ? "block text-left" : ""}`}
+      className={`w-full ${!isPassed && !logingIn ? "block text-left" : ""}`}
       onClick={join}
       disabled={(loading || isPassed) && !iAmCreator}
     >

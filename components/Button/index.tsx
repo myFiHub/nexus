@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-background",
+  "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:pointer-events-none ring-offset-background",
   {
     variants: {
       variant: {
@@ -29,51 +29,58 @@ const buttonVariants = cva(
       {
         variant: "primary",
         colorScheme: "primary",
-        className: "bg-primary hover:bg-primary-hover text-white",
+        className:
+          "bg-primary hover:bg-primary-hover text-white disabled:bg-muted disabled:text-muted-foreground",
       },
       {
         variant: "primary",
         colorScheme: "danger",
-        className: "bg-danger hover:bg-danger-hover text-white",
+        className:
+          "bg-danger hover:bg-danger-hover text-white disabled:bg-muted disabled:text-muted-foreground",
       },
       {
         variant: "primary",
         colorScheme: "warning",
-        className: "bg-warning hover:bg-warning-hover text-white",
+        className:
+          "bg-warning hover:bg-warning-hover text-white disabled:bg-muted disabled:text-muted-foreground",
       },
       // Outline variant with color schemes
       {
         variant: "outline",
         colorScheme: "primary",
         className:
-          "border-primary text-primary hover:bg-primary hover:text-white",
+          "border-primary text-primary hover:bg-primary hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
       {
         variant: "outline",
         colorScheme: "danger",
-        className: "border-danger text-danger hover:bg-danger hover:text-white",
+        className:
+          "border-danger text-danger hover:bg-danger hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
       {
         variant: "outline",
         colorScheme: "warning",
         className:
-          "border-warning text-warning hover:bg-warning hover:text-white",
+          "border-warning text-warning hover:bg-warning hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
       // Ghost variant with color schemes
       {
         variant: "ghost",
         colorScheme: "primary",
-        className: "text-primary hover:bg-primary/10",
+        className:
+          "text-primary hover:bg-primary/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
       {
         variant: "ghost",
         colorScheme: "danger",
-        className: "text-danger hover:bg-danger/10",
+        className:
+          "text-danger hover:bg-danger/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
       {
         variant: "ghost",
         colorScheme: "warning",
-        className: "text-warning hover:bg-warning/10",
+        className:
+          "text-warning hover:bg-warning/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
       },
     ],
     defaultVariants: {

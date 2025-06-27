@@ -1,4 +1,5 @@
 import { Img } from "../../../components/Img";
+import { ShareButton } from "../../../components/outpost/outpostCard/actions/ShareButton";
 import { logoUrl } from "../../../lib/constants";
 import { OutpostModel } from "../../../services/api/types";
 import { StateInitializer } from "../stateInitializer";
@@ -36,6 +37,11 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
                 {outpost.name}
               </h1>
               <p className="text-xl opacity-90">{outpost.subject}</p>
+            </div>
+
+            {/* Share Button - Top Right Corner */}
+            <div className="absolute top-4 right-4 z-10">
+              <ShareButton outpost={outpost} />
             </div>
           </div>
 
