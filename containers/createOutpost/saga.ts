@@ -272,7 +272,6 @@ function* createOutpost(
     } catch (error) {
       console.error("Failed to revalidate pages:", error);
     }
-
     router.push(`/outpost_details/${outpost.uuid}`);
   } catch (error) {
     console.log({ error });
