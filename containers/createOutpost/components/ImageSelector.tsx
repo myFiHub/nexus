@@ -25,38 +25,13 @@ const ImageSelector = () => {
       : logoUrl;
 
   return (
-    <div
-      style={{
-        marginBottom: 32,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 16,
-      }}
-    >
+    <div className="mb-8 flex flex-col items-center gap-4">
       {/* Image Preview */}
-      <div
-        style={{
-          position: "relative",
-          width: "200px",
-          height: "200px",
-          borderRadius: "12px",
-          overflow: "hidden",
-          border: "2px dashed #e5e7eb",
-          backgroundColor: "#f9fafb",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
+      <div className="relative h-48 w-48 overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
         <img
           src={imageSrc}
           alt="Outpost image"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
+          className="h-full w-full object-cover"
         />
       </div>
 
@@ -65,22 +40,13 @@ const ImageSelector = () => {
         onClick={handleImagePick}
         variant="outline"
         size="md"
-        style={{
-          minWidth: "140px",
-        }}
+        className="min-w-[140px]"
       >
         Choose Image
       </Button>
 
       {/* Help text */}
-      <p
-        style={{
-          fontSize: "14px",
-          color: "#6b7280",
-          textAlign: "center",
-          margin: 0,
-        }}
-      >
+      <p className="text-center text-sm text-gray-500 m-0">
         Select an image for your outpost. Recommended size: 400x400px
       </p>
     </div>
