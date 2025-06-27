@@ -15,7 +15,7 @@ const CreateButton = () => {
   const isScheduled = useSelector(createOutpostSelectors.scheduled);
   const allFields = useSelector(createOutpostSelectors.allFields);
   let thereAreThingsToDo = false;
-
+  const trimmedName = allFields.name?.trim();
   // checking pass for entering
   let buttonText = "Create";
   if (
@@ -39,15 +39,15 @@ const CreateButton = () => {
     buttonText = "Select date and time";
   }
   // checking if name is valid
-  if (!allFields.name || allFields.name?.length < 4) {
+  if (!trimmedName || trimmedName?.length < 4) {
     thereAreThingsToDo = true;
     buttonText = "Enter a valid name";
   }
 
   // checking if luma is enabled and there is no guests
-  if (allFields.enabled_luma && allFields.luma_guests.length === 0) {
+  if (allFields.enabled_luma && allFields.luma_hosts.length === 0) {
     thereAreThingsToDo = true;
-    buttonText = "Add guests for Luma event";
+    buttonText = "Add Hosts for Luma event";
   }
 
   const handleSubmit = () => {

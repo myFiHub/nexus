@@ -30,7 +30,8 @@ import { createOutpostActions } from "./slice";
 function* validateFields(
   params: CreateOutpostRequest
 ): Generator<unknown, boolean, unknown> {
-  if (!params.name || params.name.length < 5) {
+  const trimmedName = params.name?.trim();
+  if (!trimmedName || trimmedName.length < 5) {
     yield put(
       createOutpostActions.setError({
         field: "name",
@@ -202,7 +203,7 @@ function* createOutpost(
     if (!outpost) {
       toast.error("Failed to create outpost");
       return;
-    } else {
+    } else if (imageFile && imageFile instanceof File) {
       const uploadedImageUrl: string | undefined =
         yield outpostImageService.uploadImage(imageFile, outpost.uuid);
       if (uploadedImageUrl) {

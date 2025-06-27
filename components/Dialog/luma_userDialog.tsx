@@ -164,8 +164,15 @@ export const LumaUserDialogProvider = () => {
     }
   };
 
+  // Email validation function
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const isEmailValid =
     email.trim() &&
+    isValidEmail(email.trim()) &&
     !users.some(
       (user) => user.email.toLowerCase() === email.trim().toLowerCase()
     );

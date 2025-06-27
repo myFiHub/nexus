@@ -161,7 +161,13 @@ export const DateTimePickerDialogProvider = () => {
   const isDateDisabled = (date: Date) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Start of today
-    return date < today;
+
+    // Calculate the maximum selectable date (4 months from now)
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 4);
+    maxDate.setHours(23, 59, 59, 999); // End of the day
+
+    return date < today || date > maxDate;
   };
 
   // Function to check if a time combination would be valid
@@ -171,6 +177,15 @@ export const DateTimePickerDialogProvider = () => {
     const testDate = new Date(date);
     testDate.setHours(hour, minute, 0, 0);
     const now = new Date();
+
+    // Calculate the maximum allowed date (4 months from now)
+    const maxDate = new Date();
+    maxDate.setMonth(maxDate.getMonth() + 4);
+
+    // Check if the test date exceeds the maximum allowed date
+    if (testDate > maxDate) {
+      return false;
+    }
 
     // If the selected date is today, disable times before 1 minute from now
     const today = new Date();
@@ -183,7 +198,7 @@ export const DateTimePickerDialogProvider = () => {
       return testDate >= oneMinuteFromNow;
     }
 
-    // For future dates, allow any time
+    // For future dates, allow any time (as long as it doesn't exceed maxDate)
     return true;
   };
 
