@@ -57,3 +57,9 @@ export function getTimerInfo(
     secondsRemaining,
   };
 }
+
+export const generateOutpostShareUrl = (outpostId: string): string => {
+  const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_LINK_URL;
+  const outpostDetailRoute = "/outpost_details";
+  return ` ${websiteUrl}${outpostDetailRoute}/${outpostId}`;
+};

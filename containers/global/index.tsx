@@ -1,6 +1,9 @@
 "use client";
 import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
-import { UserSelectDialogProvider } from "app/components/Dialog";
+import {
+  LumaUserDialogProvider,
+  UserSelectDialogProvider,
+} from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { ReminderDialogProvider } from "app/components/Dialog/reminder";
 import { Toaster } from "app/components/toast";
@@ -38,6 +41,7 @@ const Container = () => {
       <OutpostAccessesDialogProvider />
       <DateTimePickerDialogProvider />
       <ReminderDialogProvider />
+      <LumaUserDialogProvider />
     </>
   );
 };

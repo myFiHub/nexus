@@ -1,4 +1,5 @@
 "use client";
+import { lumaUserDialog, LumaUserDialogResult } from "app/components/Dialog";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
@@ -10,22 +11,41 @@ import { createOutpostActions } from "../../slice";
 export const LumaField = () => {
   const dispatch = useDispatch();
   const enabledLuma = useSelector(createOutpostSelectors.enabledLuma);
-
-  console.log("LumaField rendered, enabledLuma:", enabledLuma);
+  const hosts = useSelector(createOutpostSelectors.lumaHosts);
+  const guests = useSelector(createOutpostSelectors.lumaGuests);
 
   const handleLumaChange = (value: boolean) => {
-    console.log("Luma changed to:", value);
     dispatch(createOutpostActions.setEnabledLuma(value));
   };
 
-  const handleAddHosts = () => {
-    // TODO: Implement add hosts functionality
-    console.log("Add hosts clicked");
+  const handleAddHosts = async () => {
+    const results: LumaUserDialogResult = await lumaUserDialog({
+      title: "Enter the Hosts",
+      initialUsers: hosts.map((host) => {
+        return {
+          name: host.name ?? "",
+          email: host.email,
+        };
+      }),
+    });
+    if (results.users) {
+      dispatch(createOutpostActions.setLumaHosts(results.users));
+    }
   };
 
-  const handleAddGuests = () => {
-    // TODO: Implement add guests functionality
-    console.log("Add guests clicked");
+  const handleAddGuests = async () => {
+    const results: LumaUserDialogResult = await lumaUserDialog({
+      title: "Enter the Guests",
+      initialUsers: guests.map((guest) => {
+        return {
+          name: guest.name ?? "",
+          email: guest.email,
+        };
+      }),
+    });
+    if (results.users) {
+      dispatch(createOutpostActions.setLumaGuests(results.users));
+    }
   };
 
   return (
@@ -79,15 +99,27 @@ export const LumaField = () => {
             variant="outline"
             className="flex-1 flex gap-0.5"
           >
-            <span>Add Hosts </span>
-            <span className="text-xs text-red-400"> (required)</span>
+            {hosts.length == 0 ? (
+              <>
+                <span>Add Hosts </span>
+                <span className="text-xs text-red-400"> (required)</span>
+              </>
+            ) : (
+              <span>{hosts.length} hosts </span>
+            )}
           </Button>
           <Button
             onClick={handleAddGuests}
             variant="outline"
             className="flex-1"
           >
-            Add Guests
+            {guests.length == 0 ? (
+              <>
+                <span>Add Guests </span>
+              </>
+            ) : (
+              <span>{guests.length} Guests </span>
+            )}
           </Button>
         </div>
       </motion.div>

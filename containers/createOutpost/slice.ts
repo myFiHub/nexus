@@ -188,6 +188,9 @@ const createOutpostSlice = createSlice({
         state.lumaGuests.push(guest);
       }
     },
+    setLumaGuests(state, action: PayloadAction<AddGuestModel[]>) {
+      state.lumaGuests = action.payload;
+    },
     toggleLumaHost: (state, action: PayloadAction<AddHostModel>) => {
       const host = action.payload;
       if (state.lumaHosts.map((h) => h.email).includes(host.email)) {
@@ -195,6 +198,9 @@ const createOutpostSlice = createSlice({
       } else {
         state.lumaHosts.push(host);
       }
+    },
+    setLumaHosts(state, action: PayloadAction<AddHostModel[]>) {
+      state.lumaHosts = action.payload;
     },
   },
 });

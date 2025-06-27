@@ -1,3 +1,5 @@
+import { AddGuestModel, AddHostModel } from "./luma";
+
 // User related types
 export interface ConnectedAccount {
   address: string;
@@ -120,6 +122,9 @@ export interface CreateOutpostRequest {
   is_recordable: boolean;
   tags: string[];
   reminder_offset_minutes?: number;
+  enabled_luma?: boolean;
+  luma_guests?: AddGuestModel[];
+  luma_hosts?: AddHostModel[];
 }
 
 export interface UpdateOutpostRequest {
