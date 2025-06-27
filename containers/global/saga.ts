@@ -10,6 +10,13 @@ import {
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
 import { CookieKeys } from "app/lib/cookies";
+import {
+  getNotificationPermission,
+  initializeOneSignal,
+  loginToOneSignal,
+  logoutFromOneSignal,
+  subscribeToNotifications,
+} from "app/lib/onesignal";
 import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
 import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
@@ -63,7 +70,24 @@ export function* getPrivateKey() {
   return privateKey;
 }
 
-function* initialize(action: ReturnType<typeof globalActions.initialize>) {
+function* initializeoneSignal(
+  action: ReturnType<typeof globalActions.initialize>
+) {
+  yield initializeOneSignal();
+  console.log("OneSignal initialized");
+
+  // Get notification permission
+  const hasPermission: boolean = yield getNotificationPermission();
+
+  // Subscribe to notifications if permission is granted
+  if (hasPermission) {
+    yield subscribeToNotifications();
+  }
+}
+
+function* initializeWeb3Auth(
+  action: ReturnType<typeof globalActions.initialize>
+) {
   yield put(globalActions.setInitializingWeb3Auth(true));
   const web3AuthContextConfig: Web3AuthContextConfig = {
     web3AuthOptions: {
@@ -280,6 +304,7 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
+    yield loginToOneSignal(response.user.uuid);
     yield setServerCookie(CookieKeys.myUserId, response.user.uuid);
     if (response.token) {
       yield wsClient.connect(
@@ -304,6 +329,7 @@ function* logout() {
     deleteServerCookie(CookieKeys.myUserId);
     yield web3Auth?.logout();
     yield web3Auth?.clearCache();
+    yield logoutFromOneSignal();
   } catch (error) {
     console.error(error);
   }
@@ -344,7 +370,8 @@ function* checkIfIHavePass(
 
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
-  yield takeLatest(globalActions.initialize, initialize);
+  yield takeLatest(globalActions.initialize, initializeWeb3Auth);
+  yield takeLatest(globalActions.initialize, initializeoneSignal);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);
