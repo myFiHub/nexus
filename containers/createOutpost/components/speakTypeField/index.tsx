@@ -22,7 +22,7 @@ export const SpeakField = () => {
     dispatch(createOutpostActions.setAllowedToSpeak(value));
   };
   return (
-    <div className="w-full max-w-[400px] relative">
+    <div className="w-full  relative">
       <SelectUserButton
         typeSelector={createOutpostSelectors.allowedToSpeakType}
         sellerSelector={createOutpostSelectors.passSellersRequiredToSpeak}

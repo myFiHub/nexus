@@ -41,13 +41,19 @@ export const SelectUserButton = ({
   return (
     <div
       onClick={handleClick}
-      className={`absolute bottom-[7px] w-[120px] right-3 h-8 rounded-[5px] center text-white font-medium text-sm cursor-pointer flex items-center justify-center ${
-        numberOfPassSellersRequired === 0 ? "bg-red-500" : "bg-green-300"
+      className={`absolute bottom-[7px] w-[170px] right-3 h-8 rounded-[5px] center text-white font-medium text-sm cursor-pointer flex items-center gap-1 justify-center ${
+        numberOfPassSellersRequired === 0
+          ? "border-1 border-red-500"
+          : "border-1 border-green-300"
       }`}
     >
-      {numberOfPassSellersRequired === 0
-        ? "Select users"
-        : `${numberOfPassSellersRequired} selected`}
+      {numberOfPassSellersRequired === 0 ? (
+        <>
+          Select users <span className="text-red-400">(required)</span>
+        </>
+      ) : (
+        `${numberOfPassSellersRequired} selected`
+      )}
     </div>
   );
 };

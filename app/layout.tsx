@@ -5,7 +5,6 @@ import LoadingIndicator from "app/app/loading-indicator";
 import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { OneSignalProvider } from "../components/OneSignalProvider";
 import "./globals.css";
 
 const geistSans = Geist({

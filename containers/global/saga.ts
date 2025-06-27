@@ -10,13 +10,8 @@ import {
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
 import { CookieKeys } from "app/lib/cookies";
-import {
-  getNotificationPermission,
-  initializeOneSignal,
-  loginToOneSignal,
-  logoutFromOneSignal,
-  subscribeToNotifications,
-} from "app/lib/onesignal";
+import { logoutFromOneSignal } from "app/lib/onesignal";
+import { initOneSignalForUser } from "app/lib/onesignal-init";
 import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
 import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
@@ -70,23 +65,19 @@ export function* getPrivateKey() {
   return privateKey;
 }
 
-function* initializeoneSignal(
-  action: ReturnType<typeof globalActions.initialize>
+function* initOneSignal(
+  action: ReturnType<typeof globalActions.initOneSignal>
 ) {
-  yield initializeOneSignal();
-  console.log("OneSignal initialized");
-
-  // Get notification permission
-  const hasPermission: boolean = yield getNotificationPermission();
-
-  // Subscribe to notifications if permission is granted
-  if (hasPermission) {
-    yield subscribeToNotifications();
+  const myId: string = action.payload.myId;
+  try {
+    yield initOneSignalForUser(myId);
+  } catch (error) {
+    console.error("Error initializing OneSignal:", error);
   }
 }
 
 function* initializeWeb3Auth(
-  action: ReturnType<typeof globalActions.initialize>
+  action: ReturnType<typeof globalActions.initializeWeb3Auth>
 ) {
   yield put(globalActions.setInitializingWeb3Auth(true));
   const web3AuthContextConfig: Web3AuthContextConfig = {
@@ -136,7 +127,8 @@ function* getAndSetAccount() {
       toast.error("app is not initialized, check your connection please", {
         action: {
           label: "retry?",
-          onClick: () => getStore().dispatch(globalActions.initialize()),
+          onClick: () =>
+            getStore().dispatch(globalActions.initializeWeb3Auth()),
         },
       });
       return;
@@ -304,7 +296,7 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
-    yield loginToOneSignal(response.user.uuid);
+    yield put(globalActions.initOneSignal({ myId: response.user.uuid }));
     yield setServerCookie(CookieKeys.myUserId, response.user.uuid);
     if (response.token) {
       yield wsClient.connect(
@@ -370,8 +362,8 @@ function* checkIfIHavePass(
 
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
-  yield takeLatest(globalActions.initialize, initializeWeb3Auth);
-  yield takeLatest(globalActions.initialize, initializeoneSignal);
+  yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
+  yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);

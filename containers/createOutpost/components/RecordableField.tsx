@@ -11,8 +11,8 @@ export const RecordableField = () => {
     dispatch(createOutpostActions.setRecordable(value));
   };
   return (
-    <div className="flex items-center justify-between w-full max-w-[400px]">
-      <div>
+    <div className="flex items-center justify-between w-full ">
+      <div className="cursor-pointer" onClick={() => handleChange(!recordable)}>
         <div className="font-medium text-base">Recordable</div>
         <div className="text-[#b0b8c1] text-xs">
           Outpost sessions can be recorded by you

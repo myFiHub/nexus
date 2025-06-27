@@ -2,13 +2,13 @@ import OneSignal from "react-onesignal";
 
 // OneSignal App ID - Replace with your actual App ID from OneSignal dashboard
 const ONESIGNAL_APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID || "";
-
+const isDev = process.env.NODE_ENV === "development";
 export const initializeOneSignal = async () => {
   try {
     // Initialize OneSignal with the app ID
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      allowLocalhostAsSecureOrigin: true, // For development
+      allowLocalhostAsSecureOrigin: isDev, // For development
       serviceWorkerParam: {
         scope: "/",
       },
@@ -110,15 +110,6 @@ export const sendNotification = async (data: {
     // which would then use OneSignal's REST API to send the notification
   } catch (error) {
     console.error("Error sending notification:", error);
-  }
-};
-
-export const getNotificationPermission = async () => {
-  try {
-    return await OneSignal.Notifications.permission;
-  } catch (error) {
-    console.error("Error getting notification permission:", error);
-    return false;
   }
 };
 

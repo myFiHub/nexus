@@ -41,7 +41,7 @@ export function MembersList({ outpost }: MembersListProps) {
                 followed={member.followed_by_me ?? false}
                 address={member.address}
                 size="xxs"
-                className="max-h-[24px] max-w-[40px]"
+                className="max-h-[24px]  "
               />
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 {member.is_present && (

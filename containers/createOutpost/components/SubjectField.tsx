@@ -12,11 +12,11 @@ export const SubjectField = () => {
   };
   const error = useSelector(createOutpostSelectors.fieldError("subject"));
   return (
-    <div className="w-full max-w-[400px] relative">
+    <div className="w-full   relative">
       <Input
         value={subject || ""}
         onChange={(e) => handleChange(e.target.value)}
-        placeholder="Main Subject (optional)"
+        placeholder="Main Subject"
         className={`${error ? "border-red-500" : ""}`}
       />
       {error && (

@@ -22,7 +22,7 @@ export const EnterTypeField = () => {
     dispatch(createOutpostActions.setAllowedToEnter(value));
   };
   return (
-    <div className="w-full max-w-[400px] relative">
+    <div className="w-full   relative">
       <SelectUserButton
         typeSelector={createOutpostSelectors.allowedToEnterType}
         sellerSelector={createOutpostSelectors.passSellersRequiredToEnter}

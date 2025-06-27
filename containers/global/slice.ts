@@ -32,7 +32,8 @@ const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
-    initialize() {},
+    initializeWeb3Auth() {},
+    initOneSignal(_, __: PayloadAction<{ myId: string }>) {},
     startTicker() {},
     increaseTick_(state) {
       state.tick++;

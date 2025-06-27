@@ -12,11 +12,12 @@ export const TagsField = () => {
   };
   const error = useSelector(createOutpostSelectors.fieldError("tags"));
   return (
-    <div className="w-full max-w-[400px] relative">
+    <div className="w-full   relative min-h-[54px]">
+      <style />
       <TagsInput
         value={tags || []}
         onChange={handleChange}
-        placeholder="Enter a tag (optional)..."
+        placeholder="Enter a tag..."
         className={`${error ? "border-red-500" : ""}`}
       />
       {error && (

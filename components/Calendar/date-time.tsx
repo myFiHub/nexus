@@ -157,10 +157,40 @@ export const DateTimePickerDialogProvider = () => {
     return minDate;
   };
 
-  // Function to check if a date should be disabled
+  // Function to check if a date should be disabled (for calendar)
   const isDateDisabled = (date: Date) => {
-    const minDate = getMinSelectableDate();
-    return date < minDate;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    return date < today;
+  };
+
+  // Function to check if a time combination would be valid
+  const isTimeValid = (hour: number, minute: number) => {
+    if (!date) return true;
+
+    const testDate = new Date(date);
+    testDate.setHours(hour, minute, 0, 0);
+    const now = new Date();
+
+    // If the selected date is today, disable times before 1 minute from now
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const selectedDateStart = new Date(date);
+    selectedDateStart.setHours(0, 0, 0, 0);
+
+    if (selectedDateStart.getTime() === today.getTime()) {
+      const oneMinuteFromNow = new Date(now.getTime() + 1 * 60 * 1000);
+      return testDate >= oneMinuteFromNow;
+    }
+
+    // For future dates, allow any time
+    return true;
+  };
+
+  // Function to check if current date+time combination is valid
+  const isCurrentSelectionValid = () => {
+    if (!date) return false;
+    return isTimeValid(date.getHours(), date.getMinutes());
   };
 
   React.useEffect(() => {
@@ -283,7 +313,7 @@ export const DateTimePickerDialogProvider = () => {
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button onClick={handleConfirm} disabled={!date}>
+          <Button onClick={handleConfirm} disabled={!isCurrentSelectionValid()}>
             Confirm
           </Button>
         </DialogFooter>

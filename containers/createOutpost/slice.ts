@@ -6,6 +6,7 @@ import {
 import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { createOutpostSaga } from "./saga";
+import { AddGuestModel, AddHostModel } from "app/services/api/luma";
 
 export interface CreateOutpostState {
   name: string;
@@ -19,7 +20,10 @@ export interface CreateOutpostState {
   recordable: boolean;
   selectedImage?: File;
   isCreating: boolean;
+  enabledLuma: boolean;
   reminder_offset_minutes?: number;
+  lumaGuests: AddGuestModel[];
+  lumaHosts: AddHostModel[];
   passSellersRequiredToSpeak: {
     [uuid: string]: User;
   };
@@ -43,8 +47,11 @@ const initialState: CreateOutpostState = {
   scheduledFor: 0,
   adults: false,
   recordable: false,
+  enabledLuma: false,
   passSellersRequiredToSpeak: {},
   passSellersRequiredToEnter: {},
+  lumaGuests: [],
+  lumaHosts: [],
   selectedImage: undefined,
   isCreating: false,
   error: undefined,
@@ -167,6 +174,27 @@ const createOutpostSlice = createSlice({
 
     reset: () => {
       return initialState;
+    },
+    setEnabledLuma: (state, action: PayloadAction<boolean>) => {
+      state.enabledLuma = action.payload;
+    },
+    toggleLumaGuest: (state, action: PayloadAction<AddGuestModel>) => {
+      const guest = action.payload;
+      if (state.lumaGuests.map((g) => g.email).includes(guest.email)) {
+        state.lumaGuests = state.lumaGuests.filter(
+          (g) => g.email !== guest.email
+        );
+      } else {
+        state.lumaGuests.push(guest);
+      }
+    },
+    toggleLumaHost: (state, action: PayloadAction<AddHostModel>) => {
+      const host = action.payload;
+      if (state.lumaHosts.map((h) => h.email).includes(host.email)) {
+        state.lumaHosts = state.lumaHosts.filter((h) => h.email !== host.email);
+      } else {
+        state.lumaHosts.push(host);
+      }
     },
   },
 });

@@ -4,7 +4,7 @@ import { AdultsField } from "./components/AdultsField";
 import CreateButton from "./components/CreateButton";
 import { EnterTypeField } from "./components/enterTypeField";
 import ImageSelector from "./components/ImageSelector";
-import { NameField } from "./components/NameField";
+import { NameField } from "./components/nameField";
 import { RecordableField } from "./components/RecordableField";
 import { ScheduledField } from "./components/scheduleField";
 import { SpeakField } from "./components/speakTypeField";

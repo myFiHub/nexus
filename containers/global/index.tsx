@@ -27,7 +27,7 @@ const Container = () => {
   useEffect(() => {
     dispatch(globalActions.startTicker());
     if (!initialized) {
-      dispatch(globalActions.initialize());
+      dispatch(globalActions.initializeWeb3Auth());
     }
   }, []);
   return (

@@ -198,7 +198,7 @@ class AptosMovement {
       const bigIntPrice = BigInt(pString);
       return bigIntCoinToMoveOnAptos(bigIntPrice);
     } catch (e: any) {
-      toast.error(e.toString());
+      toast.error(e.toString().replace("AxiosError: ", ""));
       return null;
     }
   }

@@ -22,6 +22,9 @@ export const createOutpostDomains = {
     store.createOutpost.passSellersRequiredToSpeak,
   passSellersRequiredToEnter: (store: RootState) =>
     store.createOutpost.passSellersRequiredToEnter,
+  enabledLuma: (store: RootState) => store.createOutpost.enabledLuma,
+  lumaGuests: (store: RootState) => store.createOutpost.lumaGuests,
+  lumaHosts: (store: RootState) => store.createOutpost.lumaHosts,
 };
 export const createOutpostSelectors = {
   image: createOutpostDomains.image,
@@ -41,6 +44,9 @@ export const createOutpostSelectors = {
     createSelector([createOutpostDomains.error], (error) => error?.[field]),
   passSellersRequiredToSpeak: createOutpostDomains.passSellersRequiredToSpeak,
   passSellersRequiredToEnter: createOutpostDomains.passSellersRequiredToEnter,
+  enabledLuma: createOutpostDomains.enabledLuma,
+  lumaGuests: createOutpostDomains.lumaGuests,
+  lumaHosts: createOutpostDomains.lumaHosts,
   allFields: createSelector(
     [
       createOutpostDomains.name,
@@ -54,6 +60,9 @@ export const createOutpostSelectors = {
       createOutpostDomains.image,
       createOutpostDomains.passSellersRequiredToSpeak,
       createOutpostDomains.passSellersRequiredToEnter,
+      createOutpostDomains.enabledLuma,
+      createOutpostDomains.lumaGuests,
+      createOutpostDomains.lumaHosts,
     ],
     (
       name,
@@ -66,7 +75,10 @@ export const createOutpostSelectors = {
       scheduledFor,
       image,
       passSellersRequiredToSpeak,
-      passSellersRequiredToEnter
+      passSellersRequiredToEnter,
+      enabledLuma,
+      lumaGuests,
+      lumaHosts
     ) => ({
       name,
       subject,
@@ -77,6 +89,9 @@ export const createOutpostSelectors = {
       has_adult_content: adults,
       is_recordable: recordable,
       tags,
+      enabled_luma: enabledLuma,
+      luma_guests: lumaGuests,
+      luma_hosts: lumaHosts,
       tickets_to_speak: Object.values(passSellersRequiredToSpeak || {}).map(
         (user) => {
           const ticket: TicketToSpeak = {
