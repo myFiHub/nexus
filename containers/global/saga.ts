@@ -261,6 +261,7 @@ function* continueWithLoginRequestAndAdditionalData(
     }
   } else if (!response.user && response.error) {
     toast.error(response.error);
+    yield put(globalActions.logout());
     return;
   }
 
@@ -319,9 +320,9 @@ function* logout() {
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookie(CookieKeys.myUserId);
+    yield logoutFromOneSignal();
     yield web3Auth?.logout();
     yield web3Auth?.clearCache();
-    yield logoutFromOneSignal();
   } catch (error) {
     console.error(error);
   }

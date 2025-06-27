@@ -4,7 +4,7 @@ import {
 } from "app/components/Dialog/reminder";
 import { BuyableTicketTypes } from "app/components/outpost/types";
 import { toast } from "app/lib/toast";
-import { generateOutpostShareUrl } from "app/lib/utils";
+import { generateOutpostShareUrl, isDev } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import {
   AddGuestModel,
@@ -123,11 +123,13 @@ function* detached_createLumaEvent({
     end_at: oneHourAfter,
     require_rsvp_approval: true,
   };
-
   const lumaEvent: LumaEventModel | undefined = (yield lumaApi.createEvent(
     createRequest
   )) as LumaEventModel | undefined;
   if (!lumaEvent) {
+    if (isDev) {
+      console.error("lumaEvent is undefined");
+    }
     return false;
   }
   const { event } = lumaEvent;
@@ -145,6 +147,9 @@ function* detached_createLumaEvent({
     });
     yield all(callArray);
   } catch (error) {
+    if (isDev) {
+      console.error("failed to add hosts");
+    }
     toast.warning("failed to add hosts");
   }
   try {
@@ -153,7 +158,13 @@ function* detached_createLumaEvent({
       name: guest.name,
     }));
     yield lumaApi.addGuests(guestsList, api_id);
+    if (isDev) {
+      console.log("guests added");
+    }
   } catch (error) {
+    if (isDev) {
+      console.error("failed to add guests");
+    }
     toast.warning("failed to add guests");
   }
   if (lumaEvent) {
@@ -162,8 +173,14 @@ function* detached_createLumaEvent({
         uuid: outpost.uuid,
         luma_event_id: lumaEvent.event.api_id,
       })) as boolean;
+      if (isDev) {
+        console.log("updatedOutpost", updatedOutpost);
+      }
       return updatedOutpost;
     } catch (error) {
+      if (isDev) {
+        console.error("error", error);
+      }
       return false;
     }
   }
@@ -197,8 +214,11 @@ function* createOutpost(
     }
     const imageFile = params.image as unknown as File;
     params.image = "";
+
+    const { luma_guests, luma_hosts, enabled_luma, ...rest } = params;
+
     const outpost: OutpostModel | undefined = yield podiumApi.createOutpost(
-      params
+      rest
     );
     if (!outpost) {
       toast.error("Failed to create outpost");
@@ -219,37 +239,35 @@ function* createOutpost(
       if (!updatedOutpost) {
         toast.error("Failed to upload the image, change it later");
       }
-
-      if (params.scheduled_for) {
-        yield detached_setReminder({
-          outpost,
-          scheduledFor: params.scheduled_for,
-        });
-      }
-      if (
-        params.enabled_luma &&
-        params.luma_guests &&
-        params.luma_hosts &&
-        params.luma_hosts.length > 0
-      ) {
-        const lumaEventCreated: boolean = yield detached_createLumaEvent({
-          guests: params.luma_guests || [],
-          hosts: params.luma_hosts || [],
-          outpost,
-        });
-        if (!lumaEventCreated) {
-          toast.error("Failed to create luma event");
-        }
-      }
-
-      yield put(createOutpostActions.setIsSubmitting(false));
-      yield put(createOutpostActions.reset());
-      const router: AppRouterInstance = yield select(GlobalSelectors.router);
-      revalidateAllOutpostsPage();
-      revalidateOutpostDetailsPage(outpost.uuid);
-      router.replace(`/outpost_details/${outpost.uuid}`);
     }
+
+    if (params.scheduled_for) {
+      console.log("calling setReminder");
+      yield detached_setReminder({
+        outpost,
+        scheduledFor: params.scheduled_for,
+      });
+    }
+    if (enabled_luma && luma_guests && luma_hosts && luma_hosts.length > 0) {
+      console.log("calling createLumaEvent");
+      const lumaEventCreated: boolean = yield detached_createLumaEvent({
+        guests: luma_guests || [],
+        hosts: luma_hosts || [],
+        outpost,
+      });
+      if (!lumaEventCreated) {
+        toast.error("Failed to create luma event");
+      }
+    }
+
+    yield put(createOutpostActions.setIsSubmitting(false));
+    yield put(createOutpostActions.reset());
+    const router: AppRouterInstance = yield select(GlobalSelectors.router);
+    revalidateAllOutpostsPage();
+    revalidateOutpostDetailsPage(outpost.uuid);
+    router.push(`/outpost_details/${outpost.uuid}`);
   } catch (error) {
+    console.log({ error });
   } finally {
     yield put(createOutpostActions.setIsSubmitting(false));
   }

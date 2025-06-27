@@ -1,7 +1,6 @@
+import { isDev } from "app/lib/utils";
 import { Lock } from "./lock";
 import { ConnectionState } from "./types";
-
-const isDev = process.env.NODE_ENV === "development";
 
 /**
  * Manages connection lifecycle and reconnection logic

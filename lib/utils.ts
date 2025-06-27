@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { differenceInSeconds } from "date-fns";
 import { twMerge } from "tailwind-merge";
-
+export const isDev = process.env.NODE_ENV === "development";
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -61,5 +61,5 @@ export function getTimerInfo(
 export const generateOutpostShareUrl = (outpostId: string): string => {
   const websiteUrl = process.env.NEXT_PUBLIC_WEBSITE_LINK_URL;
   const outpostDetailRoute = "/outpost_details";
-  return ` ${websiteUrl}${outpostDetailRoute}/${outpostId}`;
+  return `${websiteUrl}${outpostDetailRoute}/${outpostId}`;
 };

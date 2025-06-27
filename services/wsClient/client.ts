@@ -1,3 +1,4 @@
+import { isDev } from "app/lib/utils";
 import { ConnectionManager } from "./connectionManager";
 import { JoinRequestManager } from "./joinRequestManager";
 import { WebSocketMessageRouter } from "./messageRouter";
@@ -7,8 +8,6 @@ import {
   OutgoingMessage,
   OutgoingMessageType,
 } from "./types";
-
-const isDev = process.env.NODE_ENV === "development";
 
 /**
  * WebSocketService manages the WebSocket connection for the application.

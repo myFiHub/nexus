@@ -1,7 +1,6 @@
 import { EasyAccess } from "app/containers/global/effects/quickAccess";
 import { WebSocketService } from "./client";
-
-const isDev = process.env.NODE_ENV === "development";
+import { isDev } from "app/lib/utils";
 
 /**
  * Manages join requests and their lifecycle

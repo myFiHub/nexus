@@ -67,23 +67,21 @@ export interface AddHostModel {
 }
 
 // Constants
-export const LUMA_BASE_URL = "https://api.lu.ma";
+export const LUMA_BASE_URL = "/api/luma"; // Updated to use Next.js API proxy
 
-// Default headers
-const getDefaultHeaders = (apiKey: string) => ({
-  "x-luma-api-key": apiKey,
+// Default headers - no longer need API key in client
+const getDefaultHeaders = () => ({
   "Content-Type": "application/json",
 });
 
 export class LumaApi {
   private static instance: LumaApi | undefined = undefined;
   private axiosInstance: AxiosInstance;
-  //   private apiKey: string;
 
   private constructor() {
     this.axiosInstance = axios.create({
       baseURL: LUMA_BASE_URL,
-      headers: getDefaultHeaders(process.env.NEXT_PUBLIC_LUMA_API_KEY!),
+      headers: getDefaultHeaders(),
     });
   }
 

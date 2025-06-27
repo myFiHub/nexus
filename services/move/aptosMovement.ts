@@ -217,7 +217,7 @@ class AptosMovement {
       const bigIntAmount = BigInt(pString);
       return bigIntAmount;
     } catch (e: any) {
-      toast.error(e.toString());
+      toast.error(e.toString().replace("AxiosError:", ""));
       return null;
     }
   }
@@ -290,7 +290,7 @@ class AptosMovement {
       return [true, hash];
     } catch (e: any) {
       toast.error("Error buying Pass: " + e.toString());
-      return [false, e.toString()];
+      return [false, e.toString().replace("AxiosError:", "")];
     }
   }
 
@@ -306,7 +306,7 @@ class AptosMovement {
       });
       return BigInt(response[0].toString());
     } catch (e: any) {
-      toast.error(e.toString());
+      toast.error(e.toString().replace("AxiosError:", ""));
       return null;
     }
   }
@@ -349,7 +349,7 @@ class AptosMovement {
       return [true, hash];
     } catch (e: any) {
       toast.error("Error selling Pass: " + e.toString());
-      return [false, e.toString()];
+      return [false, e.toString().replace("AxiosError:", "")];
     }
   }
 }

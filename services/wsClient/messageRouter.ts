@@ -3,14 +3,13 @@ import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
 import { getStore } from "app/store";
 import { WebSocketService } from "./client";
 import { IncomingMessage, IncomingMessageType } from "./types";
+import { isDev } from "app/lib/utils";
 
 export type IncomingReactionType =
   | IncomingMessageType.USER_BOOED
   | IncomingMessageType.USER_CHEERED
   | IncomingMessageType.USER_DISLIKED
   | IncomingMessageType.USER_LIKED;
-
-const isDev = process.env.NODE_ENV === "development";
 
 /**
  * Handles WebSocket message routing to appropriate controllers

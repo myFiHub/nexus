@@ -4,6 +4,7 @@ import { OutpostModel } from "../../../services/api/types";
 import { StateInitializer } from "../stateInitializer";
 import { CreatorCard } from "./CreatorCard";
 import { EventDetails } from "./EventDetails";
+import { LumaEventDetails } from "./LumaEventDetails";
 import { MembersList } from "./MembersList";
 import { Sidebar } from "./Sidebar";
 import { Tags } from "./Tags";
@@ -15,7 +16,6 @@ interface OutpostDetailsProps {
 export function OutpostDetails({ outpost }: OutpostDetailsProps) {
   const scheduledDate = new Date(outpost.scheduled_for);
   const isUpcoming = scheduledDate > new Date();
-
   return (
     <>
       <StateInitializer outpost={outpost} />
@@ -46,6 +46,9 @@ export function OutpostDetails({ outpost }: OutpostDetailsProps) {
               <CreatorCard outpost={outpost} />
               <EventDetails outpost={outpost} />
               <Tags tags={outpost.tags} />
+              {outpost.luma_event_id && (
+                <LumaEventDetails eventId={outpost.luma_event_id} />
+              )}
               <MembersList outpost={outpost} />
             </div>
 
