@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "app/components/Button";
+import { Button, ButtonProps } from "app/components/Button";
 import { userSelectToInviteDialog } from "app/components/Dialog/userSelectToInvite";
 import { canInvite } from "app/lib/outpostPermissions";
 import { toast } from "app/lib/toast";
@@ -14,9 +14,17 @@ import { GlobalSelectors } from "../../global/selectors";
 
 interface InviteUsersButtonProps {
   outpost: OutpostModel;
+  className?: string;
+  withWrapper?: boolean;
+  buttonSize?: ButtonProps["size"];
 }
 
-const Content = ({ outpost }: InviteUsersButtonProps) => {
+const Content = ({
+  outpost,
+  className,
+  withWrapper,
+  buttonSize,
+}: InviteUsersButtonProps) => {
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const [isLoading, setIsLoading] = useState(false);
   const [outpostToUse, setOutpostToUse] = useState<OutpostModel>(outpost);
@@ -37,13 +45,12 @@ const Content = ({ outpost }: InviteUsersButtonProps) => {
   const handleInviteUsers = async () => {
     try {
       const alreadyInvitedUsers = outpostToUse.invites;
-      console.log("alreadyInvitedUsers", alreadyInvitedUsers);
       const result = await userSelectToInviteDialog({
         title: "Invite Users",
         outpostInvites: alreadyInvitedUsers,
         creatorUuid: outpostToUse.creator_user_uuid,
+        outpost: outpostToUse,
       });
-      console.log("result", result);
 
       if (result.confirmed && result.invitedUsers.length > 0) {
         // Invite each selected user
@@ -88,31 +95,43 @@ const Content = ({ outpost }: InviteUsersButtonProps) => {
       setIsLoading(false);
     }
   };
-
-  return (
-    <div className="bg-card p-6 rounded-xl shadow-sm">
-      <Button
-        onClick={handleInviteUsers}
-        className="w-full"
-        colorScheme="primary"
-        variant="outline"
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
-        ) : (
-          <UserPlus className="w-4 h-4 mr-2" />
-        )}
-        Invite Users
-      </Button>
-    </div>
+  const component = (
+    <Button
+      onClick={handleInviteUsers}
+      className={className}
+      colorScheme="primary"
+      variant="outline"
+      disabled={isLoading}
+      size={buttonSize}
+    >
+      {isLoading ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
+        <UserPlus className="w-4 h-4 mr-2" />
+      )}
+      Invite Users
+    </Button>
   );
+  if (withWrapper) {
+    return <div className="bg-card p-6 rounded-xl shadow-sm">{component}</div>;
+  }
+  return component;
 };
 
-export function InviteUsersButton({ outpost }: InviteUsersButtonProps) {
+export function InviteUsersButton({
+  outpost,
+  className,
+  withWrapper = true,
+  buttonSize = "md",
+}: InviteUsersButtonProps) {
   return (
     <ReduxProvider>
-      <Content outpost={outpost} />
+      <Content
+        outpost={outpost}
+        className={className}
+        withWrapper={withWrapper}
+        buttonSize={buttonSize}
+      />
     </ReduxProvider>
   );
 }

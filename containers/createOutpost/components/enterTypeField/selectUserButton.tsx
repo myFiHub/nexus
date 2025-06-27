@@ -1,6 +1,7 @@
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import { userSelectDialog } from "app/components/Dialog/userSelectDialog";
 import { BuyableTicketTypes } from "app/components/outpost/types";
+import { isDev } from "app/lib/utils";
 import { User } from "app/services/api/types";
 import { RootState } from "app/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +30,9 @@ export const SelectUserButton = ({
     const result = await userSelectDialog({
       title: "Select Users",
       onUserToggled: (user, isSelected) => {
-        console.log(`${user.name} ${isSelected ? "selected" : "deselected"}`);
+        if (isDev) {
+          console.log(`${user.name} ${isSelected ? "selected" : "deselected"}`);
+        }
       },
       selectedUsers: passSellersRequiredToEnter, // Optional: pre-selected users
     });

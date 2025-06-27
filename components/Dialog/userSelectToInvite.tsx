@@ -19,8 +19,9 @@
 //   }
 // };
 
+import { canInviteToSpeak } from "app/lib/outpostPermissions";
 import podiumApi from "app/services/api";
-import { InviteModel, User } from "app/services/api/types";
+import { InviteModel, OutpostModel, User } from "app/services/api/types";
 import { RootState } from "app/store";
 import { Loader2, Search, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
@@ -45,6 +46,7 @@ interface UserSelectToInviteDialogProps {
   title: ReactNode;
   outpostInvites?: InviteModel[];
   creatorUuid?: string;
+  outpost?: OutpostModel;
 }
 
 export type UserSelectToInviteDialogResult = {
@@ -59,6 +61,7 @@ export const userSelectToInviteDialog = ({
   title,
   outpostInvites = [],
   creatorUuid,
+  outpost,
 }: UserSelectToInviteDialogProps): Promise<UserSelectToInviteDialogResult> => {
   return new Promise((resolve) => {
     resolvePromise = resolve;
@@ -68,6 +71,7 @@ export const userSelectToInviteDialog = ({
         title,
         outpostInvites,
         creatorUuid,
+        outpost,
       },
     });
     window.dispatchEvent(event);
@@ -316,6 +320,15 @@ export const UserSelectToInviteDialogProvider = () => {
     });
   };
 
+  // Check if current user can invite to speak
+  const canInviteToSpeakForCurrentUser =
+    dialogContent?.outpost && myUser
+      ? canInviteToSpeak({
+          outpost: dialogContent.outpost,
+          currentUserId: myUser.uuid,
+        })
+      : false;
+
   return (
     <Dialog
       open={isOpen}
@@ -441,17 +454,21 @@ export const UserSelectToInviteDialogProvider = () => {
                     >
                       Only Invite
                     </Button>
-                    <Button
-                      size="sm"
-                      variant={
-                        invitedUser?.invitedToSpeak ? "primary" : "outline"
-                      }
-                      onClick={() => handleInviteOption(user, "inviteToSpeak")}
-                      className="text-xs px-2 py-1 h-7"
-                      disabled={!!existingInvite}
-                    >
-                      Invite to Speak
-                    </Button>
+                    {canInviteToSpeakForCurrentUser && (
+                      <Button
+                        size="sm"
+                        variant={
+                          invitedUser?.invitedToSpeak ? "primary" : "outline"
+                        }
+                        onClick={() =>
+                          handleInviteOption(user, "inviteToSpeak")
+                        }
+                        className="text-xs px-2 py-1 h-7"
+                        disabled={!!existingInvite}
+                      >
+                        Invite to Speak
+                      </Button>
+                    )}
                   </div>
                 </div>
               );

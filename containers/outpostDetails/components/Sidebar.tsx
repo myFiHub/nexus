@@ -21,7 +21,7 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
       </div>
 
       {/* Invite Users Button */}
-      <InviteUsersButton outpost={outpost} />
+      <InviteUsersButton outpost={outpost} className="w-full" />
 
       {/* Members List */}
       <MembersList outpost={outpost} />
