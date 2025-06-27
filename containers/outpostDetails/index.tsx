@@ -4,10 +4,12 @@ import { OutpostDetails } from "./components/outpostDetails";
 
 interface OutpostDetailsContainerProps {
   outpost: OutpostModel;
+  lumaSlot?: React.ReactNode;
 }
 
 export const OutpostDetailsContainer = async ({
   outpost,
+  lumaSlot,
 }: OutpostDetailsContainerProps) => {
   return (
     <Suspense
@@ -27,7 +29,7 @@ export const OutpostDetailsContainer = async ({
         </div>
       }
     >
-      <OutpostDetails outpost={outpost} />
+      <OutpostDetails outpost={outpost} lumaSlot={lumaSlot} />
     </Suspense>
   );
 };

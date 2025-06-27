@@ -67,27 +67,44 @@ export interface AddHostModel {
 }
 
 // Constants
-export const LUMA_BASE_URL = "/api/luma"; // Updated to use Next.js API proxy
+export const LUMA_BASE_URL = "/api/luma"; // Proxy URL for client-side
+export const LUMA_DIRECT_URL = "https://api.lu.ma"; // Direct URL for server-side
 
-// Default headers - no longer need API key in client
-const getDefaultHeaders = () => ({
-  "Content-Type": "application/json",
-});
+// Default headers
+const getDefaultHeaders = (useProxy: boolean = true) => {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  // Add API key directly for server-side calls
+  if (!useProxy) {
+    const apiKey = process.env.NEXT_PUBLIC_LUMA_API_KEY;
+    if (apiKey) {
+      headers["x-luma-api-key"] = apiKey;
+    }
+  }
+
+  return headers;
+};
 
 export class LumaApi {
   private static instance: LumaApi | undefined = undefined;
   private axiosInstance: AxiosInstance;
+  private useProxy: boolean;
 
-  private constructor() {
+  private constructor(useProxy: boolean = true) {
+    this.useProxy = useProxy;
+    const baseURL = useProxy ? LUMA_BASE_URL : LUMA_DIRECT_URL;
+
     this.axiosInstance = axios.create({
-      baseURL: LUMA_BASE_URL,
-      headers: getDefaultHeaders(),
+      baseURL,
+      headers: getDefaultHeaders(useProxy),
     });
   }
 
-  public static getInstance(): LumaApi {
-    if (!LumaApi.instance) {
-      LumaApi.instance = new LumaApi();
+  public static getInstance(useProxy: boolean = true): LumaApi {
+    if (!LumaApi.instance || LumaApi.instance.useProxy !== useProxy) {
+      LumaApi.instance = new LumaApi(useProxy);
     }
     return LumaApi.instance;
   }
@@ -230,4 +247,8 @@ export class LumaApi {
   }
 }
 
-export const lumaApi = LumaApi.getInstance();
+// Default export for client-side usage (with proxy)
+export const lumaApi = LumaApi.getInstance(true);
+
+// Export for server-side usage (direct API calls)
+export const lumaApiDirect = LumaApi.getInstance(false);

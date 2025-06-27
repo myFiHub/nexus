@@ -2,6 +2,7 @@ import { Img } from "app/components/Img";
 import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { DetailsButton } from "./detailsButton";
+import { LumaEventIndicator } from "./LumaEventIndicator";
 import { MembersBadge } from "./MembersBadge";
 import { Tags } from "./tags";
 
@@ -24,6 +25,9 @@ export function ImageSection({ outpost }: ImageSectionProps) {
       <div className="absolute top-3 left-3 z-10 flex gap-2">
         <DetailsButton outpost={outpost} />
         <Tags outpost={outpost} />
+        {outpost.luma_event_id && (
+          <LumaEventIndicator eventId={outpost.luma_event_id} />
+        )}
       </div>
 
       <MembersBadge membersCount={outpost.members_count} />

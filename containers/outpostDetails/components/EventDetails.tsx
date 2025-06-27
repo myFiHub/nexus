@@ -5,7 +5,7 @@ import {
   serverSpeakerTypeToText,
 } from "app/components/outpost/types";
 import { formatDistanceToNow } from "date-fns";
-import { Calendar, Clock, Mic, Shield } from "lucide-react";
+import { Calendar, Clock, Mic, Shield, Video } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
 
 interface EventDetailsProps {
@@ -82,6 +82,38 @@ export function EventDetails({ outpost }: EventDetailsProps) {
             <p className="font-medium">Speaking Type</p>
             <p className="text-muted-foreground capitalize">
               {serverSpeakerTypeToText(outpost.speak_type)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <Video
+            className={`w-5 h-5 mt-1 ${
+              outpost.is_recordable ? "text-red-600" : "text-primary"
+            }`}
+          />
+          <div>
+            <p className="font-medium">Recording</p>
+            <p className="text-muted-foreground">
+              {outpost.is_recordable
+                ? "Recording Enabled"
+                : "Recording Disabled"}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-start gap-3">
+          <Shield
+            className={`w-5 h-5 mt-1 ${
+              outpost.has_adult_content ? "text-red-600" : "text-green-500"
+            }`}
+          />
+          <div>
+            <p className="font-medium">Content Rating</p>
+            <p className="text-muted-foreground">
+              {outpost.has_adult_content
+                ? "Adult Content - 18+ Only"
+                : "Suitable for Everyone"}
             </p>
           </div>
         </div>

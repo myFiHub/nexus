@@ -1,4 +1,5 @@
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
+import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
 import podiumApi from "app/services/api";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -12,7 +13,9 @@ interface OutpostDetailsPageProps {
 // Generate metadata for the page
 export async function generateMetadata({
   params,
-}: OutpostDetailsPageProps): Promise<Metadata> {
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
   const { id } = await params;
   const outpost = await podiumApi.getOutpost(id);
 
@@ -51,5 +54,10 @@ export default async function OutpostDetailsPage({
     notFound();
   }
 
-  return <OutpostDetailsContainer outpost={outpost} />;
+  // Create the luma slot content if the outpost has a luma_event_id
+  const lumaSlot = outpost.luma_event_id ? (
+    <LumaEventDetails eventId={outpost.luma_event_id} />
+  ) : null;
+
+  return <OutpostDetailsContainer outpost={outpost} lumaSlot={lumaSlot} />;
 }

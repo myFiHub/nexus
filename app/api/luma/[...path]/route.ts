@@ -4,30 +4,34 @@ const LUMA_BASE_URL = "https://api.lu.ma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, "GET", params.path);
+  const resolvedParams = await params;
+  return handleRequest(request, "GET", resolvedParams.path);
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, "POST", params.path);
+  const resolvedParams = await params;
+  return handleRequest(request, "POST", resolvedParams.path);
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, "PUT", params.path);
+  const resolvedParams = await params;
+  return handleRequest(request, "PUT", resolvedParams.path);
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> }
 ) {
-  return handleRequest(request, "DELETE", params.path);
+  const resolvedParams = await params;
+  return handleRequest(request, "DELETE", resolvedParams.path);
 }
 
 async function handleRequest(

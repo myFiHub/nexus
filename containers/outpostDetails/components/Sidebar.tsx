@@ -1,7 +1,7 @@
-import { Shield, Video } from "lucide-react";
 import { Button } from "../../../components/Button";
 import { OutpostModel } from "../../../services/api/types";
 import { JoinButton } from "./JoinButton";
+import { MembersList } from "./MembersList";
 
 interface SidebarProps {
   outpost: OutpostModel;
@@ -16,38 +16,8 @@ export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
         <JoinButton outpost={outpost} />
       </div>
 
-      {/* Additional Info */}
-      <div className="bg-card p-6 rounded-xl shadow-sm space-y-4">
-        <h3 className="font-semibold text-lg mb-2">Additional Information</h3>
-
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Video
-              className={`w-4 h-4 ${
-                outpost.is_recordable ? "text-red-600" : "text-primary"
-              }`}
-            />
-            <span className="text-muted-foreground">
-              {outpost.is_recordable
-                ? "Recording Enabled"
-                : "Recording Disabled"}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <Shield
-              className={`w-4 h-4 ${
-                outpost.has_adult_content ? "text-red-600" : "text-green-500"
-              }`}
-            />
-            <span className="text-muted-foreground">
-              {outpost.has_adult_content
-                ? "Adult Content - 18+ Only"
-                : "Suitable for Everyone"}
-            </span>
-          </div>
-        </div>
-      </div>
+      {/* Members List */}
+      <MembersList outpost={outpost} />
 
       {/* Share Section */}
       <div className="bg-card p-6 rounded-xl shadow-sm">
