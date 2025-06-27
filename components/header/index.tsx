@@ -1,5 +1,6 @@
 "use client";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { NotificationsBell } from "app/containers/notifications";
 import { ReduxProvider } from "app/store/Provider";
 import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -67,6 +68,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
       </nav>
       <div className="flex items-center gap-4">
         <ThemeToggle initialValue={theme} />
+        {isLoggedIn && <NotificationsBell />}
         <LoginButton />
       </div>
       {/* Mobile hamburger */}

@@ -29,7 +29,10 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
           </div>
           <div className="flex items-center gap-2 text-muted-foreground">
             <Users className="w-4 h-4" />
-            <span>{outpost.members_count || 0} members</span>
+            <span>
+              {outpost.members_count || 0} member
+              {outpost.members_count === 1 ? "" : "s"}
+            </span>
             {outpost.online_users_count ? (
               <>
                 <span>•</span>

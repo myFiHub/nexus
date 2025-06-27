@@ -1,6 +1,8 @@
 import UserLink from "app/components/AppLink/userLink";
+import { CopyButton } from "app/components/copyButton";
 import { FollowButton } from "app/containers/_users/components/followButton";
-import { Mic, Users } from "lucide-react";
+import { truncate } from "app/lib/utils";
+import { Users } from "lucide-react";
 import { Img } from "../../../components/Img";
 import { logoUrl } from "../../../lib/constants";
 import { OutpostModel } from "../../../services/api/types";
@@ -47,16 +49,10 @@ export function MembersList({ outpost }: MembersListProps) {
                   className="max-h-[20px]"
                 />
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  {member.is_present && (
-                    <span className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                      Online
-                    </span>
-                  )}
-                  {member.can_speak && (
-                    <span className="flex items-center gap-1">
-                      <Mic className="w-3 h-3" />
-                      Speaker
+                  {member.aptos_address && (
+                    <span className="flex items-center gap-1 font-mono">
+                      {truncate(member.aptos_address)}
+                      <CopyButton text={member.aptos_address} />
                     </span>
                   )}
                 </div>

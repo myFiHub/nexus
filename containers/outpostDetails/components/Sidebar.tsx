@@ -11,7 +11,7 @@ interface SidebarProps {
   isUpcoming: boolean;
 }
 
-export function Sidebar({ outpost, isUpcoming }: SidebarProps) {
+export function Sidebar({ outpost }: SidebarProps) {
   const shareUrl = generateOutpostShareUrl(outpost.uuid);
   return (
     <div className="space-y-6">

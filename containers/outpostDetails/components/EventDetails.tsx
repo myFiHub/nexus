@@ -4,9 +4,9 @@ import {
   serverEnterTypeToText,
   serverSpeakerTypeToText,
 } from "app/components/outpost/types";
-import { formatDistanceToNow } from "date-fns";
-import { Calendar, Clock, Mic, Shield, Video } from "lucide-react";
+import { Calendar, Mic, Shield, Video } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
+import { TimeUntil } from "./TimeUntil";
 
 interface EventDetailsProps {
   outpost: OutpostModel;
@@ -14,7 +14,6 @@ interface EventDetailsProps {
 
 export function EventDetails({ outpost }: EventDetailsProps) {
   const scheduledDate = new Date(outpost.scheduled_for);
-  const timeUntil = formatDistanceToNow(scheduledDate, { addSuffix: true });
 
   return (
     <div className="bg-card p-6 rounded-xl shadow-sm space-y-4">
@@ -43,13 +42,7 @@ export function EventDetails({ outpost }: EventDetailsProps) {
         )}
 
         {outpost.scheduled_for ? (
-          <div className="flex items-start gap-3">
-            <Clock className="w-5 h-5 text-primary mt-1" />
-            <div>
-              <p className="font-medium">Time Until</p>
-              <p className="text-muted-foreground">{timeUntil}</p>
-            </div>
-          </div>
+          <TimeUntil scheduledDate={scheduledDate} />
         ) : (
           <></>
         )}

@@ -9,7 +9,7 @@ import {
   FollowUnfollowRequest,
   InviteRequestModel,
   LoginRequest,
-  Notification,
+  NotificationModel,
   OutpostLiveData,
   OutpostModel,
   PodiumAppMetadata,
@@ -228,7 +228,7 @@ class PodiumApi {
   }
 
   // Notification methods
-  async getNotifications(): Promise<Notification[]> {
+  async getNotifications(): Promise<NotificationModel[]> {
     try {
       const response = await this.axiosInstance.get("/notifications");
       return response.data.data;

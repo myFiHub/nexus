@@ -20,6 +20,7 @@
 // };
 
 import { canInviteToSpeak } from "app/lib/outpostPermissions";
+import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { InviteModel, OutpostModel, User } from "app/services/api/types";
 import { RootState } from "app/store";
@@ -28,6 +29,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../Button";
 import { Input } from "../Input";
+import { CopyButton } from "../copyButton";
 import {
   Dialog,
   DialogContent,
@@ -65,7 +67,6 @@ export const userSelectToInviteDialog = ({
 }: UserSelectToInviteDialogProps): Promise<UserSelectToInviteDialogResult> => {
   return new Promise((resolve) => {
     resolvePromise = resolve;
-
     const event = new CustomEvent("show-user-select-to-invite-dialog", {
       detail: {
         title,
@@ -154,16 +155,32 @@ export const UserSelectToInviteDialogProvider = () => {
         // Update existing user
         const updated = [...prev];
         if (option === "invite") {
+          const newInvited = !updated[existingIndex].invited;
+          const newInvitedToSpeak = updated[existingIndex].invitedToSpeak;
+
+          // If both options are false, remove the user from the list
+          if (!newInvited && !newInvitedToSpeak) {
+            return updated.filter((_, index) => index !== existingIndex);
+          }
+
           updated[existingIndex] = {
             user,
-            invited: !updated[existingIndex].invited,
-            invitedToSpeak: false,
+            invited: newInvited,
+            invitedToSpeak: newInvitedToSpeak,
           };
         } else {
+          const newInvited = updated[existingIndex].invited;
+          const newInvitedToSpeak = !updated[existingIndex].invitedToSpeak;
+
+          // If both options are false, remove the user from the list
+          if (!newInvited && !newInvitedToSpeak) {
+            return updated.filter((_, index) => index !== existingIndex);
+          }
+
           updated[existingIndex] = {
             user,
-            invited: false,
-            invitedToSpeak: !updated[existingIndex].invitedToSpeak,
+            invited: newInvited,
+            invitedToSpeak: newInvitedToSpeak,
           };
         }
         return updated;
@@ -429,9 +446,10 @@ export const UserSelectToInviteDialogProvider = () => {
                       <div className="font-medium text-sm">
                         {user.name || "Unknown User"}
                       </div>
-                      {user.email && (
-                        <div className="text-xs text-gray-500">
-                          {user.email}
+                      {user.aptos_address && (
+                        <div className="text-xs text-gray-400 flex items-center gap-1 mt-1">
+                          <span>{truncate(user.aptos_address)}</span>
+                          <CopyButton text={user.aptos_address} />
                         </div>
                       )}
                       {existingInvite && (

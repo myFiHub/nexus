@@ -20,6 +20,7 @@ import { isDev } from "app/lib/utils";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
+import { NotificationsState } from "app/containers/notifications/slice";
 
 let store: Store<RootState, AnyAction>;
 // Create the saga middleware
@@ -107,5 +108,6 @@ export type RootState = {
   onGoingOutpost: OnGoingOutpostState;
   myOutposts: MyOutpostsState;
   createOutpost: CreateOutpostState;
+  notifications: NotificationsState;
 };
 export type AppDispatch = typeof store.dispatch;
