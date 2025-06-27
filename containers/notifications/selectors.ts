@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 
 export const notificationsDomains = {
@@ -7,12 +8,19 @@ export const notificationsDomains = {
     state.notifications?.loadingNotifications ?? false,
   errorLoadingNotifications: (state: RootState) =>
     state.notifications?.errorLoadingNotifications ?? undefined,
-  unreadCount: (state: RootState) => state.notifications?.unreadCount ?? 0,
+  hasLoadedOnce: (state: RootState) =>
+    state.notifications?.hasLoadedOnce ?? false,
 };
 
 export const notificationsSelectors = {
   notifications: notificationsDomains.notifications,
   isLoadingNotifications: notificationsDomains.isLoadingNotifications,
   errorLoadingNotifications: notificationsDomains.errorLoadingNotifications,
-  unreadCount: notificationsDomains.unreadCount,
+  unreadCount: createSelector(
+    [notificationsDomains.notifications],
+    (notifications) => {
+      return notifications.filter((n) => !n.is_read).length;
+    }
+  ),
+  hasLoadedOnce: notificationsDomains.hasLoadedOnce,
 };

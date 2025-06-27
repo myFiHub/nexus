@@ -15,12 +15,14 @@ import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "./selectors";
 import { globalActions, useGlobalSlice } from "./slice";
+import { useNotificationsSlice } from "../notifications/slice";
 
 const Container = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const initialized = useSelector(GlobalSelectors.initialized);
   useGlobalSlice();
+  useNotificationsSlice();
 
   useEffect(() => {
     if (router) {

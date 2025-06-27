@@ -142,7 +142,9 @@ const NotificationsPageContent = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-8 text-center">
         <Bell className="h-16 w-16 text-gray-400 mb-6" />
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">Notifications</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Notifications
+        </h1>
         <p className="text-gray-500 text-lg">
           Please log in to view your notifications
         </p>

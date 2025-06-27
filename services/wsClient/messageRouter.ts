@@ -1,9 +1,14 @@
 import { EasyAccess } from "app/containers/global/effects/quickAccess";
+import { notificationsActions } from "app/containers/notifications/slice";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
+import { isDev } from "app/lib/utils";
 import { getStore } from "app/store";
 import { WebSocketService } from "./client";
 import { IncomingMessage, IncomingMessageType } from "./types";
-import { isDev } from "app/lib/utils";
+import {
+  NOTIFICATIONS_UPDATED,
+  notificationsEventBus,
+} from "app/containers/notifications/eventBus";
 
 export type IncomingReactionType =
   | IncomingMessageType.USER_BOOED
@@ -140,11 +145,10 @@ export class WebSocketMessageRouter {
     );
   }
 
-  private static handleNotification(message: IncomingMessage): void {
-    // TODO: Call notifications controller to get notifications
-    // this.withController<NotificationsController>((controller) => {
-    //   controller.getNotifications();
-    // });
+  private static handleNotification(_: IncomingMessage): void {
+    notificationsEventBus.next(NOTIFICATIONS_UPDATED);
+    const store = getStore();
+    store.dispatch(notificationsActions.getNotifications());
   }
 
   private static handleWaitlistUpdated(message: IncomingMessage): void {

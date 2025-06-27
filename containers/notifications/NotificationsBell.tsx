@@ -6,11 +6,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "app/components/Popover";
-import { ReduxProvider } from "app/store/Provider";
+import { motion } from "framer-motion";
 import { Bell, Check, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
+import { notificationsEventBus } from "./eventBus";
 import { notificationsSelectors } from "./selectors";
 import { notificationsActions, useNotificationsSlice } from "./slice";
 
@@ -72,8 +73,8 @@ const NotificationItem = ({
 
   return (
     <div
-      className={`flex items-start gap-3 p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors ${
-        !notification.is_read ? "bg-blue-50" : ""
+      className={`flex items-start gap-3 p-3 border-b border-border hover:bg-accent transition-colors ${
+        !notification.is_read ? "bg-blue-50 dark:bg-blue-950/20" : ""
       }`}
     >
       {content.image && (
@@ -86,13 +87,13 @@ const NotificationItem = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
-            <h4 className="font-medium text-gray-900 text-sm">
+            <h4 className="font-medium text-foreground text-sm">
               {content.title}
             </h4>
-            <p className="text-gray-600 text-xs mt-1 line-clamp-2">
+            <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
               {content.message}
             </p>
-            <p className="text-gray-400 text-xs mt-1">
+            <p className="text-muted-foreground/70 text-xs mt-1">
               {formatTime(notification.created_at)}
             </p>
           </div>
@@ -129,6 +130,7 @@ const NotificationsContent = () => {
   const isLoading = useSelector(notificationsSelectors.isLoadingNotifications);
   const error = useSelector(notificationsSelectors.errorLoadingNotifications);
   const unreadCount = useSelector(notificationsSelectors.unreadCount);
+  const hasLoadedOnce = useSelector(notificationsSelectors.hasLoadedOnce);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
@@ -145,14 +147,18 @@ const NotificationsContent = () => {
     dispatch(notificationsActions.deleteNotification(id));
   };
 
+  const handleRefresh = () => {
+    dispatch(notificationsActions.getNotifications());
+  };
+
   if (!myUser) {
     return (
       <div className="flex flex-col items-center justify-center p-4 text-center">
-        <Bell className="h-8 w-8 text-gray-400 mb-2" />
-        <h3 className="text-sm font-medium text-gray-900 mb-1">
+        <Bell className="h-8 w-8 text-muted-foreground mb-2" />
+        <h3 className="text-sm font-medium text-foreground mb-1">
           No notifications
         </h3>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-muted-foreground">
           Please log in to view your notifications
         </p>
       </div>
@@ -161,45 +167,48 @@ const NotificationsContent = () => {
 
   return (
     <div className="flex flex-col max-h-96">
-      <div className="flex items-center justify-between p-3 border-b border-gray-200">
-        <h2 className="text-sm font-semibold text-gray-900">Notifications</h2>
-        {unreadCount > 0 && (
-          <span className="bg-blue-500 text-white text-xs font-medium px-2 py-1 rounded-full">
-            {unreadCount}
-          </span>
-        )}
+      <div className="flex items-center justify-between p-3 border-b border-border">
+        <h2 className="text-sm font-semibold text-foreground">Notifications</h2>
+        <div className="flex items-center gap-2">
+          {isLoading && hasLoadedOnce && (
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+          )}
+          {unreadCount > 0 && (
+            <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-full">
+              {unreadCount}
+            </span>
+          )}
+        </div>
       </div>
 
       <div className="flex-1 overflow-y-auto">
-        {isLoading ? (
+        {isLoading && !hasLoadedOnce ? (
           <div className="flex items-center justify-center p-4">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center p-4 text-center">
-            <X className="h-8 w-8 text-red-400 mb-2" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">
+            <X className="h-8 w-8 text-destructive mb-2" />
+            <h3 className="text-sm font-medium text-foreground mb-1">
               Error loading notifications
             </h3>
-            <p className="text-xs text-gray-500 mb-2">{error}</p>
-            <Button
-              onClick={() => dispatch(notificationsActions.getNotifications())}
-              variant="outline"
-              size="sm"
-            >
+            <p className="text-xs text-muted-foreground mb-2">{error}</p>
+            <Button onClick={handleRefresh} variant="outline" size="sm">
               Try Again
             </Button>
           </div>
         ) : notifications.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-4 text-center">
-            <Bell className="h-8 w-8 text-gray-400 mb-2" />
-            <h3 className="text-sm font-medium text-gray-900 mb-1">
+            <Bell className="h-8 w-8 text-muted-foreground mb-2" />
+            <h3 className="text-sm font-medium text-foreground mb-1">
               No notifications
             </h3>
-            <p className="text-xs text-gray-500">You're all caught up!</p>
+            <p className="text-xs text-muted-foreground">
+              You're all caught up!
+            </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-border">
             {notifications.map((notification) => (
               <NotificationItem
                 key={notification.uuid}
@@ -227,7 +236,26 @@ export const NotificationsBell = ({
   showBadge = true,
 }: NotificationsBellProps) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isWiggling, setIsWiggling] = useState(false);
   const unreadCount = useSelector(notificationsSelectors.unreadCount);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const subscription = notificationsEventBus.subscribe(() => {
+      // Trigger wiggle animation when notification is received
+      setIsWiggling(true);
+      setTimeout(() => setIsWiggling(false), 600); // Reset after animation completes
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (open) {
+      // Fetch notifications when opening the popover
+      dispatch(notificationsActions.getNotifications());
+    }
+  };
 
   const sizeClasses = {
     sm: "h-4 w-4",
@@ -242,31 +270,45 @@ export const NotificationsBell = ({
   };
 
   return (
-    <ReduxProvider>
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="ghost"
-            size="sm"
-            className={`relative ${className}`}
-            aria-label={`Notifications ${
-              unreadCount > 0 ? `(${unreadCount} unread)` : ""
-            }`}
+    <Popover open={isOpen} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`relative ${className}`}
+          aria-label={`Notifications ${
+            unreadCount > 0 ? `(${unreadCount} unread)` : ""
+          }`}
+        >
+          <motion.div
+            animate={
+              isWiggling
+                ? {
+                    rotate: [-5, 5, -5, 5, -2, 2, 0],
+                    y: [0, -8, 0, -4, 0, -2, 0],
+                    scale: [1, 1.1, 1, 1.05, 1, 1.02, 1],
+                    transition: {
+                      duration: 0.6,
+                      ease: "easeInOut",
+                    },
+                  }
+                : {}
+            }
           >
             <Bell className={sizeClasses[size]} />
-            {showBadge && unreadCount > 0 && (
-              <span
-                className={`absolute -top-1 -right-1 bg-red-500 text-white font-medium rounded-full flex items-center justify-center ${badgeSizeClasses[size]}`}
-              >
-                {unreadCount > 9 ? "9+" : unreadCount}
-              </span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80 p-0" align="end" sideOffset={8}>
-          <NotificationsContent />
-        </PopoverContent>
-      </Popover>
-    </ReduxProvider>
+          </motion.div>
+          {showBadge && unreadCount > 0 && (
+            <span
+              className={`absolute -top-1 -right-1 bg-red-500 text-white font-medium rounded-full flex items-center justify-center ${badgeSizeClasses[size]}`}
+            >
+              {unreadCount > 9 ? "9+" : unreadCount}
+            </span>
+          )}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="end" sideOffset={8}>
+        <NotificationsContent />
+      </PopoverContent>
+    </Popover>
   );
 };
