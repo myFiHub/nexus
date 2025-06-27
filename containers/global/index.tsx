@@ -3,6 +3,7 @@ import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time"
 import { UserSelectDialogProvider } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
 import { ReminderDialogProvider } from "app/components/Dialog/reminder";
+import { OneSignalProvider } from "app/components/OneSignalProvider";
 import { Toaster } from "app/components/toast";
 import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
 import { ReduxProvider } from "app/store/Provider";
@@ -46,7 +47,9 @@ export const GlobalContainer = memo(
   () => {
     return (
       <ReduxProvider>
-        <Container />
+        <OneSignalProvider>
+          <Container />
+        </OneSignalProvider>
       </ReduxProvider>
     );
   },

@@ -44,6 +44,7 @@
     "react": "^19.0.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",
+    "react-onesignal": "^3.2.3",
     "react-redux": "^9.2.0",
     "react-tag-input-component": "^2.0.2",
     "react-tagged": "^1.2.0",
