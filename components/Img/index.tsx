@@ -8,9 +8,10 @@ interface ImgProps {
   alt: string;
   className?: string;
   style?: React.CSSProperties;
+  onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
 }
 
-export const Img = ({ src, alt, className, style }: ImgProps) => {
+export const Img = ({ src, alt, className, style, onError }: ImgProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -48,6 +49,7 @@ export const Img = ({ src, alt, className, style }: ImgProps) => {
 
       {/* Image */}
       <img
+        onError={onError}
         src={error || !src ? fallbackUrl : src}
         alt={alt}
         className={`${styles.image} ${isLoading ? styles.loading : ""} `}

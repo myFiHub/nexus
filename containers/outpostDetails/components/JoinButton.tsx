@@ -24,7 +24,6 @@ const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
   const joining = joiningId === outpost.uuid;
   const { displayText, isPassed } = getTimerInfo(outpost.scheduled_for);
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
-
   if (!outpost) return null;
   const join = () => {
     dispatch(globalActions.joinOutpost({ outpost }));

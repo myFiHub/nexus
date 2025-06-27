@@ -1,9 +1,8 @@
 "use client";
 import { useOutpostImageUpload } from "app/services/imageUpload/useOutpostImageUpload";
-import { Button } from "../../../components/Button";
-import { Img } from "../../../components/Img";
-import { logoUrl } from "../../../lib/constants";
 import { useDispatch, useSelector } from "react-redux";
+import { Button } from "../../../components/Button";
+import { logoUrl } from "../../../lib/constants";
 import { createOutpostSelectors } from "../selectors";
 import { createOutpostActions } from "../slice";
 
@@ -15,11 +14,15 @@ const ImageSelector = () => {
   const handleImagePick = async () => {
     const file = await pickImage();
     if (file) {
-      // Create a preview URL for the selected image
-
       dispatch(createOutpostActions.setSelectedImage(file));
     }
   };
+
+  // Simple approach - just use the file directly if it exists
+  const imageSrc =
+    selectedImage instanceof File
+      ? URL.createObjectURL(selectedImage)
+      : logoUrl;
 
   return (
     <div
@@ -46,8 +49,8 @@ const ImageSelector = () => {
           justifyContent: "center",
         }}
       >
-        <Img
-          src={selectedImage ? URL.createObjectURL(selectedImage) : logoUrl}
+        <img
+          src={imageSrc}
           alt="Outpost image"
           style={{
             width: "100%",
