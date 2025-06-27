@@ -64,9 +64,41 @@ fetch('/api/revalidate/all-outposts', {
 }
 ```
 
+### 3. Revalidate Outpost Details Page
+
+**Endpoint:** `POST /api/revalidate/outpost-details/[id]` or `GET /api/revalidate/outpost-details/[id]`
+
+**Description:** Revalidates the outpost details page for a specific outpost ID.
+
+**Parameters:**
+
+- `id` (path parameter): The outpost ID to revalidate
+
+**Example Usage:**
+
+```bash
+# Using curl
+curl -X POST http://your-domain.com/api/revalidate/outpost-details/67890
+
+# Using fetch
+fetch('/api/revalidate/outpost-details/67890', {
+  method: 'POST'
+})
+```
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Outpost details page for ID 67890 has been revalidated",
+  "revalidatedPath": "/outpost_details/67890"
+}
+```
+
 ## Error Responses
 
-Both endpoints return error responses in the following format:
+All endpoints return error responses in the following format:
 
 ```json
 {

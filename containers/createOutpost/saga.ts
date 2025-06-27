@@ -22,9 +22,8 @@ import {
 import { outpostImageService } from "app/services/imageUpload";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
+import { revalidateService } from "../../services/revalidate";
 import { GlobalSelectors } from "../global/selectors";
-import { revalidateAllOutpostsPage } from "../userDetails/serverActions/revalidateAllOutpostsPage";
-import { revalidateOutpostDetailsPage } from "../userDetails/serverActions/revalidateOutpostDetailsPage";
 import { createOutpostSelectors } from "./selectors";
 import { createOutpostActions } from "./slice";
 function* validateFields(
@@ -263,8 +262,17 @@ function* createOutpost(
     yield put(createOutpostActions.setIsSubmitting(false));
     yield put(createOutpostActions.reset());
     const router: AppRouterInstance = yield select(GlobalSelectors.router);
-    revalidateAllOutpostsPage();
-    revalidateOutpostDetailsPage(outpost.uuid);
+
+    // Use client-side revalidation service instead of server actions
+    try {
+      yield revalidateService.revalidateMultiple({
+        outpostId: outpost.uuid,
+        allOutposts: true,
+      });
+    } catch (error) {
+      console.error("Failed to revalidate pages:", error);
+    }
+
     router.push(`/outpost_details/${outpost.uuid}`);
   } catch (error) {
     console.log({ error });

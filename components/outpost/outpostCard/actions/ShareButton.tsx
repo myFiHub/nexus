@@ -53,7 +53,7 @@ const Content = ({ outpost, className }: ShareButtonProps) => {
           className={`bg-black/60 backdrop-blur-sm border-white/20 text-white hover:bg-black/80 hover:border-white/40 ${className}`}
         >
           {copied ? (
-            <Check className="h-4 w-4" />
+            <Check className="h-4 w-4 text-green-500" />
           ) : (
             <Share2 className="h-4 w-4" />
           )}

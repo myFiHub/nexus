@@ -1,10 +1,10 @@
-import { put, takeEvery } from "redux-saga/effects";
-import { usersActions } from "./slice";
 import { sendFollowEvent } from "app/lib/messenger";
-import { FollowUnfollowRequest } from "app/services/api/types";
 import { toast } from "app/lib/toast";
-import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
 import podiumApi from "app/services/api";
+import { FollowUnfollowRequest } from "app/services/api/types";
+import { put, takeEvery } from "redux-saga/effects";
+import { revalidateService } from "../../services/revalidate";
+import { usersActions } from "./slice";
 
 function* followUnfollowUser(
   action: ReturnType<typeof usersActions.followUnfollowUser>
@@ -23,8 +23,12 @@ function* followUnfollowUser(
       sendFollowEvent({ id, followed: follow });
       toast.success(`${toastString} user`);
       yield put(usersActions.updateFollowStatusCache({ id, follow }));
-      // invalidate user data
-      revalidateUserProfile(id);
+      // invalidate user data using client-side revalidation
+      try {
+        yield revalidateService.revalidateUser(id);
+      } catch (error) {
+        console.error("Failed to revalidate user page:", error);
+      }
     } else {
       sendFollowEvent({ id, loading: false });
       toast.error(`Failed to ${toastString} user`);

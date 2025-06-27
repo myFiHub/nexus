@@ -1,9 +1,5 @@
-import { sendFollowEvent } from "app/lib/messenger";
-import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { FollowUnfollowRequest } from "app/services/api/types";
-import { all, put, takeEvery, takeLatest } from "redux-saga/effects";
-import { revalidateUserProfile } from "./serverActions/revalidateUser";
+import { all, put, takeLatest } from "redux-saga/effects";
 import { userDetailsActions } from "./slice";
 
 function* getTabsData(

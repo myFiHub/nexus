@@ -13,10 +13,10 @@ import {
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
 import { all, put, select, takeLatest } from "redux-saga/effects";
+import { revalidateService } from "../../services/revalidate";
 import { canISpeakWithoutTicket } from "../global/effects/joinOutpost";
 import { OutpostAccesses } from "../global/effects/types";
 import { GlobalSelectors } from "../global/selectors";
-import { revalidateUserProfile } from "../userDetails/serverActions/revalidateUser";
 import {
   openOutpostPassCheckDialog,
   OutpostAccessesDialogResult,
@@ -216,7 +216,12 @@ function* buyPassFromUser(
           }
         }
 
-        revalidateUserProfile(user.uuid);
+        // Revalidate user profile using client-side service
+        try {
+          yield revalidateService.revalidateUser(user.uuid);
+        } catch (error) {
+          console.error("Failed to revalidate user page:", error);
+        }
       } else if (errorOrHash) {
         toast.error(errorOrHash);
       }
