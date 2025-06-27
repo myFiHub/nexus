@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
+import { Img } from "../Img";
 import { LoginButton } from "./LoginButton";
 import { NavLink } from "./NavLink";
 import { ThemeToggle } from "./themeToggle";
@@ -45,15 +46,16 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] px-6 py-3 flex items-center justify-between shadow-md transition-transform duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] pr-3 pl-1 py-3 flex items-center justify-between shadow-md transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="flex items-center gap-2">
+      <div className="flex items-center ">
         <AppLink
           href="/"
-          className="flex items-center gap-2 text-xl font-bold text-[var(--header-link-active)] hover:no-underline"
+          className="flex items-center gap-1 text-xl font-bold text-[var(--header-link-active)] hover:no-underline px-0"
         >
+          <Img src="/logo.png" alt="Podium Nexus" className="w-6 h-6" />
           Podium Nexus
         </AppLink>
       </div>
@@ -66,7 +68,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
             </NavLink>
           ))}
       </nav>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-1">
         <ThemeToggle initialValue={theme} />
         {isLoggedIn && <NotificationsBell />}
         <LoginButton />
