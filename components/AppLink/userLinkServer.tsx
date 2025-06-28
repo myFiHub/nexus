@@ -1,4 +1,4 @@
-import { CookieKeys } from "app/lib/cookies";
+import { CookieKeys } from "app/lib/client-cookies";
 import { getServerCookie } from "app/lib/server-cookies";
 import { AppLink } from ".";
 import { UserLinkProps } from "./userLink";

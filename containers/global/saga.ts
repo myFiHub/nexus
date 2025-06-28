@@ -9,13 +9,14 @@ import {
   confirmDialog,
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
+import { CookieKeys } from "app/lib/client-cookies";
 import {
-  CookieKeys,
   deleteServerCookieViaAPI,
   setServerCookieViaAPI,
-} from "app/lib/cookies";
+} from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
+import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
 import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
@@ -73,6 +74,11 @@ function* initOneSignal(
 ) {
   const myId: string = action.payload.myId;
   try {
+    const result: boolean = yield requestPushNotificationPermission();
+    if (!result) {
+      toast.error("Push notification permission is denied");
+      return;
+    }
     yield initOneSignalForUser(myId);
   } catch (error) {
     console.error("Error initializing OneSignal:", error);

@@ -16,14 +16,11 @@ const globalSlice = createSlice({
   name: "outpostDetails",
   initialState,
   reducers: {
-    getOutpost(state, action: PayloadAction<string>) {},
+    getOutpost(_, __: PayloadAction<string>) {},
     setOutpost(state, action: PayloadAction<OutpostModel>) {
       state.outpost = action.payload;
     },
-    editScheduledDate(
-      state,
-      action: PayloadAction<{ outpost: OutpostModel }>
-    ) {},
+    editScheduledDate(_, __: PayloadAction<{ outpost: OutpostModel }>) {},
     setEditingScheduledDate(state, action: PayloadAction<boolean>) {
       state.editingScheduledDate = action.payload;
     },

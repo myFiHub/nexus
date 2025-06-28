@@ -2,6 +2,7 @@ import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
+import { Loader2 } from "lucide-react";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
@@ -19,6 +20,7 @@ export const Meet = memo(
 
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
     const joined = useSelector(onGoingOutpostSelectors.joined);
+
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
     useEffect(() => {
       if (outpost?.uuid && !accesses?.canEnter) {
@@ -49,6 +51,7 @@ export const Meet = memo(
     };
 
     const showIframeClassName = joined ? "opacity-100" : "opacity-0";
+
     return (
       <div className="space-y-4">
         <div
@@ -56,6 +59,14 @@ export const Meet = memo(
         >
           <MeetEventListeners />
           <OngoingOutpostMembers />
+
+          {/* Loader when not joined */}
+          {!joined && (
+            <div className="absolute inset-0 flex items-center justify-center z-10">
+              <Loader2 className="w-8 h-8 animate-spin text-foreground" />
+            </div>
+          )}
+
           <JitsiMeeting
             domain={process.env.NEXT_PUBLIC_OUTPOST_SERVER}
             roomName={outpost.uuid}

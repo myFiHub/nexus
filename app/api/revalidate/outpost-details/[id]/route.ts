@@ -18,7 +18,6 @@ export async function POST(
 
     // Revalidate the outpost details page
     revalidatePath(`/outpost_details/${id}`);
-
     return NextResponse.json(
       {
         success: true,

@@ -15,6 +15,7 @@ export interface OnGoingOutpostState {
   isBooingAddress?: string;
   amIMuted: boolean;
   meetApiObj?: any;
+  hasAudioPermission: boolean;
   raisedHandUsers: {
     [address: string]: LiveMember;
   };
@@ -29,6 +30,7 @@ export const initialState: OnGoingOutpostState = {
   isGettingLiveMembers: false,
   accesses: { canEnter: false, canSpeak: false },
   liveMembers: {},
+  hasAudioPermission: true,
   amIMuted: true,
   joined: false,
   raisedHandUsers: {},
@@ -39,6 +41,9 @@ const onGoingOutpostSlice = createSlice({
   initialState,
   reducers: {
     getOutpost(_, __: PayloadAction<{ id: string }>) {},
+    setHasAudioPermission(state, action: PayloadAction<boolean>) {
+      state.hasAudioPermission = action.payload;
+    },
     isGettingOutpost(state, action: PayloadAction<boolean>) {
       state.isGettingOutpost = action.payload;
     },

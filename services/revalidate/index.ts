@@ -43,7 +43,7 @@ class RevalidateService {
     method: "GET" | "POST" = "POST"
   ): Promise<T> {
     const url = `${this.baseUrl}/api/revalidate${endpoint}`;
-
+    console.log("url", url);
     const response = await fetch(url, {
       method,
       headers: {

@@ -1,14 +1,15 @@
+"use client";
+import { ReduxProvider } from "app/store/Provider";
 import { Calendar } from "lucide-react";
+import { useSelector } from "react-redux";
+import { outpostDetailsSelectors } from "../../selectors";
 import { EditScheduledDateButton } from "./EditScheduledDateButton";
-import { OutpostModel } from "app/services/api/types";
 
-interface ScheduledDateSectionProps {
-  outpost: OutpostModel;
-}
-
-export const ScheduledDateSection = ({
-  outpost,
-}: ScheduledDateSectionProps) => {
+const Content = () => {
+  const outpost = useSelector(outpostDetailsSelectors.outpost);
+  if (!outpost || !outpost.scheduled_for) {
+    return null;
+  }
   const scheduledDate = new Date(outpost.scheduled_for);
 
   return (
@@ -31,5 +32,13 @@ export const ScheduledDateSection = ({
         </p>
       </div>
     </div>
+  );
+};
+
+export const ScheduledDateSection = () => {
+  return (
+    <ReduxProvider>
+      <Content />
+    </ReduxProvider>
   );
 };

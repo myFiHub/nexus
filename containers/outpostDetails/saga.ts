@@ -4,6 +4,7 @@ import {
 } from "app/components/Calendar/date-time";
 import podiumApi from "app/services/api";
 import { OutpostModel, UpdateOutpostRequest } from "app/services/api/types";
+import { revalidateService } from "app/services/revalidate";
 import { put, takeLatest } from "redux-saga/effects";
 import { outpostDetailsActions } from "./slice";
 
@@ -38,6 +39,9 @@ function* editScheduledDate(
           scheduled_for: newScheduledFor,
         })
       );
+      yield revalidateService.revalidateMultiple({
+        outpostId: outpost.uuid,
+      });
     }
   } catch (error) {
     console.error(error);

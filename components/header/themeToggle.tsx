@@ -1,7 +1,11 @@
 "use client";
 
+import {
+  CookieKeys,
+  getClientCookie,
+  setClientCookie,
+} from "app/lib/client-cookies";
 import { motion } from "framer-motion";
-import Cookies from "js-cookie";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -13,7 +17,7 @@ export const ThemeToggle = ({
   const [theme, setTheme] = useState<"light" | "dark">(initialValue);
 
   useEffect(() => {
-    const savedTheme = Cookies.get("theme") as "light" | "dark";
+    const savedTheme = getClientCookie(CookieKeys.theme) as "light" | "dark";
     if (savedTheme) {
       setTheme(savedTheme);
       document.documentElement.classList.toggle("dark", savedTheme === "dark");
@@ -24,7 +28,7 @@ export const ThemeToggle = ({
     const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
     document.documentElement.classList.toggle("dark", newTheme === "dark");
-    Cookies.set("theme", newTheme, { expires: 365 });
+    setClientCookie(CookieKeys.theme, newTheme, { expires: 365 });
   };
 
   return (

@@ -216,12 +216,6 @@ export async function generateMetadata({
     category: "social",
     classification: "social platform",
     referrer: "origin-when-cross-origin",
-    colorScheme: "light dark",
-    viewport: {
-      width: "device-width",
-      initialScale: 1,
-      maximumScale: 1,
-    },
     applicationName: "Nexus",
     appleWebApp: {
       capable: true,
@@ -251,11 +245,16 @@ export async function generateMetadata({
 }
 
 export const viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#000000" },
-  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  colorScheme: "light dark",
 };
+
+export const themeColor = [
+  { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+  { media: "(prefers-color-scheme: dark)", color: "#000000" },
+];
 
 export default async function OutpostDetailsPage({
   params,

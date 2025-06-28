@@ -9,18 +9,21 @@ import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
+import { outpostDetailsSelectors } from "../selectors";
 
 interface JoinButtonProps {
   outpost: OutpostModel;
 }
 
-const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
+const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
   useOnGoingOutpostSlice();
   useSelector(GlobalSelectors.tick);
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
+  const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
+  const outpost = stateOutpost || passedOutpost;
   const joining = joiningId === outpost.uuid;
   const { displayText, isPassed } = getTimerInfo(outpost.scheduled_for);
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
@@ -37,7 +40,7 @@ const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
 
   return (
     <Button
-      className={`w-full  text-center`}
+      className={`w-full text-center`}
       onClick={join}
       disabled={iAmCreator ? disabledIfIAmCreator : disabledIfImNotCreator}
     >

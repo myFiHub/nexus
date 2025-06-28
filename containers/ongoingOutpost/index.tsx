@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
 import { Meet } from "./components/meet";
+import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
 
@@ -18,7 +19,7 @@ const OngoingOutpostContent = ({
   loading: boolean;
 }) => {
   if (loading) {
-    return <div>Loading...</div>;
+    return <OngoingOutpostSkeleton />;
   }
   if (!myUser) {
     return <div>Please login to view this page</div>;

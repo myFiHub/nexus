@@ -1,4 +1,4 @@
-import { CookieKeys } from "app/lib/cookies";
+import { CookieKeys } from "app/lib/client-cookies";
 import {
   deleteServerCookie,
   getServerCookie,

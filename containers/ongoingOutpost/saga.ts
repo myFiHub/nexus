@@ -2,6 +2,7 @@ import {
   confirmDialog,
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
+import { checkAudioPermission } from "app/lib/audioPermissions";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -31,6 +32,14 @@ function* getOutpost(
   action: ReturnType<typeof onGoingOutpostActions.getOutpost>
 ) {
   try {
+    const hasAudioPermission: boolean = yield checkAudioPermission();
+    if (!hasAudioPermission) {
+      yield put(onGoingOutpostActions.setHasAudioPermission(false));
+      toast.error("Microphone permission is denied");
+    }
+
+    yield put(onGoingOutpostActions.setHasAudioPermission(true));
+
     const { id } = action.payload;
     yield put(onGoingOutpostActions.isGettingOutpost(true));
     const outpost: OutpostModel | undefined = yield podiumApi.getOutpost(id);

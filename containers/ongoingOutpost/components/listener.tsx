@@ -1,4 +1,5 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { isDev } from "app/lib/utils";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../selectors";
@@ -31,12 +32,16 @@ export const MeetEventListeners = () => {
     if (apiObj && outpost) {
       // Define event handler functions
       const handleVideoConferenceJoined = () => {
-        console.log("Conference joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        if (isDev) {
+          console.log("Conference joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
         handleJoined(true);
       };
 
       const handleVideoConferenceLeft = () => {
-        console.log("Conference left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        if (isDev) {
+          console.log("Conference left!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        }
         handleJoined(false);
         dispatch(onGoingOutpostActions.leaveOutpost(outpost));
       };
@@ -68,18 +73,26 @@ export const MeetEventListeners = () => {
       };
 
       const handleParticipantLeft = (id: string) => {
-        console.log("Participant left:", id);
+        if (isDev) {
+          console.log("Participant left:", id);
+        }
+        dispatch(onGoingOutpostActions.getLiveMembers());
       };
 
       const handleParticipantJoined = (id: string) => {
-        console.log("Participant joined:", id);
+        if (isDev) {
+          console.log("Participant joined:", id);
+        }
+        dispatch(onGoingOutpostActions.getLiveMembers());
       };
 
       const handleRaisedHand = (event: {
         id: string; // participantId of the user who raises/lowers the hand
         handRaised: number; // 0 when hand is lowered and the hand raised timestamp when raised.
       }) => {
-        console.log("Raised hand:", event);
+        if (isDev) {
+          console.log("Raised hand:", event);
+        }
       };
 
       // Add event listeners

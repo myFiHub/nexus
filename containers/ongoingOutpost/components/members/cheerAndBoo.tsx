@@ -54,7 +54,7 @@ export const CheerAndBoo = ({
         <img
           src="/cheer.png"
           alt="Cheer"
-          className="w-4 h-4 brightness-0 saturate-100 invert-[0.4] sepia-100 saturate-1000 hue-rotate-[120deg]"
+          className="w-4 h-4 brightness-0  invert-[0.4] sepia-100 saturate-1000 hue-rotate-[120deg]"
         />
       )}
     </Button>
@@ -75,7 +75,7 @@ export const CheerAndBoo = ({
         <img
           src="/boo.png"
           alt="Boo"
-          className="w-4 h-4 brightness-0 saturate-100 invert-[0.4] sepia-100 saturate-1000 hue-rotate-[320deg]"
+          className="w-4 h-4 brightness-0   invert-[0.4] sepia-100 saturate-1000 hue-rotate-[320deg]"
         />
       )}
     </Button>

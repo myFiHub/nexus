@@ -14,24 +14,14 @@ interface EventDetailsProps {
 }
 
 export function EventDetails({ outpost }: EventDetailsProps) {
-  const scheduledDate = new Date(outpost.scheduled_for);
-
   return (
     <div className="bg-card p-6 rounded-xl shadow-sm space-y-4">
       <h2 className="text-2xl font-semibold mb-4">Event Details</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {outpost.scheduled_for ? (
-          <ScheduledDateSection outpost={outpost} />
-        ) : (
-          <></>
-        )}
+        <ScheduledDateSection />
 
-        {outpost.scheduled_for ? (
-          <TimeUntil scheduledDate={scheduledDate} />
-        ) : (
-          <></>
-        )}
+        <TimeUntil />
 
         <div className="flex items-start gap-3">
           <Shield
