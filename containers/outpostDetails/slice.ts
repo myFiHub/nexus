@@ -17,7 +17,7 @@ const globalSlice = createSlice({
   initialState,
   reducers: {
     getOutpost(_, __: PayloadAction<string>) {},
-    setOutpost(state, action: PayloadAction<OutpostModel>) {
+    setOutpost(state, action: PayloadAction<OutpostModel | undefined>) {
       state.outpost = action.payload;
     },
     editScheduledDate(_, __: PayloadAction<{ outpost: OutpostModel }>) {},

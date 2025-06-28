@@ -18,7 +18,9 @@ const Content = () => {
       <Clock className="w-5 h-5 text-primary mt-1" />
       <div>
         <p className="font-medium">Time Until</p>
-        <p className="text-muted-foreground">{timeUntil}</p>
+        <p className="text-muted-foreground" id={`time-until-${outpost.uuid}`}>
+          {timeUntil}
+        </p>
       </div>
     </div>
   );

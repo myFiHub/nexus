@@ -23,7 +23,6 @@ function* editScheduledDate(
       });
     if (!newScheduledFor) {
       yield put(outpostDetailsActions.setEditingScheduledDate(false));
-
       return;
     }
 

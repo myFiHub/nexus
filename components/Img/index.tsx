@@ -15,6 +15,7 @@ interface ImgProps {
   fill?: boolean;
   sizes?: string;
   useImgTag?: boolean;
+  id?: string;
 }
 
 export const Img = ({
@@ -28,6 +29,7 @@ export const Img = ({
   fill = false,
   sizes,
   useImgTag = false,
+  id,
 }: ImgProps) => {
   const [imageState, setImageState] = useState<"loading" | "loaded" | "error">(
     "loading"
@@ -121,6 +123,7 @@ export const Img = ({
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}
+          id={id}
           className={`${styles.image} ${
             imageState === "loading" ? styles.loading : ""
           }`}
@@ -169,6 +172,7 @@ export const Img = ({
       {/* Next.js Image */}
       <Image
         src={imageSrc}
+        id={id}
         alt={alt}
         onLoad={handleLoad}
         onError={handleError}

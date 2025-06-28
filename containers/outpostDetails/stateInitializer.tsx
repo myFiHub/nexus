@@ -17,6 +17,9 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
     dispatch(outpostDetailsActions.setOutpost(outpost));
     dispatch(onGoingOutpostActions.setOutpost(outpost));
     dispatch(outpostDetailsActions.getOutpost(outpost.uuid));
+    // return () => {
+    //   dispatch(outpostDetailsActions.setOutpost(undefined));
+    // };
   }, [outpost.uuid]);
   return <></>;
 };
