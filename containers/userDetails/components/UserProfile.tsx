@@ -1,4 +1,5 @@
 import { CopyButton } from "app/components/copyButton";
+import { Img } from "app/components/Img";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
 import { FollowButton } from "../../_users/components/followButton";
@@ -12,10 +13,13 @@ export const UserProfile = ({ user }: UserProfileProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
       {user.image && (
-        <img
+        <Img
           src={user.image}
           alt={user.name || "User"}
+          width={80}
+          height={80}
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-full"
+          useImgTag
         />
       )}
       <div className="text-center sm:text-left">

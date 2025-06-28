@@ -19,6 +19,7 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
               src={outpost.creator_user_image || logoUrl}
               alt={outpost.creator_user_name}
               className="w-6 h-6 rounded-full border-1 border-primary"
+              useImgTag
             />
             <UserLink
               id={outpost.creator_user_uuid}

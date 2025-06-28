@@ -2,6 +2,7 @@ import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import { Loader2 } from "lucide-react";
+import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
 import { onGoingOutpostActions } from "../../slice";
@@ -51,9 +52,11 @@ export const CheerAndBoo = ({
       {isCheering ? (
         <Loader2 className="w-3 h-3 animate-spin" />
       ) : (
-        <img
+        <Image
           src="/cheer.png"
           alt="Cheer"
+          width={16}
+          height={16}
           className="w-4 h-4 brightness-0  invert-[0.4] sepia-100 saturate-1000 hue-rotate-[120deg]"
         />
       )}
@@ -72,9 +75,11 @@ export const CheerAndBoo = ({
       {isBooing ? (
         <Loader2 className="w-3 h-3 animate-spin" />
       ) : (
-        <img
+        <Image
           src="/boo.png"
           alt="Boo"
+          width={16}
+          height={16}
           className="w-4 h-4 brightness-0   invert-[0.4] sepia-100 saturate-1000 hue-rotate-[320deg]"
         />
       )}

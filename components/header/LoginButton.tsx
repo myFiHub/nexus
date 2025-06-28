@@ -87,6 +87,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
               src={podiumUserInfo.image}
               alt="profile"
               className="w-6 h-6 rounded-full"
+              useImgTag
             />
           )}
           <span>{truncate(podiumUserInfo.aptos_address)}</span>

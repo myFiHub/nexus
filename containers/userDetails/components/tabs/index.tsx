@@ -33,6 +33,7 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
             src={user.image || defaultProfilePic}
             alt={user.name || "User"}
             className="object-cover"
+            useImgTag
           />
         </div>
         <div className="min-w-0 flex-1">

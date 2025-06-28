@@ -16,6 +16,7 @@ export const ConnectedAccountCard = ({
             src={account.image}
             alt={account.login_type_identifier || "account"}
             className="w-full h-full object-cover"
+            useImgTag
           />
         </div>
       )}

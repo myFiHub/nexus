@@ -46,9 +46,9 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
           </div>
 
           {/* Main Content */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
             {/* Left Column - Main Info */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-3 space-y-6">
               <CreatorCard outpost={outpost} />
               <EventDetails outpost={outpost} />
               <Tags tags={outpost.tags} />
@@ -56,7 +56,9 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
             </div>
 
             {/* Right Column - Actions */}
-            <Sidebar outpost={outpost} isUpcoming={isUpcoming} />
+            <div className="lg:col-span-2">
+              <Sidebar outpost={outpost} isUpcoming={isUpcoming} />
+            </div>
           </div>
         </div>
       </div>

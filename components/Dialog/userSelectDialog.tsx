@@ -21,6 +21,7 @@
 //   }
 // };
 
+import { Img } from "app/components/Img";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
 import { RootState } from "app/store";
@@ -234,10 +235,13 @@ export const UserSelectDialogProvider = () => {
                   </div>
                   <div className="flex items-center flex-1">
                     {user.image && (
-                      <img
+                      <Img
                         src={user.image}
                         alt={user.name || "User"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full mr-3"
+                        useImgTag
                       />
                     )}
                     <div className="flex-1">

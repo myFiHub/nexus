@@ -12,6 +12,7 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
         src={user?.image}
         alt={user?.name || "user"}
         className="w-full h-full object-cover"
+        useImgTag
       />
     </div>
     <div className="flex-1 min-w-0">

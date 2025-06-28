@@ -19,6 +19,7 @@
 //   }
 // };
 
+import { Img } from "app/components/Img";
 import { canInviteToSpeak } from "app/lib/outpostPermissions";
 import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
@@ -436,10 +437,13 @@ export const UserSelectToInviteDialogProvider = () => {
                 >
                   <div className="flex items-center flex-1">
                     {user.image && (
-                      <img
+                      <Img
                         src={user.image}
                         alt={user.name || "User"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full mr-3"
+                        useImgTag
                       />
                     )}
                     <div className="flex-1">

@@ -1,5 +1,6 @@
 "use client";
 import { useOutpostImageUpload } from "app/services/imageUpload/useOutpostImageUpload";
+import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { logoUrl } from "../../../lib/constants";
@@ -28,10 +29,13 @@ const ImageSelector = () => {
     <div className="mb-8 flex flex-col items-center gap-4">
       {/* Image Preview */}
       <div className="relative h-48 w-48 overflow-hidden rounded-xl border-2 border-dashed border-gray-200 bg-gray-50 flex items-center justify-center">
-        <img
+        <Image
           src={imageSrc}
           alt="Outpost image"
+          width={192}
+          height={192}
           className="h-full w-full object-cover"
+          unoptimized={imageSrc.startsWith("blob:")}
         />
       </div>
 

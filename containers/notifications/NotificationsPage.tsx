@@ -4,6 +4,7 @@ import OutpostLink from "app/components/AppLink/outpostLink";
 import { Button } from "app/components/Button";
 import { ReduxProvider } from "app/store/Provider";
 import { Bell, Check, Trash2, X } from "lucide-react";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
@@ -87,9 +88,11 @@ const NotificationItem = ({
       }`}
     >
       {content.image && (
-        <img
+        <Image
           src={content.image}
           alt="User"
+          width={40}
+          height={40}
           className="w-10 h-10 rounded-full object-cover flex-shrink-0"
         />
       )}

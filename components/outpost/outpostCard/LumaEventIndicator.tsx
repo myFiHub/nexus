@@ -1,4 +1,5 @@
 "use client";
+import { Img } from "app/components/Img";
 import {
   Tooltip,
   TooltipContent,
@@ -7,6 +8,7 @@ import {
 } from "app/components/Tooltip";
 import { LumaApi, LumaEventModel } from "app/services/api/luma";
 import { Calendar, Clock, ExternalLink, User, Users } from "lucide-react";
+import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 interface LumaEventIndicatorProps {
@@ -79,9 +81,11 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
       <Tooltip open={isOpen} onOpenChange={setIsOpen}>
         <TooltipTrigger asChild>
           <div className="cursor-pointer w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-blue-500/80 to-purple-500/80 backdrop-blur-sm border border-white/30 hover:from-blue-500 hover:to-purple-500 hover:border-white/50 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-            <img
+            <Image
               src="/lumaPng.png"
               alt="Luma Event"
+              width={20}
+              height={20}
               className="w-5 h-5 rounded-md"
             />
           </div>
@@ -116,9 +120,11 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
               {/* Event Image */}
               {eventDetails.event.cover_url && (
                 <div className="w-full h-32 bg-gradient-to-r from-blue-500/80 to-purple-600/80 relative">
-                  <img
+                  <Image
                     src={eventDetails.event.cover_url}
                     alt={eventDetails.event.name}
+                    width={320}
+                    height={128}
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/40" />
@@ -186,10 +192,13 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
                           className="flex items-center bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white font-medium"
                         >
                           {host.avatar_url ? (
-                            <img
+                            <Img
                               src={host.avatar_url}
                               alt={host.name}
+                              width={16}
+                              height={16}
                               className="w-4 h-4 rounded-full mr-1"
+                              useImgTag
                             />
                           ) : (
                             <User className="w-3 h-3 mr-1" />
