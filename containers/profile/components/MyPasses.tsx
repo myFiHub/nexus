@@ -1,4 +1,6 @@
 import { Button } from "app/components/Button";
+import { CopyButton } from "app/components/copyButton";
+import { truncate } from "app/lib/utils";
 import { ExternalLink, Heart, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useSelector } from "react-redux";
@@ -30,10 +32,8 @@ const PassCard = ({ pass }: { pass: any }) => (
             />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-primary-foreground truncate">
-              {pass.name}
-            </h3>
-            <p className="text-sm text-primary-foreground/80">
+            <h3 className="font-medium text-white truncate">{pass.name}</h3>
+            <p className="text-sm text-white/80">
               {pass.count} {pass.count === 1 ? "pass" : "passes"}
             </p>
           </div>
@@ -63,8 +63,9 @@ const PassCard = ({ pass }: { pass: any }) => (
         {/* Address info */}
         <div className="text-sm">
           <p className="text-gray-500 mb-1">Owner Address</p>
-          <p className="font-mono text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">
-            {pass.podium_pass_owner_address}
+          <p className="font-mono text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded break-all flex items-center gap-2">
+            {truncate(pass.podium_pass_owner_address, 20)}
+            <CopyButton text={pass.podium_pass_owner_address} />
           </p>
         </div>
 
@@ -76,7 +77,7 @@ const PassCard = ({ pass }: { pass: any }) => (
             className="flex-1"
             onClick={() =>
               window.open(
-                `https://explorer.aptoslabs.com/account/${pass.podium_pass_owner_address}`,
+                `https://explorer.movementnetwork.xyz/account/${pass.podium_pass_owner_address}?network=mainnet`,
                 "_blank"
               )
             }
