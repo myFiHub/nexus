@@ -9,10 +9,13 @@ import {
   confirmDialog,
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
-import { CookieKeys } from "app/lib/cookies";
+import {
+  CookieKeys,
+  deleteServerCookieViaAPI,
+  setServerCookieViaAPI,
+} from "app/lib/cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
-import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
 import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
@@ -113,7 +116,7 @@ function* initializeWeb3Auth(
       put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookie(CookieKeys.myUserId);
+    deleteServerCookieViaAPI(CookieKeys.myUserId);
     toast.error("Failed to initialize the app");
   } finally {
     yield put(globalActions.setInitializingWeb3Auth(false));
@@ -157,7 +160,7 @@ function* getAndSetAccount() {
       put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookie(CookieKeys.myUserId);
+    deleteServerCookieViaAPI(CookieKeys.myUserId);
   }
 }
 
@@ -298,7 +301,7 @@ function* continueWithLoginRequestAndAdditionalData(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
     yield put(globalActions.initOneSignal({ myId: response.user.uuid }));
-    yield setServerCookie(CookieKeys.myUserId, response.user.uuid);
+    yield setServerCookieViaAPI(CookieKeys.myUserId, response.user.uuid);
     if (response.token) {
       yield wsClient.connect(
         response.token,
@@ -319,7 +322,7 @@ function* logout() {
       put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookie(CookieKeys.myUserId);
+    deleteServerCookieViaAPI(CookieKeys.myUserId);
     yield logoutFromOneSignal();
     yield web3Auth?.logout();
     yield web3Auth?.clearCache();

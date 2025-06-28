@@ -6,7 +6,8 @@ import {
 } from "app/components/outpost/types";
 import { Mic, Shield, Video } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
-import { ScheduledDateSection, TimeUntil } from "./scheduledDate";
+import { ScheduledDateSection } from "./scheduledDate/ScheduledDateSection";
+import { TimeUntil } from "./scheduledDate/TimeUntil";
 
 interface EventDetailsProps {
   outpost: OutpostModel;
