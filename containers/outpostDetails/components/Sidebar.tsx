@@ -15,13 +15,15 @@ export function Sidebar({ outpost }: SidebarProps) {
   const shareUrl = generateOutpostShareUrl(outpost.uuid);
   return (
     <div className="space-y-6">
-      {/* Join Button */}
-      <div className="bg-card p-6 rounded-xl shadow-sm">
+      {/* Join Button - Hidden on mobile */}
+      <div className="hidden lg:block bg-card p-6 rounded-xl shadow-sm">
         <JoinButton outpost={outpost} />
       </div>
 
-      {/* Invite Users Button */}
-      <InviteUsersButton outpost={outpost} className="w-full" />
+      {/* Invite Users Button - Hidden on mobile */}
+      <div className="hidden lg:block">
+        <InviteUsersButton outpost={outpost} className="w-full" />
+      </div>
 
       {/* Members List */}
       <MembersList outpost={outpost} />

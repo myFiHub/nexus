@@ -3,6 +3,8 @@ import { StateInitializer } from "../stateInitializer";
 import { CreatorCard } from "./CreatorCard";
 import { EventDetails } from "./EventDetails";
 import { OutpostDetailsHeader } from "./header";
+import { InviteUsersButton } from "./InviteUsersButton";
+import { JoinButton } from "./JoinButton";
 import { Sidebar } from "./Sidebar";
 import { Tags } from "./Tags";
 
@@ -28,6 +30,15 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
             {/* Left Column - Main Info */}
             <div className="lg:col-span-3 space-y-6">
               <CreatorCard outpost={outpost} />
+
+              {/* Mobile Action Buttons - Only visible on mobile */}
+              <div className="lg:hidden space-y-4">
+                <div className="bg-card p-6 rounded-xl shadow-sm">
+                  <JoinButton outpost={outpost} />
+                </div>
+                <InviteUsersButton outpost={outpost} className="w-full" />
+              </div>
+
               <EventDetails outpost={outpost} />
               <Tags tags={outpost.tags} />
               {lumaSlot}
