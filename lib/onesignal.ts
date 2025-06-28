@@ -23,7 +23,7 @@ export const initializeOneSignal = async () => {
     console.log("OneSignal initialized successfully");
     return true;
   } catch (error) {
-    console.error("Error initializing OneSignal:", error);
+    console.warn("Error initializing OneSignal:", error);
     return false;
   }
 };

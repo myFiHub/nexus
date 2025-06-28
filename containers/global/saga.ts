@@ -82,7 +82,7 @@ function* initOneSignal(
     }
     yield initOneSignalForUser(myId);
   } catch (error) {
-    console.error("Error initializing OneSignal:", error);
+    console.warn("Error initializing OneSignal:", error);
   }
 }
 

@@ -21,7 +21,7 @@ export const initOneSignalForUser = async (userId?: string) => {
     // Step 2: Initialize OneSignal
     const initSuccess = await initializeOneSignal();
     if (!initSuccess) {
-      console.error("Failed to initialize OneSignal");
+      console.warn("Failed to initialize OneSignal");
       return { success: false, reason: "initialization_failed" };
     }
 
@@ -69,7 +69,7 @@ export const initOneSignalForUser = async (userId?: string) => {
       };
     }
   } catch (error) {
-    console.error("Error initializing OneSignal:", error);
+    console.warn("Error initializing OneSignal:", error);
     return {
       success: false,
       reason: "error",
