@@ -7,6 +7,7 @@ import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { outpostDetailsSelectors } from "../selectors";
@@ -16,6 +17,12 @@ interface JoinButtonProps {
 }
 
 const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   useOnGoingOutpostSlice();
   useSelector(GlobalSelectors.tick);
   const dispatch = useDispatch();
@@ -25,7 +32,13 @@ const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const outpost = stateOutpost || passedOutpost;
   const joining = joiningId === outpost.uuid;
-  const { displayText, isPassed } = getTimerInfo(outpost.scheduled_for);
+
+  // Only calculate timer info after mounting to prevent hydration mismatch
+  const timerInfo = isMounted
+    ? getTimerInfo(outpost.scheduled_for)
+    : { displayText: "Loading...", isPassed: false };
+  const { displayText, isPassed } = timerInfo;
+
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
   if (!outpost) return null;
   const join = () => {
@@ -44,7 +57,7 @@ const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
       onClick={join}
       disabled={iAmCreator ? disabledIfIAmCreator : disabledIfImNotCreator}
     >
-      {loading ? (
+      {loading && isMounted ? (
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
         </div>
