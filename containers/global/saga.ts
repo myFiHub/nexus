@@ -39,6 +39,7 @@ import {
   takeLatest,
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
+import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
@@ -314,6 +315,8 @@ function* continueWithLoginRequestAndAdditionalData(
         process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!
       );
     }
+    useMyOutpostsSlice();
+    yield put(myOutpostsActions.getOutposts());
   } else {
     yield put(globalActions.logout());
   }

@@ -2,9 +2,9 @@ import { RootState } from "app/store";
 
 export const outpostDetailsDomains = {
   root: (state: RootState) => state,
-  outpost: (state: RootState) => state.outpostDetails.outpost,
+  outpost: (state: RootState) => state.outpostDetails?.outpost,
   editingScheduledDate: (state: RootState) =>
-    state.outpostDetails.editingScheduledDate,
+    state.outpostDetails?.editingScheduledDate ?? false,
 };
 
 export const outpostDetailsSelectors = {

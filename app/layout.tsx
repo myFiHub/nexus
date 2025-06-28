@@ -18,8 +18,70 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Podium Nexus",
-  description: "Podium Nexus",
+  title: {
+    default: "Podium Nexus - Connect, Create, Collaborate",
+    template: "%s | Podium Nexus",
+  },
+  description:
+    "Podium Nexus is a platform for creating and joining collaborative outposts. Connect with creators, participate in live events, and build meaningful communities.",
+  keywords: [
+    "collaboration",
+    "outposts",
+    "live events",
+    "community",
+    "creators",
+    "social platform",
+  ],
+  authors: [{ name: "Podium Nexus Team" }],
+  creator: "Podium Nexus",
+  publisher: "Podium Nexus",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com"
+  ),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "Podium Nexus - Connect, Create, Collaborate",
+    description:
+      "Join collaborative outposts, connect with creators, and participate in live events. Build meaningful communities on Podium Nexus.",
+    siteName: "Podium Nexus",
+    images: [
+      {
+        url: "/logo.png",
+        width: 1200,
+        height: 630,
+        alt: "Podium Nexus Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Podium Nexus - Connect, Create, Collaborate",
+    description:
+      "Join collaborative outposts, connect with creators, and participate in live events.",
+    images: ["/logo.png"],
+    creator: "@podiumnexus",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/logo.png", sizes: "32x32", type: "image/png" },
@@ -27,7 +89,17 @@ export const metadata: Metadata = {
     ],
     shortcut: "/logo.png",
     apple: "/logo.png",
+    other: [
+      {
+        rel: "mask-icon",
+        url: "/logo.png",
+        color: "#000000",
+      },
+    ],
   },
+  manifest: "/manifest.json",
+  category: "social",
+  classification: "social networking",
 };
 
 export default async function RootLayout({
@@ -41,10 +113,10 @@ export default async function RootLayout({
   return (
     <html lang="en" className={theme}>
       <head>
-        <link rel="icon" type="image/png" sizes="32x32" href="/logo.png" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/logo.png" />
-        <link rel="shortcut icon" href="/logo.png" />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=5"
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
