@@ -1,4 +1,5 @@
 import { UserDetails } from "app/containers/userDetails";
+import { logoUrl } from "app/lib/constants";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
 import { Metadata } from "next";
@@ -33,7 +34,7 @@ function generateUserDescription(user: User): string {
 
   const statsText = stats.length > 0 ? ` • ${stats.join(" • ")}` : "";
 
-  return `View ${name}'s profile on Nexus. ${statsText} Join the community and connect with like-minded individuals.`;
+  return `View ${name}'s profile on Podium Nexus. ${statsText} Join the community and connect with like-minded individuals.`;
 }
 
 // Helper function to get user stats summary
@@ -59,42 +60,86 @@ function getUserStatsSummary(user: User): string {
   return stats.join(" • ") || "New member";
 }
 
+// Helper function to generate structured data
+function generateStructuredData(user: User, userId: string) {
+  const name = user.name || "User";
+  const profileUrl = `${
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com"
+  }/user/${userId}`;
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": profileUrl,
+    name: name,
+    url: profileUrl,
+    ...(user.image && {
+      image: user.image,
+    }),
+    ...(user.aptos_address && {
+      identifier: {
+        "@type": "PropertyValue",
+        name: "Movement Address",
+        value: user.aptos_address,
+      },
+    }),
+    ...(user.followers_count && {
+      follower: {
+        "@type": "QuantitativeValue",
+        value: user.followers_count,
+      },
+    }),
+    ...(user.followings_count && {
+      follows: {
+        "@type": "QuantitativeValue",
+        value: user.followings_count,
+      },
+    }),
+    ...(user.referrals_count && {
+      additionalProperty: {
+        "@type": "PropertyValue",
+        name: "Referrals",
+        value: user.referrals_count,
+      },
+    }),
+  };
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const user = await podiumApi.getUserData(id);
 
   if (!user) {
     return {
-      title: "User Not Found | Nexus",
+      title: "User Not Found | Podium Nexus",
       description:
-        "The requested user profile could not be found. Explore other community members on Nexus.",
+        "The requested user profile could not be found. Explore other community members on Podium Nexus.",
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+      },
       openGraph: {
-        title: "User Not Found | Nexus",
+        title: "User Not Found | Podium Nexus",
         description:
-          "The requested user profile could not be found. Explore other community members on Nexus.",
+          "The requested user profile could not be found. Explore other community members on Podium Nexus.",
         type: "website",
-        siteName: "Nexus",
+        siteName: "Podium Nexus",
         images: [
           {
-            url: "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+            url: logoUrl,
             width: 1200,
             height: 630,
-            alt: "Nexus - Connect and Converse",
+            alt: "Podium Nexus - Connect and Converse",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "User Not Found | Nexus",
+        title: "User Not Found | Podium Nexus",
         description:
-          "The requested user profile could not be found. Explore other community members on Nexus.",
-        images: [
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-        ],
-      },
-      robots: {
-        index: false,
-        follow: false,
+          "The requested user profile could not be found. Explore other community members on Podium Nexus.",
+        images: [logoUrl],
       },
     };
   }
@@ -102,6 +147,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const name = user.name || "User";
   const description = generateUserDescription(user);
   const statsSummary = getUserStatsSummary(user);
+  const baseUrl =
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com";
+  const profileUrl = `${baseUrl}/user/${id}`;
 
   // Generate dynamic title based on user stats
   let title = name;
@@ -111,9 +159,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title = `${name} • ${statsSummary}`;
   }
 
-  // Enhanced metadata
+  // Enhanced metadata following Next.js 15 best practices
   const metadata: Metadata = {
-    title: `${title} | Nexus`,
+    title: `${title} | Podium Nexus`,
     description: description,
     keywords: [
       "user profile",
@@ -121,37 +169,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       "social platform",
       "connect",
       "follow",
-      "nexus user",
+      "podium nexus user",
       name.toLowerCase(),
-      ...(user.aptos_address ? ["aptos", "blockchain"] : []),
+      ...(user.aptos_address ? ["Movement", "blockchain", "web3"] : []),
     ],
     authors: [{ name: name }],
     creator: name,
-    publisher: "Nexus",
+    publisher: "Podium Nexus",
     formatDetection: {
-      email: false,
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://nexus.com"), // Replace with actual domain
+    metadataBase: new URL(baseUrl),
     alternates: {
       canonical: `/user/${id}`,
     },
     openGraph: {
       title: title,
       description: description,
-      url: `/user/${id}`,
-      siteName: "Nexus",
+      url: profileUrl,
+      siteName: "Podium Nexus",
       locale: "en_US",
       type: "profile",
       images: [
         {
-          url:
-            user.image ||
-            "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+          url: user.image || logoUrl,
           width: 1200,
           height: 630,
-          alt: `${name}'s profile`,
+          alt: `${name}'s profile on Podium Nexus`,
         },
       ],
       ...(user.aptos_address && {
@@ -162,12 +207,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: title,
       description: description,
-      images: [
-        user.image ||
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-      ],
-      creator: "@web3podium", // Replace with actual Twitter handle
-      site: "@web3podium", // Replace with actual Twitter handle
+      images: [user.image || logoUrl],
+      creator: "@podiumnexus",
+      site: "@podiumnexus",
     },
     robots: {
       index: true,
@@ -181,35 +223,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     verification: {
-      google: "your-google-verification-code", // Replace with actual verification code
+      google: process.env.GOOGLE_VERIFICATION_CODE,
     },
     category: "social",
     classification: "social platform",
     referrer: "origin-when-cross-origin",
-    applicationName: "Nexus",
+    applicationName: "Podium Nexus",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "Nexus",
+      title: "Podium Nexus",
+    },
+    other: {
+      "profile:name": name,
+      "profile:followers_count": user.followers_count?.toString() || "0",
+      "profile:followings_count": user.followings_count?.toString() || "0",
+      "profile:referrals_count": user.referrals_count?.toString() || "0",
+      "profile:received_cheer_count":
+        user.received_cheer_count?.toString() || "0",
+      "profile:received_boo_count": user.received_boo_count?.toString() || "0",
+      "profile:is_over_18": user.is_over_18?.toString() || "false",
+      ...(user.aptos_address && {
+        "profile:movement_address": user.aptos_address,
+      }),
     },
   };
-
-  // Add custom metadata
-  const customMetadata: Record<string, string> = {
-    "profile:name": name,
-    "profile:followers_count": user.followers_count?.toString() || "0",
-    "profile:followings_count": user.followings_count?.toString() || "0",
-    "profile:referrals_count": user.referrals_count?.toString() || "0",
-    "profile:received_cheer_count":
-      user.received_cheer_count?.toString() || "0",
-    "profile:received_boo_count": user.received_boo_count?.toString() || "0",
-    "profile:is_over_18": user.is_over_18?.toString() || "false",
-    ...(user.aptos_address && {
-      "profile:aptos_address": user.aptos_address,
-    }),
-  };
-
-  metadata.other = customMetadata;
 
   return metadata;
 }
@@ -217,7 +255,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   colorScheme: "light dark",
 };
 
@@ -240,12 +278,23 @@ export default async function UserPage({ params }: Props) {
     notFound();
   }
 
+  // Generate structured data for better SEO
+  const structuredData = generateStructuredData(user, id);
+
   return (
-    <UserDetails
-      user={user}
-      passBuyers={passBuyers}
-      followers={followers}
-      followings={followings}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <UserDetails
+        user={user}
+        passBuyers={passBuyers}
+        followers={followers}
+        followings={followings}
+      />
+    </>
   );
 }

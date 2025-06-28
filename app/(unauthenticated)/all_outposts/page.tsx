@@ -1,18 +1,20 @@
 import { AllOutpostsContainer } from "app/containers/allOutposts";
+import { PAGE_SIZE, logoUrl } from "app/lib/constants";
 import podiumApi from "app/services/api";
-import { AlertCircle } from "lucide-react";
 import { Metadata } from "next";
 import { ErrorState } from "./ErrorState";
-import { PAGE_SIZE } from "app/lib/constants";
 
 // Helper function to generate structured data for outposts listing
 function generateOutpostsListStructuredData(outposts: any[]) {
-  const structuredData: any = {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com";
+
+  return {
     "@context": "https://schema.org",
     "@type": "ItemList",
     name: "All Outposts",
     description:
-      "Discover and join exciting live conversations and events on Nexus",
+      "Discover and join exciting live conversations and events on Podium Nexus",
     numberOfItems: outposts.length,
     itemListElement: outposts.map((outpost, index) => ({
       "@type": "ListItem",
@@ -35,30 +37,28 @@ function generateOutpostsListStructuredData(outposts: any[]) {
           "@type": "VirtualLocation",
           name: "Online Event",
         },
-        url: `/outpost_details/${outpost.uuid}`,
+        url: `${baseUrl}/outpost_details/${outpost.uuid}`,
       },
     })),
   };
-
-  return structuredData;
 }
 
 // Helper function to get trending topics from outposts
 function getTrendingTopics(outposts: any[]): string[] {
-  const tagCounts: Record<string, number> = {};
+  const topicCount: { [key: string]: number } = {};
 
   outposts.forEach((outpost) => {
     if (outpost.tags) {
       outpost.tags.forEach((tag: string) => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
+        topicCount[tag] = (topicCount[tag] || 0) + 1;
       });
     }
   });
 
-  return Object.entries(tagCounts)
+  return Object.entries(topicCount)
     .sort(([, a], [, b]) => b - a)
     .slice(0, 10)
-    .map(([tag]) => tag);
+    .map(([topic]) => topic);
 }
 
 // Helper function to get live and upcoming stats
@@ -91,34 +91,32 @@ export async function generateMetadata(): Promise<Metadata> {
 
     if (outposts instanceof Error) {
       return {
-        title: "Outposts | Nexus",
+        title: "Outposts | Podium Nexus",
         description:
-          "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
+          "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
         openGraph: {
-          title: "Outposts | Nexus",
+          title: "Outposts | Podium Nexus",
           description:
-            "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
+            "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
           type: "website",
-          siteName: "Nexus",
+          siteName: "Podium Nexus",
           images: [
             {
-              url: "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+              url: logoUrl,
               width: 1200,
               height: 630,
-              alt: "Nexus - Discover Outposts",
+              alt: "Podium Nexus - Discover Outposts",
             },
           ],
         },
         twitter: {
           card: "summary_large_image",
-          title: "Outposts | Nexus",
+          title: "Outposts | Podium Nexus",
           description:
-            "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
-          images: [
-            "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-          ],
-          creator: "@web3podium",
-          site: "@web3podium",
+            "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
+          images: [logoUrl],
+          creator: "@podiumnexus",
+          site: "@podiumnexus",
         },
         robots: {
           index: true,
@@ -132,7 +130,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
     // Generate dynamic description based on current outposts
     let description =
-      "Discover and join exciting live conversations and events on Nexus.";
+      "Discover and join exciting live conversations and events on Podium Nexus.";
     if (stats.live > 0) {
       description += ` ${stats.live} live events happening now.`;
     }
@@ -154,9 +152,13 @@ export async function generateMetadata(): Promise<Metadata> {
       title = `${stats.upcoming} Upcoming Outposts`;
     }
 
-    // Enhanced metadata
+    const baseUrl =
+      process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com";
+    const outpostsUrl = `${baseUrl}/all_outposts`;
+
+    // Enhanced metadata following Next.js 15 best practices
     const metadata: Metadata = {
-      title: `${title} | Nexus`,
+      title: `${title} | Podium Nexus`,
       description: description,
       keywords: [
         "outposts",
@@ -169,33 +171,33 @@ export async function generateMetadata(): Promise<Metadata> {
         "live streaming",
         "virtual meetups",
         "online discussions",
+        "podium nexus",
         ...trendingTopics.slice(0, 10),
       ],
-      authors: [{ name: "Nexus Team" }],
-      creator: "Nexus",
-      publisher: "Nexus",
+      authors: [{ name: "Podium Nexus Team" }],
+      creator: "Podium Nexus",
+      publisher: "Podium Nexus",
       formatDetection: {
-        email: false,
         address: false,
         telephone: false,
       },
-      metadataBase: new URL("https://nexus.com"), // Replace with actual domain
+      metadataBase: new URL(baseUrl),
       alternates: {
         canonical: "/all_outposts",
       },
       openGraph: {
         title: title,
         description: description,
-        url: "/all_outposts",
-        siteName: "Nexus",
+        url: outpostsUrl,
+        siteName: "Podium Nexus",
         locale: "en_US",
         type: "website",
         images: [
           {
-            url: "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+            url: logoUrl,
             width: 1200,
             height: 630,
-            alt: "Nexus - Discover Outposts",
+            alt: "Podium Nexus - Discover Outposts",
           },
         ],
       },
@@ -203,11 +205,9 @@ export async function generateMetadata(): Promise<Metadata> {
         card: "summary_large_image",
         title: title,
         description: description,
-        images: [
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-        ],
-        creator: "@web3podium",
-        site: "@web3podium",
+        images: [logoUrl],
+        creator: "@podiumnexus",
+        site: "@podiumnexus",
       },
       robots: {
         index: true,
@@ -221,65 +221,56 @@ export async function generateMetadata(): Promise<Metadata> {
         },
       },
       verification: {
-        google: "your-google-verification-code", // Replace with actual verification code
+        google: process.env.GOOGLE_VERIFICATION_CODE,
       },
       category: "social",
       classification: "social platform",
       referrer: "origin-when-cross-origin",
-      applicationName: "Nexus",
+      applicationName: "Podium Nexus",
       appleWebApp: {
         capable: true,
         statusBarStyle: "default",
-        title: "Nexus",
+        title: "Podium Nexus",
+      },
+      other: {
+        "outposts:total_count": stats.total.toString(),
+        "outposts:live_count": stats.live.toString(),
+        "outposts:upcoming_count": stats.upcoming.toString(),
+        "outposts:trending_topics": trendingTopics.slice(0, 10).join(", "),
+        "outposts:last_updated": new Date().toISOString(),
       },
     };
-
-    // Add custom metadata
-    const customMetadata: Record<string, string> = {
-      "outposts:total_count": stats.total.toString(),
-      "outposts:live_count": stats.live.toString(),
-      "outposts:upcoming_count": stats.upcoming.toString(),
-      "outposts:trending_topics": trendingTopics.slice(0, 10).join(", "),
-      "outposts:last_updated": new Date().toISOString(),
-      "application/ld+json": JSON.stringify(
-        generateOutpostsListStructuredData(outposts)
-      ),
-    };
-
-    metadata.other = customMetadata;
 
     return metadata;
   } catch (error) {
     // Fallback metadata in case of any error
     return {
-      title: "Outposts | Nexus",
+      title: "Outposts | Podium Nexus",
       description:
-        "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
+        "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
       openGraph: {
-        title: "Outposts | Nexus",
+        title: "Outposts | Podium Nexus",
         description:
-          "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
+          "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
         type: "website",
-        siteName: "Nexus",
+        siteName: "Podium Nexus",
         images: [
           {
-            url: "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+            url: logoUrl,
             width: 1200,
             height: 630,
-            alt: "Nexus - Discover Outposts",
+            alt: "Podium Nexus - Discover Outposts",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "Outposts | Nexus",
+        title: "Outposts | Podium Nexus",
         description:
-          "Discover and join exciting live conversations and events on Nexus. Connect with like-minded individuals in real-time.",
-        images: [
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-        ],
-        creator: "@web3podium",
-        site: "@web3podium",
+          "Discover and join exciting live conversations and events on Podium Nexus. Connect with like-minded individuals in real-time.",
+        images: [logoUrl],
+        creator: "@podiumnexus",
+        site: "@podiumnexus",
       },
       robots: {
         index: true,
@@ -292,7 +283,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   colorScheme: "light dark",
 };
 
@@ -302,17 +293,29 @@ export const themeColor = [
 ];
 
 export default async function AllOutpostsPage() {
-  const outposts = await podiumApi.getOutposts(0, PAGE_SIZE);
-  if (outposts instanceof Error) {
+  try {
+    const outposts = await podiumApi.getOutposts(0, PAGE_SIZE);
+
+    if (outposts instanceof Error) {
+      return <ErrorState />;
+    }
+
+    // Generate structured data for better SEO
+    const structuredData = generateOutpostsListStructuredData(outposts);
+
     return (
-      <ErrorState
-        error={outposts}
-        title="Unable to load outposts"
-        description="Please try again"
-        buttonHref="/all_outposts"
-        icon={<AlertCircle className="h-10 w-10 text-destructive" />}
-      />
+      <>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(structuredData),
+          }}
+        />
+        <AllOutpostsContainer initialOutposts={outposts} />
+      </>
     );
+  } catch (error) {
+    console.error("Error loading outposts:", error);
+    return <ErrorState />;
   }
-  return <AllOutpostsContainer initialOutposts={outposts} />;
 }

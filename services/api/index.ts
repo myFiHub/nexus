@@ -136,10 +136,10 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
-       try {
-        const user = await this.getUserByAptosAddress(id)
+      try {
+        const user = await this.getUserByAptosAddress(id);
         if (user) {
-          return user
+          return user;
         }
       } catch (error) {
         return undefined;
@@ -707,7 +707,6 @@ class PodiumApi {
         `/podium-passes/my-passes`,
         { params: { page, page_size } }
       );
-      console.log({ response });
       return response.data.data;
     } catch {
       return [];

@@ -15,7 +15,6 @@ const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 const PassCard = ({ pass }: { pass: any }) => {
-  console.log(pass);
   return (
     <div
       key={pass.uuid}

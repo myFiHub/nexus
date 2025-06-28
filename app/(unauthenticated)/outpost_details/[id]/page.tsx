@@ -1,7 +1,6 @@
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
-import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
+import { logoUrl } from "app/lib/constants";
 import podiumApi from "app/services/api";
-import { format, formatDistanceToNow } from "date-fns";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -11,16 +10,40 @@ interface OutpostDetailsPageProps {
   };
 }
 
-// Helper function to format date for metadata
+// Helper function to format event date
 function formatEventDate(timestamp: number): string {
   const date = new Date(timestamp);
-  return format(date, "EEEE, MMMM do, yyyy 'at' h:mm a");
+  return date.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 // Helper function to get time until event
 function getTimeUntilEvent(timestamp: number): string {
-  const date = new Date(timestamp);
-  return formatDistanceToNow(date, { addSuffix: true });
+  const now = new Date();
+  const eventDate = new Date(timestamp);
+  const diff = eventDate.getTime() - now.getTime();
+
+  if (diff <= 0) {
+    return "Live Now";
+  }
+
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (days > 0) {
+    return `in ${days} day${days !== 1 ? "s" : ""}`;
+  } else if (hours > 0) {
+    return `in ${hours} hour${hours !== 1 ? "s" : ""}`;
+  } else {
+    return `in ${minutes} minute${minutes !== 1 ? "s" : ""}`;
+  }
 }
 
 // Helper function to generate rich description
@@ -40,24 +63,26 @@ function generateDescription(outpost: any): string {
 }
 
 // Helper function to generate structured data
-function generateStructuredData(outpost: any) {
+function generateEventStructuredData(outpost: any, outpostId: string) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com";
+  const eventUrl = `${baseUrl}/outpost_details/${outpostId}`;
   const eventDate = outpost.scheduled_for
     ? new Date(outpost.scheduled_for)
     : null;
-  const isLive = outpost.scheduled_for && eventDate && new Date() >= eventDate;
+  const isLive = eventDate && new Date() >= eventDate;
 
-  const structuredData: any = {
+  return {
     "@context": "https://schema.org",
     "@type": "Event",
+    "@id": eventUrl,
     name: outpost.name,
     description: outpost.subject,
-    startDate: eventDate ? eventDate.toISOString() : undefined,
-    organizer: {
-      "@type": "Person",
-      name: outpost.creator_user_name,
-      image: outpost.creator_user_image,
-    },
-    image: outpost.image,
+    url: eventUrl,
+    ...(eventDate && {
+      startDate: eventDate.toISOString(),
+      endDate: new Date(eventDate.getTime() + 2 * 60 * 60 * 1000).toISOString(), // Assume 2 hours
+    }),
     eventStatus: isLive
       ? "https://schema.org/EventScheduled"
       : "https://schema.org/EventScheduled",
@@ -65,20 +90,38 @@ function generateStructuredData(outpost: any) {
     location: {
       "@type": "VirtualLocation",
       name: "Online Event",
+      url: eventUrl,
     },
+    organizer: {
+      "@type": "Person",
+      name: outpost.creator_user_name || "Anonymous",
+      ...(outpost.creator_user_image && {
+        image: outpost.creator_user_image,
+      }),
+    },
+    ...(outpost.image && {
+      image: outpost.image,
+    }),
+    ...(outpost.tags &&
+      outpost.tags.length > 0 && {
+        keywords: outpost.tags.join(", "),
+      }),
+    ...(outpost.members_count && {
+      attendee: {
+        "@type": "QuantitativeValue",
+        value: outpost.members_count,
+      },
+    }),
     offers: {
       "@type": "Offer",
+      availability:
+        outpost.enter_type === "everyone"
+          ? "https://schema.org/InStock"
+          : "https://schema.org/LimitedAvailability",
       price: "0",
       priceCurrency: "USD",
-      availability: "https://schema.org/InStock",
     },
   };
-
-  if (outpost.tags?.length > 0) {
-    structuredData.keywords = outpost.tags.join(", ");
-  }
-
-  return structuredData;
 }
 
 // Generate metadata for the page
@@ -92,36 +135,35 @@ export async function generateMetadata({
 
   if (!outpost) {
     return {
-      title: "Outpost Not Found | Nexus",
+      title: "Outpost Not Found | Podium Nexus",
       description:
-        "The requested outpost could not be found. Explore other exciting events and conversations on Nexus.",
+        "The requested outpost could not be found. Explore other exciting events and conversations on Podium Nexus.",
+      robots: {
+        index: false,
+        follow: false,
+        nocache: true,
+      },
       openGraph: {
-        title: "Outpost Not Found | Nexus",
+        title: "Outpost Not Found | Podium Nexus",
         description:
-          "The requested outpost could not be found. Explore other exciting events and conversations on Nexus.",
+          "The requested outpost could not be found. Explore other exciting events and conversations on Podium Nexus.",
         type: "website",
-        siteName: "Nexus",
+        siteName: "Podium Nexus",
         images: [
           {
-            url: "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+            url: logoUrl,
             width: 1200,
             height: 630,
-            alt: "Nexus - Connect and Converse",
+            alt: "Podium Nexus - Connect and Converse",
           },
         ],
       },
       twitter: {
         card: "summary_large_image",
-        title: "Outpost Not Found | Nexus",
+        title: "Outpost Not Found | Podium Nexus",
         description:
-          "The requested outpost could not be found. Explore other exciting events and conversations on Nexus.",
-        images: [
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-        ],
-      },
-      robots: {
-        index: false,
-        follow: false,
+          "The requested outpost could not be found. Explore other exciting events and conversations on Podium Nexus.",
+        images: [logoUrl],
       },
     };
   }
@@ -133,6 +175,9 @@ export async function generateMetadata({
   const isLive = eventDate && new Date() >= eventDate;
   const timeUntil = eventDate ? getTimeUntilEvent(outpost.scheduled_for) : null;
   const accessType = outpost.enter_type === "everyone" ? "Public" : "Private";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_WEBSITE_LINK_URL || "https://podiumnexus.com";
+  const outpostUrl = `${baseUrl}/outpost_details/${id}`;
 
   // Generate dynamic title based on event status
   let title = outpost.name;
@@ -142,9 +187,9 @@ export async function generateMetadata({
     title = `${outpost.name} - ${timeUntil}`;
   }
 
-  // Enhanced metadata
+  // Enhanced metadata following Next.js 15 best practices
   const metadata: Metadata = {
-    title: `${title} | Nexus`,
+    title: `${title} | Podium Nexus`,
     description: description,
     keywords: [
       "outpost",
@@ -153,35 +198,33 @@ export async function generateMetadata({
       "social platform",
       "online event",
       "virtual meetup",
+      "podium nexus",
       ...(outpost.tags || []),
     ],
     authors: [{ name: outpost.creator_user_name }],
     creator: outpost.creator_user_name,
-    publisher: "Nexus",
+    publisher: "Podium Nexus",
     formatDetection: {
-      email: false,
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://nexus.com"), // Replace with actual domain
+    metadataBase: new URL(baseUrl),
     alternates: {
       canonical: `/outpost_details/${id}`,
     },
     openGraph: {
       title: title,
       description: description,
-      url: `/outpost_details/${id}`,
-      siteName: "Nexus",
+      url: outpostUrl,
+      siteName: "Podium Nexus",
       locale: "en_US",
       type: "website",
       images: [
         {
-          url:
-            outpost.image ||
-            "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
+          url: outpost.image || logoUrl,
           width: 1200,
           height: 630,
-          alt: outpost.name,
+          alt: `${outpost.name} - Podium Nexus Event`,
         },
       ],
       ...(eventDate && {
@@ -192,12 +235,9 @@ export async function generateMetadata({
       card: "summary_large_image",
       title: title,
       description: description,
-      images: [
-        outpost.image ||
-          "https://firebasestorage.googleapis.com/v0/b/podium-b809c.appspot.com/o/logo.png?alt=media&token=3c44b7b8-e2a3-46b4-81ad-a565df0ff172",
-      ],
-      creator: "@web3podium", // Replace with actual Twitter handle
-      site: "@web3podium", // Replace with actual Twitter handle
+      images: [outpost.image || logoUrl],
+      creator: "@podiumnexus",
+      site: "@podiumnexus",
     },
     robots: {
       index: true,
@@ -211,35 +251,31 @@ export async function generateMetadata({
       },
     },
     verification: {
-      google: "your-google-verification-code", // Replace with actual verification code
+      google: process.env.GOOGLE_VERIFICATION_CODE,
     },
     category: "social",
     classification: "social platform",
     referrer: "origin-when-cross-origin",
-    applicationName: "Nexus",
+    applicationName: "Podium Nexus",
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "Nexus",
+      title: "Podium Nexus",
+    },
+    other: {
+      "event:start_time": eventDate ? eventDate.toISOString() : "",
+      "event:end_time": eventDate
+        ? new Date(eventDate.getTime() + 2 * 60 * 60 * 1000).toISOString()
+        : "", // Assume 2 hours duration
+      "event:location": "Online",
+      "event:type": "Virtual Event",
+      "event:access": accessType,
+      "event:status": isLive ? "Live" : "Upcoming",
+      "event:creator": outpost.creator_user_name,
+      "event:members_count": outpost.members_count?.toString() || "0",
+      "event:tags": outpost.tags?.join(", ") || "",
     },
   };
-
-  // Add structured data and custom metadata
-  const customMetadata: Record<string, string> = {
-    "event:start_time": eventDate ? eventDate.toISOString() : "",
-    "event:end_time": eventDate
-      ? new Date(eventDate.getTime() + 2 * 60 * 60 * 1000).toISOString()
-      : "", // Assume 2 hours duration
-    "event:location": "Online",
-    "event:type": "Virtual Event",
-    "event:access": accessType,
-    "event:status": isLive ? "Live" : "Upcoming",
-    "event:creator": outpost.creator_user_name,
-    "event:members_count": outpost.members_count?.toString() || "0",
-    "event:tags": outpost.tags?.join(", ") || "",
-  };
-
-  metadata.other = customMetadata;
 
   return metadata;
 }
@@ -247,7 +283,7 @@ export async function generateMetadata({
 export const viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
   colorScheme: "light dark",
 };
 
@@ -266,10 +302,18 @@ export default async function OutpostDetailsPage({
     notFound();
   }
 
-  // Create the luma slot content if the outpost has a luma_event_id
-  const lumaSlot = outpost.luma_event_id ? (
-    <LumaEventDetails eventId={outpost.luma_event_id} />
-  ) : null;
+  // Generate structured data for better SEO
+  const structuredData = generateEventStructuredData(outpost, id);
 
-  return <OutpostDetailsContainer outpost={outpost} lumaSlot={lumaSlot} />;
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <OutpostDetailsContainer outpost={outpost} />
+    </>
+  );
 }
