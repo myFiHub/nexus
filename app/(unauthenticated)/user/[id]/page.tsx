@@ -36,55 +36,6 @@ function generateUserDescription(user: User): string {
   return `View ${name}'s profile on Nexus. ${statsText} Join the community and connect with like-minded individuals.`;
 }
 
-// Helper function to generate structured data
-function generateUserStructuredData(user: User) {
-  const structuredData: any = {
-    "@context": "https://schema.org",
-    "@type": "Person",
-    name: user.name || "User",
-    image: user.image,
-    url: `/user/${user.uuid}`,
-  };
-
-  if (user.aptos_address) {
-    structuredData.identifier = {
-      "@type": "PropertyValue",
-      name: "Aptos Address",
-      value: user.aptos_address,
-    };
-  }
-
-  // Add social media profile if available
-  if (user.accounts?.length > 0) {
-    structuredData.sameAs = user.accounts
-      .filter((account) => account.address)
-      .map((account) => account.address);
-  }
-
-  // Add follower/following counts as interaction statistics
-  if (user.followers_count || user.followings_count) {
-    structuredData.interactionStatistic = [];
-
-    if (user.followers_count) {
-      structuredData.interactionStatistic.push({
-        "@type": "InteractionCounter",
-        interactionType: "https://schema.org/FollowAction",
-        userInteractionCount: user.followers_count,
-      });
-    }
-
-    if (user.followings_count) {
-      structuredData.interactionStatistic.push({
-        "@type": "InteractionCounter",
-        interactionType: "https://schema.org/FollowAction",
-        userInteractionCount: user.followings_count,
-      });
-    }
-  }
-
-  return structuredData;
-}
-
 // Helper function to get user stats summary
 function getUserStatsSummary(user: User): string {
   const stats = [];

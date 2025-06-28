@@ -136,8 +136,14 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
-      console.error("Get user data error:", error);
-      return undefined;
+       try {
+        const user = await this.getUserByAptosAddress(id)
+        if (user) {
+          return user
+        }
+      } catch (error) {
+        return undefined;
+      }
     }
   }
 

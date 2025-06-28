@@ -7,7 +7,7 @@ import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
-import { MyPasses } from "./components/MyPasses";
+import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
@@ -71,7 +71,7 @@ const Content = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-12">
+    <div className="max-w-4xl mx-auto p-6 mt-24">
       <div className="bg-card rounded-lg shadow-md p-6">
         <ProfileHeader user={user} />
         <UserStats user={user} />
