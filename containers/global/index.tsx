@@ -2,6 +2,7 @@
 import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
 import {
   LumaUserDialogProvider,
+  SearchDialogProvider,
   UserSelectDialogProvider,
 } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
@@ -13,9 +14,9 @@ import { ReduxProvider } from "app/store/Provider";
 import { useRouter } from "next/navigation";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNotificationsSlice } from "../notifications/slice";
 import { GlobalSelectors } from "./selectors";
 import { globalActions, useGlobalSlice } from "./slice";
-import { useNotificationsSlice } from "../notifications/slice";
 
 const Container = () => {
   const dispatch = useDispatch();
@@ -41,6 +42,7 @@ const Container = () => {
       <Toaster richColors closeButton position="top-right" />
       <ConfirmDialogProvider />
       <UserSelectDialogProvider />
+      <SearchDialogProvider />
       <OutpostAccessesDialogProvider />
       <DateTimePickerDialogProvider />
       <ReminderDialogProvider />

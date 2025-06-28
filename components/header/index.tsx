@@ -1,8 +1,9 @@
 "use client";
+import { searchDialog } from "app/components/Dialog";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
 import { ReduxProvider } from "app/store/Provider";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
@@ -44,6 +45,12 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [lastScrollY]);
 
+  const handleSearchClick = async () => {
+    await searchDialog({
+      title: "Search Everything",
+    });
+  };
+
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] pr-3 pl-1 py-3 flex items-center justify-between shadow-md transition-transform duration-300 ${
@@ -70,6 +77,13 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
       </nav>
       <div className="flex items-center gap-1">
         <ThemeToggle initialValue={theme} />
+        <button
+          onClick={handleSearchClick}
+          className="p-2 rounded-md text-[var(--header-link)] hover:text-[var(--header-link-active)] hover:bg-[var(--header-hover)] transition-colors duration-200"
+          aria-label="Search"
+        >
+          <Search className="w-5 h-5" />
+        </button>
         {isLoggedIn && <NotificationsBell />}
         <LoginButton />
       </div>
@@ -92,6 +106,16 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
       {/* Mobile menu */}
       {mobileOpen && (
         <nav className="md:hidden absolute top-full left-0 right-0 bg-[var(--header-bg)] p-4 shadow-md">
+          <button
+            onClick={() => {
+              handleSearchClick();
+              setMobileOpen(false);
+            }}
+            className="flex items-center gap-2 w-full py-2 text-[var(--header-link)] hover:text-[var(--header-link-active)] transition-colors duration-200"
+          >
+            <Search className="w-5 h-5" />
+            Search
+          </button>
           {isLoggedIn &&
             navLinks.map((link) => (
               <NavLink

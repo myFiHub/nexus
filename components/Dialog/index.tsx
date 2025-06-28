@@ -149,3 +149,7 @@ export type { UserSelectDialogResult } from "./userSelectDialog";
 // Export luma user dialog components
 export { lumaUserDialog, LumaUserDialogProvider } from "./luma_userDialog";
 export type { LumaUserDialogResult } from "./luma_userDialog";
+
+// Export search dialog components
+export { searchDialog, SearchDialogProvider } from "./searchDialog";
+export type { SearchDialogResult } from "./searchDialog";
