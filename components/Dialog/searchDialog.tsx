@@ -207,9 +207,12 @@ export const SearchDialogProvider = () => {
                 Object.values(usersResults).map((user) => (
                   <AppLink
                     key={user.uuid}
+                    onClick={() => {
+                      handleClose();
+                    }}
                     underline={false}
                     href={`/user/${user.uuid}`}
-                    className="block p-4 rounded-lg border border-border hover:border-primary/50 hover:bg-accent/5 transition-all duration-200 group"
+                    className="block p-4 rounded-lg border border-border   transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-3">
                       <div className="relative">
@@ -254,8 +257,11 @@ export const SearchDialogProvider = () => {
                   <AppLink
                     key={outpost.uuid}
                     underline={false}
+                    onClick={() => {
+                      handleClose();
+                    }}
                     href={`/outpost_details/${outpost.uuid}`}
-                    className="block p-4 rounded-lg border hover:border-primary/50 hover:bg-accent/50 transition-all duration-200 group"
+                    className="block p-4 rounded-lg border transition-all duration-200 group"
                   >
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">

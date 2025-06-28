@@ -21,7 +21,6 @@ export const UserDetails = ({
   followers,
   followings,
 }: UserDetailsProps) => {
-  console.log({ user });
   return (
     <>
       <ClientRedirecter id={user.uuid} />
