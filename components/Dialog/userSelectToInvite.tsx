@@ -25,6 +25,7 @@ import podiumApi from "app/services/api";
 import { InviteModel, OutpostModel, User } from "app/services/api/types";
 import { RootState } from "app/store";
 import { Loader2, Search, X } from "lucide-react";
+import Image from "next/image";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../Button";
@@ -436,9 +437,11 @@ export const UserSelectToInviteDialogProvider = () => {
                 >
                   <div className="flex items-center flex-1">
                     {user.image && (
-                      <img
+                      <Image
                         src={user.image}
                         alt={user.name || "User"}
+                        width={32}
+                        height={32}
                         className="w-8 h-8 rounded-full mr-3"
                       />
                     )}

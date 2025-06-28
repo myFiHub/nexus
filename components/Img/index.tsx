@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import styles from "./styles.module.css";
 
@@ -9,9 +10,23 @@ interface ImgProps {
   className?: string;
   style?: React.CSSProperties;
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  width?: number;
+  height?: number;
+  fill?: boolean;
+  sizes?: string;
 }
 
-export const Img = ({ src, alt, className, style, onError }: ImgProps) => {
+export const Img = ({
+  src,
+  alt,
+  className,
+  style,
+  onError,
+  width,
+  height,
+  fill = false,
+  sizes,
+}: ImgProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(false);
 
@@ -23,24 +38,14 @@ export const Img = ({ src, alt, className, style, onError }: ImgProps) => {
 
   // Reset states when src changes
   useEffect(() => {
-    const img = new Image();
-    img.src = src || fallbackUrl;
+    setIsLoading(true);
+    setError(false);
+  }, [src]);
 
-    if (img.complete) {
-      setIsLoading(false);
-    } else {
-      img.onload = () => setIsLoading(false);
-      img.onerror = () => {
-        setError(true);
-        setIsLoading(false);
-      };
-    }
+  const imageSrc = error || !src ? fallbackUrl : src;
 
-    return () => {
-      img.onload = null;
-      img.onerror = null;
-    };
-  }, [src, fallbackUrl]);
+  // Determine if we should use fill mode
+  const shouldUseFill = fill || (!width && !height);
 
   return (
     <div className={`${styles.container} ${className || ""}`} style={style}>
@@ -48,12 +53,24 @@ export const Img = ({ src, alt, className, style, onError }: ImgProps) => {
       {isLoading && <div className={styles.shimmer} />}
 
       {/* Image */}
-      <img
-        onError={onError}
-        src={error || !src ? fallbackUrl : src}
+      <Image
+        onError={(e) => {
+          setError(true);
+          setIsLoading(false);
+          onError?.(e);
+        }}
+        onLoad={() => setIsLoading(false)}
+        src={imageSrc}
         alt={alt}
         className={`${styles.image} ${isLoading ? styles.loading : ""} `}
         draggable={false}
+        width={shouldUseFill ? undefined : width}
+        height={shouldUseFill ? undefined : height}
+        fill={shouldUseFill}
+        sizes={sizes || (shouldUseFill ? "100vw" : undefined)}
+        unoptimized={
+          imageSrc.startsWith("blob:") || imageSrc.startsWith("data:")
+        }
       />
     </div>
   );

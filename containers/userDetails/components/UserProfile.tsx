@@ -1,6 +1,7 @@
 import { CopyButton } from "app/components/copyButton";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
+import Image from "next/image";
 import { FollowButton } from "../../_users/components/followButton";
 import { PodiumPassButton } from "./podiumPassButton";
 
@@ -12,9 +13,11 @@ export const UserProfile = ({ user }: UserProfileProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
       {user.image && (
-        <img
+        <Image
           src={user.image}
           alt={user.name || "User"}
+          width={80}
+          height={80}
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-full"
         />
       )}
