@@ -120,11 +120,12 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
               {/* Event Image */}
               {eventDetails.event.cover_url && (
                 <div className="w-full h-32 bg-gradient-to-r from-blue-500/80 to-purple-600/80 relative">
-                  <Image
+                  <Img
                     src={eventDetails.event.cover_url}
                     alt={eventDetails.event.name}
                     width={320}
                     height={128}
+                    useImgTag
                     className="w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-black/40" />

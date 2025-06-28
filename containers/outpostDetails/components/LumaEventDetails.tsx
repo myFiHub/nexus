@@ -29,6 +29,7 @@ export async function LumaEventDetails({ eventId }: LumaEventDetailsProps) {
             <Img
               src={event.cover_url}
               alt={event.name}
+              useImgTag
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
