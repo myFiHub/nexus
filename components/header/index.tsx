@@ -14,7 +14,7 @@ import { ThemeToggle } from "./themeToggle";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/dashboard", label: "Dashboard" },
+  // { href: "/dashboard", label: "Dashboard" },
   { href: "/profile", label: "Profile" },
   { href: "/my_outposts", label: "My Outposts" },
   // { href: "/settings", label: "Settings" },
