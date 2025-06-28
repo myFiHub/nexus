@@ -1,5 +1,6 @@
 "use client";
 
+import OutpostLink from "app/components/AppLink/outpostLink";
 import { Button } from "app/components/Button";
 import { Dialog, DialogContent, DialogTrigger } from "app/components/Dialog";
 import { ReduxProvider } from "app/store/Provider";
@@ -51,9 +52,23 @@ const NotificationItem = ({
       notification.notification_type === "invite" &&
       notification.invite_metadata
     ) {
+      const outpostName = notification.invite_metadata.outpost_name;
+      const outpostId = notification.invite_metadata.outpost_uuid;
+
       return {
         title: "Outpost Invitation",
-        message: `${notification.invite_metadata.inviter_name} invited you to join "${notification.invite_metadata.outpost_name}"`,
+        message: (
+          <span>
+            {notification.invite_metadata.inviter_name} invited you to join{" "}
+            <OutpostLink
+              id={outpostId}
+              className="text-blue-600 hover:text-blue-800 no-underline p-0 m-0"
+              underline={false}
+            >
+              "{outpostName}"
+            </OutpostLink>
+          </span>
+        ),
         image: notification.invite_metadata.inviter_image,
       };
     }

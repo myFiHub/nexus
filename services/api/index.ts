@@ -231,7 +231,30 @@ class PodiumApi {
   async getNotifications(): Promise<NotificationModel[]> {
     try {
       const response = await this.axiosInstance.get("/notifications");
-      return response.data.data;
+      const rawNotifications = response.data.data;
+
+      // Parse metadata based on notification type
+      return rawNotifications.map((notification: any) => {
+        let followMetadata = undefined;
+        let inviteMetadata = undefined;
+
+        if (notification.notification_type === "follow") {
+          followMetadata = notification.metadata;
+        }
+        if (notification.notification_type === "invite") {
+          inviteMetadata = notification.metadata;
+        }
+
+        return {
+          created_at: notification.created_at,
+          is_read: notification.is_read,
+          message: notification.message,
+          notification_type: notification.notification_type,
+          follow_metadata: followMetadata,
+          invite_metadata: inviteMetadata,
+          uuid: notification.uuid,
+        };
+      });
     } catch (error) {
       return [];
     }

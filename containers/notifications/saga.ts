@@ -7,6 +7,7 @@ function* getNotifications() {
   try {
     yield put(notificationsActions.setErrorLoadingNotifications(undefined));
     yield put(notificationsActions.setLoadingNotifications(true));
+
     const notifications: NotificationModel[] =
       yield podiumApi.getNotifications();
     yield put(notificationsActions.setNotifications(notifications));
