@@ -1,24 +1,23 @@
 "use client";
 
 import { LoginButton } from "app/components/header/LoginButton";
-import { OutpostsList } from "app/components/outpost/OutpostsList";
-import { EmptyOutposts } from "app/containers/myOutposts/components/emptyState";
 import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
+import { InfiniteScrollOutpostsList } from "./InfiniteScrollOutpostsList";
 import { myOutpostsSelectors } from "./selectors";
 import { myOutpostsActions, useMyOutpostsSlice } from "./slice";
 
 const Content = () => {
   const dispatch = useDispatch();
   useMyOutpostsSlice();
-  const outposts = useSelector(myOutpostsSelectors.outposts);
   const isLoadingOutposts = useSelector(myOutpostsSelectors.isLoadingOutposts);
   const errorLoadingOutposts = useSelector(
     myOutpostsSelectors.errorLoadingOutposts
   );
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+
   useEffect(() => {
     if (myUser) {
       dispatch(myOutpostsActions.getOutposts());
@@ -37,12 +36,7 @@ const Content = () => {
     <div className="flex flex-col gap-4 pt-24">
       <h1 className="text-2xl font-bold">My Outposts</h1>
 
-      <OutpostsList
-        outposts={outposts}
-        loading={isLoadingOutposts}
-        error={errorLoadingOutposts}
-        noOutpostComponent={<EmptyOutposts />}
-      />
+      <InfiniteScrollOutpostsList />
     </div>
   );
 };

@@ -3,6 +3,7 @@ import podiumApi from "app/services/api";
 import { AlertCircle } from "lucide-react";
 import { Metadata } from "next";
 import { ErrorState } from "./ErrorState";
+import { PAGE_SIZE } from "app/lib/constants";
 
 // Helper function to generate structured data for outposts listing
 function generateOutpostsListStructuredData(outposts: any[]) {
@@ -301,7 +302,7 @@ export const themeColor = [
 ];
 
 export default async function AllOutpostsPage() {
-  const outposts = await podiumApi.getOutposts(0, 50);
+  const outposts = await podiumApi.getOutposts(0, PAGE_SIZE);
   if (outposts instanceof Error) {
     return (
       <ErrorState

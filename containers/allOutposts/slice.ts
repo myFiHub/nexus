@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PAGE_SIZE } from "app/lib/constants";
-import { OutpostModel } from "app/services/api/types";
-import { injectContainer } from "app/store";
-import { myOutpostsSaga } from "./saga";
+import { OutpostModel } from "../../services/api/types";
+import { injectContainer } from "../../store";
+import { allOutpostsSaga } from "./saga";
 
-export interface MyOutpostsState {
+export interface AllOutpostsState {
   outposts: OutpostModel[];
   loadingOutposts: boolean;
   loadingMoreOutposts: boolean;
@@ -14,7 +14,7 @@ export interface MyOutpostsState {
   pageSize: number;
 }
 
-const initialState: MyOutpostsState = {
+const initialState: AllOutpostsState = {
   outposts: [],
   loadingOutposts: false,
   loadingMoreOutposts: false,
@@ -24,8 +24,8 @@ const initialState: MyOutpostsState = {
   pageSize: PAGE_SIZE,
 };
 
-const myOutpostsSlice = createSlice({
-  name: "myOutposts",
+const allOutpostsSlice = createSlice({
+  name: "allOutposts",
   initialState,
   reducers: {
     setLoadingOutposts: (state, action: PayloadAction<boolean>) => {
@@ -65,15 +65,15 @@ const myOutpostsSlice = createSlice({
 });
 
 export const {
-  reducer: myOutpostsReducer,
+  reducer: allOutpostsReducer,
   name,
-  actions: myOutpostsActions,
-} = myOutpostsSlice;
+  actions: allOutpostsActions,
+} = allOutpostsSlice;
 
-export const useMyOutpostsSlice = () => {
+export const useAllOutpostsSlice = () => {
   injectContainer({
     name: name,
-    reducer: myOutpostsReducer,
-    saga: myOutpostsSaga,
+    reducer: allOutpostsReducer,
+    saga: allOutpostsSaga,
   });
 };
