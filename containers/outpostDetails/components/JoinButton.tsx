@@ -31,11 +31,15 @@ const JoinButtonContent = ({ outpost }: JoinButtonProps) => {
 
   if (!myUser && !logingIn) return <LoginButton className="w-full" />;
   const loading = joining || logingIn;
+
+  const disabledIfIAmCreator = loading;
+  const disabledIfImNotCreator = !isPassed || loading;
+
   return (
     <Button
       className={`w-full  text-center`}
       onClick={join}
-      disabled={(loading || isPassed) && !iAmCreator}
+      disabled={iAmCreator ? disabledIfIAmCreator : disabledIfImNotCreator}
     >
       {loading ? (
         <div className="flex items-center gap-2">

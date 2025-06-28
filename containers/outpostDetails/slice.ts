@@ -5,16 +5,27 @@ import { outpostDetailsSaga } from "./saga";
 
 export interface OutpostDetailsState {
   outpost?: OutpostModel;
+  editingScheduledDate: boolean;
 }
 
-const initialState: OutpostDetailsState = {};
+const initialState: OutpostDetailsState = {
+  editingScheduledDate: false,
+};
 
 const globalSlice = createSlice({
   name: "outpostDetails",
   initialState,
   reducers: {
+    getOutpost(state, action: PayloadAction<string>) {},
     setOutpost(state, action: PayloadAction<OutpostModel>) {
       state.outpost = action.payload;
+    },
+    editScheduledDate(
+      state,
+      action: PayloadAction<{ outpost: OutpostModel }>
+    ) {},
+    setEditingScheduledDate(state, action: PayloadAction<boolean>) {
+      state.editingScheduledDate = action.payload;
     },
   },
 });

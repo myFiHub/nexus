@@ -11,8 +11,8 @@ import { myOutpostsSelectors } from "./selectors";
 import { myOutpostsActions, useMyOutpostsSlice } from "./slice";
 
 const Content = () => {
-  useMyOutpostsSlice();
   const dispatch = useDispatch();
+  useMyOutpostsSlice();
   const outposts = useSelector(myOutpostsSelectors.outposts);
   const isLoadingOutposts = useSelector(myOutpostsSelectors.isLoadingOutposts);
   const errorLoadingOutposts = useSelector(

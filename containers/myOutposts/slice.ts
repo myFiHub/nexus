@@ -2,7 +2,6 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { OutpostModel } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { myOutpostsSaga } from "./saga";
-import { usersReducer } from "../_users/slice";
 
 export interface MyOutpostsState {
   outposts: OutpostModel[];
@@ -47,7 +46,7 @@ export const {
 export const useMyOutpostsSlice = () => {
   injectContainer({
     name: name,
-    reducer: usersReducer,
+    reducer: myOutpostsReducer,
     saga: myOutpostsSaga,
   });
 };

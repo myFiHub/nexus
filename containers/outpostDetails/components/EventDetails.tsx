@@ -4,9 +4,9 @@ import {
   serverEnterTypeToText,
   serverSpeakerTypeToText,
 } from "app/components/outpost/types";
-import { Calendar, Mic, Shield, Video } from "lucide-react";
+import { Mic, Shield, Video } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
-import { TimeUntil } from "./TimeUntil";
+import { ScheduledDateSection, TimeUntil } from "./scheduledDate";
 
 interface EventDetailsProps {
   outpost: OutpostModel;
@@ -21,22 +21,7 @@ export function EventDetails({ outpost }: EventDetailsProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {outpost.scheduled_for ? (
-          <div className="flex items-start gap-3">
-            <Calendar className="w-5 h-5 text-primary mt-1" />
-            <div>
-              <p className="font-medium">Scheduled For</p>
-              <p className="text-muted-foreground">
-                {scheduledDate.toLocaleString(undefined, {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </div>
-          </div>
+          <ScheduledDateSection outpost={outpost} />
         ) : (
           <></>
         )}
