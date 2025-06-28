@@ -79,7 +79,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
         <ThemeToggle initialValue={theme} />
         <button
           onClick={handleSearchClick}
-          className="p-2 rounded-md text-[var(--header-link)] hover:text-[var(--header-link-active)] hover:bg-[var(--header-hover)] transition-colors duration-200"
+          className="p-2 rounded-md text-[var(--header-link)] hover:text-[var(--header-link-active)] hover:bg-[var(--header-hover)] transition-colors duration-200 cursor-pointer"
           aria-label="Search"
         >
           <Search className="w-5 h-5" />
