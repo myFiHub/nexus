@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { Img } from "../../../components/Img";
 import { lumaApiDirect } from "../../../services/api/luma";
 
@@ -116,12 +115,13 @@ export async function LumaEventDetails({ eventId }: LumaEventDetailsProps) {
                 {hosts.map((host) => (
                   <div key={host.api_id} className="flex items-center gap-3">
                     {host.avatar_url && (
-                      <Image
+                      <Img
                         src={host.avatar_url}
                         alt={host.name}
                         width={32}
                         height={32}
                         className="w-8 h-8 rounded-full"
+                        useImgTag
                       />
                     )}
                     <div>

@@ -18,6 +18,7 @@ export function CreatorSection({ outpost }: CreatorSectionProps) {
             src={outpost.creator_user_image || logoUrl}
             alt={outpost.creator_user_name}
             className="w-10 h-10 rounded-full border-2 border-border"
+            useImgTag
           />
           {/* Online indicator */}
           <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></div>

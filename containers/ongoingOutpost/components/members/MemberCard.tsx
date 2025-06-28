@@ -1,17 +1,15 @@
-import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { Clock, Heart, ThumbsDown, ThumbsUp, XCircle } from "lucide-react";
-import { useDispatch, useSelector } from "react-redux";
+import { Clock } from "lucide-react";
+import { useSelector } from "react-redux";
 import { Img } from "../../../../components/Img";
 import { logoUrl } from "../../../../lib/constants";
 import { cn } from "../../../../lib/utils";
 import { onGoingOutpostSelectors } from "../../selectors";
-import { onGoingOutpostActions } from "../../slice";
-import { IsTalkingIndicator } from "./isTalkingIndicator";
-import { RemainingTimeText } from "./remainingTimeText";
-import { LikeAndDislike } from "./likeAndDislike";
 import { CheerAndBoo } from "./cheerAndBoo";
 import { ConfettiContainer } from "./confettiContainer";
+import { IsTalkingIndicator } from "./isTalkingIndicator";
+import { LikeAndDislike } from "./likeAndDislike";
+import { RemainingTimeText } from "./remainingTimeText";
 
 interface MemberCardProps {
   address: string;
@@ -44,6 +42,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
             src={member.image || logoUrl}
             alt={member.name}
             className="w-12 h-12 rounded-full border-2 border-primary/20"
+            useImgTag
           />
 
           {!member.is_present && (

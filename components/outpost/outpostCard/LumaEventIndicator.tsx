@@ -1,4 +1,5 @@
 "use client";
+import { Img } from "app/components/Img";
 import {
   Tooltip,
   TooltipContent,
@@ -191,12 +192,13 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
                           className="flex items-center bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 text-xs text-white font-medium"
                         >
                           {host.avatar_url ? (
-                            <Image
+                            <Img
                               src={host.avatar_url}
                               alt={host.name}
                               width={16}
                               height={16}
                               className="w-4 h-4 rounded-full mr-1"
+                              useImgTag
                             />
                           ) : (
                             <User className="w-3 h-3 mr-1" />

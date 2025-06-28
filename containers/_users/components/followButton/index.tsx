@@ -4,6 +4,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
+import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -89,24 +90,34 @@ const Content = ({
     return <></>;
   }
   return (
-    <Button
-      variant="outline"
-      size={size}
-      onClick={handleFollowUnfollowClick}
-      disabled={isLoading}
-      className={cn("min-w-22", className)}
-      colorScheme={followed ? "danger" : "primary"}
-    >
-      {isLoading ? (
-        <div className="h-5 flex items-center justify-center">
-          <Loader2 className="animate-spin" size={15} />
-        </div>
-      ) : followed ? (
-        "Unfollow"
-      ) : (
-        "Follow"
-      )}
-    </Button>
+    <AnimatePresence>
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{ height: "auto", opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeOut" }}
+        style={{ overflow: "hidden" }}
+      >
+        <Button
+          variant="outline"
+          size={size}
+          onClick={handleFollowUnfollowClick}
+          disabled={isLoading}
+          className={cn("min-w-22", className)}
+          colorScheme={followed ? "danger" : "primary"}
+        >
+          {isLoading ? (
+            <div className="h-5 flex items-center justify-center">
+              <Loader2 className="animate-spin" size={15} />
+            </div>
+          ) : followed ? (
+            "Unfollow"
+          ) : (
+            "Follow"
+          )}
+        </Button>
+      </motion.div>
+    </AnimatePresence>
   );
 };
 export const FollowButton = ({

@@ -112,6 +112,7 @@ export const PassSellerItem = ({
             src={passSeller.image}
             alt={passSeller.name}
             className="w-10 h-10 rounded-full"
+            useImgTag
           />
         </div>
 

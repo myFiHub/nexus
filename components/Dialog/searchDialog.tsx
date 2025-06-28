@@ -217,6 +217,7 @@ export const SearchDialogProvider = () => {
                           src={user.image || logoUrl}
                           alt={user.name || "User"}
                           className="w-12 h-12 rounded-full border-2 border-gradient-to-br from-blue-500/80 to-purple-500/80 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300"
+                          useImgTag
                         />
                       </div>
                       <div className="flex-1 min-w-0">

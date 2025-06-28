@@ -1,9 +1,9 @@
 import { AppLink } from "app/components/AppLink";
 import { Button } from "app/components/Button";
 import { CopyButton } from "app/components/copyButton";
+import { Img } from "app/components/Img";
 import { truncate } from "app/lib/utils";
 import { ExternalLink, Heart, Loader2 } from "lucide-react";
-import Image from "next/image";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../../_assets/selectore";
 
@@ -26,11 +26,12 @@ const PassCard = ({ pass }: { pass: any }) => {
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="flex items-center gap-3">
             <div className="relative w-16 h-16 rounded-full overflow-hidden border-2 border-white">
-              <Image
+              <Img
                 src={pass.image || "/default-avatar.png"}
                 alt={pass.name}
                 fill
                 className="object-cover"
+                useImgTag
               />
             </div>
             <div className="flex-1 min-w-0">
