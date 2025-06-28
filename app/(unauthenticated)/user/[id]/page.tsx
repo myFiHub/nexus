@@ -6,9 +6,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 // Helper function to generate rich description
@@ -258,11 +256,6 @@ export const viewport = {
   maximumScale: 5,
   colorScheme: "light dark",
 };
-
-export const themeColor = [
-  { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  { media: "(prefers-color-scheme: dark)", color: "#000000" },
-];
 
 export default async function UserPage({ params }: Props) {
   const { id } = await params;

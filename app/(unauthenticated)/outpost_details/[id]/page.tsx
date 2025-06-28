@@ -1,13 +1,12 @@
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
+import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
 import { logoUrl } from "app/lib/constants";
 import podiumApi from "app/services/api";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-interface OutpostDetailsPageProps {
-  params: {
-    id: string;
-  };
+interface PageProps {
+  params: Promise<{ id: string }>;
 }
 
 // Helper function to format event date
@@ -127,9 +126,7 @@ function generateEventStructuredData(outpost: any, outpostId: string) {
 // Generate metadata for the page
 export async function generateMetadata({
   params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   const outpost = await podiumApi.getOutpost(id);
 
@@ -287,14 +284,7 @@ export const viewport = {
   colorScheme: "light dark",
 };
 
-export const themeColor = [
-  { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  { media: "(prefers-color-scheme: dark)", color: "#000000" },
-];
-
-export default async function OutpostDetailsPage({
-  params,
-}: OutpostDetailsPageProps) {
+export default async function OutpostDetailsPage({ params }: PageProps) {
   const { id } = await params;
   const outpost = await podiumApi.getOutpost(id);
 
@@ -313,7 +303,14 @@ export default async function OutpostDetailsPage({
           __html: JSON.stringify(structuredData),
         }}
       />
-      <OutpostDetailsContainer outpost={outpost} />
+      <OutpostDetailsContainer
+        outpost={outpost}
+        lumaSlot={
+          outpost.luma_event_id ? (
+            <LumaEventDetails eventId={outpost.luma_event_id} />
+          ) : undefined
+        }
+      />
     </>
   );
 }

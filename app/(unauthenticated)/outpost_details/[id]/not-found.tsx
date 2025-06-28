@@ -8,7 +8,7 @@ export default function OutpostNotFound() {
           Outpost Not Found
         </h1>
         <p className="text-xl text-[var(--muted-foreground)] mb-8">
-          The outpost you're looking for doesn't exist or has been removed.
+          The outpost you are looking for does not exist or has been removed.
         </p>
         <AppLink
           href="/all_outposts"

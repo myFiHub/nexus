@@ -8,7 +8,7 @@ export default function NotFound() {
           Page Not Found
         </h1>
         <p className="text-xl text-[var(--muted-foreground)] mb-8">
-          The page you're looking for doesn't exist or has been moved.
+          The page you are looking for does not exist or has been moved.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <AppLink

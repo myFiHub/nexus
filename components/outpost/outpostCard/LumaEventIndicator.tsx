@@ -56,7 +56,7 @@ export function LumaEventIndicator({ eventId }: LumaEventIndicatorProps) {
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [isOpen]);
+  }, [isOpen, fetchEventDetails]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("en-US", {

@@ -287,11 +287,6 @@ export const viewport = {
   colorScheme: "light dark",
 };
 
-export const themeColor = [
-  { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-  { media: "(prefers-color-scheme: dark)", color: "#000000" },
-];
-
 export default async function AllOutpostsPage() {
   try {
     const outposts = await podiumApi.getOutposts(0, PAGE_SIZE);
