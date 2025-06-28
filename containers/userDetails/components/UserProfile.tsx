@@ -25,7 +25,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         {user.aptos_address && (
           <div className="flex items-center">
             <p className="text-gray-600 text-sm sm:text-base">
-              {truncate(user.aptos_address)}
+              {truncate(user.aptos_address, 20)}
             </p>
             <CopyButton text={user.aptos_address} />
           </div>
