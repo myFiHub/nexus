@@ -235,10 +235,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     category: "social",
     classification: "social platform",
     referrer: "origin-when-cross-origin",
-    themeColor: [
-      { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-      { media: "(prefers-color-scheme: dark)", color: "#000000" },
-    ],
     colorScheme: "light dark",
     viewport: {
       width: "device-width",
@@ -272,6 +268,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return metadata;
 }
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#000000" },
+  ],
+};
 
 export default async function UserPage({ params }: Props) {
   const { id } = await params;
