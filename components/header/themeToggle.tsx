@@ -8,6 +8,7 @@ import {
 import { motion } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Button } from "../Button";
 
 export const ThemeToggle = ({
   initialValue,
@@ -32,10 +33,12 @@ export const ThemeToggle = ({
   };
 
   return (
-    <button
+    <Button
+      variant="ghost"
+      size="sm"
+      className={`relative`}
       onClick={toggleTheme}
-      className="relative p-2 rounded-lg hover:bg-accent transition-colors"
-      aria-label="Toggle theme"
+      aria-label={`Theme`}
     >
       <motion.div
         initial={false}
@@ -55,6 +58,6 @@ export const ThemeToggle = ({
           <Sun className="w-5 h-5 text-foreground" />
         )}
       </motion.div>
-    </button>
+    </Button>
   );
 };

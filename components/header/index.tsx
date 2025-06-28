@@ -7,6 +7,7 @@ import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
+import { Button } from "../Button";
 import { Img } from "../Img";
 import { LoginButton } from "./LoginButton";
 import { NavLink } from "./NavLink";
@@ -77,13 +78,17 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
       </nav>
       <div className="flex items-center gap-1">
         <ThemeToggle initialValue={theme} />
-        <button
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className={`relative`}
           onClick={handleSearchClick}
-          className="p-2 rounded-md text-[var(--header-link)] hover:text-[var(--header-link-active)] hover:bg-[var(--header-hover)] transition-colors duration-200 cursor-pointer"
-          aria-label="Search"
+          aria-label={`Search`}
         >
           <Search className="w-5 h-5" />
-        </button>
+        </Button>
+
         {isLoggedIn && <NotificationsBell />}
         <LoginButton />
       </div>
