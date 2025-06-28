@@ -41,6 +41,7 @@ function* editScheduledDate(
       );
       yield revalidateService.revalidateMultiple({
         outpostId: outpost.uuid,
+        allOutposts: true,
       });
     }
   } catch (error) {
