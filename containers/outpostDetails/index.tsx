@@ -14,7 +14,7 @@ export const OutpostDetailsContainer = async ({
   return (
     <Suspense
       fallback={
-        <div className="container mx-auto px-4 py-8 mt-12">
+        <div className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto">
             {/* Header Image with Overlay Skeleton */}
             <div className="relative w-full mb-8 rounded-xl overflow-hidden">

@@ -53,7 +53,7 @@ const Content = () => {
     return <div>Joining outpost...</div>;
   }
   return (
-    <div className="container mx-auto px-4 py-8 mt-12">
+    <div className="container mx-auto px-4 py-8">
       <OngoingOutpostContent myUser={myUser} loading={loading} />
     </div>
   );

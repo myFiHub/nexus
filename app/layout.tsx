@@ -124,7 +124,7 @@ export default async function RootLayout({
         <LoadingIndicator />
         <GlobalContainer />
         <Header theme={theme as "light" | "dark"} />
-        {children}
+        <main className="max-w-7xl mx-auto  pt-24">{children}</main>
       </body>
     </html>
   );

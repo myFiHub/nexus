@@ -14,7 +14,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
   return (
     <div className="flex gap-2 mt-auto">
-      <JoinButton outpost={outpost} />
+      <JoinButton outpost={outpost} fromCard />
     </div>
   );
 };

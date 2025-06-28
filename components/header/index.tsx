@@ -54,85 +54,95 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] pr-3 pl-1 py-3 flex items-center justify-between shadow-md transition-transform duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] shadow-md transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-      <div className="flex items-center ">
-        <AppLink
-          href="/"
-          className="flex items-center gap-1 text-xl font-bold text-[var(--header-link-active)] hover:no-underline px-0"
-        >
-          <Img src="/logo.png" alt="Podium Nexus" className="w-6 h-6" />
-          Podium Nexus
-        </AppLink>
-      </div>
-      {/* Desktop nav */}
-      <nav className="hidden md:flex gap-8 items-center">
-        {isLoggedIn &&
-          navLinks.map((link) => (
-            <NavLink key={link.href} href={link.href}>
-              {link.label}
-            </NavLink>
-          ))}
-      </nav>
-      <div className="flex items-center gap-1">
-        <ThemeToggle initialValue={theme} />
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="py-3 flex items-center justify-between">
+          <div className="flex items-center ">
+            <AppLink
+              href="/"
+              className="flex items-center gap-1 text-xl font-bold text-[var(--header-link-active)] hover:no-underline px-0"
+            >
+              <Img src="/logo.png" alt="Podium Nexus" className="w-6 h-6" />
+              Podium Nexus
+            </AppLink>
+          </div>
+          {/* Desktop nav */}
+          <nav className="hidden md:flex gap-8 items-center">
+            {isLoggedIn &&
+              navLinks.map((link) => (
+                <NavLink key={link.href} href={link.href}>
+                  {link.label}
+                </NavLink>
+              ))}
+          </nav>
+          <div className="flex items-center gap-1">
+            <ThemeToggle initialValue={theme} />
 
-        <Button
-          variant="ghost"
-          size="sm"
-          className={`relative`}
-          onClick={handleSearchClick}
-          aria-label={`Search`}
-        >
-          <Search className="w-5 h-5" />
-        </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className={`relative`}
+              onClick={handleSearchClick}
+              aria-label={`Search`}
+            >
+              <Search className="w-5 h-5" />
+            </Button>
 
-        {isLoggedIn && <NotificationsBell />}
-        <LoginButton />
-      </div>
-      {/* Mobile hamburger */}
-      {isLoggedIn && (
-        <div className="md:hidden flex items-center ">
-          <button
-            onClick={() => setMobileOpen((v) => !v)}
-            aria-label={mobileOpen ? "Close mobile menu" : "Open mobile menu"}
-            className="text-2xl text-[var(--header-link)] focus:outline-none"
-          >
-            {mobileOpen ? (
-              <X className="w-7 h-7" />
-            ) : (
-              <Menu className="w-7 h-7" />
-            )}
-          </button>
+            {isLoggedIn && <NotificationsBell />}
+            <LoginButton />
+          </div>
+          {/* Mobile hamburger */}
+          {isLoggedIn && (
+            <div className="md:hidden flex items-center ">
+              <button
+                onClick={() => setMobileOpen((v) => !v)}
+                aria-label={
+                  mobileOpen ? "Close mobile menu" : "Open mobile menu"
+                }
+                className="text-2xl text-[var(--header-link)] focus:outline-none"
+              >
+                {mobileOpen ? (
+                  <X className="w-7 h-7" />
+                ) : (
+                  <Menu className="w-7 h-7" />
+                )}
+              </button>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       {/* Mobile menu */}
       {mobileOpen && (
-        <nav className="md:hidden absolute top-full left-0 right-0 bg-[var(--header-bg)] p-4 shadow-md">
-          <button
-            onClick={() => {
-              handleSearchClick();
-              setMobileOpen(false);
-            }}
-            className="flex items-center gap-2 w-full py-2 text-[var(--header-link)] hover:text-[var(--header-link-active)] transition-colors duration-200"
-          >
-            <Search className="w-5 h-5" />
-            Search
-          </button>
-          {isLoggedIn &&
-            navLinks.map((link) => (
-              <NavLink
-                key={link.href}
-                href={link.href}
-                className="block py-2"
-                onClick={() => setMobileOpen(false)}
+        <div className="bg-[var(--header-bg)] shadow-md">
+          <div className="max-w-7xl mx-auto px-4">
+            <nav className="py-4">
+              <button
+                onClick={() => {
+                  handleSearchClick();
+                  setMobileOpen(false);
+                }}
+                className="flex items-center gap-2 w-full py-2 text-[var(--header-link)] hover:text-[var(--header-link-active)] transition-colors duration-200"
               >
-                {link.label}
-              </NavLink>
-            ))}
-        </nav>
+                <Search className="w-5 h-5" />
+                Search
+              </button>
+              {isLoggedIn &&
+                navLinks.map((link) => (
+                  <NavLink
+                    key={link.href}
+                    href={link.href}
+                    className="block py-2"
+                    onClick={() => setMobileOpen(false)}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+            </nav>
+          </div>
+        </div>
       )}
     </header>
   );

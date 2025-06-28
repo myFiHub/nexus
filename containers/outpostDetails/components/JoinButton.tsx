@@ -14,9 +14,13 @@ import { outpostDetailsSelectors } from "../selectors";
 
 interface JoinButtonProps {
   outpost: OutpostModel;
+  fromCard?: boolean;
 }
 
-const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
+const JoinButtonContent = ({
+  outpost: passedOutpost,
+  fromCard,
+}: JoinButtonProps) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -30,7 +34,7 @@ const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
-  const outpost = stateOutpost || passedOutpost;
+  const outpost = fromCard ? passedOutpost : stateOutpost || passedOutpost;
   const joining = joiningId === outpost.uuid;
 
   // Only calculate timer info after mounting to prevent hydration mismatch
@@ -68,10 +72,10 @@ const JoinButtonContent = ({ outpost: passedOutpost }: JoinButtonProps) => {
   );
 };
 
-export function JoinButton({ outpost }: JoinButtonProps) {
+export function JoinButton({ outpost, fromCard }: JoinButtonProps) {
   return (
     <ReduxProvider>
-      <JoinButtonContent outpost={outpost} />
+      <JoinButtonContent outpost={outpost} fromCard={fromCard} />
     </ReduxProvider>
   );
 }

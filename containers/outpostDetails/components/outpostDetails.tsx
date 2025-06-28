@@ -20,7 +20,7 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
   return (
     <>
       <StateInitializer outpost={outpost} />
-      <div className="container mx-auto px-4 py-8 mt-12">
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header Image with Overlay */}
           <div className="relative w-full mb-8 rounded-xl overflow-hidden group flex justify-center">

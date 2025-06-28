@@ -13,7 +13,7 @@ import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
 
 const LoadingSkeleton = () => (
-  <div className="max-w-4xl mx-auto p-6 mt-24">
+  <div className="max-w-4xl mx-auto p-6">
     <div className="bg-card rounded-lg shadow-md p-6 animate-pulse">
       {/* Profile Header Skeleton - matches ProfileHeader component */}
       <div className="flex items-center space-x-6 mb-8">
@@ -142,7 +142,7 @@ const Content = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 mt-24">
+    <div className="max-w-4xl mx-auto p-6">
       <div className="bg-card rounded-lg shadow-md p-6">
         <ProfileHeader user={user} />
         <UserStats user={user} />

@@ -25,7 +25,7 @@ export const UserDetails = ({
   return (
     <>
       <ClientRedirecter id={user.uuid} />
-      <div className="p-4 sm:p-6 mt-12">
+      <div className="p-4 sm:p-6">
         <div className="flex justify-between items-center">
           <div className="text-2xl font-bold">User Details</div>
         </div>

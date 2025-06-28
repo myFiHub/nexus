@@ -33,7 +33,7 @@ const Content = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 pt-24">
+    <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">My Outposts</h1>
 
       <InfiniteScrollOutpostsList />
