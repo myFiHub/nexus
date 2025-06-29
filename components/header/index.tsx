@@ -3,6 +3,7 @@ import { searchDialog } from "app/components/Dialog";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
 import { ReduxProvider } from "app/store/Provider";
+import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Search, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -25,7 +26,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
+  const isLoggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,8 +91,20 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
             >
               <Search className="w-5 h-5" />
             </Button>
-
-            {isLoggedIn && <NotificationsBell />}
+            <AnimatePresence>
+              {isLoggedIn && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20, width: 0 }}
+                  animate={{ opacity: 1, x: 0, width: "auto" }}
+                  exit={{ opacity: 0, x: 20, width: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <NotificationsBell />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div className="w-1" />
             <LoginButton />
           </div>
           {/* Mobile hamburger */}
