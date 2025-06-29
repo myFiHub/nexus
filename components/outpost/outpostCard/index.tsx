@@ -11,7 +11,7 @@ interface OutpostCardProps {
 
 export function OutpostCard({ outpost }: OutpostCardProps) {
   return (
-    <div className="bg-card rounded-xl shadow-lg overflow-hidden hover:shadow-xl h-full flex flex-col border border-border">
+    <div className="bg-card rounded-xl shadow-lg overflow-hidden hover:shadow-xl h-full flex flex-col border border-border ">
       <ImageSection outpost={outpost} />
 
       {/* Content Section */}

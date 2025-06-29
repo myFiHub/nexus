@@ -11,4 +11,6 @@ export const podiumTeamMembersAptosAddresses = [
   "0xf2926d1ce63e1f541fc6c5f1c3e75d71bfd8b667ed83642b10809a5a3cdade10", //Luis
 ];
 
+export const localLogoUrl = "/logo.png";
+
 export const PAGE_SIZE = 24;

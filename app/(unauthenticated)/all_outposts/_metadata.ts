@@ -1,5 +1,6 @@
 import { logoUrl } from "app/lib/constants";
 import podiumApi from "app/services/api";
+import { OutpostModel } from "app/services/api/types";
 import { Metadata } from "next";
 
 // Helper function to generate structured data for outposts listing
@@ -59,7 +60,7 @@ function getTrendingTopics(outposts: any[]): string[] {
 }
 
 // Helper function to get live and upcoming stats
-function getOutpostStats(outposts: any[]): {
+function getOutpostStats(outposts: OutpostModel[]): {
   live: number;
   upcoming: number;
   total: number;
@@ -71,9 +72,9 @@ function getOutpostStats(outposts: any[]): {
   outposts.forEach((outpost) => {
     if (outpost.scheduled_for) {
       const eventDate = new Date(outpost.scheduled_for);
-      if (eventDate <= now) {
+      if (eventDate <= now && (outpost.online_users_count ?? 0) > 0) {
         live++;
-      } else {
+      } else if (eventDate > now) {
         upcoming++;
       }
     }

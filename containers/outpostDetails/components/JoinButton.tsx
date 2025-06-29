@@ -72,10 +72,10 @@ const JoinButtonContent = ({
   );
 };
 
-export function JoinButton({ outpost, fromCard }: JoinButtonProps) {
+export function JoinButton({ outpost }: JoinButtonProps) {
   return (
     <ReduxProvider>
-      <JoinButtonContent outpost={outpost} fromCard={fromCard} />
+      <JoinButtonContent outpost={outpost} />
     </ReduxProvider>
   );
 }
