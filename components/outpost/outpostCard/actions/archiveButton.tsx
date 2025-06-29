@@ -14,7 +14,7 @@ import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { revalidateService } from "app/services/revalidate";
 import { ReduxProvider } from "app/store/Provider";
-import { Archive, ArchiveRestore } from "lucide-react";
+import { ArchiveRestore, ArchiveX } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -64,11 +64,13 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
           onClick={handleArchive}
           disabled={isLoading}
           className={`${
-            !isArchivedState ? "bg-orange-500 hover:bg-orange-600" : ""
+            !isArchivedState
+              ? "bg-orange-500 hover:bg-orange-600"
+              : "bg-green-300 hover:bg-green-400"
           }`}
         >
           {isArchivedState ? (
-            <Archive className="w-4 h-4" />
+            <ArchiveX className="w-4 h-4" />
           ) : (
             <ArchiveRestore className="w-4 h-4" />
           )}
