@@ -3,7 +3,7 @@ import { PAGE_SIZE } from "app/lib/constants";
 import { ReduxProvider } from "app/store/Provider";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { OutpostCardSkeleton } from "../../components/outpost/OutpostCardSkeleton";
+import { LoadingOutposts } from "../../components/outpost/LoadingOutposts";
 import { OutpostsList } from "../../components/outpost/OutpostsList";
 import { OutpostModel } from "../../services/api/types";
 import { allOutpostsSelectors } from "./selectors";
@@ -81,13 +81,14 @@ const Content = ({ initialOutposts }: ClientOutpostsListProps) => {
 
       {/* Loading indicator for infinite scroll */}
       {hasMore && (
-        <div ref={lastElementRef} className="flex justify-center py-8">
+        <div ref={lastElementRef} className="py-8 w-full relative">
           {isLoadingMore ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr w-full">
-              {Array.from({ length: 3 }).map((_, index) => (
-                <OutpostCardSkeleton key={`loading-${index}`} />
-              ))}
-            </div>
+            <LoadingOutposts
+              count={3}
+              loadingText="Loading more outposts..."
+              showLoadingIndicator={true}
+              loadingIndicatorPosition="bottom"
+            />
           ) : (
             <div className="h-8" /> // Invisible element for intersection observer
           )}

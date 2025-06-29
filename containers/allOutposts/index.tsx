@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { OutpostCardSkeleton } from "../../components/outpost/OutpostCardSkeleton";
+import { LoadingOutposts } from "../../components/outpost/LoadingOutposts";
 import { OutpostModel } from "../../services/api/types";
 import { ClientOutpostsList } from "./ClientOutpostsList";
 
@@ -17,11 +17,11 @@ export const AllOutpostsContainer = ({
       {/* Client-side component that handles both SSR and infinite scroll */}
       <Suspense
         fallback={
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <OutpostCardSkeleton key={index} />
-            ))}
-          </div>
+          <LoadingOutposts
+            count={6}
+            loadingText="Loading outposts..."
+            showLoadingIndicator={true}
+          />
         }
       >
         <ClientOutpostsList initialOutposts={initialOutposts} />
