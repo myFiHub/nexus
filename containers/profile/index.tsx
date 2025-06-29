@@ -51,8 +51,8 @@ const Content = () => {
           <UserStats user={user} />
           <ConnectedAccounts accounts={user.accounts} />
           <AdditionalInfo user={user} />
-          <SettingsSection />
           <MyPasses />
+          <SettingsSection />
         </div>
       </div>
     </>

@@ -1,5 +1,6 @@
 import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { truncate } from "app/lib/utils";
 import { ConnectedAccount } from "app/services/api/types";
 import { motion } from "framer-motion";
@@ -17,6 +18,7 @@ export const ConnectedAccountCard = ({
   account,
 }: ConnectedAccountCardProps) => {
   const dispatch = useDispatch();
+  const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const addressOfAccountThatIsBeingMadePrimary = useSelector(
     myProfileSelectors.addressOfAccountThatIsBeingMadePrimary
   );
@@ -35,7 +37,7 @@ export const ConnectedAccountCard = ({
 
   const isBeingMadePrimary =
     addressOfAccountThatIsBeingMadePrimary === account.address;
-
+  const isThisMyCurrentAccount = myUser?.address === account.address;
   return (
     <motion.div
       className={`bg-card p-4 rounded-lg shadow-md border border-border/50 ${
@@ -105,6 +107,11 @@ export const ConnectedAccountCard = ({
           <div className="font-medium text-foreground truncate flex items-center gap-2">
             ID: {truncate(account.login_type_identifier)}
             <CopyButton text={account.login_type_identifier} />
+            {isThisMyCurrentAccount && (
+              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                Current
+              </span>
+            )}
           </div>
           <div className="text-sm text-muted-foreground truncate">
             {account.login_type}
