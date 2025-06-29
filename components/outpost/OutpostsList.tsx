@@ -1,6 +1,6 @@
 import { OutpostModel } from "../../services/api/types";
+import { LoadingOutposts } from "./LoadingOutposts";
 import { OutpostCard } from "./outpostCard";
-import { OutpostCardSkeleton } from "./OutpostCardSkeleton";
 
 interface OutpostsListProps {
   outposts: OutpostModel[];
@@ -16,13 +16,7 @@ export function OutpostsList({
   noOutpostComponent,
 }: OutpostsListProps) {
   if (loading && outposts.length === 0) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        {Array.from({ length: 6 }).map((_, index) => (
-          <OutpostCardSkeleton key={index} />
-        ))}
-      </div>
-    );
+    return <LoadingOutposts count={6} loadingText="Loading outposts..." />;
   }
 
   if (error) {

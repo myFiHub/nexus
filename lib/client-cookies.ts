@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 export enum CookieKeys {
   theme = "theme",
   myUserId = "my_user_id",
+  viewArchivedOutposts = "view_archived_outposts",
 }
 
 // Client-side cookie management using js-cookies package

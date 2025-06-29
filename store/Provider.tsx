@@ -8,5 +8,6 @@ interface ProviderProps {
 }
 
 export function ReduxProvider({ children }: ProviderProps) {
-  return <Provider store={getStore()}>{children}</Provider>;
+
+  return <Provider store={getStore()!}>{children}</Provider>;
 }

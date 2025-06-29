@@ -1,3 +1,4 @@
+"use client";
 import {
   IProvider,
   UserInfo,
@@ -138,7 +139,7 @@ function* getAndSetAccount() {
         action: {
           label: "retry?",
           onClick: () =>
-            getStore().dispatch(globalActions.initializeWeb3Auth()),
+            getStore()!.dispatch(globalActions.initializeWeb3Auth()),
         },
       });
       return;

@@ -1,3 +1,4 @@
+"use client";
 import { EasyAccess } from "app/containers/global/effects/quickAccess";
 import { notificationsActions } from "app/containers/notifications/slice";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
@@ -86,20 +87,20 @@ export class WebSocketMessageRouter {
       WebSocketService.instance.completeJoinRequest(joinId);
     }
     const store = getStore();
-    store.dispatch(onGoingOutpostActions.getLiveMembers());
+    store!.dispatch(onGoingOutpostActions.getLiveMembers());
   }
 
   private static handleUserLeft(message: IncomingMessage): void {
     const userAddress = message.data.address;
     const store = getStore();
     if (userAddress !== EasyAccess.getInstance().myUser?.address) {
-      store.dispatch(onGoingOutpostActions.getLiveMembers());
+      store!.dispatch(onGoingOutpostActions.getLiveMembers());
     }
   }
 
   private static handleRemainingTimeUpdated(message: IncomingMessage): void {
     const store = getStore();
-    store.dispatch(
+    store!.dispatch(
       onGoingOutpostActions.updateRemainingTime({
         userAddress: message.data.address!,
         remainingTime: message.data.remaining_time!,
@@ -112,7 +113,7 @@ export class WebSocketMessageRouter {
     isTalking: boolean
   ): void {
     const store = getStore();
-    store.dispatch(
+    store!.dispatch(
       onGoingOutpostActions.updateUserIsTalking({
         userAddress: message.data.address!,
         isTalking: isTalking,
@@ -128,7 +129,7 @@ export class WebSocketMessageRouter {
       );
     }
     const store = getStore();
-    store.dispatch(
+    store!.dispatch(
       onGoingOutpostActions.incomingUserReaction({
         userAddress: message.data.address!,
         reaction: message.name as IncomingReactionType,
@@ -138,7 +139,7 @@ export class WebSocketMessageRouter {
 
   private static handleTimeIsUp(message: IncomingMessage): void {
     const store = getStore();
-    store.dispatch(
+    store!.dispatch(
       onGoingOutpostActions.handleTimeIsUp({
         userAddress: message.data.address!,
       })
@@ -148,7 +149,7 @@ export class WebSocketMessageRouter {
   private static handleNotification(_: IncomingMessage): void {
     notificationsEventBus.next(NOTIFICATIONS_UPDATED);
     const store = getStore();
-    store.dispatch(notificationsActions.getNotifications());
+    store!.dispatch(notificationsActions.getNotifications());
   }
 
   private static handleWaitlistUpdated(message: IncomingMessage): void {
@@ -172,7 +173,7 @@ export class WebSocketMessageRouter {
     isRecording: boolean
   ): void {
     const store = getStore();
-    store.dispatch(
+    store!.dispatch(
       onGoingOutpostActions.updateUserIsRecording({
         userAddress: message.data.address!,
         isRecording: isRecording,

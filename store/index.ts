@@ -54,33 +54,33 @@ export const getStore = (): Store<RootState, AnyAction> => {
 
 // Function to inject a reducer
 const injectReducer = (key: string, reducer: Reducer<any, UnknownAction>) => {
-  if (injectedReducers[key]) {
-    return;
-  }
-
-  injectedReducers[key] = reducer;
-  const combinedReducer = combineReducers<RootState>(
-    // @ts-ignore
-    {
-      ...rootReducer,
-      ...injectedReducers,
+  if (typeof window !== "undefined") {
+    if (injectedReducers[key]) {
+      return;
     }
-  ) as Reducer<RootState, UnknownAction>;
 
-  getStore().replaceReducer(combinedReducer);
-  if (isDev) {
+    injectedReducers[key] = reducer;
+    const combinedReducer = combineReducers<RootState>(
+      // @ts-ignore
+      {
+        ...rootReducer,
+        ...injectedReducers,
+      }
+    ) as Reducer<RootState, UnknownAction>;
+
+    getStore().replaceReducer(combinedReducer);
     console.log("injected reducer", key);
   }
 };
 
 // Function to inject a saga
 const injectSaga = (key: string, saga: any) => {
-  if (injectedSagas[key]) {
-    return;
-  }
-  injectedSagas[key] = saga;
-  sagaMiddleware.run(saga);
-  if (isDev) {
+  if (typeof window !== "undefined") {
+    if (injectedSagas[key]) {
+      return;
+    }
+    injectedSagas[key] = saga;
+    sagaMiddleware.run(saga);
     console.log("injected saga", key);
   }
 };

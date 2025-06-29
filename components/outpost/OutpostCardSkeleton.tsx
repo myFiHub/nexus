@@ -1,6 +1,9 @@
 export function OutpostCardSkeleton() {
   return (
-    <div className="bg-card rounded-xl shadow-lg overflow-hidden h-full flex flex-col border border-border animate-pulse">
+    <div className="bg-card rounded-xl shadow-lg overflow-hidden h-full flex flex-col border border-border relative overflow-hidden">
+      {/* Shimmer overlay */}
+      <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+
       {/* Image skeleton */}
       <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700">
         <div className="absolute top-3 left-3 z-10 flex gap-2">

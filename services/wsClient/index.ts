@@ -1,4 +1,6 @@
+"use client";
 // Export main service
+
 export { WebSocketService } from "./client";
 
 // Export types and enums

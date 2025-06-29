@@ -1,6 +1,11 @@
 "use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
+import {
+  CookieKeys,
+  getClientCookie,
+  setClientCookie,
+} from "app/lib/client-cookies";
 import { OutpostModel, User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { injectContainer } from "app/store";
@@ -36,7 +41,8 @@ const initialState: GlobalState = {
   logingIn: false,
   logingOut: false,
   tick: 0,
-  viewArchivedOutposts: getViewArchivedOutposts(),
+  viewArchivedOutposts:
+    getClientCookie(CookieKeys.viewArchivedOutposts) === "true", //getViewArchivedOutposts(),
 };
 
 const globalSlice = createSlice({
@@ -51,7 +57,10 @@ const globalSlice = createSlice({
     },
     setViewArchivedOutposts(state, action: PayloadAction<boolean>) {
       state.viewArchivedOutposts = action.payload;
-      localStorage.setItem("viewArchivedOutposts", action.payload.toString());
+      setClientCookie(
+        CookieKeys.viewArchivedOutposts,
+        action.payload.toString()
+      );
     },
     setRouter(state, action: PayloadAction<AppRouterInstance>) {
       state.router = action.payload;
