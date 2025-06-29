@@ -134,6 +134,21 @@ const globalSlice = createSlice({
     setSwitchingAccount(state, action: PayloadAction<boolean>) {
       state.switchingAccount = action.payload;
     },
+    setAccountAsPrimary(state, action: PayloadAction<string>) {
+      if (!state.podiumUserInfo) {
+        return;
+      }
+
+      const accounts = state.podiumUserInfo.accounts.map((account) => ({
+        ...account,
+        is_primary: account.address === action.payload,
+      }));
+
+      state.podiumUserInfo = {
+        ...state.podiumUserInfo,
+        accounts,
+      };
+    },
   },
 });
 

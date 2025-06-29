@@ -4,7 +4,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { cn, truncate } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2 } from "lucide-react";
+import { Crown, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../Button";
@@ -34,7 +34,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
   );
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const logingOut = useSelector(GlobalSelectors.logingOut);
-
+  const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
   // Ensure loading is always a boolean to prevent hydration mismatch
   const loading = Boolean(logingIn || logingOut || initializingWeb3Auth);
 
@@ -72,29 +72,44 @@ const Content = ({ size, className }: LoginButtonProps) => {
   }
 
   return (
-    <Button
-      disabled={loading}
-      size={size}
-      className={cn(className, minWidth)}
-      onClick={isLoggedIn ? disconnect : connect}
-    >
-      {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : isLoggedIn && podiumUserInfo?.aptos_address ? (
-        <div className="flex items-center gap-2">
-          {podiumUserInfo.image && (
-            <Img
-              src={podiumUserInfo.image}
-              alt="profile"
-              className="w-6 h-6 rounded-full"
-              useImgTag
-            />
+    <div className="relative">
+      <Button
+        disabled={loading}
+        size={size}
+        className={cn(className, minWidth)}
+        onClick={isLoggedIn ? disconnect : connect}
+      >
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : isLoggedIn && podiumUserInfo?.aptos_address ? (
+          <div className="flex items-center gap-2">
+            {podiumUserInfo.image && (
+              <Img
+                src={podiumUserInfo.image}
+                alt="profile"
+                className="w-6 h-6 rounded-full"
+                useImgTag
+              />
+            )}
+            <span>{truncate(podiumUserInfo.aptos_address)}</span>
+          </div>
+        ) : (
+          "Login"
+        )}
+      </Button>
+
+      {/* Primary account indicator */}
+      {isLoggedIn && !loading && (
+        <div className="absolute -top-1 -right-1">
+          {isPrimary ? (
+            <Crown className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+          ) : (
+            <div className="bg-red-500 text-white text-[6px] px-0.5 py-0.5 rounded text-center min-w-[55px]">
+              Not Primary
+            </div>
           )}
-          <span>{truncate(podiumUserInfo.aptos_address)}</span>
         </div>
-      ) : (
-        "Login"
       )}
-    </Button>
+    </div>
   );
 };

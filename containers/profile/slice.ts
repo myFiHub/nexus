@@ -7,6 +7,7 @@ export interface ProfileState {
   loading: boolean;
   user?: User;
   userError?: string;
+  addressOfAccountThatIsBeingMadePrimary?: string;
 }
 
 const initialState: ProfileState = {
@@ -26,6 +27,13 @@ const profileSlice = createSlice({
     },
     setUserError(state, action: PayloadAction<string>) {
       state.userError = action.payload;
+    },
+    makeAccountPrimary(_, __: PayloadAction<string>) {},
+    setAddressOfAccountThatIsBeingMadePrimary(
+      state,
+      action: PayloadAction<string | undefined>
+    ) {
+      state.addressOfAccountThatIsBeingMadePrimary = action.payload;
     },
   },
 });
