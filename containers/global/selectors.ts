@@ -1,3 +1,4 @@
+import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 
 export const GlobalDomains = {
@@ -18,6 +19,10 @@ export const GlobalDomains = {
     state.global?.checkingOutpostForPass,
   viewArchivedOutposts: (state: RootState) =>
     state.global?.viewArchivedOutposts ?? false,
+  objectOfOnlineUsersToGet: (state: RootState) =>
+    state.global?.objectOfOnlineUsersToGet ?? {},
+  numberOfOnlineUsers: (state: RootState) =>
+    state.global?.numberOfOnlineUsers ?? {},
 };
 
 export const GlobalSelectors = {
@@ -37,4 +42,11 @@ export const GlobalSelectors = {
   tick: GlobalDomains.tick,
   checkingOutpostForPass: GlobalDomains.checkingOutpostForPass,
   viewArchivedOutposts: GlobalDomains.viewArchivedOutposts,
+  numberOfOnlineUsers: GlobalDomains.numberOfOnlineUsers,
+  objectOfOnlineUsersToGet: GlobalDomains.objectOfOnlineUsersToGet,
+  numberOfOnlineUsersForOutpost: (id: string) =>
+    createSelector(
+      GlobalDomains.numberOfOnlineUsers,
+      (objectOfOnlineUsers) => objectOfOnlineUsers[id] ?? 0
+    ),
 };

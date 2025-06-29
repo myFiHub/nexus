@@ -4,6 +4,7 @@ import { OutpostModel } from "app/services/api/types";
 import { DetailsButton } from "./detailsButton";
 import { LumaEventIndicator } from "./LumaEventIndicator";
 import { MembersBadge } from "./MembersBadge";
+import { OnlineUsersIndicator } from "./OnlineUsersIndicator";
 import { Tags } from "./tags";
 
 interface ImageSectionProps {
@@ -30,7 +31,11 @@ export function ImageSection({ outpost }: ImageSectionProps) {
         )}
       </div>
 
-      <MembersBadge membersCount={outpost.members_count} />
+      {/* Members and online users info positioned at top-right */}
+      <div className="absolute top-3 right-3 z-10 flex flex-col gap-1">
+        <MembersBadge membersCount={outpost.members_count} />
+        <OnlineUsersIndicator outpost={outpost} />
+      </div>
     </div>
   );
 }

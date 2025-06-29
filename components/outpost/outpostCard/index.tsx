@@ -18,7 +18,12 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
       <div className="p-5 flex-1 flex flex-col">
         <ContentSection name={outpost.name} subject={outpost.subject} />
         <CreatorSection outpost={outpost} />
-        <EnterAndSpeakIndicators outpost={outpost} />
+
+        {/* Indicators Section */}
+        <div className="space-y-3 mb-4">
+          <EnterAndSpeakIndicators outpost={outpost} />
+        </div>
+
         <OutpostCardActions outpost={outpost} />
       </div>
     </div>

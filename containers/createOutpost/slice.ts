@@ -145,14 +145,18 @@ const createOutpostSlice = createSlice({
     },
     togglePassSellerRequiredToSpeak: (state, action: PayloadAction<User>) => {
       if (state.passSellersRequiredToSpeak[action.payload.uuid]) {
-        delete state.passSellersRequiredToSpeak[action.payload.uuid];
+        const { [action.payload.uuid]: _, ...rest } =
+          state.passSellersRequiredToSpeak;
+        state.passSellersRequiredToSpeak = rest;
       } else {
         state.passSellersRequiredToSpeak[action.payload.uuid] = action.payload;
       }
     },
     togglePassSellerRequiredToEnter: (state, action: PayloadAction<User>) => {
       if (state.passSellersRequiredToEnter[action.payload.uuid]) {
-        delete state.passSellersRequiredToEnter[action.payload.uuid];
+        const { [action.payload.uuid]: _, ...rest } =
+          state.passSellersRequiredToEnter;
+        state.passSellersRequiredToEnter = rest;
       } else {
         state.passSellersRequiredToEnter[action.payload.uuid] = action.payload;
       }

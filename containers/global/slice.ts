@@ -26,23 +26,21 @@ export interface GlobalState {
   tick: number;
   checkingOutpostForPass?: OutpostModel;
   viewArchivedOutposts?: boolean;
+  objectOfOnlineUsersToGet: {
+    [outpostId: string]: boolean;
+  };
+  numberOfOnlineUsers: { [outpostId: string]: number };
 }
-
-// Safe function to get localStorage value only on client side
-const getViewArchivedOutposts = (): boolean => {
-  if (typeof window !== "undefined" && window.localStorage) {
-    return localStorage.getItem("viewArchivedOutposts") === "true";
-  }
-  return false;
-};
 
 const initialState: GlobalState = {
   initializingWeb3Auth: true,
   logingIn: false,
   logingOut: false,
   tick: 0,
+  numberOfOnlineUsers: {},
+  objectOfOnlineUsersToGet: {},
   viewArchivedOutposts:
-    getClientCookie(CookieKeys.viewArchivedOutposts) === "true", //getViewArchivedOutposts(),
+    getClientCookie(CookieKeys.viewArchivedOutposts) === "true",
 };
 
 const globalSlice = createSlice({
@@ -110,6 +108,25 @@ const globalSlice = createSlice({
       action: PayloadAction<OutpostModel | undefined>
     ) {
       state.checkingOutpostForPass = action.payload;
+    },
+
+    setNumberOfOnlineUsers(
+      state,
+      action: PayloadAction<{ [outpostId: string]: number }>
+    ) {
+      state.numberOfOnlineUsers = action.payload;
+    },
+    toggleOutpostFromOnlineObject(
+      state,
+      action: PayloadAction<{ outpostId: string; addToObject: boolean }>
+    ) {
+      const { outpostId, addToObject } = action.payload;
+      if (addToObject) {
+        state.objectOfOnlineUsersToGet[outpostId] = true;
+      } else {
+        const { [outpostId]: _, ...rest } = state.objectOfOnlineUsersToGet;
+        state.objectOfOnlineUsersToGet = rest;
+      }
     },
   },
 });

@@ -1,10 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { LiveMember, OutpostModel, User } from "app/services/api/types";
+import { LiveMember, OutpostModel } from "app/services/api/types";
 import { IncomingReactionType } from "app/services/wsClient/messageRouter";
 import { injectContainer } from "app/store";
 import { OutpostAccesses } from "../global/effects/types";
 import { onGoingOutpostSaga } from "./saga";
-import { confettiEventBus } from "./eventBusses/confetti";
 
 export interface OnGoingOutpostState {
   outpost?: OutpostModel;
@@ -143,7 +142,8 @@ const onGoingOutpostSlice = createSlice({
       state.raisedHandUsers[action.payload.address] = action.payload.user;
     },
     removeFromRaisedHand(state, action: PayloadAction<string>) {
-      delete state.raisedHandUsers[action.payload];
+      const { [action.payload]: _, ...rest } = state.raisedHandUsers;
+      state.raisedHandUsers = rest;
     },
   },
 });

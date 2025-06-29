@@ -33,6 +33,7 @@ import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import {
   all,
+  debounce,
   delay,
   put,
   select,
@@ -381,6 +382,28 @@ function* setViewArchivedOutposts(
   yield put(myOutpostsActions.getOutposts());
 }
 
+function* getLatestOnlineUsersForOutposts(
+  action: ReturnType<typeof globalActions.toggleOutpostFromOnlineObject>
+) {
+  try {
+    const objectOfOnlineUsersToGet: { [outpostId: string]: boolean } =
+      yield select(GlobalSelectors.objectOfOnlineUsersToGet);
+    const arrayToCheck = Object.keys(objectOfOnlineUsersToGet);
+    const arrayToCall: Promise<number>[] = [];
+    for (const outpostId of arrayToCheck) {
+      arrayToCall.push(podiumApi.getNumberOfOnlineMembers(outpostId));
+    }
+    const results: number[] = yield all(arrayToCall);
+    const objectToPut: { [outpostId: string]: number } = {};
+    for (let i = 0; i < arrayToCheck.length; i++) {
+      objectToPut[arrayToCheck[i]] = results[i];
+    }
+    yield put(globalActions.setNumberOfOnlineUsers(objectToPut));
+  } catch (error) {
+    console.error(error);
+  }
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
@@ -392,5 +415,10 @@ export function* globalSaga() {
   yield takeLatest(
     globalActions.setViewArchivedOutposts,
     setViewArchivedOutposts
+  );
+  yield debounce(
+    5000,
+    globalActions.toggleOutpostFromOnlineObject,
+    getLatestOnlineUsersForOutposts
   );
 }
