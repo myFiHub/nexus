@@ -27,6 +27,13 @@ export const initializeOneSignal = async () => {
     return false;
   }
 };
+export const isLoggedInToOneSignal = () => {
+  try {
+    return OneSignal.User.onesignalId;
+  } catch (error) {
+    return false;
+  }
+};
 
 export const subscribeToNotifications = async () => {
   try {

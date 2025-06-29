@@ -18,11 +18,15 @@ import {
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
 import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
-import { signMessageWithTimestamp } from "app/lib/signWithPrivateKey";
+import {
+  signMessage,
+  signMessageWithTimestamp,
+} from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
   AdditionalDataForLogin,
+  ConnectNewAccountRequest,
   LoginRequest,
   OutpostModel,
   User,
@@ -148,8 +152,8 @@ function* getAndSetAccount() {
     }
     yield put(globalActions.setLogingIn(true));
     const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-    const user: IProvider | null = yield web3Auth.connect();
-    if (user) {
+    const provider: IProvider | null = yield web3Auth.connect();
+    if (provider) {
       const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
       if (
         userInfo.authConnection &&
@@ -160,7 +164,7 @@ function* getAndSetAccount() {
         toast.error("Only social login is supported for now");
         return;
       }
-      yield afterConnect(userInfo);
+      yield detached_afterConnect(userInfo);
     }
     yield put(globalActions.setLogingIn(false));
   } catch (error) {
@@ -174,7 +178,136 @@ function* getAndSetAccount() {
   }
 }
 
-function* afterConnect(userInfo: Partial<UserInfo>) {
+function* switchAccount() {
+  yield put(globalActions.setSwitchingAccount(true));
+  try {
+    let thereWasAnError = false;
+    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
+    const correntAccountPrivateKey: string | undefined = yield getPrivateKey();
+
+    if (!correntAccountPrivateKey) {
+      thereWasAnError = true;
+    } else {
+      yield web3Auth.logout();
+      yield web3Auth.clearCache();
+      const provider: IProvider | null = yield web3Auth.connect();
+
+      if (!provider) {
+        thereWasAnError = true;
+      } else {
+        const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
+        const newAccountPrivateKey: string | undefined = yield provider.request(
+          {
+            method: "private_key",
+          }
+        );
+
+        if (!newAccountPrivateKey) {
+          thereWasAnError = true;
+          return;
+        } else {
+          const correntAccountAddress = new ethers.Wallet(
+            correntAccountPrivateKey
+          ).address;
+          const newAccountAddress = new ethers.Wallet(newAccountPrivateKey)
+            .address;
+
+          if (correntAccountAddress === newAccountAddress) {
+            thereWasAnError = true;
+          } else {
+            const privateKeyBytes = Uint8Array.from(
+              Buffer.from(newAccountPrivateKey, "hex")
+            );
+            const newAccountAptosAccount = new AptosAccount(privateKeyBytes);
+            yield put(globalActions.setAptosAccount(newAccountAptosAccount));
+            const newAccountAptosAddress = newAccountAptosAccount
+              .address()
+              .hex();
+
+            const currentAccountAddressSignedByNewAccount: string =
+              yield signMessage({
+                privateKey: newAccountPrivateKey,
+                message: correntAccountAddress,
+              });
+            const newAccountAddressSignedByCurrentAccount: string =
+              yield signMessage({
+                privateKey: correntAccountPrivateKey,
+                message: newAccountAddress,
+              });
+
+            if (!userInfo.authConnection) {
+              thereWasAnError = true;
+            } else {
+              const request: ConnectNewAccountRequest = {
+                aptos_address: newAccountAptosAddress,
+                current_address_signature:
+                  currentAccountAddressSignedByNewAccount,
+                image: userInfo.profileImage ?? "",
+                login_type: userInfo.authConnection,
+                login_type_identifier: userInfo.authConnectionId ?? "",
+                new_address: newAccountAddress,
+                new_address_signature: newAccountAddressSignedByCurrentAccount,
+              };
+
+              const connected: boolean = yield podiumApi.connectNewAccount(
+                request
+              );
+              if (!connected) {
+                thereWasAnError = true;
+              } else {
+                const {
+                  signature: newAccountSignature,
+                  timestampInUTCInSeconds,
+                }: {
+                  signature: string;
+                  timestampInUTCInSeconds: number;
+                } = yield signMessageWithTimestamp({
+                  privateKey: newAccountPrivateKey,
+                  message: newAccountAddress,
+                });
+
+                const loginRequest: LoginRequest = {
+                  signature: newAccountSignature,
+                  username: newAccountAddress,
+                  timestamp: timestampInUTCInSeconds,
+                  aptos_address: newAccountAptosAccount.address().hex(),
+                  has_ticket: false,
+                  login_type_identifier: userInfo?.authConnectionId ?? "",
+                };
+
+                const response: {
+                  user: User | null;
+                  error: string | null;
+                  statusCode: number | null;
+                  token: string | null;
+                } = yield podiumApi.login(loginRequest, {});
+                if (response.user) {
+                  yield detached_afterGettingPodiumUser({
+                    user: response.user,
+                    token: response.token ?? "",
+                  });
+                } else {
+                  thereWasAnError = true;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (thereWasAnError) {
+      toast.error("there was an error, please try again");
+      yield put(globalActions.logout());
+    }
+  } catch (error) {
+    yield put(globalActions.logout());
+    toast.error("there was an error, please try again");
+  } finally {
+    yield put(globalActions.setSwitchingAccount(false));
+  }
+}
+
+function* detached_afterConnect(userInfo: Partial<UserInfo>) {
   try {
     const privateKey: string | undefined = yield getPrivateKey();
     if (privateKey) {
@@ -204,15 +337,11 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
 
       const evmWallet = new ethers.Wallet(privateKey);
       const evmAddress = evmWallet.address;
-      const { signature, timestampInUTCInSeconds } =
-        yield signMessageWithTimestamp({
-          privateKey,
-          message: evmAddress,
-        });
+
       const loginRequest: LoginRequest = {
-        signature,
+        signature: "placeholder",
         username: evmAddress,
-        timestamp: timestampInUTCInSeconds,
+        timestamp: 0,
         aptos_address: aptosAddress,
         has_ticket: hasCreatorPass,
         login_type_identifier: identifierId,
@@ -229,21 +358,41 @@ function* afterConnect(userInfo: Partial<UserInfo>) {
       if (email) {
         additionalDataForLogin.email = email;
       }
-      yield continueWithLoginRequestAndAdditionalData(
+      yield detached_continueWithLoginRequestAndAdditionalData({
         loginRequest,
-        additionalDataForLogin
-      );
+        additionalDataForLogin,
+        privateKey,
+      });
     }
   } catch (error) {
     yield put(globalActions.logout());
   }
 }
 
-function* continueWithLoginRequestAndAdditionalData(
-  loginRequest: LoginRequest,
-  additionalDataForLogin: AdditionalDataForLogin,
-  retried = false
-): any {
+function* detached_continueWithLoginRequestAndAdditionalData({
+  loginRequest,
+  additionalDataForLogin,
+  retried = false,
+  privateKey,
+}: {
+  loginRequest: LoginRequest;
+  additionalDataForLogin: AdditionalDataForLogin;
+  retried?: boolean;
+  privateKey: string;
+}): any {
+  const {
+    signature,
+    timestampInUTCInSeconds,
+  }: {
+    signature: string;
+    timestampInUTCInSeconds: number;
+  } = yield signMessageWithTimestamp({
+    privateKey,
+    message: loginRequest.username,
+  });
+  loginRequest.signature = signature;
+  loginRequest.timestamp = timestampInUTCInSeconds;
+
   const response: {
     user: User | null;
     error: string | null;
@@ -265,11 +414,12 @@ function* continueWithLoginRequestAndAdditionalData(
     if (confirmed && enteredText) {
       referrerId = enteredText;
       loginRequest.referrer_user_uuid = referrerId;
-      yield continueWithLoginRequestAndAdditionalData(
+      yield detached_continueWithLoginRequestAndAdditionalData({
         loginRequest,
         additionalDataForLogin,
-        true
-      );
+        privateKey,
+        retried: true,
+      });
       return;
     }
   } else if (!response.user && response.error) {
@@ -277,7 +427,6 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(globalActions.logout());
     return;
   }
-
   let savedName = response.user?.name;
   let canContinue = true;
   if (!savedName) {
@@ -310,20 +459,29 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
-    yield put(notificationsActions.getNotifications());
-    yield put(globalActions.initOneSignal({ myId: response.user.uuid }));
-    yield setServerCookieViaAPI(CookieKeys.myUserId, response.user.uuid);
-    if (response.token) {
-      yield wsClient.connect(
-        response.token,
-        process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!
-      );
-    }
-    useMyOutpostsSlice();
-    yield put(myOutpostsActions.getOutposts());
+    yield detached_afterGettingPodiumUser({
+      user: response.user,
+      token: response.token ?? "",
+    });
   } else {
     yield put(globalActions.logout());
   }
+}
+function* detached_afterGettingPodiumUser({
+  user,
+  token,
+}: {
+  user: User;
+  token: string;
+}) {
+  yield put(notificationsActions.getNotifications());
+  yield put(globalActions.initOneSignal({ myId: user.uuid }));
+  yield setServerCookieViaAPI(CookieKeys.myUserId, user.uuid);
+  if (token) {
+    yield wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!);
+  }
+  useMyOutpostsSlice();
+  yield put(myOutpostsActions.getOutposts());
 }
 
 function* logout() {
@@ -411,6 +569,7 @@ export function* globalSaga() {
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
+  yield takeLatest(globalActions.switchAccount, switchAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);
   yield takeLatest(globalActions.checkIfIHavePass, checkIfIHavePass);

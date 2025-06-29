@@ -23,6 +23,7 @@ export const GlobalDomains = {
     state.global?.objectOfOnlineUsersToGet ?? {},
   numberOfOnlineUsers: (state: RootState) =>
     state.global?.numberOfOnlineUsers ?? {},
+  switchingAccount: (state: RootState) => state.global?.switchingAccount ?? false,
 };
 
 export const GlobalSelectors = {
@@ -49,4 +50,5 @@ export const GlobalSelectors = {
       GlobalDomains.numberOfOnlineUsers,
       (objectOfOnlineUsers) => objectOfOnlineUsers[id] ?? 0
     ),
+  switchingAccount: GlobalDomains.switchingAccount,
 };

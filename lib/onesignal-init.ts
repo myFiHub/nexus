@@ -1,13 +1,19 @@
 import {
   getNotificationPermission,
   initializeOneSignal,
+  isLoggedInToOneSignal,
   isNotificationsSupported,
   loginToOneSignal,
+  logoutFromOneSignal,
   requestNotificationPermission,
   subscribeToNotifications,
 } from "./onesignal";
 
 export const initOneSignalForUser = async (userId?: string) => {
+  // if already logged in user, log out
+  if (isLoggedInToOneSignal()) {
+    await logoutFromOneSignal();
+  }
   try {
     console.log("Initializing OneSignal...");
 

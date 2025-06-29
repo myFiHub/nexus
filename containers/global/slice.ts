@@ -16,6 +16,7 @@ import { globalSaga } from "./saga";
 export interface GlobalState {
   initializingWeb3Auth: boolean;
   logingIn: boolean;
+  switchingAccount: boolean;
   logingOut: boolean;
   web3Auth?: Web3Auth;
   web3AuthUserInfo?: Partial<UserInfo>;
@@ -35,6 +36,7 @@ export interface GlobalState {
 const initialState: GlobalState = {
   initializingWeb3Auth: true,
   logingIn: false,
+  switchingAccount: false,
   logingOut: false,
   tick: 0,
   numberOfOnlineUsers: {},
@@ -127,6 +129,10 @@ const globalSlice = createSlice({
         const { [outpostId]: _, ...rest } = state.objectOfOnlineUsersToGet;
         state.objectOfOnlineUsersToGet = rest;
       }
+    },
+    switchAccount() {},
+    setSwitchingAccount(state, action: PayloadAction<boolean>) {
+      state.switchingAccount = action.payload;
     },
   },
 });

@@ -153,3 +153,10 @@ export type { LumaUserDialogResult } from "./luma_userDialog";
 // Export search dialog components
 export { searchDialog, SearchDialogProvider } from "./searchDialog";
 export type { SearchDialogResult } from "./searchDialog";
+
+// Export confirm add or switch account dialog components
+export {
+  confirmAddOrSwitchAccountDialog,
+  ConfirmAddOrSwitchAccountDialogProvider,
+} from "./confirmAddOrSwitchAccountDialog";
+export type { ConfirmAddOrSwitchAccountDialogResult } from "./confirmAddOrSwitchAccountDialog";
