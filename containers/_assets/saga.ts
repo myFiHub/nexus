@@ -271,10 +271,47 @@ function* getPassesBoughtByMe(
 }
 
 function* sellOneOfMyBoughtPasses(
-  action: ReturnType<typeof assetsActions.sellOneOfMyBoughtPasses>
+  action: ReturnType<typeof assetsActions.sellPass>
 ): Generator<any, void, any> {
-  const { pass } = action.payload;
-  console.log("pass", pass);
+  yield put(assetsActions.setSellingPass(true));
+  const { seller } = action.payload;
+  try {
+    const myUser: User | undefined = yield select(
+      GlobalSelectors.podiumUserInfo
+    );
+    if (!myUser) {
+      toast.error("You are not logged in");
+      return;
+    }
+
+    const [sold, hashOrError]: [boolean | null, string | null] =
+      yield movementService.sellPodiumPass({
+        sellerAddress: seller.aptos_address!,
+        sellerUuid: seller.uuid,
+        numberOfTickets: 1,
+      });
+    if (sold) {
+      const response: boolean = yield podiumApi.buySellPodiumPass({
+        count: 1,
+        podium_pass_owner_address: seller.aptos_address!,
+        podium_pass_owner_uuid: seller.uuid,
+        trade_type: "sell",
+        tx_hash: hashOrError ?? "",
+      });
+      if (response) {
+        toast.success("Pass sold successfully");
+      } else {
+        toast.error("Error, while selling the Pass. Please try again.");
+      }
+    }
+  } catch (error) {
+    toast.error("Error, while selling the Pass. Please try again.");
+  } finally {
+    yield put(
+      assetsActions.getUserPassInfo({ address: seller.aptos_address! })
+    );
+    yield put(assetsActions.setSellingPass(false));
+  }
 }
 
 export function* detached_checkPass({
@@ -491,10 +528,7 @@ export function* assetsSaga() {
   yield takeLatest(assetsActions.getUserPassInfo.type, getUserPassInfo);
   yield takeLatest(assetsActions.buyPassFromUser.type, buyPassFromUser);
   yield takeLatest(assetsActions.getPassesBoughtByMe.type, getPassesBoughtByMe);
-  yield takeLatest(
-    assetsActions.sellOneOfMyBoughtPasses.type,
-    sellOneOfMyBoughtPasses
-  );
+  yield takeLatest(assetsActions.sellPass.type, sellOneOfMyBoughtPasses);
   yield takeLatest(
     assetsActions.setPassesListBoughtByMePage.type,
     getPassesBoughtByMe

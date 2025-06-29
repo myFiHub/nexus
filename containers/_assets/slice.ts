@@ -54,6 +54,7 @@ export interface AssetsState {
       error?: string;
     };
   };
+  sellingPass: boolean;
 }
 
 const initialState: AssetsState = {
@@ -74,6 +75,7 @@ const initialState: AssetsState = {
     page: 0,
   },
   outpostPassSellers: {},
+  sellingPass: false,
 };
 
 const assetsSlice = createSlice({
@@ -107,10 +109,10 @@ const assetsSlice = createSlice({
         buyingToHaveAccessToOutpostWithId?: string;
       }>
     ) {},
-    sellOneOfMyBoughtPasses(
-      state,
-      action: PayloadAction<{ pass: PodiumPassBuyerModel }>
-    ) {},
+    sellPass(state, action: PayloadAction<{ seller: User }>) {},
+    setSellingPass(state, action: PayloadAction<boolean>) {
+      state.sellingPass = action.payload;
+    },
     setPassesListBoughtByMePage(state, action: PayloadAction<number>) {
       state.passesListBoughtByMe.page = action.payload;
     },

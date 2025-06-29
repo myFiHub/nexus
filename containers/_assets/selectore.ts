@@ -24,6 +24,7 @@ export const AssetsDomains = {
     state.assets?.passesListBoughtByMe || {},
   outpostPassSellers: (state: RootState) =>
     state.assets?.outpostPassSellers || {},
+  sellingPass: (state: RootState) => state.assets?.sellingPass || false,
 };
 
 export const AssetsSelectors = {
@@ -109,4 +110,5 @@ export const AssetsSelectors = {
     // Fallback (should never reach here)
     return DEFAULT_ACCESSES;
   },
+  sellingPass: AssetsDomains.sellingPass,
 };

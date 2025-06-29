@@ -311,7 +311,7 @@ class AptosMovement {
     }
   }
 
-  async sellTicketOnPodiumPass(opts: {
+  async sellPodiumPass(opts: {
     sellerAddress: string;
     sellerUuid: string;
     numberOfTickets: number;

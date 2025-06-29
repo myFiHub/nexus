@@ -237,14 +237,25 @@ function* switchAccount() {
 
             if (!userInfo.authConnection) {
               thereWasAnError = true;
+            } else if (
+              userInfo.authConnection &&
+              !stringContainsOneOfAvailableSocialLogins(userInfo.authConnection)
+            ) {
+              thereWasAnError = true;
+              toast.error("Only social login methods are supported for now");
             } else {
+              let identifierId = userInfo.authConnectionId ?? "";
+              if (identifierId.includes("|")) {
+                identifierId = identifierId.split("|")[1];
+              }
+
               const request: ConnectNewAccountRequest = {
                 aptos_address: newAccountAptosAddress,
                 current_address_signature:
                   currentAccountAddressSignedByNewAccount,
                 image: userInfo.profileImage ?? "",
                 login_type: userInfo.authConnection,
-                login_type_identifier: userInfo.authConnectionId ?? "",
+                login_type_identifier: identifierId,
                 new_address: newAccountAddress,
                 new_address_signature: newAccountAddressSignedByCurrentAccount,
               };
@@ -392,7 +403,6 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   });
   loginRequest.signature = signature;
   loginRequest.timestamp = timestampInUTCInSeconds;
-
   const response: {
     user: User | null;
     error: string | null;

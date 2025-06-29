@@ -1,6 +1,7 @@
 "use client";
 import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
 import {
+  BuyOrSellPassDialogProvider,
   LumaUserDialogProvider,
   SearchDialogProvider,
   UserSelectDialogProvider,
@@ -48,6 +49,7 @@ const Container = () => {
       <ReminderDialogProvider />
       <LumaUserDialogProvider />
       <UserSelectToInviteDialogProvider />
+      <BuyOrSellPassDialogProvider />
     </>
   );
 };
