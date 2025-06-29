@@ -19,6 +19,7 @@ export interface GlobalState {
   router?: AppRouterInstance;
   tick: number;
   checkingOutpostForPass?: OutpostModel;
+  viewArchivedOutposts?: boolean;
 }
 
 const initialState: GlobalState = {
@@ -26,6 +27,7 @@ const initialState: GlobalState = {
   logingIn: false,
   logingOut: false,
   tick: 0,
+  viewArchivedOutposts: localStorage.getItem("viewArchivedOutposts") === "true",
 };
 
 const globalSlice = createSlice({
@@ -37,6 +39,10 @@ const globalSlice = createSlice({
     startTicker() {},
     increaseTick_(state) {
       state.tick++;
+    },
+    setViewArchivedOutposts(state, action: PayloadAction<boolean>) {
+      state.viewArchivedOutposts = action.payload;
+      localStorage.setItem("viewArchivedOutposts", action.payload.toString());
     },
     setRouter(state, action: PayloadAction<AppRouterInstance>) {
       state.router = action.payload;

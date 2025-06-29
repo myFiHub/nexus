@@ -16,6 +16,8 @@ export const GlobalDomains = {
   tick: (state: RootState) => state.global?.tick ?? 0,
   checkingOutpostForPass: (state: RootState) =>
     state.global?.checkingOutpostForPass,
+  viewArchivedOutposts: (state: RootState) =>
+    state.global?.viewArchivedOutposts ?? false,
 };
 
 export const GlobalSelectors = {
@@ -34,4 +36,5 @@ export const GlobalSelectors = {
   joiningOutpostId: GlobalDomains.joiningOutpostId,
   tick: GlobalDomains.tick,
   checkingOutpostForPass: GlobalDomains.checkingOutpostForPass,
+  viewArchivedOutposts: GlobalDomains.viewArchivedOutposts,
 };

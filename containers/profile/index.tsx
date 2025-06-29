@@ -5,10 +5,12 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
+import { useGlobalSlice } from "../global/slice";
 import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
 import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
+import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
 
@@ -83,6 +85,20 @@ const LoadingSkeleton = () => (
         ))}
       </div>
 
+      {/* Settings Section Skeleton - matches SettingsSection component */}
+      <div className="mb-8">
+        <div className="h-6 w-32 bg-muted rounded mb-4" />
+        <div className="bg-muted p-4 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="h-5 w-48 bg-card rounded mb-2" />
+              <div className="h-3 w-64 bg-card rounded" />
+            </div>
+            <div className="w-8 h-4 bg-card rounded" />
+          </div>
+        </div>
+      </div>
+
       {/* My Passes Skeleton - matches MyPasses component */}
       <div className="mt-8">
         <div className="h-6 w-32 bg-muted rounded mb-4" />
@@ -148,6 +164,7 @@ const Content = () => {
         <UserStats user={user} />
         <ConnectedAccounts accounts={user.accounts} />
         <AdditionalInfo user={user} />
+        <SettingsSection />
         <MyPasses />
       </div>
     </div>

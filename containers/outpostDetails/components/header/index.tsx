@@ -1,6 +1,6 @@
 import { ShareButton } from "app/components/outpost/outpostCard/actions/ShareButton";
 import { OutpostModel } from "app/services/api/types";
-import { EditImageButton } from "../EditImageButton";
+import { EditImageButton } from "./EditImageButton";
 import { ServerImage } from "./server_image";
 
 export const OutpostDetailsHeader = ({

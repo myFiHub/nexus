@@ -43,8 +43,9 @@ const myOutpostsSlice = createSlice({
     setHasMoreOutposts: (state, action: PayloadAction<boolean>) => {
       state.hasMoreOutposts = action.payload;
     },
-    getOutposts: (state) => {},
-    loadMoreOutposts: (state) => {},
+    getOutposts: (_, __: PayloadAction<void>) => {},
+
+    loadMoreOutposts: (_, __: PayloadAction<void>) => {},
     setOutposts: (state, action: PayloadAction<OutpostModel[]>) => {
       state.outposts = action.payload;
       state.currentPage = 0;
@@ -60,6 +61,11 @@ const myOutpostsSlice = createSlice({
       state.currentPage = 0;
       state.hasMoreOutposts = true;
       state.errorLoadingOutposts = undefined;
+    },
+    removeOutpost: (state, action: PayloadAction<string>) => {
+      state.outposts = state.outposts.filter(
+        (outpost) => outpost.uuid !== action.payload
+      );
     },
   },
 });

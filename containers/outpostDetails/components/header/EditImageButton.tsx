@@ -12,7 +12,7 @@ import { Edit, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { outpostDetailsActions } from "../slice";
+import { outpostDetailsActions } from "../../slice";
 
 interface EditImageButtonProps {
   outpost: OutpostModel;
@@ -57,7 +57,6 @@ const Content = ({ outpost, className }: EditImageButtonProps) => {
         );
         await revalidateService.revalidateMultiple({
           outpostId: outpost.uuid,
-          allOutposts: true,
         });
         router.refresh();
       }

@@ -373,6 +373,13 @@ function* checkIfIHavePass(
   }
 }
 
+function* setViewArchivedOutposts(
+  action: ReturnType<typeof globalActions.setViewArchivedOutposts>
+) {
+  useMyOutpostsSlice();
+  yield put(myOutpostsActions.getOutposts());
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
@@ -381,4 +388,8 @@ export function* globalSaga() {
   yield takeLatest(globalActions.logout, logout);
   yield takeEvery(globalActions.joinOutpost, joinOutpost);
   yield takeLatest(globalActions.checkIfIHavePass, checkIfIHavePass);
+  yield takeLatest(
+    globalActions.setViewArchivedOutposts,
+    setViewArchivedOutposts
+  );
 }

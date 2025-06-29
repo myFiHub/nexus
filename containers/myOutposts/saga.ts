@@ -3,12 +3,18 @@ import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { all, put, select, takeLatest } from "redux-saga/effects";
 import { myOutpostsActions } from "./slice";
+import { GlobalSelectors } from "../global/selectors";
 
 // This saga fetches the initial page (page 0)
-function* getOutposts(): Generator<any, void, any> {
+function* getOutposts(
+  action: ReturnType<typeof myOutpostsActions.getOutposts>
+): Generator<any, void, any> {
+  const viewArchivedOutposts = yield select(
+    GlobalSelectors.viewArchivedOutposts
+  );
   try {
     const [outposts]: [OutpostModel[]] = yield all([
-      podiumApi.getMyOutposts(true, 0, PAGE_SIZE),
+      podiumApi.getMyOutposts(viewArchivedOutposts, 0, PAGE_SIZE),
       put(myOutpostsActions.setErrorLoadingOutposts(undefined)),
       put(myOutpostsActions.setLoadingOutposts(true)),
     ]);

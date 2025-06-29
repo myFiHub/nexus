@@ -6,8 +6,8 @@ import { ReduxProvider } from "app/store/Provider";
 import { Loader2, Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { toast } from "sonner";
 import { BuyableTicketTypes } from "../../types";
+import { toast } from "app/lib/toast";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const dispatch = useDispatch();
