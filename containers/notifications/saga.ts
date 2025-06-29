@@ -6,12 +6,12 @@ import { notificationsActions } from "./slice";
 
 function* getNotifications() {
   try {
-    const alreadyLoading: boolean = yield select(
-      notificationsSelectors.isLoadingNotifications
-    );
-    if (alreadyLoading) {
-      return;
-    }
+    // const alreadyLoading: boolean = yield select(
+    //   notificationsSelectors.isLoadingNotifications
+    // );
+    // if (alreadyLoading) {
+    //   return;
+    // }
     yield put(notificationsActions.setErrorLoadingNotifications(undefined));
     yield put(notificationsActions.setLoadingNotifications(true));
     const notifications: NotificationModel[] =
@@ -32,12 +32,7 @@ function* markNotificationAsRead(
   action: ReturnType<typeof notificationsActions.markNotificationAsRead>
 ) {
   try {
-    const success: boolean = yield podiumApi.markNotificationAsRead(
-      action.payload
-    );
-    if (success) {
-      yield put(notificationsActions.markNotificationAsRead(action.payload));
-    }
+    yield podiumApi.markNotificationAsRead(action.payload);
   } catch (error) {
     console.error("Error marking notification as read:", error);
   }
@@ -47,12 +42,7 @@ function* deleteNotification(
   action: ReturnType<typeof notificationsActions.deleteNotification>
 ) {
   try {
-    console.log("deleteNotification", action.payload);
-    const success: boolean = yield podiumApi.deleteNotification(action.payload);
-    console.log("success", success);
-    if (success) {
-      yield put(notificationsActions.deleteNotification(action.payload));
-    }
+    yield podiumApi.deleteNotification(action.payload);
   } catch (error) {
     console.error("Error deleting notification:", error);
   }

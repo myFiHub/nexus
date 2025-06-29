@@ -19,15 +19,18 @@ import { notificationsActions, useNotificationsSlice } from "./slice";
 
 interface NotificationItemProps {
   notification: any;
-  onMarkAsRead: (id: string) => void;
-  onDelete: (id: string) => void;
 }
 
-const NotificationItem = ({
-  notification,
-  onMarkAsRead,
-  onDelete,
-}: NotificationItemProps) => {
+const NotificationItem = ({ notification }: NotificationItemProps) => {
+  const dispatch = useDispatch();
+
+  const handleRead = (id: string) => {
+    dispatch(notificationsActions.markNotificationAsRead(id));
+  };
+  const handleDelete = (id: string) => {
+    dispatch(notificationsActions.deleteNotification(id));
+  };
+
   const formatTime = (timestamp: number) => {
     const date = new Date(timestamp * 1000);
     const now = new Date();
@@ -120,7 +123,7 @@ const NotificationItem = ({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onMarkAsRead(notification.uuid)}
+                onClick={() => handleRead(notification.uuid)}
                 className="h-6 w-6 p-0"
               >
                 <Check className="h-3 w-3" />
@@ -129,7 +132,7 @@ const NotificationItem = ({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onDelete(notification.uuid)}
+              onClick={() => handleDelete(notification.uuid)}
               className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
             >
               <Trash2 className="h-3 w-3" />
@@ -191,11 +194,6 @@ const NotificationsContent = () => {
           {isLoading && hasLoadedOnce && (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
           )}
-          {unreadCount > 0 && (
-            <span className="bg-primary text-primary-foreground text-xs font-medium px-2 py-1 rounded-full">
-              {unreadCount}
-            </span>
-          )}
         </div>
       </div>
 
@@ -231,8 +229,6 @@ const NotificationsContent = () => {
               <NotificationItem
                 key={notification.uuid}
                 notification={notification}
-                onMarkAsRead={handleMarkAsRead}
-                onDelete={handleDelete}
               />
             ))}
           </div>
@@ -271,7 +267,7 @@ export const NotificationsBell = ({
     setIsOpen(open);
     if (open) {
       // Fetch notifications when opening the popover
-      dispatch(notificationsActions.getNotifications());
+      // dispatch(notificationsActions.getNotifications());
     }
   };
 
