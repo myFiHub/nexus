@@ -1,17 +1,10 @@
 import podiumApi from "app/services/api";
 import { NotificationModel } from "app/services/api/types";
-import { put, select, takeLatest } from "redux-saga/effects";
-import { notificationsSelectors } from "./selectors";
+import { put, takeLatest } from "redux-saga/effects";
 import { notificationsActions } from "./slice";
 
 function* getNotifications() {
   try {
-    // const alreadyLoading: boolean = yield select(
-    //   notificationsSelectors.isLoadingNotifications
-    // );
-    // if (alreadyLoading) {
-    //   return;
-    // }
     yield put(notificationsActions.setErrorLoadingNotifications(undefined));
     yield put(notificationsActions.setLoadingNotifications(true));
     const notifications: NotificationModel[] =
