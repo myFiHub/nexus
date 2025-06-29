@@ -10,7 +10,6 @@ export const AdditionalInfo = ({ user }: AdditionalInfoProps) => (
     <InfoCard
       title="Wallet Information"
       items={[
-        { label: "EVM Address", value: user.address, isMonospace: true },
         ...(user.aptos_address
           ? [
               {
@@ -18,6 +17,7 @@ export const AdditionalInfo = ({ user }: AdditionalInfoProps) => (
                 value: user.aptos_address,
                 isMonospace: true,
               },
+              { label: "EVM Address", value: user.address, isMonospace: true },
             ]
           : []),
         ...(user.external_wallet_address
