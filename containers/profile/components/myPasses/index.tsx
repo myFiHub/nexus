@@ -70,7 +70,9 @@ const PassCard = ({ pass }: { pass: any }) => {
 
           {/* Address info */}
           <div className="text-sm">
-            <p className="text-gray-500 mb-1">Owner Address</p>
+            <p className="text-gray-500 mb-1">
+              {pass.name.split(" ")[0]}'s Address
+            </p>
             <p className="font-mono text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded break-all flex items-center gap-2">
               {truncate(pass.podium_pass_owner_address, 20)}
               <CopyButton text={pass.podium_pass_owner_address} />

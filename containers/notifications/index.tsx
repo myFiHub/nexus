@@ -10,7 +10,7 @@ import {
 import { motion } from "framer-motion";
 import { Bell, Check, Trash2, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import { notificationsEventBus } from "./eventBus";
@@ -241,10 +241,18 @@ export const NotificationsBell = ({
   size = "md",
   showBadge = true,
 }: NotificationsBellProps) => {
+  const wiggledOnceOnAppearRef = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [isWiggling, setIsWiggling] = useState(false);
   const unreadCount = useSelector(notificationsSelectors.unreadCount);
-  const dispatch = useDispatch();
+  const loggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
+  useEffect(() => {
+    if (loggedIn && !wiggledOnceOnAppearRef.current && unreadCount > 0) {
+      setIsWiggling(true);
+      setTimeout(() => setIsWiggling(false), 2000);
+      wiggledOnceOnAppearRef.current = true;
+    }
+  }, [loggedIn]);
 
   useEffect(() => {
     const subscription = notificationsEventBus.subscribe(() => {

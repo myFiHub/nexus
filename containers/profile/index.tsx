@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { AdditionalInfo } from "./components/AdditionalInfo";
-import { ConnectedAccounts } from "./components/ConnectedAccounts";
+import { ConnectedAccounts } from "./components/connectedAccounts";
 import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SettingsSection } from "./components/SettingsSection";
