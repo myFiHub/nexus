@@ -23,7 +23,8 @@ export const GlobalDomains = {
     state.global?.objectOfOnlineUsersToGet ?? {},
   numberOfOnlineUsers: (state: RootState) =>
     state.global?.numberOfOnlineUsers ?? {},
-  switchingAccount: (state: RootState) => state.global?.switchingAccount ?? false,
+  switchingAccount: (state: RootState) =>
+    state.global?.switchingAccount ?? false,
 };
 
 export const GlobalSelectors = {
@@ -51,4 +52,14 @@ export const GlobalSelectors = {
       (objectOfOnlineUsers) => objectOfOnlineUsers[id] ?? 0
     ),
   switchingAccount: GlobalDomains.switchingAccount,
+  isPrimaryAccount: createSelector(
+    GlobalDomains.podiumUserInfo,
+    (podiumUserInfo) => {
+      const connectedAccounts = podiumUserInfo?.accounts ?? [];
+      const currentAccount = connectedAccounts.find(
+        (account) => account.address === podiumUserInfo?.address
+      );
+      return currentAccount?.is_primary ?? false;
+    }
+  ),
 };

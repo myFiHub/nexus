@@ -14,6 +14,7 @@ import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
+import { AccountCardActionSelectDialogProvider } from "./dialogs/accountCardActionSelectDialog";
 import { profileActions, useProfileSlice } from "./slice";
 
 const Content = () => {
@@ -43,7 +44,7 @@ const Content = () => {
   return (
     <>
       <ConfirmAddOrSwitchAccountDialogProvider />
-
+      <AccountCardActionSelectDialogProvider />
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-card rounded-lg shadow-md p-6">
           <ProfileHeader user={user} />

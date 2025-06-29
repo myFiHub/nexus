@@ -160,3 +160,10 @@ export {
   ConfirmAddOrSwitchAccountDialogProvider,
 } from "./confirmAddOrSwitchAccountDialog";
 export type { ConfirmAddOrSwitchAccountDialogResult } from "./confirmAddOrSwitchAccountDialog";
+
+// Export account card action select dialog components
+export {
+  accountCardActionSelectDialog,
+  AccountCardActionSelectDialogProvider,
+} from "../../containers/profile/dialogs/accountCardActionSelectDialog";
+export type { AccountCardActionSelectDialogResult } from "../../containers/profile/dialogs/accountCardActionSelectDialog";
