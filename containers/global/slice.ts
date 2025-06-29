@@ -1,3 +1,4 @@
+"use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
 import { OutpostModel, User } from "app/services/api/types";
@@ -22,12 +23,20 @@ export interface GlobalState {
   viewArchivedOutposts?: boolean;
 }
 
+// Safe function to get localStorage value only on client side
+const getViewArchivedOutposts = (): boolean => {
+  if (typeof window !== "undefined" && window.localStorage) {
+    return localStorage.getItem("viewArchivedOutposts") === "true";
+  }
+  return false;
+};
+
 const initialState: GlobalState = {
   initializingWeb3Auth: true,
   logingIn: false,
   logingOut: false,
   tick: 0,
-  viewArchivedOutposts: localStorage.getItem("viewArchivedOutposts") === "true",
+  viewArchivedOutposts: getViewArchivedOutposts(),
 };
 
 const globalSlice = createSlice({

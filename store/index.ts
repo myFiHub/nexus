@@ -9,9 +9,11 @@ import {
 } from "@reduxjs/toolkit";
 import { type AssetsState } from "app/containers/_assets/slice";
 import { UsersState } from "app/containers/_users/slice";
+import { AllOutpostsState } from "app/containers/allOutposts/slice";
 import { CreateOutpostState } from "app/containers/createOutpost/slice";
 import { type GlobalState } from "app/containers/global/slice";
 import { MyOutpostsState } from "app/containers/myOutposts/slice";
+import { NotificationsState } from "app/containers/notifications/slice";
 import { OnGoingOutpostState } from "app/containers/ongoingOutpost/slice";
 import { OutpostDetailsState } from "app/containers/outpostDetails/slice";
 import { type ProfileState } from "app/containers/profile/slice";
@@ -20,8 +22,6 @@ import { isDev } from "app/lib/utils";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
-import { NotificationsState } from "app/containers/notifications/slice";
-import { AllOutpostsState } from "app/containers/allOutposts/slice";
 
 let store: Store<RootState, AnyAction>;
 // Create the saga middleware

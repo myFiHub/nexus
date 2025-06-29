@@ -1,10 +1,11 @@
 "use client";
 
-import { LoginButton } from "app/components/header/LoginButton";
 import { ReduxProvider } from "app/store/Provider";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
+import { LoginPrompt } from "./components/LoginPrompt";
 import { InfiniteScrollOutpostsList } from "./InfiniteScrollOutpostsList";
 import { myOutpostsSelectors } from "./selectors";
 import { myOutpostsActions, useMyOutpostsSlice } from "./slice";
@@ -24,20 +25,22 @@ const Content = () => {
     }
   }, [myUser]);
 
-  if (!myUser) {
-    return (
-      <div className="flex justify-center items-center h-full pt-24">
-        <LoginButton />
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">My Outposts</h1>
-
-      <InfiniteScrollOutpostsList />
-    </div>
+    <AnimatePresence mode="wait">
+      {!myUser ? (
+        <motion.div
+          key="login-prompt"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          transition={{ duration: 0.4, ease: "easeInOut" }}
+        >
+          <LoginPrompt />
+        </motion.div>
+      ) : (
+        <InfiniteScrollOutpostsList />
+      )}
+    </AnimatePresence>
   );
 };
 

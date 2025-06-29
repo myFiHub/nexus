@@ -8,6 +8,5 @@ export function* rootSaga() {
   yield all([
     // Add your sagas here
     // Example: authSaga(),
-    notificationsSaga(),
   ]);
 }

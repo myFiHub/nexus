@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
-import { useGlobalSlice } from "../global/slice";
 import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/ConnectedAccounts";
 import { MyPasses } from "./components/myPasses";
