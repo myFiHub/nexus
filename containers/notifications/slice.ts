@@ -142,10 +142,6 @@ const notificationsSlice = createSlice({
       }
     },
     deleteNotification: (state, action: PayloadAction<string>) => {
-      const notification = state.notifications.find(
-        (n) => n.uuid === action.payload
-      );
-
       state.notifications = state.notifications.filter(
         (n) => n.uuid !== action.payload
       );

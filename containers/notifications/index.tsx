@@ -147,7 +147,7 @@ const NotificationsContent = () => {
     if (myUser) {
       dispatch(notificationsActions.getNotifications());
     }
-  }, [myUser, dispatch]);
+  }, [myUser]);
 
   const handleMarkAsRead = (id: string) => {
     dispatch(notificationsActions.markNotificationAsRead(id));
@@ -172,7 +172,7 @@ const NotificationsContent = () => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full ">
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
         {unreadCount > 0 && (
@@ -202,7 +202,7 @@ const NotificationsContent = () => {
             </Button>
           </div>
         ) : notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center p-8 text-center">
+          <div className="flex flex-col items-center justify-center p-8 text-center  ">
             <Bell className="h-12 w-12 text-gray-400 mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
               No notifications
@@ -210,7 +210,7 @@ const NotificationsContent = () => {
             <p className="text-gray-500">You're all caught up!</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100  ">
             {notifications.map((notification) => (
               <NotificationItem
                 key={notification.uuid}

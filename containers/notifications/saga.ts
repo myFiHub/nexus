@@ -1,13 +1,19 @@
 import podiumApi from "app/services/api";
 import { NotificationModel } from "app/services/api/types";
-import { put, takeLatest } from "redux-saga/effects";
+import { put, select, takeLatest } from "redux-saga/effects";
+import { notificationsSelectors } from "./selectors";
 import { notificationsActions } from "./slice";
 
 function* getNotifications() {
   try {
+    const alreadyLoading: boolean = yield select(
+      notificationsSelectors.isLoadingNotifications
+    );
+    if (alreadyLoading) {
+      return;
+    }
     yield put(notificationsActions.setErrorLoadingNotifications(undefined));
     yield put(notificationsActions.setLoadingNotifications(true));
-
     const notifications: NotificationModel[] =
       yield podiumApi.getNotifications();
     yield put(notificationsActions.setNotifications(notifications));
@@ -41,7 +47,9 @@ function* deleteNotification(
   action: ReturnType<typeof notificationsActions.deleteNotification>
 ) {
   try {
+    console.log("deleteNotification", action.payload);
     const success: boolean = yield podiumApi.deleteNotification(action.payload);
+    console.log("success", success);
     if (success) {
       yield put(notificationsActions.deleteNotification(action.payload));
     }

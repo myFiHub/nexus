@@ -42,6 +42,7 @@ import {
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
+import { notificationsActions } from "../notifications/slice";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
@@ -309,6 +310,7 @@ function* continueWithLoginRequestAndAdditionalData(
     yield put(
       globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
     );
+    yield put(notificationsActions.getNotifications());
     yield put(globalActions.initOneSignal({ myId: response.user.uuid }));
     yield setServerCookieViaAPI(CookieKeys.myUserId, response.user.uuid);
     if (response.token) {

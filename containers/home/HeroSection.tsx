@@ -15,28 +15,8 @@ export function HeroSection() {
           A frontier where creators and supporters build value together through
           shared ownership and goals.
         </p>
-
-        <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
-          <AppLink
-            href="/discover"
-            variant="default"
-            size="default"
-            className="bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
-          >
-            Discover Creators
-          </AppLink>
-          <AppLink
-            href="/create_outpost"
-            variant="outline"
-            size="default"
-            className="border-2 border-[var(--primary)] text-[var(--primary)] px-8 py-4 rounded-full text-lg font-bold hover:bg-[var(--primary)] hover:text-white transition-all duration-200 hover:scale-105 backdrop-blur-sm"
-          >
-            Start Your Outpost
-          </AppLink>
-        </div>
-
         {/* Social proof */}
-        <div className="flex items-center justify-center gap-4 text-sm text-[var(--muted-foreground)]">
+        <div className="flex items-center justify-center gap-4 text-sm text-[var(--muted-foreground)] mb-4">
           <div className="flex -space-x-2">
             {[1, 2, 3, 4].map((i) => (
               <div
@@ -46,6 +26,35 @@ export function HeroSection() {
             ))}
           </div>
           <span className="font-medium">Join 100+ creators and supporters</span>
+        </div>
+        <div>
+          <div className="flex flex-col sm:flex-row gap-6 justify-center mb-4 ">
+            <AppLink
+              href="/discover"
+              variant="default"
+              size="default"
+              className="bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            >
+              Discover Creators
+            </AppLink>
+            <AppLink
+              href="/create_outpost"
+              variant="outline"
+              size="default"
+              className="border-2 border-[var(--primary)] text-[var(--primary)] px-8 py-4 rounded-full text-lg font-bold hover:bg-[var(--primary)] hover:text-white transition-all duration-200 hover:scale-105 backdrop-blur-sm"
+            >
+              Start Your Outpost
+            </AppLink>
+          </div>
+          <AppLink
+            href="/all_outposts"
+            className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:text-purple-600 text-lg group transition-colors duration-200 mb-12"
+          >
+            <span>View All Outposts</span>
+            <span className="group-hover:translate-x-1 transition-transform duration-200">
+              &rarr;
+            </span>
+          </AppLink>
         </div>
       </div>
     </div>

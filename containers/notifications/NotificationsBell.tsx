@@ -184,7 +184,7 @@ const NotificationsContent = () => {
   }
 
   return (
-    <div className="flex flex-col max-h-96">
+    <div className="flex flex-col max-h-96 min-h-[170px]">
       <div className="flex items-center justify-between p-3 border-b border-border">
         <h2 className="text-sm font-semibold text-foreground">Notifications</h2>
         <div className="flex items-center gap-2">
