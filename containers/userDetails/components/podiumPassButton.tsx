@@ -80,11 +80,11 @@ const Content = ({ user }: { user: User }) => {
   };
   const loading = gettingPrices || loadingPass || sellingPass;
   return (
-    <div className="w-full sm:w-auto min-w-[280px]">
+    <div className="w-full sm:w-auto min-w-[330px]">
       <Button
         onClick={handleClick}
         disabled={loading}
-        className="relative group overflow-hidden bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-6 py-4 w-full sm:w-auto transition-all duration-300 transform hover:scale-105 hover:shadow-2xl border-0 min-w-[280px]"
+        className="relative group overflow-hidden bg-gradient-to-r from-purple-600 via-blue-600 to-indigo-600 hover:from-purple-700 hover:via-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl px-6 py-4 w-full sm:w-auto transition-all duration-300 transform hover:scale-105 hover:shadow-2xl border-0 min-w-[330px]"
       >
         {/* Animated background overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent" />
