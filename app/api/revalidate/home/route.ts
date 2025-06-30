@@ -3,21 +3,21 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    // Revalidate the outposts cache tag
-    revalidateTag("outposts");
+    // Revalidate the trending outposts cache tag
+    revalidateTag("trending-outposts");
 
     return NextResponse.json(
       {
         success: true,
-        message: "Outposts cache has been revalidated",
-        revalidatedTag: "outposts",
+        message: "Home page trending outposts cache has been revalidated",
+        revalidatedTag: "trending-outposts",
       },
       { status: 200 }
     );
   } catch (error) {
-    console.error("Error revalidating outposts:", error);
+    console.error("Error revalidating home page:", error);
     return NextResponse.json(
-      { error: "Failed to revalidate outposts cache" },
+      { error: "Failed to revalidate home page cache" },
       { status: 500 }
     );
   }

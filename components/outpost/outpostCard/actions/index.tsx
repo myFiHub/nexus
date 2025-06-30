@@ -22,7 +22,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <JoinButton outpost={outpost} fromCard />
+      <JoinButton outpost={outpost} fromCard={true} />
       <LeaveButton outpost={outpost} />
       <ArchiveButton outpost={outpost} />
     </motion.div>

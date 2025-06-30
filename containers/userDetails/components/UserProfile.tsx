@@ -3,7 +3,7 @@ import { Img } from "app/components/Img";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
 import { FollowButton } from "../../_users/components/followButton";
-import { PodiumPassButton } from "./podiumPassButton";
+import { PodiumPassButton } from "./podiumPassButton/index";
 
 interface UserProfileProps {
   user: User;

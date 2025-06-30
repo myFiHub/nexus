@@ -109,7 +109,6 @@ export default async function RootLayout({
 }>) {
   const cookieStore = await cookies();
   const theme = cookieStore.get("theme")?.value || "dark"; // default to light
-
   return (
     <html lang="en" className={theme}>
       <head>

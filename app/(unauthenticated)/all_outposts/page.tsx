@@ -1,6 +1,7 @@
 import { AllOutpostsContainer } from "app/containers/allOutposts";
 import { PAGE_SIZE } from "app/lib/constants";
 import podiumApi from "app/services/api";
+import { unstable_cache } from "next/cache";
 import {
   generateMetadata,
   generateOutpostsListStructuredData,
@@ -9,9 +10,21 @@ import { ErrorState } from "./ErrorState";
 
 export { generateMetadata };
 
+// Cache the outposts data with ISR
+const getCachedOutposts = unstable_cache(
+  async () => {
+    return await podiumApi.getOutposts(0, PAGE_SIZE);
+  },
+  ["all-outposts"],
+  {
+    revalidate: 10, // Revalidate every 10 seconds
+    tags: ["outposts"],
+  }
+);
+
 export default async function AllOutpostsPage() {
   try {
-    const outposts = await podiumApi.getOutposts(0, PAGE_SIZE);
+    const outposts = await getCachedOutposts();
 
     if (outposts instanceof Error) {
       return <ErrorState />;
