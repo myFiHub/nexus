@@ -165,8 +165,8 @@ export type { ConfirmAddOrSwitchAccountDialogResult } from "./confirmAddOrSwitch
 export {
   accountCardActionSelectDialog,
   AccountCardActionSelectDialogProvider,
-} from "../../containers/profile/dialogs/accountCardActionSelectDialog";
-export type { AccountCardActionSelectDialogResult } from "../../containers/profile/dialogs/accountCardActionSelectDialog";
+} from "../../containers/profile/components/SecuritySection/dialogs/accountCardActionSelectDialog";
+export type { AccountCardActionSelectDialogResult } from "../../containers/profile/components/SecuritySection/dialogs/accountCardActionSelectDialog";
 
 // Export buy or sell pass dialog components
 export {

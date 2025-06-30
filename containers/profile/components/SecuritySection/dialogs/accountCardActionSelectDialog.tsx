@@ -3,14 +3,14 @@
 import { motion } from "framer-motion";
 import { ArrowLeft, Crown, Sparkles, Star, User, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Button } from "../../../components/Button";
+import { Button } from "../../../../../components/Button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../../../components/Dialog";
+} from "../../../../../components/Dialog";
 
 export type AccountCardActionSelectDialogResult = boolean | undefined;
 

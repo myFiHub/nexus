@@ -5,9 +5,9 @@ import { truncate } from "app/lib/utils";
 import { ConnectedAccount } from "app/services/api/types";
 import { motion } from "framer-motion";
 import { useDispatch, useSelector } from "react-redux";
-import { accountCardActionSelectDialog } from "../../dialogs/accountCardActionSelectDialog";
 import { myProfileSelectors } from "../../selectors";
 import { profileActions } from "../../slice";
+import { accountCardActionSelectDialog } from "../SecuritySection/dialogs/accountCardActionSelectDialog";
 import { PrimaryBadge } from "./PrimaryBadge";
 
 interface ConnectedAccountCardProps {
