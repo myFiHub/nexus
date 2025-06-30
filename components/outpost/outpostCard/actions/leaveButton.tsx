@@ -57,7 +57,9 @@ const Content = ({ outpost: passedOutpost }: { outpost: OutpostModel }) => {
           <LogOut className="w-4 h-4" />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Leave the Outpost</TooltipContent>
+      <TooltipContent className="text-foreground">
+        Leave the Outpost
+      </TooltipContent>
     </Tooltip>
   );
 };

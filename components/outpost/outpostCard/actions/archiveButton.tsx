@@ -76,7 +76,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent className="text-foreground">
         {isArchivedState ? "Unarchive the Outpost" : "Archive the Outpost"}
       </TooltipContent>
     </Tooltip>
