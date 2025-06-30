@@ -1,6 +1,7 @@
 "use client";
 
 import OutpostLink from "app/components/AppLink/outpostLink";
+import UserLink from "app/components/AppLink/userLink";
 import { Button } from "app/components/Button";
 import {
   Popover,
@@ -89,6 +90,9 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
   };
 
   const content = getNotificationContent();
+  {
+    console.log(notification);
+  }
 
   return (
     <div
@@ -96,24 +100,35 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
         !notification.is_read ? "bg-blue-50 dark:bg-blue-950/20" : ""
       }`}
     >
-      {content.image && (
-        <Image
-          src={content.image}
-          alt="User"
-          width={32}
-          height={32}
-          className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-        />
-      )}
+      <UserLink
+        id={notification.follow_metadata?.follower_uuid}
+        className="p-0 m-0"
+      >
+        {
+          <Image
+            src={content.image ?? ""}
+            alt={notification.follow_metadata?.follower_name ?? ""}
+            width={32}
+            height={32}
+            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+          />
+        }
+      </UserLink>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1">
             <h4 className="font-medium text-foreground text-sm">
               {content.title}
             </h4>
-            <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
-              {content.message}
-            </p>
+            <UserLink
+              underline={false}
+              id={notification.follow_metadata?.follower_uuid}
+              className="p-0 m-0"
+            >
+              <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
+                {content.message}
+              </p>
+            </UserLink>
             <p className="text-muted-foreground/70 text-xs mt-1">
               {formatTime(notification.created_at)}
             </p>
@@ -150,7 +165,6 @@ const NotificationsContent = () => {
   const notifications = useSelector(notificationsSelectors.notifications);
   const isLoading = useSelector(notificationsSelectors.isLoadingNotifications);
   const error = useSelector(notificationsSelectors.errorLoadingNotifications);
-  const unreadCount = useSelector(notificationsSelectors.unreadCount);
   const hasLoadedOnce = useSelector(notificationsSelectors.hasLoadedOnce);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
@@ -313,7 +327,7 @@ export const NotificationsBell = ({
           </motion.div>
           {showBadge && unreadCount > 0 && (
             <span
-              className={`absolute -top-1 -right-1 bg-red-500 text-white font-medium rounded-full flex items-center justify-center ${badgeSizeClasses[size]}`}
+              className={`absolute top-1 right-1 bg-red-500 text-white text-[10px] rounded-full flex items-center justify-center h-4 w-4`}
             >
               {unreadCount > 9 ? "9+" : unreadCount}
             </span>
