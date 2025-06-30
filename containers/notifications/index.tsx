@@ -90,9 +90,6 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
   };
 
   const content = getNotificationContent();
-  {
-    console.log(notification);
-  }
 
   return (
     <div
