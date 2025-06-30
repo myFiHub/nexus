@@ -105,7 +105,7 @@ function* initializeWeb3Auth(
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
           : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      ssr: true,
+      ssr: false,
     },
   };
 
