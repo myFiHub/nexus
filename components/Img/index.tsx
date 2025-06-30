@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./styles.module.css";
 
 interface ImgProps {
@@ -34,15 +34,18 @@ export const Img = ({
   const [imageState, setImageState] = useState<"loading" | "loaded" | "error">(
     "loading"
   );
+  const [shouldUseFallback, setShouldUseFallback] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // Generate fallback URL using UI Avatars
-  const fallbackUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-    alt
-  )}&size=200&background=random`;
+  // Memoize fallback URL to prevent regeneration on every render
+  const fallbackUrl = useMemo(() => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      alt
+    )}&size=200&background=random`;
+  }, [alt]);
 
   // Determine the actual source to use
-  const imageSrc = imageState === "error" || !src ? fallbackUrl : src;
+  const imageSrc = shouldUseFallback || !src ? fallbackUrl : src;
 
   // Determine if we should use fill mode
   const shouldUseFill = fill || (!width && !height);
@@ -50,6 +53,7 @@ export const Img = ({
   // Reset state when src changes
   useEffect(() => {
     setImageState("loading");
+    setShouldUseFallback(false);
   }, [src]);
 
   // Check if image is already loaded (for cached images)
@@ -79,10 +83,17 @@ export const Img = ({
 
   const handleError = useCallback(
     (e: React.SyntheticEvent<HTMLImageElement>) => {
-      setImageState("error");
+      // If we're already using the fallback URL and it fails, show error state
+      if (shouldUseFallback) {
+        setImageState("error");
+      } else {
+        // First time error - try fallback
+        setShouldUseFallback(true);
+        setImageState("loading");
+      }
       onError?.(e);
     },
-    [onError]
+    [onError, shouldUseFallback]
   );
 
   // For regular img tag - use a more reliable approach
@@ -93,7 +104,7 @@ export const Img = ({
         {imageState === "loading" && <div className={styles.shimmer} />}
 
         {/* Error fallback */}
-        {imageState === "error" && (
+        {imageState === "error" && shouldUseFallback && (
           <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
             <div className="text-center text-muted-foreground">
               <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-muted-foreground/20 flex items-center justify-center">
@@ -146,7 +157,7 @@ export const Img = ({
       {imageState === "loading" && <div className={styles.shimmer} />}
 
       {/* Error fallback */}
-      {imageState === "error" && (
+      {imageState === "error" && shouldUseFallback && (
         <div className="absolute inset-0 flex items-center justify-center bg-muted rounded-lg">
           <div className="text-center text-muted-foreground">
             <div className="w-8 h-8 mx-auto mb-2 rounded-full bg-muted-foreground/20 flex items-center justify-center">

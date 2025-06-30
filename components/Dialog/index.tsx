@@ -174,3 +174,10 @@ export {
   BuyOrSellPassDialogProvider,
 } from "../../containers/_assets/buyOrSellPassDialog";
 export type { BuyOrSellPassDialogResult } from "../../containers/_assets/buyOrSellPassDialog";
+
+// Export cheer boo amount dialog components
+export {
+  cheerBooAmountDialog,
+  CheerBooAmountDialogProvider,
+} from "./cheerBooAmountDialog";
+export type { CheerBooAmountDialogResult } from "./cheerBooAmountDialog";

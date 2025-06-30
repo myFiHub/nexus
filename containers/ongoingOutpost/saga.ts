@@ -1,7 +1,7 @@
 import {
-  confirmDialog,
-  ConfirmDialogResult,
-} from "app/components/Dialog/confirmDialog";
+  cheerBooAmountDialog,
+  CheerBooAmountDialogResult,
+} from "app/components/Dialog/cheerBooAmountDialog";
 import { checkAudioPermission } from "app/lib/audioPermissions";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
@@ -203,24 +203,13 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
     const isSelfReaction =
       targetUserAddress === EasyAccess.getInstance().myUser?.address;
     let amount = "0";
-    const results: ConfirmDialogResult = yield confirmDialog({
-      title: `${cheer ? "cheer" : "boo"}`,
-      content: `Enter the amount of ${cheer ? "cheer" : "boo"} in MOVE`,
-      confirmOpts: {
-        text:
-          cheer && isSelfReaction ? "Cheer yourself " : cheer ? "Cheer" : "Boo",
-      },
-      cancelOpts: {
-        text: "Cancel",
-        variant: "ghost",
-      },
-      inputOpts: {
-        inputType: "number",
-        inputPlaceholder: "Enter amount",
-      },
+    const results: CheerBooAmountDialogResult = yield cheerBooAmountDialog({
+      cheer,
+      member: user,
+      isMe: isSelfReaction,
     });
-    if (results.confirmed) {
-      amount = results.enteredText ?? "0";
+    if (results !== undefined) {
+      amount = results.toString();
     }
     if (amount === "0") {
       if (cheer) {

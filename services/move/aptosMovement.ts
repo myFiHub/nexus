@@ -1,9 +1,6 @@
-import { confirmDialog } from "app/components/Dialog/confirmDialog";
 import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
-
-const showConfirmPopup = async (opts: any) => true; // Always confirm for now
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -254,18 +251,7 @@ class AptosMovement {
       const isMyAccountActive = await this.isMyAccountActive();
       if (!isMyAccountActive) return [false, "Account not active"];
       const referrerAddress = opts.referrer || "";
-      const price = await this.getPodiumPassPrice({
-        sellerAddress: opts.sellerAddress,
-        numberOfTickets: opts.numberOfTickets,
-      });
-      if (price == null) return [false, "Error fetching price"];
-      const confirmed = await confirmDialog({
-        title: "Buy Podium Pass",
-        content: `Buy ${opts.numberOfTickets || 1} pass(es) from ${
-          opts.sellerName
-        } for ${price} MOVE?`,
-      });
-      if (!confirmed) return [null, "Cancelled"];
+
       const payload: Types.EntryFunctionPayload = {
         function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::buy_pass`,
         type_arguments: [],
@@ -317,18 +303,6 @@ class AptosMovement {
     numberOfTickets: number;
   }): Promise<[boolean | null, string | null]> {
     try {
-      const price = await this.getTicketSellPriceForPodiumPass({
-        sellerAddress: opts.sellerAddress,
-        numberOfTickets: opts.numberOfTickets,
-      });
-      if (price == null) return [false, "Error fetching price"];
-      const confirmed = await showConfirmPopup({
-        title: "Sell Podium Pass",
-        message: `Sell ${
-          opts.numberOfTickets
-        } pass(es) for ${bigIntCoinToMoveOnAptos(price)} MOVE?`,
-      });
-      if (!confirmed) return [false, "Cancelled"];
       const payload: Types.EntryFunctionPayload = {
         function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::sell_pass`,
         type_arguments: [],

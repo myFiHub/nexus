@@ -1,4 +1,5 @@
 "use client";
+import { CheerBooAmountDialogProvider } from "app/components/Dialog/cheerBooAmountDialog";
 import { User } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
 import { useParams } from "next/navigation";
@@ -26,6 +27,7 @@ const OngoingOutpostContent = ({
   }
   return (
     <div className="space-y-6">
+      <CheerBooAmountDialogProvider />
       <OutpostHeader />
       <Meet />
     </div>
