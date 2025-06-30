@@ -114,7 +114,7 @@ const Content = ({ outpost }: OnlineUsersIndicatorProps) => {
         </TooltipTrigger>
         <TooltipContent side="left" className="max-w-xs">
           <div className="space-y-1">
-            <p className="font-medium">
+            <p className="font-medium text-white">
               {onlineCount > 0
                 ? `${onlineCount} user${
                     onlineCount === 1 ? "" : "s"
@@ -122,7 +122,7 @@ const Content = ({ outpost }: OnlineUsersIndicatorProps) => {
                 : "No users currently online"}
             </p>
             {membersCount > 0 && (
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-white/90">
                 {membersCount} total member{membersCount === 1 ? "" : "s"}
               </p>
             )}
