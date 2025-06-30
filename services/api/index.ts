@@ -56,7 +56,6 @@ class PodiumApi {
     token: string | null;
   }> {
     try {
-      request.username = request.username.toLowerCase();
       const response = await this.axiosInstance.post("/auth/login", request);
       if (response.status === 200) {
         this.token = response.data.data.token;
