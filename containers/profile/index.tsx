@@ -12,9 +12,11 @@ import LoadingSkeleton from "./components/LoadingSkeleton";
 import { LoginPrompt } from "./components/LoginPrompt";
 import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
+import { SecuritySection } from "./components/SecuritySection";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { AccountCardActionSelectDialogProvider } from "./dialogs/accountCardActionSelectDialog";
+import { ExportPrivateKeyDialogProvider } from "./dialogs/exportPrivateKeyDialog";
 import { profileActions, useProfileSlice } from "./slice";
 
 const Content = () => {
@@ -45,6 +47,7 @@ const Content = () => {
     <>
       <ConfirmAddOrSwitchAccountDialogProvider />
       <AccountCardActionSelectDialogProvider />
+      <ExportPrivateKeyDialogProvider />
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-card rounded-lg shadow-md p-6">
           <ProfileHeader user={user} />
@@ -53,6 +56,7 @@ const Content = () => {
           <AdditionalInfo user={user} />
           <MyPasses />
           <SettingsSection />
+          <SecuritySection />
         </div>
       </div>
     </>

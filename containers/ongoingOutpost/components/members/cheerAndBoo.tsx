@@ -57,7 +57,7 @@ export const CheerAndBoo = ({
           alt="Cheer"
           width={16}
           height={16}
-          className="w-4 h-4 brightness-0  invert-[0.4] sepia-100 saturate-1000 hue-rotate-[120deg]"
+          className="w-4 h-4 brightness-0  filter   invert drop-shadow-lg"
         />
       )}
     </Button>
@@ -80,7 +80,7 @@ export const CheerAndBoo = ({
           alt="Boo"
           width={16}
           height={16}
-          className="w-4 h-4 brightness-0   invert-[0.4] sepia-100 saturate-1000 hue-rotate-[320deg]"
+          className="w-4 h-4 brightness-0   filter brightness-0 invert drop-shadow-lg"
         />
       )}
     </Button>
