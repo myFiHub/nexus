@@ -1,3 +1,4 @@
+"use client";
 import { confettiEventBus } from "app/containers/ongoingOutpost/eventBusses/confetti";
 import { IncomingMessageType } from "app/services/wsClient";
 import confetti from "canvas-confetti";
