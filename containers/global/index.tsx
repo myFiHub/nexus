@@ -2,7 +2,6 @@
 import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
 import {
   BuyOrSellPassDialogProvider,
-  CheerBooAmountDialogProvider,
   LumaUserDialogProvider,
   SearchDialogProvider,
   UserSelectDialogProvider,
