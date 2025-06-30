@@ -1,3 +1,4 @@
+import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
 import { logoUrl } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
@@ -23,9 +24,11 @@ export function CreatorSection({ outpost }: CreatorSectionProps) {
           {/* Online indicator */}
         </div>
         <div className="flex-1 min-w-0">
-          <h4 className="font-semibold text-foreground line-clamp-1">
-            {outpost.creator_user_name}
-          </h4>
+          <UserLink underline={false} id={creatorUUid} className="p-0 m-0">
+            <h4 className="font-semibold text-foreground line-clamp-1">
+              {outpost.creator_user_name}
+            </h4>
+          </UserLink>
           <p className="text-xs text-muted-foreground font-mono">
             {truncate(creatorUUid)}
           </p>

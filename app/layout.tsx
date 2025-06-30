@@ -69,7 +69,7 @@ export const metadata: Metadata = {
     description:
       "Join collaborative outposts, connect with creators, and participate in live events.",
     images: ["/logo.png"],
-    creator: "@podiumnexus",
+    creator: "@web3podium",
   },
   robots: {
     index: true,

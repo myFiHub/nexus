@@ -11,7 +11,7 @@ export default function LoadingIndicator() {
     NProgress.start();
     const timeout = setTimeout(() => {
       NProgress.done();
-    }, 300);
+    }, 1000);
 
     return () => {
       clearTimeout(timeout);
