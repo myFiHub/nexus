@@ -11,6 +11,7 @@ import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
+import { useUsersSlice } from "../_users/slice";
 
 const OngoingOutpostContent = ({
   myUser,
@@ -19,6 +20,7 @@ const OngoingOutpostContent = ({
   myUser?: User;
   loading: boolean;
 }) => {
+  useUsersSlice();
   if (loading) {
     return <OngoingOutpostSkeleton />;
   }
