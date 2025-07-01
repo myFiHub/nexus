@@ -37,6 +37,7 @@ import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import {
   all,
+  call,
   debounce,
   delay,
   put,
@@ -592,4 +593,10 @@ export function* globalSaga() {
     globalActions.toggleOutpostFromOnlineObject,
     getLatestOnlineUsersForOutposts
   );
+  // Example retry usage - uncomment and replace with your actual action and function
+  // yield retry(
+  //   5,
+  //   globalActions.yourAction, // Replace with your actual action
+  //   yourRetryableFunction
+  // );
 }
