@@ -4,6 +4,16 @@ import NProgress from "nprogress";
 import "nprogress/nprogress.css";
 import { useEffect, useRef } from "react";
 
+// Custom CSS for magenta color
+const customStyles = `
+  #nprogress .bar {
+    background: magenta !important;
+  }
+  #nprogress .peg {
+    box-shadow: 0 0 10px magenta, 0 0 5px magenta !important;
+  }
+`;
+
 export default function LoadingIndicator() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -12,6 +22,12 @@ export default function LoadingIndicator() {
   const navigationTimeout = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    // Inject custom styles
+    const styleElement = document.createElement("style");
+    styleElement.textContent = customStyles;
+    styleElement.setAttribute("data-nprogress-custom", "true");
+    document.head.appendChild(styleElement);
+
     // Configure NProgress
     NProgress.configure({
       showSpinner: false,
@@ -129,6 +145,14 @@ export default function LoadingIndicator() {
         // Clear any pending timeouts
         if (navigationTimeout.current) {
           clearTimeout(navigationTimeout.current);
+        }
+
+        // Remove custom styles
+        const styleElement = document.querySelector(
+          "style[data-nprogress-custom]"
+        );
+        if (styleElement) {
+          styleElement.remove();
         }
 
         // Restore original history methods
