@@ -152,7 +152,7 @@ export const DeleteAccountDialogProvider = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.3, staggerChildren: 0.1 }}
-          className="space-y-4"
+          className="space-y-4 min-h-[420px]"
         >
           {/* Critical Warning Section */}
           <motion.div
