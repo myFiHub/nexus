@@ -47,7 +47,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
   };
 
   const disconnect = async () => {
-    const confirmed = await confirmDialog({
+    const result = await confirmDialog({
       title: "do you want to logout?",
       content: "",
       confirmOpts: {
@@ -55,7 +55,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
         text: "Logout",
       },
     });
-    if (confirmed) {
+    if (result.confirmed) {
       dispatch(globalActions.logout());
     }
   };
