@@ -92,8 +92,8 @@ export const LoginState = () => {
                 whileHover={{ scale: 1.02, y: -2 }}
                 transition={{ duration: 0.2, delay: 0.1 }}
               >
-                <div className="w-10 h-10 bg-secondary/20 rounded-lg flex items-center justify-center">
-                  <MessageCircle className="w-5 h-5 text-secondary" />
+                <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                  <MessageCircle className="w-5 h-5 text-primary" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-foreground">Live Chat</h4>
