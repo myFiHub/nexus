@@ -1,6 +1,7 @@
 import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
+import { FungableTokenBalance } from "./types";
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -114,7 +115,7 @@ class AptosMovement {
     }
   }
 
-  async getUserTokenBalances(address: string): Promise<any[] | string> {
+  async getUserTokenBalances(address: string): Promise<FungableTokenBalance[]> {
     const query = `
       query GetUserTokenBalances($address: String!) {
         current_fungible_asset_balances(
@@ -143,15 +144,49 @@ class AptosMovement {
         },
         { headers: { "Content-Type": "application/json" } }
       );
-      return response.data.current_fungible_asset_balances;
+      return response.data.data.current_fungible_asset_balances;
     } catch (error) {
       toast.error("Error fetching token balances from indexer: " + error);
       return [];
     }
   }
 
+  // Get total supply
+  async getTotalSupply(targetAddress: string): Promise<number> {
+    try {
+      const supply = await this.client.view({
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::get_total_supply`,
+        type_arguments: [],
+        arguments: [targetAddress],
+      });
+      return supply[0] as number;
+    } catch (error) {
+      console.error("Error fetching total supply:", error);
+      return 0;
+    }
+  }
+
   async getAddressBalance(address: string): Promise<bigint> {
     return this.getBalanceFromIndexer(address);
+  }
+
+  // Get protocol fees
+  async getProtocolFees() {
+    try {
+      const fees = await this.client.view({
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::get_protocol_fees`,
+        type_arguments: [],
+        arguments: [],
+      });
+      return {
+        subscriptionFee: fees[0],
+        passFee: fees[1],
+        referrerFee: fees[2],
+      };
+    } catch (error) {
+      console.error("Error fetching protocol fees:", error);
+      throw error;
+    }
   }
 
   async balance() {

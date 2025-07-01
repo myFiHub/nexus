@@ -1,3 +1,4 @@
+import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
 import { Lock } from "./lock";
 import { ConnectionState } from "./types";
@@ -10,7 +11,7 @@ export class ConnectionManager {
   private static readonly INITIAL_RECONNECT_DELAY = 1000; // 1 second
   private static readonly MAX_RECONNECT_DELAY = 5000; // 5 seconds
   private static readonly CONNECTION_TIMEOUT = 30000; // 30 seconds
-
+  private static toastId: string | number = 0;
   private reconnectAttempts = 0;
   private connectionTimeoutTimer?: number;
   private readonly connectionLock = new Lock();
@@ -79,6 +80,11 @@ export class ConnectionManager {
             );
           }
           params.updateConnectionState(ConnectionState.DISCONNECTED);
+          if (ConnectionManager.toastId) {
+            ConnectionManager.toastId = toast.error("check your connection", {
+              permanent: true,
+            });
+          }
           resolve(false);
         }, ConnectionManager.CONNECTION_TIMEOUT);
 
@@ -100,6 +106,8 @@ export class ConnectionManager {
           params.setChannel(channel);
           params.setupPongTimer();
           params.setupMessageListener();
+          toast.dismiss(ConnectionManager.toastId);
+          ConnectionManager.toastId = 0;
           resolve(true);
         };
 
@@ -223,6 +231,8 @@ export class ConnectionManager {
               "color: #4CAF50; font-weight: bold;"
             );
           }
+          toast.dismiss(ConnectionManager.toastId);
+          ConnectionManager.toastId = 0;
           return true;
         } else {
           if (isDev) {
@@ -272,6 +282,8 @@ export class ConnectionManager {
               "color: #4CAF50; font-weight: bold;"
             );
           }
+          toast.dismiss(ConnectionManager.toastId);
+          ConnectionManager.toastId = 0;
           return true;
         }
 
@@ -298,6 +310,9 @@ export class ConnectionManager {
               "color: #F44336; font-weight: bold;"
             );
           }
+          ConnectionManager.toastId = toast.error("check your connection", {
+            permanent: true,
+          });
           return false;
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));

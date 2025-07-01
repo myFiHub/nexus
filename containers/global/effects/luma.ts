@@ -1,7 +1,7 @@
 import { lumaApi } from "app/services/api/luma";
 import { OutpostModel } from "app/services/api/types";
 import { OutpostAccesses } from "./types";
-import { EasyAccess } from "./quickAccess";
+import { easyAccess, EasyAccess } from "./quickAccess";
 
 export async function _checkLumaAccess({
   outpost,
@@ -10,7 +10,7 @@ export async function _checkLumaAccess({
 }): Promise<OutpostAccesses | undefined> {
   try {
     if (outpost.luma_event_id != null && outpost.luma_event_id.length > 0) {
-      const myUser = EasyAccess.getInstance().myUser;
+      const myUser = easyAccess.myUser;
       const myLoginType = myUser.login_type;
       if (myLoginType != null) {
         if (myLoginType.includes("google") || myLoginType.includes("email")) {

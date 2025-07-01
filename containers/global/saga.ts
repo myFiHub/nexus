@@ -31,6 +31,9 @@ import {
   OutpostModel,
   User,
 } from "app/services/api/types";
+import { movementService } from "app/services/move/aptosMovement";
+import { FungableTokenBalance, OnChainPass } from "app/services/move/types";
+import { getAssetLabel } from "app/services/move/utils";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AptosAccount } from "aptos";
@@ -592,4 +595,10 @@ export function* globalSaga() {
     globalActions.toggleOutpostFromOnlineObject,
     getLatestOnlineUsersForOutposts
   );
+  // Example retry usage - uncomment and replace with your actual action and function
+  // yield retry(
+  //   5,
+  //   globalActions.yourAction, // Replace with your actual action
+  //   yourRetryableFunction
+  // );
 }
