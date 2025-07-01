@@ -12,19 +12,23 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   if (!myUser) {
-    return <div className="h-10 w-full" />;
+    return <div className="h-12 w-full" />;
   }
 
   return (
     <motion.div
-      className="flex gap-2 mt-auto"
+      className="flex gap-3 mt-auto"
       initial={{ opacity: 0, y: -5 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
-      <JoinButton outpost={outpost} fromCard={true} />
-      <LeaveButton outpost={outpost} />
-      <ArchiveButton outpost={outpost} />
+      <div className="flex-1">
+        <JoinButton outpost={outpost} fromCard={true} />
+      </div>
+      <div className="flex gap-2">
+        <LeaveButton outpost={outpost} />
+        <ArchiveButton outpost={outpost} />
+      </div>
     </motion.div>
   );
 };

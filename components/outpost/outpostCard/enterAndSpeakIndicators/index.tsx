@@ -35,29 +35,31 @@ export const EnterAndSpeakIndicators = ({
   outpost: OutpostModel;
 }) => {
   return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 mb-4 text-sm">
+    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-sm">
       {/* Access Type */}
       <Tooltip>
         <TooltipTrigger asChild>
           <div
-            className={`flex items-center gap-2 text-[var(--muted-foreground)] ${
+            className={`flex items-center gap-2 text-muted-foreground ${
               outpost.enter_type !== BuyableTicketTypes.onlyPodiumPassHolders
                 ? "cursor-help"
                 : ""
             }`}
           >
-            {outpost.enter_type === FreeOutpostEnterTypes.public ? (
-              <Unlock className="w-4 h-4 text-green-500" />
-            ) : (
-              <LockActionIcon outpost={outpost} />
-            )}
-            <span className="capitalize">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-muted/50">
+              {outpost.enter_type === FreeOutpostEnterTypes.public ? (
+                <Unlock className="w-3 h-3 text-green-500" />
+              ) : (
+                <LockActionIcon outpost={outpost} />
+              )}
+            </div>
+            <span className="capitalize font-medium text-xs">
               {serverEnterTypeToText(outpost.enter_type)}
             </span>
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>
+          <p className="text-xs text-white">
             {
               tooltipExplanation[
                 outpost.enter_type as keyof typeof tooltipExplanation
@@ -70,19 +72,21 @@ export const EnterAndSpeakIndicators = ({
       {/* Speak Type */}
       <Tooltip>
         <TooltipTrigger asChild>
-          <div className="flex items-center gap-2 text-[var(--muted-foreground)] cursor-help">
-            {outpost.speak_type === FreeOutpostSpeakerTypes.everyone ? (
-              <Mic className="w-4 h-4 text-green-500" />
-            ) : (
-              <MicOff className="w-4 h-4 text-orange-500" />
-            )}
-            <span className="capitalize">
+          <div className="flex items-center gap-2 text-muted-foreground cursor-help">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-muted/50">
+              {outpost.speak_type === FreeOutpostSpeakerTypes.everyone ? (
+                <Mic className="w-3 h-3 text-green-500" />
+              ) : (
+                <MicOff className="w-3 h-3 text-orange-500" />
+              )}
+            </div>
+            <span className="capitalize font-medium text-xs">
               {serverSpeakerTypeToText(outpost.speak_type)}
             </span>
           </div>
         </TooltipTrigger>
         <TooltipContent>
-          <p>
+          <p className="text-xs text-white">
             {
               speakTooltipExplanation[
                 outpost.speak_type as keyof typeof speakTooltipExplanation

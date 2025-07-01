@@ -11,24 +11,42 @@ interface OutpostCardProps {
 
 export function OutpostCard({ outpost }: OutpostCardProps) {
   return (
-    <div className="bg-card rounded-xl shadow-lg overflow-hidden hover:shadow-xl h-full flex flex-col border border-border ">
-      <ImageSection outpost={outpost} />
+    <div className="group relative bg-background rounded-xl border border-border overflow-hidden hover:border-border/80 transition-colors duration-200">
+      {/* Main content */}
+      <div className="relative">
+        {/* Image section */}
+        <div className="relative">
+          <ImageSection outpost={outpost} />
 
-      {/* Content Section */}
-      <div className="p-5 flex-1 flex flex-col">
-        <ContentSection
-          name={outpost.name}
-          subject={outpost.subject}
-          uuid={outpost.uuid}
-        />
-        <CreatorSection outpost={outpost} />
-
-        {/* Indicators Section */}
-        <div className="space-y-3 mb-4">
-          <EnterAndSpeakIndicators outpost={outpost} />
+          {/* Floating status indicators */}
+          <div className="absolute -bottom-4 left-4 right-4 z-20">
+            <div className="bg-background/95 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm p-3">
+              <EnterAndSpeakIndicators outpost={outpost} />
+            </div>
+          </div>
         </div>
 
-        <OutpostCardActions outpost={outpost} />
+        {/* Content area */}
+        <div className="p-5 pt-8">
+          {/* Title and subject */}
+          <div className="mb-5">
+            <ContentSection
+              name={outpost.name}
+              subject={outpost.subject}
+              uuid={outpost.uuid}
+            />
+          </div>
+
+          {/* Creator section */}
+          <div className="mb-5">
+            <CreatorSection outpost={outpost} />
+          </div>
+
+          {/* Actions */}
+          <div className="pt-4 border-t border-border/30">
+            <OutpostCardActions outpost={outpost} />
+          </div>
+        </div>
       </div>
     </div>
   );

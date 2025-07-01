@@ -64,16 +64,17 @@ const JoinButtonContent = ({
 
   return (
     <Button
-      className={`w-full text-center`}
+      className={`w-full text-center bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:transform-none disabled:opacity-60`}
       onClick={join}
       disabled={iAmCreator ? disabledIfIAmCreator : disabledIfImNotCreator}
     >
       {loading && isMounted ? (
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
+          <span>{joining ? "Joining..." : "Loading..."}</span>
         </div>
       ) : (
-        displayText
+        <span className="font-medium">{displayText}</span>
       )}
     </Button>
   );
