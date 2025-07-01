@@ -89,17 +89,19 @@ export const LogoutDialogProvider = () => {
             }
           }}
         >
-          <DialogContent className="p-0 overflow-hidden border-0 shadow-2xl max-w-md">
+          <DialogContent
+            className="p-0 overflow-hidden border-0 shadow-2xl max-w-md"
+            showCloseButton={false}
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.8, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: 20 }}
               transition={{
-                duration: 0.3,
+                duration: 0.15,
                 ease: [0.25, 0.46, 0.45, 0.94],
                 type: "spring",
-                stiffness: 300,
-                damping: 30,
+                stiffness: 400,
+                damping: 25,
               }}
               className="relative"
             >
@@ -125,12 +127,26 @@ export const LogoutDialogProvider = () => {
               />
               <div className="absolute inset-[1px] bg-background rounded-lg" />
 
+              {/* Custom Close Button */}
+              <motion.button
+                onClick={handleCancel}
+                className="absolute top-4 right-4 z-50 w-8 h-8 rounded-full bg-muted/80 hover:bg-muted flex items-center justify-center transition-colors duration-200 group cursor-pointer"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.2, duration: 0.15 }}
+              >
+                <X className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" />
+                <span className="sr-only">Close</span>
+              </motion.button>
+
               {/* Header */}
               <DialogHeader className="relative p-6 pb-4">
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.3 }}
+                  transition={{ delay: 0.05, duration: 0.15 }}
                   className="flex items-center gap-3"
                 >
                   <motion.div
@@ -156,7 +172,7 @@ export const LogoutDialogProvider = () => {
                 className="relative px-6 pb-6"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.3 }}
+                transition={{ delay: 0.1, duration: 0.15 }}
               >
                 <div className="flex gap-3">
                   <motion.div
@@ -186,7 +202,7 @@ export const LogoutDialogProvider = () => {
                   className="flex gap-3 w-full"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.3 }}
+                  transition={{ delay: 0.15, duration: 0.15 }}
                 >
                   <motion.div
                     whileHover={{ scale: 1.02 }}
