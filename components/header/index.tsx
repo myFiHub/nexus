@@ -66,7 +66,12 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
               href="/"
               className="flex items-center gap-1 text-xl font-bold text-[var(--header-link-active)] hover:no-underline px-0"
             >
-              <Img src="/logo.png" alt="Podium Nexus" className="w-6 h-6" />
+              <Img
+                src="/logo.png"
+                alt="Podium Nexus"
+                className="w-6 h-6"
+                sizes="24px"
+              />
               Podium Nexus
             </AppLink>
           </div>
