@@ -35,6 +35,7 @@ const profileSlice = createSlice({
     ) {
       state.addressOfAccountThatIsBeingMadePrimary = action.payload;
     },
+    deleteAccount(_, __: PayloadAction<void>) {},
   },
 });
 
