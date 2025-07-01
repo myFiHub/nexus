@@ -1,4 +1,3 @@
-import OutpostLink from "app/components/AppLink/outpostLink";
 import { Img } from "app/components/Img";
 import { localLogoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
@@ -19,6 +18,7 @@ export function ImageSection({ outpost }: ImageSectionProps) {
         src={outpost.image || localLogoUrl}
         alt={outpost.name}
         className="w-full h-full object-cover"
+        sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
       />
 
       {/* Overlay gradient for better text readability */}

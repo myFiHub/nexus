@@ -194,7 +194,12 @@ export const Img = ({
         width={shouldUseFill ? undefined : width}
         height={shouldUseFill ? undefined : height}
         fill={shouldUseFill}
-        sizes={sizes || (shouldUseFill ? "100vw" : undefined)}
+        sizes={
+          sizes ||
+          (shouldUseFill
+            ? "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            : undefined)
+        }
         unoptimized={
           imageSrc.startsWith("blob:") || imageSrc.startsWith("data:")
         }
