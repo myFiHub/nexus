@@ -1,15 +1,15 @@
 "use client";
-import { EasyAccess } from "app/containers/global/effects/quickAccess";
+import { easyAccess } from "app/containers/global/effects/quickAccess";
+import {
+  NOTIFICATIONS_UPDATED,
+  notificationsEventBus,
+} from "app/containers/notifications/eventBus";
 import { notificationsActions } from "app/containers/notifications/slice";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
 import { isDev } from "app/lib/utils";
 import { getStore } from "app/store";
 import { WebSocketService } from "./client";
 import { IncomingMessage, IncomingMessageType } from "./types";
-import {
-  NOTIFICATIONS_UPDATED,
-  notificationsEventBus,
-} from "app/containers/notifications/eventBus";
 
 export type IncomingReactionType =
   | IncomingMessageType.USER_BOOED
@@ -74,7 +74,7 @@ export class WebSocketMessageRouter {
   }
 
   private static handleUserJoined(message: IncomingMessage): void {
-    const myUserAddress = EasyAccess.getInstance().myUser?.address;
+    const myUserAddress = easyAccess.myUser?.address;
 
     if (message.data.address === myUserAddress) {
       const joinId = `join-${myUserAddress}`;
@@ -93,7 +93,7 @@ export class WebSocketMessageRouter {
   private static handleUserLeft(message: IncomingMessage): void {
     const userAddress = message.data.address;
     const store = getStore();
-    if (userAddress !== EasyAccess.getInstance().myUser?.address) {
+    if (userAddress !== easyAccess.myUser?.address) {
       store!.dispatch(onGoingOutpostActions.getLiveMembers());
     }
   }

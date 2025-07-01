@@ -17,7 +17,7 @@ import { put, select } from "redux-saga/effects";
 import { GlobalDomains } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
-import { EasyAccess } from "./quickAccess";
+import { easyAccess, EasyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
 
 const BuyableTicketTypes = {
@@ -71,7 +71,7 @@ function* getOutpostAccesses({
   outpost: OutpostModel;
   joiningByLink: boolean;
 }): Generator<any, OutpostAccesses | undefined, any> {
-  const myUser = EasyAccess.getInstance().myUser;
+  const myUser = easyAccess.myUser;
   ///////////////////////////////////////////////////
   const iAmOutpostCreator = outpost.creator_user_uuid == myUser.uuid;
   if (iAmOutpostCreator) {
@@ -90,10 +90,7 @@ function* getOutpostAccesses({
   }
 
   //////////////////////////////////////////////////
-  if (
-    outpost.has_adult_content &&
-    !EasyAccess.getInstance().myUser.is_over_18
-  ) {
+  if (outpost.has_adult_content && !easyAccess.myUser.is_over_18) {
     const res: ConfirmDialogResult = yield confirmDialog({
       title: "Adult Content",
       content: "This Outpost has adult content, are you sure you want to join?",
@@ -202,7 +199,7 @@ function* openOutpost({
   const router: AppRouterInstance = yield select(GlobalDomains.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const iAmMember: LiveMember | undefined = currentMembers.find(
-    (member) => member.uuid === EasyAccess.getInstance().myUser.uuid
+    (member) => member.uuid === easyAccess.myUser.uuid
   );
   if (!iAmMember) {
     const added: boolean = yield podiumApi.addMeAsMember(outpost.uuid);
@@ -254,7 +251,7 @@ export const canEnterWithoutATicket = (outpost: OutpostModel): boolean => {
 };
 
 export const canISpeakWithoutTicket = (outpost: OutpostModel): boolean => {
-  const myId = EasyAccess.getInstance().myUser.uuid;
+  const myId = easyAccess.myUser.uuid;
   const iAmTheCreator = outpost.creator_user_uuid === myId;
   if (iAmTheCreator) return true;
   if (outpost.speak_type === FreeOutpostAccessTypes.invited_users) {

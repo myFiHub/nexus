@@ -1,6 +1,7 @@
 import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
+import { FungableTokenBalance } from "./types";
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -114,7 +115,7 @@ class AptosMovement {
     }
   }
 
-  async getUserTokenBalances(address: string): Promise<any[] | string> {
+  async getUserTokenBalances(address: string): Promise<FungableTokenBalance[]> {
     const query = `
       query GetUserTokenBalances($address: String!) {
         current_fungible_asset_balances(
@@ -143,7 +144,7 @@ class AptosMovement {
         },
         { headers: { "Content-Type": "application/json" } }
       );
-      return response.data.current_fungible_asset_balances;
+      return response.data.data.current_fungible_asset_balances;
     } catch (error) {
       toast.error("Error fetching token balances from indexer: " + error);
       return [];

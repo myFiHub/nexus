@@ -19,7 +19,7 @@ import {
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
-import { EasyAccess } from "../global/effects/quickAccess";
+import { easyAccess, EasyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -200,8 +200,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       console.error("Outpost not found to boo");
       return;
     }
-    const isSelfReaction =
-      targetUserAddress === EasyAccess.getInstance().myUser?.address;
+    const isSelfReaction = targetUserAddress === easyAccess.myUser?.address;
     let amount = "0";
     const results: CheerBooAmountDialogResult = yield cheerBooAmountDialog({
       cheer,
