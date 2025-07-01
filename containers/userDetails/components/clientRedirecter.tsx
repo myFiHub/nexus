@@ -10,7 +10,7 @@ const Content = ({ id }: { id: string }) => {
   const router = useRouter();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   useEffect(() => {
-    if (myUser?.uuid === id) {
+    if (myUser?.uuid === id || myUser?.aptos_address === id) {
       //   redirect to profile page
       router.replace(`/profile`);
     }
