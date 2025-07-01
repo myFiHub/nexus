@@ -181,3 +181,6 @@ export {
   CheerBooAmountDialogProvider,
 } from "./cheerBooAmountDialog";
 export type { CheerBooAmountDialogResult } from "./cheerBooAmountDialog";
+
+// Export logout dialog components
+export { logoutDialog, LogoutDialogProvider } from "./logoutDialog";

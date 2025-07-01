@@ -8,7 +8,7 @@ import { Crown, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../Button";
-import { confirmDialog } from "../Dialog/confirmDialog";
+import { logoutDialog } from "../Dialog";
 import { Img } from "../Img";
 
 interface LoginButtonProps {
@@ -47,15 +47,8 @@ const Content = ({ size, className }: LoginButtonProps) => {
   };
 
   const disconnect = async () => {
-    const result = await confirmDialog({
-      title: "do you want to logout?",
-      content: "",
-      confirmOpts: {
-        colorScheme: "danger",
-        text: "Logout",
-      },
-    });
-    if (result.confirmed) {
+    const result = await logoutDialog();
+    if (result) {
       dispatch(globalActions.logout());
     }
   };
