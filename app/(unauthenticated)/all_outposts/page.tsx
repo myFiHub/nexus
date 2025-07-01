@@ -26,7 +26,7 @@ export default async function AllOutpostsPage() {
   try {
     const outposts = await getCachedOutposts();
 
-    if (outposts instanceof Error) {
+    if (outposts instanceof Error || !outposts.length) {
       return <ErrorState />;
     }
 

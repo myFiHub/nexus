@@ -31,9 +31,6 @@ import {
   OutpostModel,
   User,
 } from "app/services/api/types";
-import { movementService } from "app/services/move/aptosMovement";
-import { FungableTokenBalance, OnChainPass } from "app/services/move/types";
-import { getAssetLabel } from "app/services/move/utils";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AptosAccount } from "aptos";

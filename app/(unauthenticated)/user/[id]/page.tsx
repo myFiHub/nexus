@@ -1,6 +1,8 @@
 import { UserDetails } from "app/containers/userDetails";
+import { CookieKeys } from "app/lib/client-cookies";
 import podiumApi from "app/services/api";
-import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 import { generateMetadata, generateStructuredData } from "./_metadata";
 
 interface Props {
@@ -11,6 +13,21 @@ export { generateMetadata };
 
 export default async function UserPage({ params }: Props) {
   const { id } = await params;
+
+  // Server-side guard: check if user is viewing their own profile
+  // This must be done BEFORE any other async operations
+  let myUserId: string | undefined;
+  try {
+    const cookieStore = await cookies();
+    myUserId = cookieStore.get(CookieKeys.myUserId)?.value;
+  } catch (error) {
+    console.error("Error checking user ID from cookies:", error);
+  }
+
+  // Redirect if user is viewing their own profile
+  if (myUserId && myUserId === id) {
+    redirect("/profile");
+  }
 
   const [user, passBuyers, followers, followings] = await Promise.all([
     podiumApi.getUserData(id),
