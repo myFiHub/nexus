@@ -362,14 +362,14 @@ export class WebSocketService {
 
   // Helper method to get WebSocket address
   private getWebSocketAddress(): string {
-    // TODO: Replace with your actual WebSocket server configuration
     // You can use environment variables, config files, or any other method
     if (typeof window !== "undefined") {
       // Browser environment - use relative URL or environment variable
       return process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!;
     } else {
       // Node.js environment
-      return process.env.WEBSOCKET_URL || "wss://localhost:8080/ws";
+      console.log("WRONG ENVIRONMENT");
+      return "";
     }
   }
 }

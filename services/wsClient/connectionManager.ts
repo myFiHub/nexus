@@ -16,6 +16,34 @@ export class ConnectionManager {
   private connectionTimeoutTimer?: number;
   private readonly connectionLock = new Lock();
 
+  // Centralized toast management
+  private static showConnectionErrorToast(
+    message: string = "check your connection",
+    action?: { label: string; onClick: () => void }
+  ): void {
+    // Dismiss any existing toast first
+    if (ConnectionManager.toastId) {
+      toast.dismiss(ConnectionManager.toastId);
+    }
+
+    ConnectionManager.toastId = toast.error(message, {
+      permanent: true,
+      action: action || {
+        label: "reload",
+        onClick: () => {
+          window.location.reload();
+        },
+      },
+    });
+  }
+
+  private static dismissConnectionToast(): void {
+    if (ConnectionManager.toastId) {
+      toast.dismiss(ConnectionManager.toastId);
+      ConnectionManager.toastId = 0;
+    }
+  }
+
   private getReconnectDelay(): number {
     if (this.reconnectAttempts >= ConnectionManager.MAX_RECONNECT_ATTEMPTS) {
       return ConnectionManager.MAX_RECONNECT_DELAY;
@@ -80,11 +108,7 @@ export class ConnectionManager {
             );
           }
           params.updateConnectionState(ConnectionState.DISCONNECTED);
-          if (ConnectionManager.toastId) {
-            ConnectionManager.toastId = toast.error("check your connection", {
-              permanent: true,
-            });
-          }
+          ConnectionManager.showConnectionErrorToast();
           resolve(false);
         }, ConnectionManager.CONNECTION_TIMEOUT);
 
@@ -106,8 +130,7 @@ export class ConnectionManager {
           params.setChannel(channel);
           params.setupPongTimer();
           params.setupMessageListener();
-          toast.dismiss(ConnectionManager.toastId);
-          ConnectionManager.toastId = 0;
+          ConnectionManager.dismissConnectionToast();
           resolve(true);
         };
 
@@ -177,7 +200,7 @@ export class ConnectionManager {
           "color: #F44336; font-weight: bold;"
         );
       }
-      // TODO: Show toast error message
+      ConnectionManager.showConnectionErrorToast();
       return false;
     }
 
@@ -231,8 +254,7 @@ export class ConnectionManager {
               "color: #4CAF50; font-weight: bold;"
             );
           }
-          toast.dismiss(ConnectionManager.toastId);
-          ConnectionManager.toastId = 0;
+          ConnectionManager.dismissConnectionToast();
           return true;
         } else {
           if (isDev) {
@@ -282,8 +304,7 @@ export class ConnectionManager {
               "color: #4CAF50; font-weight: bold;"
             );
           }
-          toast.dismiss(ConnectionManager.toastId);
-          ConnectionManager.toastId = 0;
+          ConnectionManager.dismissConnectionToast();
           return true;
         }
 
@@ -310,9 +331,7 @@ export class ConnectionManager {
               "color: #F44336; font-weight: bold;"
             );
           }
-          ConnectionManager.toastId = toast.error("check your connection", {
-            permanent: true,
-          });
+          ConnectionManager.showConnectionErrorToast();
           return false;
         }
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -325,6 +344,7 @@ export class ConnectionManager {
         "color: #F44336; font-weight: bold;"
       );
     }
+    ConnectionManager.showConnectionErrorToast();
     return false;
   }
 
@@ -334,5 +354,6 @@ export class ConnectionManager {
       clearTimeout(this.connectionTimeoutTimer);
       this.connectionTimeoutTimer = undefined;
     }
+    ConnectionManager.dismissConnectionToast();
   }
 }
