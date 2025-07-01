@@ -17,15 +17,20 @@ export default async function UserPage({ params }: Props) {
   // Server-side guard: check if user is viewing their own profile
   // This must be done BEFORE any other async operations
   let myUserId: string | undefined;
+  let myUserMoveAddress: string | undefined;
   try {
     const cookieStore = await cookies();
     myUserId = cookieStore.get(CookieKeys.myUserId)?.value;
+    myUserMoveAddress = cookieStore.get(CookieKeys.myMoveAddress)?.value;
   } catch (error) {
     console.error("Error checking user ID from cookies:", error);
   }
 
   // Redirect if user is viewing their own profile
-  if (myUserId && myUserId === id) {
+  if (
+    (myUserId && myUserId === id) ||
+    (myUserMoveAddress && myUserMoveAddress === id)
+  ) {
     redirect("/profile");
   }
 

@@ -486,7 +486,11 @@ function* detached_afterGettingPodiumUser({
 }) {
   yield put(notificationsActions.getNotifications());
   yield put(globalActions.initOneSignal({ myId: user.uuid }));
-  yield setServerCookieViaAPI(CookieKeys.myUserId, user.uuid);
+  yield all([
+    setServerCookieViaAPI(CookieKeys.myUserId, user.uuid),
+    setServerCookieViaAPI(CookieKeys.myMoveAddress, user.aptos_address!),
+  ]);
+
   if (token) {
     yield wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!);
   }
