@@ -114,6 +114,42 @@ class AptosMovement {
     }
   }
 
+  async getUserTokenBalances(address: string): Promise<any[] | string> {
+    const query = `
+      query GetUserTokenBalances($address: String!) {
+        current_fungible_asset_balances(
+          where: { owner_address: { _eq: $address }, amount: { _gt: 0 } }
+        ) {
+          asset_type
+          amount
+          last_transaction_timestamp
+          metadata {
+            icon_uri
+            maximum_v2
+            project_uri
+            supply_aggregator_table_handle_v1
+            supply_aggregator_table_key_v1
+            supply_v2
+          }
+        }
+      }
+    `;
+    try {
+      const response = await axios.post(
+        APTOS_INDEXER_URL,
+        {
+          query,
+          variables: { address },
+        },
+        { headers: { "Content-Type": "application/json" } }
+      );
+      return response.data.current_fungible_asset_balances;
+    } catch (error) {
+      toast.error("Error fetching token balances from indexer: " + error);
+      return [];
+    }
+  }
+
   async getAddressBalance(address: string): Promise<bigint> {
     return this.getBalanceFromIndexer(address);
   }
