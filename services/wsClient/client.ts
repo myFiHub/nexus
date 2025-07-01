@@ -1,4 +1,6 @@
+import { globalActions } from "app/containers/global/slice";
 import { isDev } from "app/lib/utils";
+import { getStore } from "app/store";
 import { ConnectionManager } from "./connectionManager";
 import { JoinRequestManager } from "./joinRequestManager";
 import { WebSocketMessageRouter } from "./messageRouter";
@@ -216,6 +218,18 @@ export class WebSocketService {
   private updateConnectionState(newState: ConnectionState): void {
     const oldState = this._connectionState;
     this._connectionState = newState;
+    const store = getStore();
+
+    store.dispatch(
+      globalActions.setWsConnectionStatus({
+        state: newState,
+        isConnecting: this.isConnecting,
+        connected: this.connected,
+        hasChannel: this.channel !== null,
+        hasToken: this.token.length > 0,
+      })
+    );
+
     if (isDev) {
       console.log(
         `%c[DEBUG] Connection state changed: ${oldState} -> ${newState}`,

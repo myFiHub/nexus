@@ -1,6 +1,7 @@
 "use client";
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import { initialState } from "./slice";
 
 export const GlobalDomains = {
   root: (state: RootState) => state,
@@ -12,6 +13,8 @@ export const GlobalDomains = {
     state.global?.initializingWeb3Auth,
   initialized: (state: RootState) => !!state.global?.web3Auth,
   logingIn: (state: RootState) => state.global?.logingIn,
+  wsConnectionStatus: (state: RootState) =>
+    state.global?.wsConnectionStatus ?? initialState.wsConnectionStatus,
   logingOut: (state: RootState) => state.global?.logingOut,
   podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
   joiningOutpostId: (state: RootState) => state.global?.joiningOutpostId,
@@ -39,6 +42,7 @@ export const GlobalSelectors = {
   initializingWeb3Auth: GlobalDomains.initializingWeb3Auth,
   initialized: GlobalDomains.initialized,
   logingIn: GlobalDomains.logingIn,
+  wsConnectionStatus: GlobalDomains.wsConnectionStatus,
   logingOut: GlobalDomains.logingOut,
   podiumUserInfo: GlobalDomains.podiumUserInfo,
   joiningOutpostId: GlobalDomains.joiningOutpostId,

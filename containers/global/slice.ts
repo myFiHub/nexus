@@ -8,6 +8,7 @@ import {
 } from "app/lib/client-cookies";
 import { OutpostModel, User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
+import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -25,6 +26,7 @@ export interface GlobalState {
   joiningOutpostId?: string;
   router?: AppRouterInstance;
   tick: number;
+  wsConnectionStatus: ConnectionStatus;
   checkingOutpostForPass?: OutpostModel;
   viewArchivedOutposts?: boolean;
   objectOfOnlineUsersToGet: {
@@ -33,7 +35,7 @@ export interface GlobalState {
   numberOfOnlineUsers: { [outpostId: string]: number };
 }
 
-const initialState: GlobalState = {
+export const initialState: GlobalState = {
   initializingWeb3Auth: true,
   logingIn: false,
   switchingAccount: false,
@@ -41,6 +43,13 @@ const initialState: GlobalState = {
   tick: 0,
   numberOfOnlineUsers: {},
   objectOfOnlineUsersToGet: {},
+  wsConnectionStatus: {
+    state: ConnectionState.DISCONNECTED,
+    isConnecting: false,
+    connected: false,
+    hasChannel: false,
+    hasToken: false,
+  },
   viewArchivedOutposts:
     getClientCookie(CookieKeys.viewArchivedOutposts) === "true",
 };
@@ -148,6 +157,9 @@ const globalSlice = createSlice({
         ...state.podiumUserInfo,
         accounts,
       };
+    },
+    setWsConnectionStatus(state, action: PayloadAction<ConnectionStatus>) {
+      state.wsConnectionStatus = action.payload;
     },
   },
 });

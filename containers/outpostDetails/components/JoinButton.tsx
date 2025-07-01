@@ -3,8 +3,10 @@ import { LoginButton } from "app/components/header/LoginButton";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
+import { ConnectionState } from "app/services/wsClient";
 import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -34,6 +36,7 @@ const JoinButtonContent = ({
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
+  const wsConnectionStatus = useSelector(GlobalSelectors.wsConnectionStatus);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
   const joining = joiningId === outpost.uuid;
 
@@ -46,6 +49,10 @@ const JoinButtonContent = ({
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
   if (!outpost) return null;
   const join = () => {
+    if (wsConnectionStatus.state !== ConnectionState.CONNECTED) {
+      toast.error("Please check your connection and try again");
+      return;
+    }
     dispatch(globalActions.joinOutpost({ outpost }));
   };
 
