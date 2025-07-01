@@ -32,6 +32,8 @@ import {
   User,
 } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
+import { FungableTokenBalance, OnChainPass } from "app/services/move/types";
+import { getAssetLabel } from "app/services/move/utils";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AptosAccount } from "aptos";
@@ -97,11 +99,6 @@ function* initOneSignal(
 function* initializeWeb3Auth(
   action: ReturnType<typeof globalActions.initializeWeb3Auth>
 ) {
-  const userPasses: unknown = yield movementService.getUserTokenBalances(
-    "0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2"
-  );
-  console.log({ userPasses });
-
   yield put(globalActions.setInitializingWeb3Auth(true));
   const web3AuthContextConfig: Web3AuthContextConfig = {
     web3AuthOptions: {

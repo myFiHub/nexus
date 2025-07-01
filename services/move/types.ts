@@ -11,3 +11,10 @@ export interface FungableTokenBalance {
     supply_v2: number;
   };
 }
+
+export interface OnChainPass {
+  outpostAddress: string;
+  outpostName: string;
+  balance: number;
+  currentPrice: number;
+}

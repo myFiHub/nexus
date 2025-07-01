@@ -145,3 +145,21 @@ export const getPassDetails = async (
     return undefined;
   }
 };
+// test_passesFromBlockChain(){
+//   const userPasses: FungableTokenBalance[] =
+//   yield movementService.getUserTokenBalances(
+//     "0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2"
+//   );
+// const passResults: OnChainPass[] = userPasses
+//   .filter(
+//     (b: FungableTokenBalance) =>
+//       b.metadata && b.metadata.project_uri === "https://podium.fi/pass/"
+//   )
+//   .map((b: FungableTokenBalance) => ({
+//     outpostAddress: b.asset_type,
+//     outpostName: getAssetLabel(b.asset_type),
+//     balance: Number(b.amount),
+//     currentPrice: 0, // Price not available from indexer
+//   }));
+// console.log({ passResults });
+// }
