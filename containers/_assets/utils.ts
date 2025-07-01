@@ -2,6 +2,28 @@ import { movementService } from "app/services/move/aptosMovement";
 
 type PassPrices = any;
 type PassDetails = any;
+
+// Retry utility
+const retry = async <T>(
+  operation: () => Promise<T>,
+  maxRetries: number = 3,
+  delay: number = 1000
+): Promise<T> => {
+  let lastError: any;
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      console.error("retry", `Attempt ${i + 1} failed`, { error });
+      if (i < maxRetries - 1) {
+        await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)));
+      }
+    }
+  }
+  throw lastError;
+};
+
 // Calculate pass prices for a given amount
 const calculatePassPrices = async (
   targetAddress: string,
@@ -20,6 +42,9 @@ const calculatePassPrices = async (
         sellerAddress: targetAddress,
       })
     );
+    if (!singlePrice) {
+      return undefined;
+    }
 
     // Calculate buy/sell prices
     const buyPrice = singlePrice * amount;
