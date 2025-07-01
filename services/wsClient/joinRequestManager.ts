@@ -1,9 +1,6 @@
-import {
-  easyAccess,
-  EasyAccess,
-} from "app/containers/global/effects/quickAccess";
-import { WebSocketService } from "./client";
+import { easyAccess } from "app/containers/global/effects/quickAccess";
 import { isDev } from "app/lib/utils";
+import { WebSocketService } from "./client";
 
 /**
  * Manages join requests and their lifecycle
@@ -13,6 +10,7 @@ export class JoinRequestManager {
     string,
     { resolve: (value: boolean) => void; reject: (reason?: any) => void }
   >();
+  private joinTimeouts = new Map<string, NodeJS.Timeout>();
   private joinSubject = new EventTarget();
 
   get joinStream(): EventTarget {
@@ -69,6 +67,7 @@ export class JoinRequestManager {
           }
           this.joinRequests.get(joinId)!.resolve(false);
           this.joinRequests.delete(joinId);
+          this.joinTimeouts.delete(joinId);
         } else {
           if (isDev) {
             console.log(
@@ -78,6 +77,9 @@ export class JoinRequestManager {
           }
         }
       }, timeoutDuration);
+
+      // Store timeout for cleanup
+      this.joinTimeouts.set(joinId, timeout);
 
       // Send join message
       this.sendJoinMessage(outpostId)
@@ -89,7 +91,7 @@ export class JoinRequestManager {
                 "color: #F44336; font-weight: bold;"
               );
             }
-            clearTimeout(timeout);
+            this.cleanupJoinTimeout(joinId);
             if (isDev) {
               console.log(
                 `%c[DEBUG] Cancelled timeout due to send failure for outpost: ${outpostId}`,
@@ -115,7 +117,7 @@ export class JoinRequestManager {
               "color: #F44336; font-weight: bold;"
             );
           }
-          clearTimeout(timeout);
+          this.cleanupJoinTimeout(joinId);
           if (isDev) {
             console.log(
               `%c[DEBUG] Cancelled timeout due to error for outpost: ${outpostId}`,
@@ -199,6 +201,7 @@ export class JoinRequestManager {
     // Dispatch event for join stream
     const event = new CustomEvent("join", { detail: joinId });
     this.joinSubject.dispatchEvent(event);
+
     if (this.joinRequests.has(joinId)) {
       if (isDev) {
         console.log(
@@ -208,14 +211,30 @@ export class JoinRequestManager {
       }
       this.joinRequests.get(joinId)!.resolve(true);
       this.joinRequests.delete(joinId);
+      this.cleanupJoinTimeout(joinId);
     }
   }
 
   cleanup(): void {
+    // Clean up all pending requests
     for (const [joinId, { resolve }] of this.joinRequests.entries()) {
       resolve(false);
     }
     this.joinRequests.clear();
+
+    // Clean up all timeouts
+    for (const [joinId, timeout] of this.joinTimeouts.entries()) {
+      clearTimeout(timeout);
+    }
+    this.joinTimeouts.clear();
+  }
+
+  private cleanupJoinTimeout(joinId: string): void {
+    const timeout = this.joinTimeouts.get(joinId);
+    if (timeout) {
+      clearTimeout(timeout);
+      this.joinTimeouts.delete(joinId);
+    }
   }
 
   // This will be injected by the WebSocketService

@@ -17,10 +17,9 @@ export class Lock {
       return await action();
     } finally {
       this.locked = false;
-      if (this.completers.length > 0) {
-        const completer = this.completers.shift()!;
-        completer();
-      }
+      // Release all waiting operations
+      const waitingCompleters = this.completers.splice(0);
+      waitingCompleters.forEach((completer) => completer());
     }
   }
 }

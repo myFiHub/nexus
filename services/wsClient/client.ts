@@ -89,7 +89,8 @@ export class WebSocketService {
   }
 
   async send(message: OutgoingMessage): Promise<boolean> {
-    if (this._connectionState !== ConnectionState.CONNECTED || !this.channel) {
+    // Validate connection state before sending
+    if (!this.validateConnectionState()) {
       if (!this.token) {
         if (isDev) {
           console.warn(
@@ -108,11 +109,8 @@ export class WebSocketService {
       }
       const reconnectSuccess = await this.reconnect();
 
-      if (
-        !reconnectSuccess ||
-        this._connectionState !== ConnectionState.CONNECTED ||
-        !this.channel
-      ) {
+      // Re-validate after reconnection attempt
+      if (!reconnectSuccess || !this.validateConnectionState()) {
         if (isDev) {
           console.error(
             "%c[ERROR] Failed to reconnect, cannot send message",
@@ -133,6 +131,18 @@ export class WebSocketService {
           "color: #2196F3; font-weight: bold;"
         );
       }
+
+      // Final safety check before sending
+      if (!this.channel || this.channel.readyState !== WebSocket.OPEN) {
+        if (isDev) {
+          console.error(
+            "%c[ERROR] WebSocket channel is not in OPEN state",
+            "color: #F44336; font-weight: bold;"
+          );
+        }
+        return false;
+      }
+
       this.channel.send(stringified);
       if (isDev) {
         console.log(
@@ -214,6 +224,14 @@ export class WebSocketService {
     }
   }
 
+  private validateConnectionState(): boolean {
+    return (
+      this._connectionState === ConnectionState.CONNECTED &&
+      this.channel !== null &&
+      this.channel.readyState === WebSocket.OPEN
+    );
+  }
+
   private async closeChannel(): Promise<void> {
     if (this.channel) {
       try {
@@ -236,9 +254,18 @@ export class WebSocketService {
       this.pongTimer = undefined;
     }
 
+    this.cleanupMessageListeners();
     this.closeChannel();
     this.updateConnectionState(ConnectionState.DISCONNECTED);
     this.joinManager.cleanup();
+  }
+
+  private cleanupMessageListeners(): void {
+    if (this.channel) {
+      this.channel.onmessage = null;
+      this.channel.onerror = null;
+      this.channel.onclose = null;
+    }
   }
 
   private setupPongTimer(): void {
@@ -246,11 +273,14 @@ export class WebSocketService {
       clearInterval(this.pongTimer);
     }
     this.pong();
-    this.pongTimer = window.setInterval(() => this.pong(), 10000); // 19 seconds
+    this.pongTimer = window.setInterval(() => this.pong(), 10000); // 10 seconds
   }
 
   private setupMessageListener(): void {
     if (!this.channel) return;
+
+    // Clean up any existing listeners first
+    this.cleanupMessageListeners();
 
     if (isDev) {
       console.log(
@@ -329,10 +359,10 @@ export class WebSocketService {
 
   private async pong(): Promise<void> {
     if (this._connectionState !== ConnectionState.CONNECTING && this.token) {
-      if (this._connectionState === ConnectionState.CONNECTED && this.channel) {
+      if (this.validateConnectionState()) {
         try {
           // Send pong frame (0x8A)
-          this.channel.send(new Uint8Array([0x8a]));
+          this.channel!.send(new Uint8Array([0x8a]));
         } catch (error) {
           if (isDev) {
             console.error(
@@ -362,14 +392,18 @@ export class WebSocketService {
 
   // Helper method to get WebSocket address
   private getWebSocketAddress(): string {
-    // You can use environment variables, config files, or any other method
     if (typeof window !== "undefined") {
-      // Browser environment - use relative URL or environment variable
-      return process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!;
+      const address = process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS;
+      if (!address) {
+        throw new Error(
+          "NEXT_PUBLIC_WEBSOCKET_ADDRESS environment variable is not set"
+        );
+      }
+      return address;
     } else {
-      // Node.js environment
-      console.log("WRONG ENVIRONMENT");
-      return "";
+      throw new Error(
+        "WebSocket client should only be used in browser environment"
+      );
     }
   }
 }
