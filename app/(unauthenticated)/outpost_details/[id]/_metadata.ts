@@ -230,8 +230,8 @@ export async function generateMetadata({
       title: title,
       description: description,
       images: [outpost.image || logoUrl],
-      creator: "@podiumnexus",
-      site: "@podiumnexus",
+      creator: "@web3podium",
+      site: "@web3podium",
     },
     robots: {
       index: true,

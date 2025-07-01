@@ -16,7 +16,11 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
 
       {/* Content Section */}
       <div className="p-5 flex-1 flex flex-col">
-        <ContentSection name={outpost.name} subject={outpost.subject} />
+        <ContentSection
+          name={outpost.name}
+          subject={outpost.subject}
+          uuid={outpost.uuid}
+        />
         <CreatorSection outpost={outpost} />
 
         {/* Indicators Section */}

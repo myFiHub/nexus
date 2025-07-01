@@ -113,8 +113,8 @@ export async function generateMetadata(): Promise<Metadata> {
           description:
             "Discover and join exciting live conversations and events. Connect with like-minded individuals in real-time.",
           images: [logoUrl],
-          creator: "@podiumnexus",
-          site: "@podiumnexus",
+          creator: "@web3podium",
+          site: "@web3podium",
         },
         robots: {
           index: true,
@@ -204,8 +204,8 @@ export async function generateMetadata(): Promise<Metadata> {
         title: title,
         description: description,
         images: [logoUrl],
-        creator: "@podiumnexus",
-        site: "@podiumnexus",
+        creator: "@web3podium",
+        site: "@web3podium",
       },
       robots: {
         index: true,

@@ -1,4 +1,7 @@
-import { EasyAccess } from "app/containers/global/effects/quickAccess";
+import {
+  easyAccess,
+  EasyAccess,
+} from "app/containers/global/effects/quickAccess";
 import { WebSocketService } from "./client";
 import { isDev } from "app/lib/utils";
 
@@ -17,7 +20,7 @@ export class JoinRequestManager {
   }
 
   generateJoinId(): string {
-    const userAddress = EasyAccess.getInstance().myUser?.address;
+    const userAddress = easyAccess.myUser?.address;
     return `join-${userAddress}`;
   }
 
