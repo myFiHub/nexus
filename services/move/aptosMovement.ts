@@ -150,6 +150,21 @@ class AptosMovement {
     }
   }
 
+  // Get total supply
+  async getTotalSupply(targetAddress: string): Promise<number> {
+    try {
+      const supply = await this.client.view({
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::get_total_supply`,
+        type_arguments: [],
+        arguments: [targetAddress],
+      });
+      return supply[0] as number;
+    } catch (error) {
+      console.error("Error fetching total supply:", error);
+      return 0;
+    }
+  }
+
   async getAddressBalance(address: string): Promise<bigint> {
     return this.getBalanceFromIndexer(address);
   }
