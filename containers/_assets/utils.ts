@@ -55,9 +55,10 @@ const calculatePassPrices = async (
     });
 
     // Get protocol fees with retry
-    const { buyFee, sellFee, referralFee } = await retry(() =>
-      podiumProtocol.getProtocolFees()
-    );
+    const response: any = await retry(() => getProtocolFees());
+    const { buyFee, sellFee, referralFee } = response;
+
+    console.error(buyFee, sellFee, referralFee);
 
     // Calculate fees
     const protocolFee = Math.floor((buyPrice * buyFee) / 10000);
@@ -85,6 +86,22 @@ const calculatePassPrices = async (
     };
   } catch (error) {
     return undefined;
+  }
+};
+
+// Get protocol fees
+const getProtocolFees = async () => {
+  try {
+    const fees = await movementService.getProtocolFees();
+    // console.error(fees);
+    // return {
+    //   passFee: Number(fees.buyFee),
+    //   subscriptionFee: Number(fees.sellFee),
+    //   referrerFee: Number(fees.referralFee),
+    // };
+  } catch (error) {
+    console.error("Failed to fetch protocol fees:", error);
+    throw error;
   }
 };
 

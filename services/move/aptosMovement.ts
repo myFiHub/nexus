@@ -169,6 +169,25 @@ class AptosMovement {
     return this.getBalanceFromIndexer(address);
   }
 
+  // Get protocol fees
+  async getProtocolFees() {
+    try {
+      const fees = await this.client.view({
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::get_protocol_fees`,
+        type_arguments: [],
+        arguments: [],
+      });
+      return {
+        subscriptionFee: fees[0],
+        passFee: fees[1],
+        referrerFee: fees[2],
+      };
+    } catch (error) {
+      console.error("Error fetching protocol fees:", error);
+      throw error;
+    }
+  }
+
   async balance() {
     const exists = await this.isMyAccountActive();
     if (!exists) return BigInt(0);
