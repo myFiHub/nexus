@@ -61,6 +61,7 @@ export const GlobalSelectors = {
     GlobalDomains.podiumUserInfo,
     (podiumUserInfo) => {
       const connectedAccounts = podiumUserInfo?.accounts ?? [];
+      if (connectedAccounts.length === 0) return true;
       const currentAccount = connectedAccounts.find(
         (account) => account.address === podiumUserInfo?.address
       );

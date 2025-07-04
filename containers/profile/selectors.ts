@@ -12,10 +12,13 @@ export const myProfileSelectors = {
   addressOfAccountThatIsBeingMadePrimary:
     myProfileDomains.addressOfAccountThatIsBeingMadePrimary,
   isAccountPrimary: (address: string) =>
-    createSelector(
-      GlobalDomains.podiumUserInfo,
-      (podiumUserInfo) =>
-        podiumUserInfo?.accounts.find((account) => account.address === address)
+    createSelector(GlobalDomains.podiumUserInfo, (podiumUserInfo) => {
+      if (!podiumUserInfo) return false;
+      const connectedAccounts = podiumUserInfo.accounts;
+      if (connectedAccounts.length === 0) return true;
+      return (
+        connectedAccounts.find((account) => account.address === address)
           ?.is_primary ?? false
-    ),
+      );
+    }),
 };
