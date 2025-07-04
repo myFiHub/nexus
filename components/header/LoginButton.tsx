@@ -53,7 +53,7 @@ const Content = ({ size, className }: LoginButtonProps) => {
     }
   };
 
-  const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[154px]";
+  const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[162px]";
 
   // Don't render until mounted to prevent hydration mismatch
   if (!isMounted) {
