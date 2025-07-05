@@ -4,7 +4,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
 import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
@@ -97,44 +97,8 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
             <LoginButton />
           </div>
           {/* Mobile hamburger */}
-          {isLoggedIn && (
-            <div className="md:hidden flex items-center ">
-              <button
-                onClick={() => setMobileOpen((v) => !v)}
-                aria-label={
-                  mobileOpen ? "Close mobile menu" : "Open mobile menu"
-                }
-                className="text-2xl text-[var(--header-link)] focus:outline-none"
-              >
-                {mobileOpen ? (
-                  <X className="w-7 h-7" />
-                ) : (
-                  <Menu className="w-7 h-7" />
-                )}
-              </button>
-            </div>
-          )}
         </div>
       </div>
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="bg-[var(--header-bg)] shadow-md">
-          <div className="max-w-7xl mx-auto px-4">
-            <nav className="py-4">
-              <button
-                onClick={() => {
-                  handleSearchClick();
-                  setMobileOpen(false);
-                }}
-                className="flex items-center gap-2 w-full py-2 text-[var(--header-link)] hover:text-[var(--header-link-active)] transition-colors duration-200"
-              >
-                <Search className="w-5 h-5" />
-                Search
-              </button>
-            </nav>
-          </div>
-        </div>
-      )}
     </header>
   );
 };
