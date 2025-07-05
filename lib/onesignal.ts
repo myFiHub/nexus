@@ -20,7 +20,9 @@ export const initializeOneSignal = async () => {
       // subdomainName: "your-subdomain",
     });
 
-    console.log("OneSignal initialized successfully");
+    if (isDev) {
+      console.log("OneSignal initialized successfully");
+    }
     return true;
   } catch (error) {
     console.warn("Error initializing OneSignal:", error);
@@ -39,7 +41,9 @@ export const subscribeToNotifications = async () => {
   try {
     // Get the user's OneSignal ID (correct API for v3.2.3)
     const playerId = await OneSignal.User.onesignalId;
-    console.log("OneSignal Player ID:", playerId);
+    if (isDev) {
+      console.log("OneSignal Player ID:", playerId);
+    }
     return playerId;
   } catch (error) {
     console.error("Error subscribing to notifications:", error);
@@ -51,7 +55,9 @@ export const subscribeToNotifications = async () => {
 export const loginToOneSignal = async (externalUserId: string) => {
   try {
     await OneSignal.login(externalUserId);
-    console.log("User external ID set:", externalUserId);
+    if (isDev) {
+      console.log("User external ID set:", externalUserId);
+    }
     return true;
   } catch (error) {
     console.error("Error setting user external ID:", error);
@@ -63,7 +69,9 @@ export const loginToOneSignal = async (externalUserId: string) => {
 export const setUserEmail = async (email: string) => {
   try {
     await OneSignal.User.addEmail(email);
-    console.log("User email set:", email);
+    if (isDev) {
+      console.log("User email set:", email);
+    }
     return true;
   } catch (error) {
     console.error("Error setting user email:", error);
@@ -75,7 +83,9 @@ export const setUserEmail = async (email: string) => {
 export const setUserProperties = async (properties: Record<string, any>) => {
   try {
     await OneSignal.User.addTags(properties);
-    console.log("User properties set:", properties);
+    if (isDev) {
+      console.log("User properties set:", properties);
+    }
     return true;
   } catch (error) {
     console.error("Error setting user properties:", error);
