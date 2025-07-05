@@ -13,20 +13,33 @@ export function SidebarItem({
   isMobile,
   loading,
   isActive,
+  needsAuth,
+  index,
 }: SidebarItemProps) {
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [showAuthAnimation, setShowAuthAnimation] = useState(false);
 
   useEffect(() => {
+    // Initial load timing for audio wave effect
     const timer = setTimeout(() => {
       setHasLoaded(true);
+
+      // Trigger auth animation after wave effect completes
+      if (needsAuth) {
+        const authTimer = setTimeout(() => {
+          setShowAuthAnimation(true);
+        }, 500 + index * 50); // Delay after wave animation
+        return () => clearTimeout(authTimer);
+      }
     }, 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [needsAuth, index]);
 
-  const itemVariants = {
+  // Audio wave slide-in effect with staggered timing
+  const audioWaveVariants = {
     hidden: {
       opacity: 0,
-      x: -50,
+      x: -100,
       scale: 0.8,
       filter: "blur(4px)",
     },
@@ -39,18 +52,54 @@ export function SidebarItem({
         type: "spring" as const,
         stiffness: 300,
         damping: 25,
-        mass: 1,
+        mass: 0.8,
+        delay: index * 0.05, // Staggered wave effect
       },
     },
-    dance: {
-      x: [0, -2, 2, -1, 1, 0],
-      y: [0, -1, 1, -0.5, 0.5, 0],
-      rotate: [0, -1, 1, -0.5, 0.5, 0],
-      scale: [1, 1.02, 0.98, 1.01, 0.99, 1],
+  };
+
+  // Special auth item animations
+  const authItemVariants = {
+    initial: {
+      height: 0,
+      opacity: 0,
+      overflow: "hidden",
+    },
+    animate: {
+      height: "auto",
+      opacity: 1,
+      overflow: "visible",
       transition: {
-        duration: 2,
+        duration: 0.3,
+        ease: "easeOut" as const,
+      },
+    },
+    flash: {
+      backgroundColor: [
+        "transparent",
+        "rgba(var(--primary), 0.3)",
+        "transparent",
+        "rgba(var(--primary), 0.4)",
+        "transparent",
+      ],
+      borderColor: [
+        "transparent",
+        "rgba(var(--primary), 0.6)",
+        "transparent",
+        "rgba(var(--primary), 0.8)",
+        "transparent",
+      ],
+      boxShadow: [
+        "none",
+        "0 0 20px rgba(var(--primary), 0.5)",
+        "none",
+        "0 0 25px rgba(var(--primary), 0.6)",
+        "none",
+      ],
+      transition: {
+        duration: 1.2,
         ease: "easeInOut" as const,
-        times: [0, 0.2, 0.4, 0.6, 0.8, 1],
+        times: [0, 0.25, 0.5, 0.75, 1],
       },
     },
   };
@@ -67,6 +116,21 @@ export function SidebarItem({
       filter: "drop-shadow(0 0 8px rgba(var(--primary), 0.4))",
       transition: {
         duration: 0.6,
+        ease: "easeInOut" as const,
+        times: [0, 0.25, 0.5, 0.75, 1],
+      },
+    },
+    authFlash: {
+      scale: [1, 1.2, 1, 1.15, 1],
+      filter: [
+        "drop-shadow(0 0 0 transparent)",
+        "drop-shadow(0 0 15px rgba(var(--primary), 0.8))",
+        "drop-shadow(0 0 0 transparent)",
+        "drop-shadow(0 0 20px rgba(var(--primary), 1))",
+        "drop-shadow(0 0 0 transparent)",
+      ],
+      transition: {
+        duration: 1.2,
         ease: "easeInOut" as const,
         times: [0, 0.25, 0.5, 0.75, 1],
       },
@@ -108,17 +172,27 @@ export function SidebarItem({
     },
   };
 
+  const containerVariants = needsAuth ? authItemVariants : {};
+
   return (
     <motion.div
-      className={cn("relative group min-h-10")}
-      variants={itemVariants}
-      initial="hidden"
-      animate={!hasLoaded ? "dance" : "visible"}
+      className={cn("relative group")}
+      variants={needsAuth ? containerVariants : audioWaveVariants}
+      initial={needsAuth ? "initial" : "hidden"}
+      animate={
+        needsAuth
+          ? showAuthAnimation
+            ? "flash"
+            : "animate"
+          : hasLoaded
+          ? "visible"
+          : "hidden"
+      }
       whileHover={{
         scale: 1.03,
         x: isOpen ? 8 : 2,
         transition: {
-          type: "spring",
+          type: "spring" as const,
           stiffness: 400,
           damping: 25,
           mass: 0.8,
@@ -136,7 +210,8 @@ export function SidebarItem({
           "transition-all duration-300 ease-out",
           "border border-transparent hover:border-primary/20",
           isActive &&
-            "bg-primary/20 border-primary/30 shadow-lg shadow-primary/10"
+            "bg-primary/20 border-primary/30 shadow-lg shadow-primary/10",
+          needsAuth && "border-dashed border-primary/40"
         )}
         style={{
           padding: "10px",
@@ -156,6 +231,23 @@ export function SidebarItem({
           }}
         />
 
+        {/* Special auth glow effect */}
+        {needsAuth && showAuthAnimation && (
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-lg"
+            initial={{ opacity: 0 }}
+            animate={{
+              opacity: [0, 0.6, 0, 0.8, 0],
+              scale: [1, 1.02, 1, 1.01, 1],
+            }}
+            transition={{
+              duration: 1.2,
+              ease: "easeInOut" as const,
+              times: [0, 0.25, 0.5, 0.75, 1],
+            }}
+          />
+        )}
+
         {/* Shimmer effect */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0"
@@ -163,12 +255,16 @@ export function SidebarItem({
           whileHover={{
             x: "100%",
             opacity: [0, 1, 0],
-            transition: { duration: 0.6, ease: "easeInOut" },
+            transition: { duration: 0.6, ease: "easeInOut" as const },
           }}
         />
 
         {/* Icon with enhanced animations */}
-        <motion.div variants={iconVariants} className="shrink-0 relative z-10">
+        <motion.div
+          variants={iconVariants}
+          className="shrink-0 relative z-10"
+          animate={needsAuth && showAuthAnimation ? "authFlash" : "idle"}
+        >
           {loading ? (
             <motion.div
               animate={{ rotate: 360 }}
@@ -186,13 +282,26 @@ export function SidebarItem({
           <AnimatePresence mode="wait">
             {isOpen && (
               <motion.span
-                className="truncate relative z-10 ml-3 font-medium"
+                className={cn(
+                  "truncate relative z-10 ml-3 font-medium",
+                  needsAuth && "text-primary/90"
+                )}
                 variants={labelVariants}
                 initial="hidden"
                 animate="visible"
                 exit="hidden"
               >
                 {label}
+                {needsAuth && (
+                  <motion.span
+                    className="ml-2 text-xs text-primary/60"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                  >
+                    🔐
+                  </motion.span>
+                )}
               </motion.span>
             )}
           </AnimatePresence>
@@ -204,7 +313,21 @@ export function SidebarItem({
             className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full"
             initial={{ scaleY: 0 }}
             animate={{ scaleY: 1 }}
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            transition={{
+              type: "spring" as const,
+              stiffness: 500,
+              damping: 30,
+            }}
+          />
+        )}
+
+        {/* Auth indicator line */}
+        {needsAuth && (
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
           />
         )}
       </motion.div>
@@ -231,7 +354,7 @@ export function SidebarItem({
               opacity: 1,
               filter: "blur(0px)",
               transition: {
-                type: "spring",
+                type: "spring" as const,
                 stiffness: 500,
                 damping: 30,
                 mass: 0.8,
@@ -256,7 +379,10 @@ export function SidebarItem({
                   <span>Loading...</span>
                 </div>
               ) : (
-                tooltip || label
+                <div className="flex items-center gap-2">
+                  <span>{tooltip || label}</span>
+                  {needsAuth && <span className="text-xs">🔐</span>}
+                </div>
               )}
             </motion.div>
 

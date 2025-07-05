@@ -34,4 +34,6 @@ export interface TriggerButtonProps {
   isOpen: boolean;
   onClick: () => void;
   controls: any;
+  isMobile?: boolean;
+  hasBeenClicked?: boolean;
 }

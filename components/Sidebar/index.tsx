@@ -11,7 +11,18 @@ import { TriggerButton } from "./TriggerButton";
 const Content = () => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(isMobile ? false : true);
+  const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const triggerControls = useAnimation();
+
+  // Check localStorage for previous mobile menu interaction
+  useEffect(() => {
+    if (isMobile && typeof window !== "undefined") {
+      const mobileMenuClicked = localStorage.getItem("mobile-menu-clicked");
+      if (mobileMenuClicked === "true") {
+        setHasBeenClicked(true);
+      }
+    }
+  }, [isMobile]);
 
   // Update CSS custom property for content pushing
   useEffect(() => {
@@ -41,10 +52,28 @@ const Content = () => {
 
   const toggle = () => {
     setIsOpen(!isOpen);
+    // Mark as clicked on first mobile interaction and save to localStorage
+    if (isMobile && !hasBeenClicked) {
+      setHasBeenClicked(true);
+      if (typeof window !== "undefined") {
+        localStorage.setItem("mobile-menu-clicked", "true");
+      }
+    }
   };
 
   return (
     <>
+      {/* Mobile toggle button - positioned outside sidebar container */}
+      {isMobile && (
+        <TriggerButton
+          isOpen={isOpen}
+          onClick={toggle}
+          controls={triggerControls}
+          isMobile={isMobile}
+          hasBeenClicked={hasBeenClicked}
+        />
+      )}
+
       <motion.div
         className={cn(
           "mt-16 bg-background border-r flex flex-col relative transition-all duration-300 ease-in-out",
@@ -71,11 +100,15 @@ const Content = () => {
           transition={{ duration: 0.5 }}
         />
 
-        <TriggerButton
-          isOpen={isOpen}
-          onClick={toggle}
-          controls={triggerControls}
-        />
+        {/* Desktop toggle button - stays in sidebar */}
+        {!isMobile && (
+          <TriggerButton
+            isOpen={isOpen}
+            onClick={toggle}
+            controls={triggerControls}
+            isMobile={isMobile}
+          />
+        )}
 
         <SidebarContent isOpen={isOpen} isMobile={isMobile} />
       </motion.div>
