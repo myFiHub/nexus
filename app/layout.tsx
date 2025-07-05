@@ -5,6 +5,7 @@ import LoadingIndicator from "app/app/loading-indicator";
 import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Sidebar } from "../components/Sidebar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -123,7 +124,8 @@ export default async function RootLayout({
         <LoadingIndicator />
         <GlobalContainer />
         <Header theme={theme as "light" | "dark"} />
-        <main className="max-w-7xl mx-auto  pt-24">{children}</main>
+        <Sidebar />
+        <main className="pt-24">{children}</main>
       </body>
     </html>
   );
