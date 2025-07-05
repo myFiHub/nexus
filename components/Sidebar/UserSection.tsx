@@ -5,7 +5,7 @@ import { Crown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { Img } from "../Img";
-import { Separator } from "./Separator";
+import { Separator } from "./separator";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarSectionProps } from "./types";
 

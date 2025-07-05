@@ -11,7 +11,7 @@ import { useDispatch } from "react-redux";
 import { logoutDialog, searchDialog } from "../Dialog";
 import { NavigationSection } from "./NavigationSection";
 import { QuickActionsSection } from "./QuickActionsSection";
-import { Separator } from "./Separator";
+import { Separator } from "./separator";
 import { UserSection } from "./UserSection";
 import { SidebarItemProps, SidebarProps } from "./types";
 
