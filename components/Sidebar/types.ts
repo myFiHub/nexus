@@ -13,7 +13,8 @@ export interface SidebarSectionProps {
 
 export interface SidebarItemData {
   onClick: () => void;
-  icon: LucideIcon;
+  icon?: LucideIcon;
+  imageSrc?: string;
   label: string;
   tooltip?: string;
   index: number;

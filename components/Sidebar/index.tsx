@@ -76,7 +76,7 @@ const Content = () => {
 
       <motion.div
         className={cn(
-          "mt-16 bg-background border-r flex flex-col relative transition-all duration-300 ease-in-out",
+          "pt-16 bg-background border-r flex flex-col relative transition-all duration-300 ease-in-out",
           isMobile
             ? cn(
                 "fixed inset-y-0 left-0 z-50 w-[260px]",

@@ -1,13 +1,14 @@
+import { globalActions } from "app/containers/global/slice";
 import {
   HomeIcon,
   LogOutIcon,
-  MapIcon,
   PlusIcon,
   SearchIcon,
   UserIcon,
 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
-import { searchDialog } from "../Dialog";
+import { useDispatch } from "react-redux";
+import { logoutDialog, searchDialog } from "../Dialog";
 import { NavigationSection } from "./NavigationSection";
 import { QuickActionsSection } from "./QuickActionsSection";
 import { Separator } from "./Separator";
@@ -15,12 +16,14 @@ import { UserSection } from "./UserSection";
 import { SidebarItemProps, SidebarProps } from "./types";
 
 export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
+  const dispatch = useDispatch();
   const router = useRouter();
   const currentPath = usePathname();
   const isHome = currentPath === "/";
   const isMyOutposts = currentPath === "/my_outposts";
   const isProfile = currentPath === "/profile";
   const isCreateOutpost = currentPath === "/create_outpost";
+  const isAllOutposts = currentPath === "/all_outposts";
 
   const navigationItems: SidebarItemProps[] = [
     {
@@ -36,8 +39,19 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
     },
     {
       index: 1,
+      label: "All Outposts",
+      imageSrc: "/outpost.png",
+      onClick: () => {
+        router.push("/all_outposts");
+      },
+      isOpen: isOpen,
+      isMobile: isMobile,
+      isActive: isAllOutposts,
+    },
+    {
+      index: 2,
       label: "My Outposts",
-      icon: MapIcon,
+      imageSrc: "/flag.png",
       onClick: () => {
         router.push("/my_outposts");
       },
@@ -47,7 +61,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isMyOutposts,
     },
     {
-      index: 2,
+      index: 3,
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
@@ -58,7 +72,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isCreateOutpost,
     },
     {
-      index: 3,
+      index: 4,
       label: "Profile",
       icon: UserIcon,
       onClick: () => {
@@ -91,8 +105,11 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       index: 0,
       label: "Logout",
       icon: LogOutIcon,
-      onClick: () => {
-        router.push("/logout");
+      onClick: async () => {
+        const confirmed = await logoutDialog();
+        if (confirmed) {
+          dispatch(globalActions.logout());
+        }
       },
       isOpen: isOpen,
       isMobile: isMobile,

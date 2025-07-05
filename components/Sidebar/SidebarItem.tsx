@@ -1,9 +1,12 @@
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 import { SidebarItemProps } from "./types";
+import { Img } from "../Img";
 
 export function SidebarItem({
   onClick,
@@ -17,9 +20,14 @@ export function SidebarItem({
   needsAuth,
   index,
   isDanger,
+  imageSrc,
 }: SidebarItemProps) {
+  const loggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
   const [hasAudioWavePlayed, setHasAudioWavePlayed] = useState(false); // Default to false to allow animation
   const [showAuthAnimation, setShowAuthAnimation] = useState(false);
+  const [flashedOnce, setFlashedOnce] = useState(false);
+  const [loginFlashCount, setLoginFlashCount] = useState(0);
+
   useEffect(() => {
     // Check if audio wave animation has already played
     if (typeof window !== "undefined") {
@@ -50,6 +58,38 @@ export function SidebarItem({
       setShowAuthAnimation(true);
     }
   }, [needsAuth, index, hasAudioWavePlayed]);
+
+  // Handle login flash animation
+  useEffect(() => {
+    if (needsAuth && loggedIn && typeof window !== "undefined") {
+      if (!flashedOnce) {
+        // Reset and start double flash
+        setLoginFlashCount(0);
+        setShowAuthAnimation(false);
+
+        // First flash
+        const firstFlashTimer = setTimeout(() => {
+          setShowAuthAnimation(true);
+          setLoginFlashCount(1);
+        }, 100);
+
+        // Reset between flashes
+
+        // Final reset and mark as completed
+        const finalResetTimer = setTimeout(() => {
+          setShowAuthAnimation(false);
+          setLoginFlashCount(0);
+          setFlashedOnce(true);
+        }, 2700);
+
+        return () => {
+          clearTimeout(firstFlashTimer);
+
+          clearTimeout(finalResetTimer);
+        };
+      }
+    }
+  }, [needsAuth, loggedIn, index]);
 
   // Audio wave slide-in effect with staggered timing
   const audioWaveVariants = {
@@ -251,7 +291,6 @@ export function SidebarItem({
           "border border-transparent hover:border-primary/20",
           isActive &&
             "bg-primary/20 border-primary/30 shadow-lg shadow-primary/10",
-          needsAuth && "border-dashed border-primary/40",
           isDanger && "border-dashed border-red-500"
         )}
         style={{
@@ -321,8 +360,16 @@ export function SidebarItem({
             >
               <Loader2 className="h-5 w-5" />
             </motion.div>
-          ) : (
+          ) : Icon ? (
             <Icon className={cn("h-5 w-5", isDanger && "text-red-500")} />
+          ) : (
+            <Img
+              src={imageSrc}
+              alt={label}
+              width={20}
+              height={20}
+              className="h-5 w-5"
+            />
           )}
         </motion.div>
 
@@ -333,7 +380,6 @@ export function SidebarItem({
               <motion.span
                 className={cn(
                   "truncate relative z-10 ml-3 font-medium",
-                  needsAuth && "text-primary/90",
                   isDanger && "text-red-500"
                 )}
                 variants={labelVariants}
@@ -358,19 +404,6 @@ export function SidebarItem({
               stiffness: 500,
               damping: 30,
             }}
-          />
-        )}
-
-        {/* Auth indicator line */}
-        {needsAuth && (
-          <motion.div
-            className={cn(
-              "absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent",
-              isDanger && "bg-gradient-to-r from-red-500/60 to-transparent"
-            )}
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
           />
         )}
       </motion.div>
