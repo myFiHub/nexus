@@ -17,7 +17,6 @@ import { SidebarItemProps, SidebarProps } from "./types";
 export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
   const router = useRouter();
   const currentPath = usePathname();
-  console.log(currentPath);
   const isHome = currentPath === "/";
   const isMyOutposts = currentPath === "/my_outposts";
   const isProfile = currentPath === "/profile";
@@ -97,6 +96,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       },
       isOpen: isOpen,
       isMobile: isMobile,
+      isDanger: true,
     },
   ];
 

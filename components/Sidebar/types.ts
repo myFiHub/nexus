@@ -22,6 +22,7 @@ export interface SidebarItemData {
   isMobile: boolean;
   loading?: boolean;
   isActive?: boolean;
+  isDanger?: boolean;
 }
 
 export interface SidebarItemProps extends SidebarItemData {}

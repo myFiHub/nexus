@@ -109,6 +109,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
           index={9}
           isOpen={isOpen}
           isMobile={isMobile}
+          isDanger={true}
         />
       </motion.div>
     </>

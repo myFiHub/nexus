@@ -2,6 +2,7 @@ import { cn } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 import { SidebarItemProps } from "./types";
 
 export function SidebarItem({
@@ -15,25 +16,40 @@ export function SidebarItem({
   isActive,
   needsAuth,
   index,
+  isDanger,
 }: SidebarItemProps) {
-  const [hasLoaded, setHasLoaded] = useState(false);
+  const [hasAudioWavePlayed, setHasAudioWavePlayed] = useState(false); // Default to false to allow animation
   const [showAuthAnimation, setShowAuthAnimation] = useState(false);
+  useEffect(() => {
+    // Check if audio wave animation has already played
+    if (typeof window !== "undefined") {
+      const audioWavePlayed = localStorage.getItem("sidebar-audio-wave-played");
+      if (audioWavePlayed === "true") {
+        // Animation has already played, skip it
+        setHasAudioWavePlayed(true);
+      } else {
+        // Animation hasn't played yet, let it play and then mark as played
+        const timer = setTimeout(() => {
+          setHasAudioWavePlayed(true);
+          localStorage.setItem("sidebar-audio-wave-played", "true");
+        }, 1000 + index * 50); // Allow time for animation to complete
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [index]);
 
   useEffect(() => {
-    // Initial load timing for audio wave effect
-    const timer = setTimeout(() => {
-      setHasLoaded(true);
-
-      // Trigger auth animation after wave effect completes
-      if (needsAuth) {
-        const authTimer = setTimeout(() => {
-          setShowAuthAnimation(true);
-        }, 500 + index * 50); // Delay after wave animation
-        return () => clearTimeout(authTimer);
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [needsAuth, index]);
+    // Trigger auth animation after wave effect completes (if needed)
+    if (needsAuth && !hasAudioWavePlayed) {
+      const authTimer = setTimeout(() => {
+        setShowAuthAnimation(true);
+      }, 1200 + index * 50); // Delay after wave animation
+      return () => clearTimeout(authTimer);
+    } else if (needsAuth && hasAudioWavePlayed) {
+      // If wave already played, show auth animation immediately
+      setShowAuthAnimation(true);
+    }
+  }, [needsAuth, index, hasAudioWavePlayed]);
 
   // Audio wave slide-in effect with staggered timing
   const audioWaveVariants = {
@@ -55,6 +71,12 @@ export function SidebarItem({
         mass: 0.8,
         delay: index * 0.05, // Staggered wave effect
       },
+    },
+    static: {
+      opacity: 1,
+      x: 0,
+      scale: 1,
+      filter: "blur(0px)",
     },
   };
 
@@ -101,6 +123,11 @@ export function SidebarItem({
         ease: "easeInOut" as const,
         times: [0, 0.25, 0.5, 0.75, 1],
       },
+    },
+    static: {
+      height: "auto",
+      opacity: 1,
+      overflow: "visible",
     },
   };
 
@@ -172,22 +199,35 @@ export function SidebarItem({
     },
   };
 
-  const containerVariants = needsAuth ? authItemVariants : {};
+  // Determine animation state based on whether audio wave has played
+  const getAnimationState = () => {
+    if (needsAuth) {
+      if (hasAudioWavePlayed) {
+        return showAuthAnimation && !isDanger ? "flash" : "static";
+      } else {
+        return showAuthAnimation && !isDanger ? "flash" : "animate";
+      }
+    } else {
+      return hasAudioWavePlayed ? "static" : "visible";
+    }
+  };
 
-  return (
+  const getInitialState = () => {
+    if (needsAuth) {
+      return hasAudioWavePlayed ? "static" : "initial";
+    } else {
+      return hasAudioWavePlayed ? "static" : "hidden";
+    }
+  };
+
+  const containerVariants = needsAuth ? authItemVariants : audioWaveVariants;
+
+  const sidebarItem = (
     <motion.div
       className={cn("relative group")}
-      variants={needsAuth ? containerVariants : audioWaveVariants}
-      initial={needsAuth ? "initial" : "hidden"}
-      animate={
-        needsAuth
-          ? showAuthAnimation
-            ? "flash"
-            : "animate"
-          : hasLoaded
-          ? "visible"
-          : "hidden"
-      }
+      variants={containerVariants}
+      initial={getInitialState()}
+      animate={getAnimationState()}
       whileHover={{
         scale: 1.03,
         x: isOpen ? 8 : 2,
@@ -211,7 +251,8 @@ export function SidebarItem({
           "border border-transparent hover:border-primary/20",
           isActive &&
             "bg-primary/20 border-primary/30 shadow-lg shadow-primary/10",
-          needsAuth && "border-dashed border-primary/40"
+          needsAuth && "border-dashed border-primary/40",
+          isDanger && "border-dashed border-red-500"
         )}
         style={{
           padding: "10px",
@@ -232,9 +273,13 @@ export function SidebarItem({
         />
 
         {/* Special auth glow effect */}
-        {needsAuth && showAuthAnimation && (
+        {needsAuth && showAuthAnimation && !isDanger && (
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-lg"
+            className={cn(
+              "absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20 rounded-lg",
+              isDanger &&
+                "bg-gradient-to-r from-red-500/20 via-red-500/30 to-red-500/20"
+            )}
             initial={{ opacity: 0 }}
             animate={{
               opacity: [0, 0.6, 0, 0.8, 0],
@@ -250,7 +295,9 @@ export function SidebarItem({
 
         {/* Shimmer effect */}
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0"
+          className={cn(
+            "absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0"
+          )}
           initial={{ x: "-100%" }}
           whileHover={{
             x: "100%",
@@ -262,8 +309,10 @@ export function SidebarItem({
         {/* Icon with enhanced animations */}
         <motion.div
           variants={iconVariants}
-          className="shrink-0 relative z-10"
-          animate={needsAuth && showAuthAnimation ? "authFlash" : "idle"}
+          className={cn("shrink-0 relative z-10", isDanger && "text-red-500")}
+          animate={
+            needsAuth && showAuthAnimation && !isDanger ? "authFlash" : "idle"
+          }
         >
           {loading ? (
             <motion.div
@@ -273,7 +322,7 @@ export function SidebarItem({
               <Loader2 className="h-5 w-5" />
             </motion.div>
           ) : (
-            <Icon className="h-5 w-5" />
+            <Icon className={cn("h-5 w-5", isDanger && "text-red-500")} />
           )}
         </motion.div>
 
@@ -284,7 +333,8 @@ export function SidebarItem({
               <motion.span
                 className={cn(
                   "truncate relative z-10 ml-3 font-medium",
-                  needsAuth && "text-primary/90"
+                  needsAuth && "text-primary/90",
+                  isDanger && "text-red-500"
                 )}
                 variants={labelVariants}
                 initial="hidden"
@@ -292,16 +342,6 @@ export function SidebarItem({
                 exit="hidden"
               >
                 {label}
-                {needsAuth && (
-                  <motion.span
-                    className="ml-2 text-xs text-primary/60"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    🔐
-                  </motion.span>
-                )}
               </motion.span>
             )}
           </AnimatePresence>
@@ -324,80 +364,32 @@ export function SidebarItem({
         {/* Auth indicator line */}
         {needsAuth && (
           <motion.div
-            className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent"
+            className={cn(
+              "absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/60 to-transparent",
+              isDanger && "bg-gradient-to-r from-red-500/60 to-transparent"
+            )}
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           />
         )}
       </motion.div>
-
-      {/* Enhanced tooltip */}
-      <AnimatePresence>
-        {!isOpen && !isMobile && (
-          <motion.div
-            className={cn(
-              "absolute left-full ml-4 top-1/2 -translate-y-1/2",
-              "bg-black/90 backdrop-blur-sm text-white text-sm px-4 py-3 rounded-xl shadow-2xl",
-              "opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap",
-              "border border-white/10"
-            )}
-            initial={{
-              scale: 0.8,
-              x: -20,
-              opacity: 0,
-              filter: "blur(4px)",
-            }}
-            animate={{
-              scale: 1,
-              x: 0,
-              opacity: 1,
-              filter: "blur(0px)",
-              transition: {
-                type: "spring" as const,
-                stiffness: 500,
-                damping: 30,
-                mass: 0.8,
-              },
-            }}
-            exit={{
-              scale: 0.8,
-              x: -20,
-              opacity: 0,
-              filter: "blur(4px)",
-              transition: { duration: 0.2 },
-            }}
-          >
-            <motion.div
-              initial={{ opacity: 0, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
-              {loading ? (
-                <div className="flex items-center gap-2">
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  <span>Loading...</span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <span>{tooltip || label}</span>
-                  {needsAuth && <span className="text-xs">🔐</span>}
-                </div>
-              )}
-            </motion.div>
-
-            {/* Tooltip arrow */}
-            <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black/90" />
-
-            {/* Tooltip glow */}
-            <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-xl opacity-0"
-              whileHover={{ opacity: 1 }}
-              transition={{ duration: 0.3 }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
     </motion.div>
   );
+
+  // Wrap with tooltip only when sidebar is closed and not on mobile
+  if (!isOpen && !isMobile) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{sidebarItem}</TooltipTrigger>
+        <TooltipContent side="right" sideOffset={8}>
+          <div className="flex items-center gap-2 text-white">
+            <span>{tooltip || label}</span>
+          </div>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return sidebarItem;
 }

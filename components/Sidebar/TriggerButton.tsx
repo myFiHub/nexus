@@ -13,19 +13,15 @@ export function TriggerButton({
   // Only show animations on mobile if button hasn't been clicked yet
   const shouldAnimateOnMobile = isMobile && !hasBeenClicked && !isOpen;
 
-  // Mobile floating button variants
-  const mobileFloatingVariants = {
-    hidden: {
+  // Static mobile button variants (no animations)
+  const staticMobileVariants = {
+    idle: {
       scale: 1,
-      boxShadow: "0 8px 32px rgba(var(--primary), 0.3)",
-    },
-    visible: {
-      scale: 0.9,
       boxShadow: "0 4px 16px rgba(var(--primary), 0.2)",
     },
   };
 
-  // Enhanced mobile pulse animation when hidden
+  // Enhanced mobile pulse animation when should animate
   const mobilePulseVariants = {
     idle: {
       scale: 1,
@@ -82,61 +78,69 @@ export function TriggerButton({
             "hover:bg-primary hover:text-primary-foreground transition-all duration-300",
             "flex items-center justify-center group backdrop-blur-sm",
             "hover:scale-110 active:scale-95",
+            // Only add bounce animation if should animate
             shouldAnimateOnMobile && "animate-bounce"
           )}
           style={{
             background: isOpen
               ? "hsl(var(--background))"
-              : "linear-gradient(135deg, hsl(var(--background)), hsl(var(--primary) / 0.1))",
+              : shouldAnimateOnMobile
+              ? "linear-gradient(135deg, hsl(var(--background)), hsl(var(--primary) / 0.1))"
+              : "hsl(var(--background))",
           }}
           variants={
-            shouldAnimateOnMobile ? mobilePulseVariants : mobileFloatingVariants
+            shouldAnimateOnMobile ? mobilePulseVariants : staticMobileVariants
           }
           initial="idle"
           animate={{
             ...(shouldAnimateOnMobile
               ? mobilePulseVariants.pulse
-              : mobileFloatingVariants.visible),
+              : staticMobileVariants.idle),
             left: isOpen ? "244px" : "16px", // 244px = 260px sidebar width - 16px button margin
           }}
           whileTap={{ scale: 0.9 }}
-          whileHover={{ scale: 1.1 }}
+          whileHover={{ scale: shouldAnimateOnMobile ? 1.1 : 1.05 }} // Reduce hover scale when not animating
           transition={{
             left: { duration: 0.3, ease: "easeInOut" },
+            scale: { duration: 0.2 },
             ...(shouldAnimateOnMobile
               ? mobilePulseVariants.pulse.transition
               : {}),
           }}
         >
           {/* Animated background glow - only when should animate */}
-          <motion.div
-            className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{
-              opacity: shouldAnimateOnMobile ? [0.3, 0.7, 0.3] : 0,
-              scale: shouldAnimateOnMobile ? [0.8, 1.2, 0.8] : 0.8,
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          {shouldAnimateOnMobile && (
+            <motion.div
+              className="absolute inset-0 rounded-full bg-gradient-to-r from-primary/20 via-primary/30 to-primary/20"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{
+                opacity: [0.3, 0.7, 0.3],
+                scale: [0.8, 1.2, 0.8],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          )}
 
           {/* Ripple effect - only when should animate */}
-          <motion.div
-            className="absolute inset-0 rounded-full border-2 border-primary/50"
-            initial={{ scale: 0, opacity: 1 }}
-            animate={{
-              scale: shouldAnimateOnMobile ? [1, 1.5, 1] : 1,
-              opacity: shouldAnimateOnMobile ? [0.5, 0, 0.5] : 0,
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
+          {shouldAnimateOnMobile && (
+            <motion.div
+              className="absolute inset-0 rounded-full border-2 border-primary/50"
+              initial={{ scale: 0, opacity: 1 }}
+              animate={{
+                scale: [1, 1.5, 1],
+                opacity: [0.5, 0, 0.5],
+              }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+            />
+          )}
 
           {/* Icon container */}
           <motion.div
