@@ -11,16 +11,7 @@ import { AppLink } from "../AppLink";
 import { Button } from "../Button";
 import { Img } from "../Img";
 import { LoginButton } from "./LoginButton";
-import { NavLink } from "./NavLink";
 import { ThemeToggle } from "./themeToggle";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  // { href: "/dashboard", label: "Dashboard" },
-  { href: "/profile", label: "Profile" },
-  { href: "/my_outposts", label: "My Outposts" },
-  // { href: "/settings", label: "Settings" },
-];
 
 const Content = ({ theme }: { theme: "light" | "dark" }) => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -76,14 +67,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
             </AppLink>
           </div>
           {/* Desktop nav */}
-          <nav className="hidden md:flex gap-8 items-center">
-            {isLoggedIn &&
-              navLinks.map((link) => (
-                <NavLink key={link.href} href={link.href}>
-                  {link.label}
-                </NavLink>
-              ))}
-          </nav>
+
           <div className="flex items-center gap-1">
             <ThemeToggle initialValue={theme} />
 
@@ -147,17 +131,6 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
                 <Search className="w-5 h-5" />
                 Search
               </button>
-              {isLoggedIn &&
-                navLinks.map((link) => (
-                  <NavLink
-                    key={link.href}
-                    href={link.href}
-                    className="block py-2"
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </NavLink>
-                ))}
             </nav>
           </div>
         </div>

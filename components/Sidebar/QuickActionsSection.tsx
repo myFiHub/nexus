@@ -1,10 +1,16 @@
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { motion } from "framer-motion";
-import { BellIcon, PlusIcon, SearchIcon, SettingsIcon } from "lucide-react";
+import { useSelector } from "react-redux";
 import { SectionHeader } from "./SectionHeader";
 import { SidebarItem } from "./SidebarItem";
-import { SidebarProps } from "./types";
+import { SidebarSectionProps } from "./types";
 
-export function QuickActionsSection({ isOpen, isMobile }: SidebarProps) {
+export function QuickActionsSection({
+  isOpen,
+  isMobile,
+  items,
+}: SidebarSectionProps) {
+  const loggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
   return (
     <motion.div
       className="space-y-1"
@@ -19,38 +25,12 @@ export function QuickActionsSection({ isOpen, isMobile }: SidebarProps) {
       />
 
       <div className="space-y-1">
-        <SidebarItem
-          href="/search"
-          icon={SearchIcon}
-          label="Search"
-          index={5}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/notifications"
-          icon={BellIcon}
-          label="Notifications"
-          index={6}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/create_outpost"
-          icon={PlusIcon}
-          label="Create Outpost"
-          index={7}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/settings"
-          icon={SettingsIcon}
-          label="Settings"
-          index={8}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
+        {items.map((item) => {
+          if (item.needsAuth && !loggedIn) {
+            return null;
+          }
+          return <SidebarItem key={item.index} {...item} />;
+        })}
       </div>
     </motion.div>
   );

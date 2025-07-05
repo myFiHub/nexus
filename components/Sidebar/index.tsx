@@ -2,12 +2,13 @@
 
 import { useIsMobile } from "app/hooks/use-mobile";
 import { cn } from "app/lib/utils";
+import { ReduxProvider } from "app/store/Provider";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect, useState } from "react";
 import { SidebarContent } from "./SidebarContent";
 import { TriggerButton } from "./TriggerButton";
 
-export function SimpleSidebar() {
+const Content = () => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(isMobile ? false : true);
   const triggerControls = useAnimation();
@@ -80,4 +81,12 @@ export function SimpleSidebar() {
       </motion.div>
     </>
   );
-}
+};
+
+export const Sidebar = () => {
+  return (
+    <ReduxProvider>
+      <Content />
+    </ReduxProvider>
+  );
+};

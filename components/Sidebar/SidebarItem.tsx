@@ -1,18 +1,21 @@
+import { cn } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { SidebarItemProps } from "./types";
 
 export function SidebarItem({
-  href,
+  onClick,
   icon: Icon,
   label,
   tooltip,
-  index,
   isOpen,
   isMobile,
+  loading,
+  isActive,
 }: SidebarItemProps) {
   return (
     <motion.div
-      className="relative group min-h-10"
+      className={cn("relative group min-h-10")}
       whileHover={{
         scale: 1.02,
         x: isOpen ? 5 : 0,
@@ -20,15 +23,20 @@ export function SidebarItem({
       }}
       whileTap={{ scale: 0.98 }}
     >
-      <motion.a
-        href={href}
-        className="flex items-center rounded hover:bg-accent relative overflow-hidden"
+      <motion.div
+        onClick={onClick}
+        className={cn(
+          "flex items-center rounded hover:bg-accent relative overflow-hidden cursor-pointer",
+          isActive && "bg-primary/20"
+        )}
         style={{
           padding: "8px",
         }}
       >
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0"
+          className={cn(
+            "absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent opacity-0"
+          )}
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         />
@@ -40,9 +48,8 @@ export function SidebarItem({
         >
           <Icon className="h-5 w-5" />
         </motion.div>
-
-        <AnimatePresence>
-          {(isOpen || isMobile) && (
+        <div className="w-content max-h-6 overflow-hidden">
+          <AnimatePresence>
             <motion.span
               className="truncate relative z-10 ml-3"
               initial={{ opacity: 0, width: 0 }}
@@ -55,10 +62,9 @@ export function SidebarItem({
             >
               {label}
             </motion.span>
-          )}
-        </AnimatePresence>
-      </motion.a>
-
+          </AnimatePresence>
+        </div>
+      </motion.div>
       <AnimatePresence>
         {!isOpen && !isMobile && (
           <motion.div
@@ -67,7 +73,7 @@ export function SidebarItem({
             animate={{ scale: 1, x: 0 }}
             exit={{ scale: 0.8, x: -10 }}
           >
-            {tooltip || label}
+            {loading ? <Loader2 /> : tooltip || label}
             <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black" />
           </motion.div>
         )}

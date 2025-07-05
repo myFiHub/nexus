@@ -5,15 +5,26 @@ export interface SidebarProps {
   isMobile: boolean;
 }
 
+export interface SidebarSectionProps {
+  isOpen: boolean;
+  isMobile: boolean;
+  items: SidebarItemProps[];
+}
+
 export interface SidebarItemData {
-  href: string;
+  onClick: () => void;
   icon: LucideIcon;
   label: string;
   tooltip?: string;
   index: number;
+  needsAuth?: boolean;
+  isOpen: boolean;
+  isMobile: boolean;
+  loading?: boolean;
+  isActive?: boolean;
 }
 
-export interface SidebarItemProps extends SidebarItemData, SidebarProps {}
+export interface SidebarItemProps extends SidebarItemData {}
 
 export interface SectionHeaderProps extends SidebarProps {
   title: string;

@@ -1,10 +1,18 @@
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { motion } from "framer-motion";
-import { HomeIcon, MapIcon, PlusIcon, UserIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import { SectionHeader } from "./SectionHeader";
 import { SidebarItem } from "./SidebarItem";
-import { SidebarProps } from "./types";
+import { SidebarSectionProps } from "./types";
 
-export function NavigationSection({ isOpen, isMobile }: SidebarProps) {
+export function NavigationSection({
+  isOpen,
+  isMobile,
+  items,
+}: SidebarSectionProps) {
+  const router = useRouter();
+  const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   return (
     <motion.div
       className="space-y-1"
@@ -15,38 +23,12 @@ export function NavigationSection({ isOpen, isMobile }: SidebarProps) {
       <SectionHeader title="Navigation" isOpen={isOpen} isMobile={isMobile} />
 
       <div className="space-y-1">
-        <SidebarItem
-          href="/"
-          icon={HomeIcon}
-          label="Home"
-          index={0}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/my_outposts"
-          icon={MapIcon}
-          label="My Outposts"
-          index={2}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/create_outpost"
-          icon={PlusIcon}
-          label="Create Outpost"
-          index={3}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
-        <SidebarItem
-          href="/profile"
-          icon={UserIcon}
-          label="Profile"
-          index={4}
-          isOpen={isOpen}
-          isMobile={isMobile}
-        />
+        {items.map((item) => {
+          if (item.needsAuth && !loggedIn) {
+            return null;
+          }
+          return <SidebarItem key={item.index} {...item} />;
+        })}
       </div>
     </motion.div>
   );
