@@ -17,6 +17,7 @@ export const onGoingOutpostDomains = {
   meetApiObj: (state: RootState) => state.onGoingOutpost.meetApiObj,
   joined: (state: RootState) => state.onGoingOutpost.joined,
   raisedHandUsers: (state: RootState) => state.onGoingOutpost.raisedHandUsers,
+  isRecording: (state: RootState) => state.onGoingOutpost.isRecording,
 };
 
 export const onGoingOutpostSelectors = {
@@ -97,4 +98,5 @@ export const onGoingOutpostSelectors = {
         return raisedHandUsers[address] !== undefined;
       }
     ),
+  isRecording: onGoingOutpostDomains.isRecording,
 };

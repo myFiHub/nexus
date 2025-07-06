@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
+import { RecordingIndicator } from "./components/header/RecordingIndicator";
 import { LoginState } from "./components/LoginState";
 import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
@@ -39,6 +40,7 @@ const OngoingOutpostContent = ({
       <CheerBooAmountDialogProvider />
       <OutpostHeader />
       <Meet />
+      <RecordingIndicator />
     </motion.div>
   );
 };
@@ -82,7 +84,7 @@ const Content = () => {
     );
   }
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container !max-w-full px-4 py-8">
       <OngoingOutpostContent myUser={myUser} loading={loading} />
     </div>
   );

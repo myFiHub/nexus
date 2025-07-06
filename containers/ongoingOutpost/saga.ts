@@ -19,7 +19,7 @@ import {
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
-import { easyAccess, EasyAccess } from "../global/effects/quickAccess";
+import { easyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -368,6 +368,25 @@ function* incomingUserReaction(
   confettiEventBus.next({ address, type: reaction });
 }
 
+function* setIsRecording(
+  action: ReturnType<typeof onGoingOutpostActions.setIsRecording>
+) {
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to start recording");
+    return;
+  }
+  const isRecording = action.payload;
+  wsClient.send({
+    message_type: isRecording
+      ? OutgoingMessageType.START_RECORDING
+      : OutgoingMessageType.STOP_RECORDING,
+    outpost_uuid: outpost.uuid,
+  });
+}
+
 export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.getOutpost, getOutpost);
   yield takeLatest(onGoingOutpostActions.leaveOutpost, leaveOutpost);
@@ -378,6 +397,7 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
   yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield takeLatest(onGoingOutpostActions.setIsRecording, setIsRecording);
   yield takeLatest(
     onGoingOutpostActions.incomingUserReaction,
     incomingUserReaction

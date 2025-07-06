@@ -8,6 +8,7 @@ import { onGoingOutpostSaga } from "./saga";
 export interface OnGoingOutpostState {
   outpost?: OutpostModel;
   accesses?: OutpostAccesses;
+  isRecording: boolean;
   isGettingOutpost: boolean;
   isGettingLiveMembers: boolean;
   isCheeringAddress?: string;
@@ -25,6 +26,7 @@ export interface OnGoingOutpostState {
 }
 
 export const initialState: OnGoingOutpostState = {
+  isRecording: false,
   isGettingOutpost: false,
   isGettingLiveMembers: false,
   accesses: { canEnter: false, canSpeak: false },
@@ -73,6 +75,9 @@ const onGoingOutpostSlice = createSlice({
     stopSpeaking() {},
     startRecording() {},
     getLiveMembers() {},
+    setIsRecording(state, action: PayloadAction<boolean>) {
+      state.isRecording = action.payload;
+    },
 
     isGettingLiveMembers(state, action: PayloadAction<boolean>) {
       state.isGettingLiveMembers = action.payload;
