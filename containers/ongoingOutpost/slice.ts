@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { toast } from "app/lib/toast";
 import { LiveMember, OutpostModel } from "app/services/api/types";
 import { IncomingReactionType } from "app/services/wsClient/messageRouter";
 import { injectContainer } from "app/store";
@@ -78,6 +79,11 @@ const onGoingOutpostSlice = createSlice({
     statrtStopRecording(state, action: PayloadAction<boolean>) {},
     setIsRecording(state, action: PayloadAction<boolean>) {
       state.isRecording = action.payload;
+      if (action.payload) {
+        toast.warning("Creator started recording the outpost");
+      } else {
+        toast.success("Creator stopped recording the outpost");
+      }
     },
 
     isGettingLiveMembers(state, action: PayloadAction<boolean>) {

@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
+import { LoginButton } from "../header/LoginButton";
 import { Img } from "../Img";
 import { Separator } from "./separator";
 import { SidebarItem } from "./SidebarItem";
@@ -16,7 +17,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
   const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
 
   if (!loggedIn) {
-    return null;
+    return <LoginButton className="w-full h-12" fancy />;
   }
   const openMyProfile = () => {
     router.push("/profile");
