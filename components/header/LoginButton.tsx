@@ -29,6 +29,7 @@ export const LoginButton = ({ size, className, fancy }: LoginButtonProps) => {
 const Content = ({ size, className, fancy }: LoginButtonProps) => {
   const dispatch = useDispatch();
   const [isMounted, setIsMounted] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
   const initializingWeb3Auth = useSelector(
@@ -73,9 +74,11 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
       className={cn(
         className,
         minWidth,
-        fancy && !loading && "relative overflow-hidden"
+        !loading && "relative overflow-hidden"
       )}
       onClick={isLoggedIn ? disconnect : connect}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {fancy && !loading && (
         <>
@@ -94,7 +97,45 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
               ease: "linear",
             }}
           />
+
+          {/* Hover shine effect */}
+          <motion.div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.4) 50%, transparent 75%)",
+              borderRadius: "inherit",
+            }}
+            initial={{ x: "-100%" }}
+            animate={isHovered ? { x: "100%" } : { x: "-100%" }}
+            transition={{
+              duration: 0.6,
+              ease: "easeInOut",
+            }}
+          />
         </>
+      )}
+
+      {/* Non-fancy button hover shine effect */}
+      {!fancy && !loading && (
+        <motion.div
+          className="absolute inset-0 pointer-events-none overflow-hidden"
+          style={{ borderRadius: "inherit" }}
+        >
+          <motion.div
+            className="absolute inset-0"
+            style={{
+              background:
+                "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.2) 50%, transparent 75%)",
+            }}
+            initial={{ x: "-100%" }}
+            animate={isHovered ? { x: "100%" } : { x: "-100%" }}
+            transition={{
+              duration: 0.6,
+              ease: "easeInOut",
+            }}
+          />
+        </motion.div>
       )}
 
       <span className="relative z-10">
@@ -150,78 +191,130 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
           {/* Static button - no rotation! */}
           {buttonContent}
 
-          {/* Rotating sparkles around the button */}
+          {/* Individual orbiting sparkles */}
+          {/* Sparkle 1 */}
           <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-            className="absolute inset-0 pointer-events-none"
+            animate={{
+              rotate: [0, 360],
+              scale: [0.3, 0.8, 0.3],
+              opacity: [0.1, 0.6, 0.1],
+            }}
+            transition={{
+              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
+              scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+            }}
+            className="absolute top-1/2 left-1/2 pointer-events-none"
+            style={{
+              transformOrigin: "0 -28px",
+            }}
           >
-            {/* Top sparkle */}
-            <motion.div
-              animate={{
-                scale: [0.3, 0.8, 0.3],
-                opacity: [0.1, 0.6, 0.1],
-              }}
-              transition={{
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="absolute top-0 left-1/2 transform -translate-x-1/2"
-            >
-              <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-            </motion.div>
+            <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
+          </motion.div>
 
-            {/* Right sparkle */}
-            <motion.div
-              animate={{
-                scale: [0.3, 0.8, 0.3],
-                opacity: [0.1, 0.6, 0.1],
-              }}
-              transition={{
+          {/* Sparkle 2 */}
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+              scale: [0.3, 0.8, 0.3],
+              opacity: [0.1, 0.6, 0.1],
+            }}
+            transition={{
+              rotate: {
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+                delay: 2,
+              },
+              scale: {
                 duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: 0.5,
-              }}
-              className="absolute top-1/2 right-0 transform -translate-y-1/2"
-            >
-              <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-            </motion.div>
+              },
+              opacity: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              },
+            }}
+            className="absolute top-1/2 left-1/2 pointer-events-none"
+            style={{
+              transformOrigin: "28px 0",
+            }}
+          >
+            <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
+          </motion.div>
 
-            {/* Bottom sparkle */}
-            <motion.div
-              animate={{
-                scale: [0.3, 0.8, 0.3],
-                opacity: [0.1, 0.6, 0.1],
-              }}
-              transition={{
+          {/* Sparkle 3 */}
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+              scale: [0.3, 0.8, 0.3],
+              opacity: [0.1, 0.6, 0.1],
+            }}
+            transition={{
+              rotate: {
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+                delay: 4,
+              },
+              scale: {
                 duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: 1,
-              }}
-              className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
-            >
-              <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-            </motion.div>
+              },
+              opacity: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1,
+              },
+            }}
+            className="absolute top-1/2 left-1/2 pointer-events-none"
+            style={{
+              transformOrigin: "0 28px",
+            }}
+          >
+            <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
+          </motion.div>
 
-            {/* Left sparkle */}
-            <motion.div
-              animate={{
-                scale: [0.3, 0.8, 0.3],
-                opacity: [0.1, 0.6, 0.1],
-              }}
-              transition={{
+          {/* Sparkle 4 */}
+          <motion.div
+            animate={{
+              rotate: [0, 360],
+              scale: [0.3, 0.8, 0.3],
+              opacity: [0.1, 0.6, 0.1],
+            }}
+            transition={{
+              rotate: {
+                duration: 8,
+                repeat: Infinity,
+                ease: "linear",
+                delay: 6,
+              },
+              scale: {
                 duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut",
                 delay: 1.5,
-              }}
-              className="absolute top-1/2 left-0 transform -translate-y-1/2"
-            >
-              <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-            </motion.div>
+              },
+              opacity: {
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.5,
+              },
+            }}
+            className="absolute top-1/2 left-1/2 pointer-events-none"
+            style={{
+              transformOrigin: "-28px 0",
+            }}
+          >
+            <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
           </motion.div>
         </motion.div>
       ) : (

@@ -36,7 +36,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
       </div>
 
       {/* IsTalkingIndicator in top-right corner (below follow button) */}
-      <div className="absolute top-2 right-12 z-10">
+      <div className="absolute top-2 right-2 z-10">
         <IsTalkingIndicator address={address} />
       </div>
 
