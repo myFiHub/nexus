@@ -5,8 +5,10 @@ import {
 import podiumApi from "app/services/api";
 import { OutpostModel, UpdateOutpostRequest } from "app/services/api/types";
 import { revalidateService } from "app/services/revalidate";
-import { put, takeLatest } from "redux-saga/effects";
+import { put, select, takeLatest } from "redux-saga/effects";
 import { outpostDetailsActions } from "./slice";
+import { GlobalSelectors } from "../global/selectors";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 function* editScheduledDate(
   action: ReturnType<typeof outpostDetailsActions.editScheduledDate>
@@ -42,6 +44,12 @@ function* editScheduledDate(
         outpostId: outpost.uuid,
         allOutposts: true,
       });
+      const router: AppRouterInstance | undefined = yield select(
+        GlobalSelectors.router
+      );
+      if (router) {
+        router.refresh();
+      }
     }
   } catch (error) {
     console.error(error);

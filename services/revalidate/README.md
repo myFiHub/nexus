@@ -90,10 +90,10 @@ await revalidateService.revalidateAllUserData("user123"); // all: true
 #### Outpost Revalidation
 
 ```typescript
-// Revalidate an outpost details page
+// Revalidate outpost details (cache only)
 try {
   const result = await revalidateService.revalidateOutpostDetails("outpost456");
-  console.log("Outpost page revalidated:", result.message);
+  console.log("Outpost cache revalidated:", result.message);
 } catch (error) {
   console.error("Failed to revalidate outpost:", error);
 }
@@ -181,7 +181,7 @@ function MyComponent() {
 
   const handleOutpostUpdate = async (outpostId: string) => {
     try {
-      // Revalidate both the outpost details and all outposts listing
+      // Revalidate outpost cache and all outposts listing
       await revalidateMultiple({
         outpostId,
         allOutposts: true,
@@ -224,7 +224,7 @@ function MyComponent() {
         onClick={() => handleOutpostUpdate("outpost456")}
         disabled={isLoading}
       >
-        Refresh Outpost Pages
+        Refresh Outpost (Cache Only)
       </button>
     </div>
   );
@@ -271,7 +271,7 @@ Revalidates user data with granular cache tag control.
 
 ##### `revalidateOutpostDetails(outpostId: string): Promise<RevalidateResponse>`
 
-Revalidates an outpost details page.
+Revalidates outpost details cache tag only.
 
 ##### `revalidateAllOutposts(): Promise<RevalidateResponse>`
 
@@ -346,6 +346,7 @@ The React hook automatically manages error state and provides a `clearError()` f
 // ✅ Good: Only revalidate what changed
 await revalidateService.revalidateUserFollowers("user123"); // After follow/unfollow
 await revalidateService.revalidateUserData("user123", { userData: true }); // After profile update
+await revalidateService.revalidateOutpostDetails("outpost456"); // Cache-only outpost update
 
 // ❌ Bad: Revalidates everything unnecessarily
 await revalidateService.revalidateAllUserData("user123"); // For a simple follow action

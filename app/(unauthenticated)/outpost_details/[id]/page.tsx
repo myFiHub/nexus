@@ -1,12 +1,19 @@
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
 import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
 import podiumApi from "app/services/api";
+import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { generateEventStructuredData, generateMetadata } from "./_metadata";
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+
+// Cached API function
+const getOutpostCached = (id: string) =>
+  unstable_cache(() => podiumApi.getOutpost(id), [`outpost-details-${id}`], {
+    tags: [`outpost-details-${id}`],
+  });
 
 export { generateMetadata };
 
@@ -19,7 +26,8 @@ export const viewport = {
 
 export default async function OutpostDetailsPage({ params }: PageProps) {
   const { id } = await params;
-  const outpost = await podiumApi.getOutpost(id);
+
+  const outpost = await getOutpostCached(id)();
 
   if (!outpost) {
     notFound();

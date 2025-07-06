@@ -10,6 +10,39 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
+// Cached API functions
+const getUserDataCached = (id: string) =>
+  unstable_cache(() => podiumApi.getUserData(id), [`user-data-${id}`], {
+    tags: [`user-data-${id}`],
+  });
+
+const getPodiumPassBuyersCached = (id: string) =>
+  unstable_cache(
+    () => podiumApi.podiumPassBuyers(id),
+    [`user-pass-buyers-${id}`],
+    {
+      tags: [`user-pass-buyers-${id}`],
+    }
+  );
+
+const getFollowersCached = (id: string) =>
+  unstable_cache(
+    () => podiumApi.getFollowersOfUser(id),
+    [`user-followers-${id}`],
+    {
+      tags: [`user-followers-${id}`],
+    }
+  );
+
+const getFollowingsCached = (id: string) =>
+  unstable_cache(
+    () => podiumApi.getFollowingsOfUser(id),
+    [`user-followings-${id}`],
+    {
+      tags: [`user-followings-${id}`],
+    }
+  );
+
 export { generateMetadata };
 
 export default async function UserPage({ params }: Props) {
@@ -35,44 +68,11 @@ export default async function UserPage({ params }: Props) {
     redirect("/profile");
   }
 
-  // Create cached versions of API calls with individual tags
-  const getUserDataCached = unstable_cache(
-    () => podiumApi.getUserData(id),
-    [`user-data-${id}`],
-    {
-      tags: [`user-data-${id}`],
-    }
-  );
-
-  const getPodiumPassBuyersCached = unstable_cache(
-    () => podiumApi.podiumPassBuyers(id),
-    [`user-pass-buyers-${id}`],
-    {
-      tags: [`user-pass-buyers-${id}`],
-    }
-  );
-
-  const getFollowersCached = unstable_cache(
-    () => podiumApi.getFollowersOfUser(id),
-    [`user-followers-${id}`],
-    {
-      tags: [`user-followers-${id}`],
-    }
-  );
-
-  const getFollowingsCached = unstable_cache(
-    () => podiumApi.getFollowingsOfUser(id),
-    [`user-followings-${id}`],
-    {
-      tags: [`user-followings-${id}`],
-    }
-  );
-
   const [user, passBuyers, followers, followings] = await Promise.all([
-    getUserDataCached(),
-    getPodiumPassBuyersCached(),
-    getFollowersCached(),
-    getFollowingsCached(),
+    getUserDataCached(id)(),
+    getPodiumPassBuyersCached(id)(),
+    getFollowersCached(id)(),
+    getFollowingsCached(id)(),
   ]);
 
   if (!user) {

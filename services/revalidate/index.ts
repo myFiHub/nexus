@@ -171,7 +171,9 @@ class RevalidateService {
     }
 
     return this.makeRequest<RevalidateResponse>(
-      `/outpost-details/${outpostId}`
+      `/outpost-details/${outpostId}`,
+      "POST",
+      { cacheOnly: true }
     );
   }
 

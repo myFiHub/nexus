@@ -1,7 +1,14 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidateTag } from "next/cache";
 
-export async function revalidateOutpostDetailsPage(outpostId: string) {
-  revalidatePath(`/outpost_details/${outpostId}`);
+/**
+ * Revalidates the outpost details cache tag
+ * @param outpostId - The outpost ID to revalidate cache for
+ */
+export async function revalidateOutpostDetails(outpostId: string) {
+  if (!outpostId) {
+    throw new Error("Outpost ID is required");
+  }
+  revalidateTag(`outpost-details-${outpostId}`);
 }
