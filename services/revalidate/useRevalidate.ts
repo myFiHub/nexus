@@ -1,14 +1,28 @@
 import { useCallback, useState } from "react";
-import { RevalidateResponse, revalidateService } from "./index";
+import {
+  RevalidateResponse,
+  revalidateService,
+  UserDataRevalidateOptions,
+} from "./index";
 
 interface UseRevalidateReturn {
   revalidateUser: (userId: string) => Promise<RevalidateResponse>;
+  revalidateUserData: (
+    userId: string,
+    options?: UserDataRevalidateOptions
+  ) => Promise<RevalidateResponse>;
+  revalidateUserBasicData: (userId: string) => Promise<RevalidateResponse>;
+  revalidateUserFollowers: (userId: string) => Promise<RevalidateResponse>;
+  revalidateUserFollowings: (userId: string) => Promise<RevalidateResponse>;
+  revalidateUserPassBuyers: (userId: string) => Promise<RevalidateResponse>;
+  revalidateAllUserData: (userId: string) => Promise<RevalidateResponse>;
   revalidateAllOutposts: () => Promise<RevalidateResponse>;
   revalidateOutpostDetails: (outpostId: string) => Promise<RevalidateResponse>;
   revalidateMultiple: (options: {
     userId?: string;
     outpostId?: string;
     allOutposts?: boolean;
+    userDataOptions?: UserDataRevalidateOptions;
   }) => Promise<RevalidateResponse[]>;
   isLoading: boolean;
   error: string | null;
@@ -50,6 +64,63 @@ export function useRevalidate(): UseRevalidateReturn {
     [handleRequest]
   );
 
+  const revalidateUserData = useCallback(
+    async (
+      userId: string,
+      options?: UserDataRevalidateOptions
+    ): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateUserData(userId, options)
+      );
+    },
+    [handleRequest]
+  );
+
+  const revalidateUserBasicData = useCallback(
+    async (userId: string): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateUserBasicData(userId)
+      );
+    },
+    [handleRequest]
+  );
+
+  const revalidateUserFollowers = useCallback(
+    async (userId: string): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateUserFollowers(userId)
+      );
+    },
+    [handleRequest]
+  );
+
+  const revalidateUserFollowings = useCallback(
+    async (userId: string): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateUserFollowings(userId)
+      );
+    },
+    [handleRequest]
+  );
+
+  const revalidateUserPassBuyers = useCallback(
+    async (userId: string): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateUserPassBuyers(userId)
+      );
+    },
+    [handleRequest]
+  );
+
+  const revalidateAllUserData = useCallback(
+    async (userId: string): Promise<RevalidateResponse> => {
+      return handleRequest(() =>
+        revalidateService.revalidateAllUserData(userId)
+      );
+    },
+    [handleRequest]
+  );
+
   const revalidateAllOutposts =
     useCallback(async (): Promise<RevalidateResponse> => {
       return handleRequest(() => revalidateService.revalidateAllOutposts());
@@ -69,6 +140,7 @@ export function useRevalidate(): UseRevalidateReturn {
       userId?: string;
       outpostId?: string;
       allOutposts?: boolean;
+      userDataOptions?: UserDataRevalidateOptions;
     }): Promise<RevalidateResponse[]> => {
       return handleRequest(() => revalidateService.revalidateMultiple(options));
     },
@@ -77,6 +149,12 @@ export function useRevalidate(): UseRevalidateReturn {
 
   return {
     revalidateUser,
+    revalidateUserData,
+    revalidateUserBasicData,
+    revalidateUserFollowers,
+    revalidateUserFollowings,
+    revalidateUserPassBuyers,
+    revalidateAllUserData,
     revalidateAllOutposts,
     revalidateOutpostDetails,
     revalidateMultiple,

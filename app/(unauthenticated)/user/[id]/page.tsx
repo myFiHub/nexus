@@ -1,6 +1,7 @@
 import { UserDetails } from "app/containers/userDetails";
 import { CookieKeys } from "app/lib/client-cookies";
 import podiumApi from "app/services/api";
+import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { generateMetadata, generateStructuredData } from "./_metadata";
@@ -34,11 +35,48 @@ export default async function UserPage({ params }: Props) {
     redirect("/profile");
   }
 
+  // Create cached versions of API calls with individual tags
+  const getUserDataCached = unstable_cache(
+    () => podiumApi.getUserData(id),
+    [`user-data-${id}`],
+    {
+      tags: [`user-data-${id}`],
+      revalidate: 60 * 5, // 5 minutes
+    }
+  );
+
+  const getPodiumPassBuyersCached = unstable_cache(
+    () => podiumApi.podiumPassBuyers(id),
+    [`user-pass-buyers-${id}`],
+    {
+      tags: [`user-pass-buyers-${id}`],
+      revalidate: 60 * 5, // 5 minutes
+    }
+  );
+
+  const getFollowersCached = unstable_cache(
+    () => podiumApi.getFollowersOfUser(id),
+    [`user-followers-${id}`],
+    {
+      tags: [`user-followers-${id}`],
+      revalidate: 60 * 2, // 2 minutes
+    }
+  );
+
+  const getFollowingsCached = unstable_cache(
+    () => podiumApi.getFollowingsOfUser(id),
+    [`user-followings-${id}`],
+    {
+      tags: [`user-followings-${id}`],
+      revalidate: 60 * 2, // 2 minutes
+    }
+  );
+
   const [user, passBuyers, followers, followings] = await Promise.all([
-    podiumApi.getUserData(id),
-    podiumApi.podiumPassBuyers(id),
-    podiumApi.getFollowersOfUser(id),
-    podiumApi.getFollowingsOfUser(id),
+    getUserDataCached(),
+    getPodiumPassBuyersCached(),
+    getFollowersCached(),
+    getFollowingsCached(),
   ]);
 
   if (!user) {
