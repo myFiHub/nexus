@@ -65,7 +65,7 @@ const Content = () => {
   if (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid) {
     return (
       <motion.div
-        className="flex items-center justify-center min-h-[60vh]"
+        className="flex items-center justify-center min-h-[60vh] min-w-full"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
