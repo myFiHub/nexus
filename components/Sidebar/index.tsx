@@ -12,6 +12,7 @@ const Content = () => {
   const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(isMobile ? false : true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const triggerControls = useAnimation();
 
   // Check localStorage for previous mobile menu interaction
@@ -32,6 +33,7 @@ const Content = () => {
     } else {
       root.style.setProperty("--sidebar-width", isOpen ? "260px" : "70px");
     }
+    setIsVisible(true);
   }, [isOpen, isMobile]);
 
   // Trigger button pulse animation
@@ -60,6 +62,7 @@ const Content = () => {
       }
     }
   };
+  if (!isVisible) return null;
 
   return (
     <>

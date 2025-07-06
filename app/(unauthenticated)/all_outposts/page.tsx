@@ -1,7 +1,9 @@
+import { LoadingOutposts } from "app/components/outpost/LoadingOutposts";
 import { AllOutpostsContainer } from "app/containers/allOutposts";
 import { PAGE_SIZE } from "app/lib/constants";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
+import { Suspense } from "react";
 import {
   generateMetadata,
   generateOutpostsListStructuredData,
@@ -41,7 +43,18 @@ export default async function AllOutpostsPage() {
             __html: JSON.stringify(structuredData),
           }}
         />
-        <AllOutpostsContainer initialOutposts={outposts} />
+        <Suspense
+          fallback={
+            <LoadingOutposts
+              count={9}
+              loadingText="Loading"
+              showLoadingIndicator={true}
+              loadingIndicatorPosition="bottom"
+            />
+          }
+        >
+          <AllOutpostsContainer initialOutposts={outposts} />
+        </Suspense>
       </>
     );
   } catch (error) {

@@ -60,7 +60,7 @@
   --light-hover: oklch(0.97 0 0 / 0.9);
   --dark: oklch(0.145 0 0);
   --dark-hover: oklch(0.145 0 0 / 0.9);
-  --sidebar-width: 70px;
+  --sidebar-width: 260px;
 }
 
 @theme inline {
