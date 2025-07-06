@@ -41,7 +41,6 @@ export default async function UserPage({ params }: Props) {
     [`user-data-${id}`],
     {
       tags: [`user-data-${id}`],
-      revalidate: 60 * 5, // 5 minutes
     }
   );
 
@@ -50,7 +49,6 @@ export default async function UserPage({ params }: Props) {
     [`user-pass-buyers-${id}`],
     {
       tags: [`user-pass-buyers-${id}`],
-      revalidate: 60 * 5, // 5 minutes
     }
   );
 
@@ -59,7 +57,6 @@ export default async function UserPage({ params }: Props) {
     [`user-followers-${id}`],
     {
       tags: [`user-followers-${id}`],
-      revalidate: 60 * 2, // 2 minutes
     }
   );
 
@@ -68,7 +65,6 @@ export default async function UserPage({ params }: Props) {
     [`user-followings-${id}`],
     {
       tags: [`user-followings-${id}`],
-      revalidate: 60 * 2, // 2 minutes
     }
   );
 
