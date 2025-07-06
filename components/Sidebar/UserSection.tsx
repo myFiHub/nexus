@@ -1,9 +1,10 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { globalActions } from "app/containers/global/slice";
 import { truncate } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Crown } from "lucide-react";
+import { Crown, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { LoginButton } from "../header/LoginButton";
 import { Img } from "../Img";
 import { Separator } from "./separator";
@@ -11,13 +12,42 @@ import { SidebarItem } from "./SidebarItem";
 import { SidebarSectionProps } from "./types";
 
 export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
+  const dispatch = useDispatch();
   const router = useRouter();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
-
+  const connect = async () => {
+    dispatch(globalActions.getAndSetWeb3AuthAccount());
+  };
   if (!loggedIn) {
-    return <LoginButton className="w-full h-12" fancy />;
+    return isOpen ? (
+      <LoginButton fancy className="w-full" />
+    ) : (
+      <motion.div
+        className="relative group mb-3"
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2 }}
+      >
+        <div
+          onClick={connect}
+          className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-br from-primary/20 to-secondary/20 border border-primary/30 hover:border-primary/50 transition-all duration-200 cursor-pointer hover:shadow-lg"
+        >
+          <LogIn className="w-4 h-4 text-primary" />
+        </div>
+        <motion.div
+          className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap"
+          initial={{ scale: 0.8, x: -10 }}
+          whileHover={{ scale: 1, x: 0 }}
+        >
+          Sign In
+          <div className="absolute right-full top-1/2 -translate-y-1/2 border-4 border-transparent border-r-black" />
+        </motion.div>
+      </motion.div>
+    );
   }
   const openMyProfile = () => {
     router.push("/profile");
