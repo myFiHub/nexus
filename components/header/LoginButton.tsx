@@ -167,7 +167,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
-              className="absolute -top-0.5 left-1/2 transform -translate-x-1/2"
+              className="absolute top-0 left-1/2 transform -translate-x-1/2"
             >
               <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
             </motion.div>
@@ -184,7 +184,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
                 ease: "easeInOut",
                 delay: 0.5,
               }}
-              className="absolute top-1/2 -right-0.5 transform -translate-y-1/2"
+              className="absolute top-1/2 right-0 transform -translate-y-1/2"
             >
               <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
             </motion.div>
@@ -201,7 +201,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
                 ease: "easeInOut",
                 delay: 1,
               }}
-              className="absolute -bottom-0.5 left-1/2 transform -translate-x-1/2"
+              className="absolute bottom-0 left-1/2 transform -translate-x-1/2"
             >
               <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
             </motion.div>
@@ -218,7 +218,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
                 ease: "easeInOut",
                 delay: 1.5,
               }}
-              className="absolute top-1/2 -left-0.5 transform -translate-y-1/2"
+              className="absolute top-1/2 left-0 transform -translate-y-1/2"
             >
               <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
             </motion.div>

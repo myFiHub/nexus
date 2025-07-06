@@ -125,7 +125,7 @@ export default async function RootLayout({
         <GlobalContainer />
         <Header theme={theme as "light" | "dark"} />
         <Sidebar />
-        <main className="pt-24">{children}</main>
+        <main className="pt-16">{children}</main>
       </body>
     </html>
   );
