@@ -369,7 +369,7 @@ function* incomingUserReaction(
 }
 
 function* setIsRecording(
-  action: ReturnType<typeof onGoingOutpostActions.setIsRecording>
+  action: ReturnType<typeof onGoingOutpostActions.statrtStopRecording>
 ) {
   const outpost: OutpostModel | undefined = yield select(
     onGoingOutpostSelectors.outpost
@@ -402,7 +402,7 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
   yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
-  yield takeLatest(onGoingOutpostActions.setIsRecording, setIsRecording);
+  yield takeLatest(onGoingOutpostActions.statrtStopRecording, setIsRecording);
   yield takeLatest(
     onGoingOutpostActions.incomingUserReaction,
     incomingUserReaction

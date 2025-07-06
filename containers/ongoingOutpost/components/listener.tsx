@@ -25,7 +25,7 @@ export const MeetEventListeners = () => {
     transcription: boolean; // whether a transcription is active or not
   }) => {
     console.log("Recording status changed:", event);
-    dispatch(onGoingOutpostActions.setIsRecording(event.on));
+    dispatch(onGoingOutpostActions.statrtStopRecording(event.on));
   };
 
   const handleVideoConferenceJoined = () => {

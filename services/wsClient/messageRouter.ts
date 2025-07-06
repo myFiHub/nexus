@@ -65,10 +65,10 @@ export class WebSocketMessageRouter {
         this.handleCreatorJoined(message);
         break;
       case IncomingMessageType.USER_STARTED_RECORDING:
-        this.handleUserRecording(message, true);
+        this.handleUserRecording(true);
         break;
       case IncomingMessageType.USER_STOPPED_RECORDING:
-        this.handleUserRecording(message, false);
+        this.handleUserRecording(false);
         break;
     }
   }
@@ -168,17 +168,9 @@ export class WebSocketMessageRouter {
     // }
   }
 
-  private static handleUserRecording(
-    message: IncomingMessage,
-    isRecording: boolean
-  ): void {
+  private static handleUserRecording(isRecording: boolean): void {
     const store = getStore();
-    store!.dispatch(
-      onGoingOutpostActions.updateUserIsRecording({
-        userAddress: message.data.address!,
-        isRecording: isRecording,
-      })
-    );
+    store!.dispatch(onGoingOutpostActions.setIsRecording(isRecording));
   }
 
   // private static withController<T>(action: (controller: T) => void): void {
