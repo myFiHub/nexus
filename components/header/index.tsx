@@ -94,7 +94,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
               )}
             </AnimatePresence>
             <div className="w-1" />
-            <LoginButton />
+            <LoginButton fancy />
           </div>
           {/* Mobile hamburger */}
         </div>
