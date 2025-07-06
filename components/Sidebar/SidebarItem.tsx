@@ -4,9 +4,9 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { Img } from "../Img";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 import { SidebarItemProps } from "./types";
-import { Img } from "../Img";
 
 export function SidebarItem({
   onClick,
@@ -363,13 +363,38 @@ export function SidebarItem({
           ) : Icon ? (
             <Icon className={cn("h-5 w-5", isDanger && "text-red-500")} />
           ) : (
-            <Img
-              src={imageSrc}
-              alt={label}
-              width={20}
-              height={20}
-              className="h-5 w-5"
-            />
+            <div
+              className={cn("h-5 w-5", imageSrc && "dark:bg-transparent")}
+              style={
+                imageSrc
+                  ? {
+                      maskImage: `url(${imageSrc})`,
+                      maskSize: "contain",
+                      maskRepeat: "no-repeat",
+                      maskPosition: "center",
+                      WebkitMaskImage: `url(${imageSrc})`,
+                      WebkitMaskSize: "contain",
+                      WebkitMaskRepeat: "no-repeat",
+                      WebkitMaskPosition: "center",
+                    }
+                  : undefined
+              }
+            >
+              {imageSrc && (
+                <>
+                  {/* Light theme: black masked shape */}
+                  <div className="h-full w-full bg-black dark:hidden" />
+                  {/* Dark theme: original image */}
+                  <Img
+                    src={imageSrc}
+                    alt={label}
+                    width={20}
+                    height={20}
+                    className="h-5 w-5 hidden dark:block"
+                  />
+                </>
+              )}
+            </div>
           )}
         </motion.div>
 

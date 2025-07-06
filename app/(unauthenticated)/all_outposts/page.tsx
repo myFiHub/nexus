@@ -26,39 +26,45 @@ const getCachedOutposts = unstable_cache(
 
 export default async function AllOutpostsPage() {
   try {
-    const outposts = await getCachedOutposts();
-
-    if (outposts instanceof Error || !outposts.length) {
-      return <ErrorState />;
-    }
-
-    // Generate structured data for better SEO
-    const structuredData = generateOutpostsListStructuredData(outposts);
-
     return (
-      <>
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData),
-          }}
-        />
-        <Suspense
-          fallback={
-            <LoadingOutposts
-              count={9}
-              loadingText="Loading"
-              showLoadingIndicator={true}
-              loadingIndicatorPosition="bottom"
-            />
-          }
-        >
-          <AllOutpostsContainer initialOutposts={outposts} />
-        </Suspense>
-      </>
+      <Suspense
+        fallback={
+          <LoadingOutposts
+            count={9}
+            loadingText="Loading outposts..."
+            showLoadingIndicator={true}
+            loadingIndicatorPosition="bottom"
+          />
+        }
+      >
+        <InitialOutpostsList />
+      </Suspense>
     );
   } catch (error) {
     console.error("Error loading outposts:", error);
     return <ErrorState />;
   }
 }
+
+const InitialOutpostsList = async () => {
+  const outposts = await getCachedOutposts();
+
+  if (outposts instanceof Error || !outposts.length) {
+    return <ErrorState />;
+  }
+
+  // Generate structured data for better SEO
+  const structuredData = generateOutpostsListStructuredData(outposts);
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData),
+        }}
+      />
+      <AllOutpostsContainer initialOutposts={outposts} />
+    </>
+  );
+};
