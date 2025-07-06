@@ -1,4 +1,3 @@
-"use client";
 import { OutpostCardSkeleton } from "./OutpostCardSkeleton";
 
 interface LoadingOutpostsProps {
