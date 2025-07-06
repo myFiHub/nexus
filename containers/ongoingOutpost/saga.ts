@@ -378,6 +378,11 @@ function* setIsRecording(
     console.error("Outpost not found to start recording");
     return;
   }
+  const amICreator = outpost.creator_user_uuid === easyAccess.myUser?.uuid;
+  if (!amICreator) {
+    console.error("You are not the creator of the outpost");
+    return;
+  }
   const isRecording = action.payload;
   wsClient.send({
     message_type: isRecording
