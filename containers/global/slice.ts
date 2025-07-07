@@ -172,8 +172,8 @@ export const {
 
 export const useGlobalSlice = () => {
   injectContainer({
-    name: name,
-    reducer: globalReducer,
+    name: globalSlice.name,
+    reducer: globalSlice.reducer,
     saga: globalSaga,
   });
 };

@@ -1,6 +1,23 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Configure webpack to disable minification for Next.js 15
+  webpack: (config, { dev, isServer }) => {
+    if (!dev) {
+      // Disable all minification
+      config.optimization.minimize = false;
+
+      // Disable SWC minification specifically
+      if (config.optimization.minimizer) {
+        config.optimization.minimizer = [];
+      }
+
+      // Keep source maps for debugging
+      config.devtool = "source-map";
+    }
+    return config;
+  },
+
   images: {
     remotePatterns: [
       {

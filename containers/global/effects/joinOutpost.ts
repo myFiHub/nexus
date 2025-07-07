@@ -15,10 +15,10 @@ import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select } from "redux-saga/effects";
-import { GlobalDomains } from "../selectors";
-import { globalActions } from "../slice";
+ import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
 import { OutpostAccesses } from "./types";
+import { GlobalSelectors } from "../selectors";
 
 const BuyableTicketTypes = {
   onlyPodiumPassHolders: "podium_pass_holders",
@@ -34,7 +34,7 @@ export function* joinOutpost(
   action: ReturnType<typeof globalActions.joinOutpost>
 ) {
   const joiningId: string | undefined = yield select(
-    GlobalDomains.joiningOutpostId
+    GlobalSelectors.joiningOutpostId
   );
   if (joiningId !== undefined) {
     return;
@@ -198,7 +198,7 @@ function* openOutpost({
 }) {
   useOnGoingOutpostSlice();
   const outpost = { ...receivedOutpost };
-  const router: AppRouterInstance = yield select(GlobalDomains.router);
+  const router: AppRouterInstance = yield select(GlobalSelectors.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const store = getStore();
   const myUser = store.getState().global.podiumUserInfo!;

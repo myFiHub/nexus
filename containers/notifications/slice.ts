@@ -160,8 +160,8 @@ export const {
 
 export const useNotificationsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: notificationsReducer,
+    name: notificationsSlice.name,
+    reducer: notificationsSlice.reducer,
     saga: notificationsSaga,
   });
 };

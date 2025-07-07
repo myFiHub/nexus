@@ -3,7 +3,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 import { initialState } from "./slice";
 
-export const GlobalDomains = {
+const GlobalDomains = {
   root: (state: RootState) => state,
   router: (state: RootState) => state.global?.router,
   web3Auth: (state: RootState) => state.global?.web3Auth,

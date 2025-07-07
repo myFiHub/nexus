@@ -38,8 +38,8 @@ export const {
 
 export const useUsersSlice = () => {
   injectContainer({
-    name: name,
-    reducer: usersReducer,
+    name: usersSlice.name,
+    reducer: usersSlice.reducer,
     saga: usersSaga,
   });
 };

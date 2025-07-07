@@ -47,8 +47,8 @@ export const {
 
 export const useProfileSlice = () => {
   injectContainer({
-    name: name,
-    reducer: profileReducer,
+    name: profileSlice.name,
+    reducer: profileSlice.reducer,
     saga: profileSaga, // Add saga if needed later
   });
 };

@@ -160,8 +160,8 @@ export const {
 
 export const useOnGoingOutpostSlice = () => {
   injectContainer({
-    name: name,
-    reducer: onGoingOutpostReducer,
+    name: onGoingOutpostSlice.name,
+    reducer: onGoingOutpostSlice.reducer,
     saga: onGoingOutpostSaga,
   });
 };

@@ -1,6 +1,5 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
-import { GlobalDomains } from "../global/selectors";
 
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
@@ -18,6 +17,7 @@ export const onGoingOutpostDomains = {
   joined: (state: RootState) => state.onGoingOutpost.joined,
   raisedHandUsers: (state: RootState) => state.onGoingOutpost.raisedHandUsers,
   isRecording: (state: RootState) => state.onGoingOutpost.isRecording,
+  podiumUserInfo: (state: RootState) => state.global.podiumUserInfo,
 };
 
 export const onGoingOutpostSelectors = {
@@ -29,7 +29,7 @@ export const onGoingOutpostSelectors = {
   accesses: onGoingOutpostDomains.accesses,
   members: onGoingOutpostDomains.members,
   myUserInOutpostMembers: createSelector(
-    [onGoingOutpostDomains.members, GlobalDomains.podiumUserInfo],
+    [onGoingOutpostDomains.members, onGoingOutpostDomains.podiumUserInfo],
     (members, myUser) => {
       if (!myUser) {
         return undefined;

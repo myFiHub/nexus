@@ -72,8 +72,8 @@ export const {
 
 export const useAllOutpostsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: allOutpostsReducer,
+    name: allOutpostsSlice.name,
+    reducer: allOutpostsSlice.reducer,
     saga: allOutpostsSaga,
   });
 };
