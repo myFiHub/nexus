@@ -16,6 +16,7 @@ import { globalSaga } from "./saga";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
+
   logingIn: boolean;
   switchingAccount: boolean;
   logingOut: boolean;

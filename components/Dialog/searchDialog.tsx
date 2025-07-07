@@ -15,6 +15,7 @@
 // };
 
 import { logoUrl } from "app/lib/constants";
+import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { OutpostModel, TagModel, User } from "app/services/api/types";
@@ -284,7 +285,7 @@ export const SearchDialogProvider = () => {
                         handleClose();
                       }}
                       underline={false}
-                      href={`/user/${user.uuid}`}
+                      href={AppPages.userDetails(user.uuid)}
                       className="block p-4 rounded-lg border border-border   transition-all duration-200 group"
                     >
                       <div className="flex items-center gap-3">
@@ -339,7 +340,7 @@ export const SearchDialogProvider = () => {
                       onClick={() => {
                         handleClose();
                       }}
-                      href={`/outpost_details/${outpost.uuid}`}
+                      href={AppPages.outpostDetails(outpost.uuid)}
                       className="block p-4 rounded-lg border transition-all duration-200 group"
                     >
                       <div className="flex items-center gap-3">
@@ -481,7 +482,7 @@ export const SearchDialogProvider = () => {
                             onClick={() => {
                               handleClose();
                             }}
-                            href={`/outpost_details/${outpost.uuid}`}
+                            href={AppPages.outpostDetails(outpost.uuid)}
                             className="block p-4 rounded-lg border transition-all duration-200 group"
                           >
                             <div className="flex items-center gap-3">

@@ -1,3 +1,4 @@
+import { AppPages } from "app/lib/routes";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -36,7 +37,7 @@ export async function POST(
 
     // Only revalidate path if not cache-only
     if (!options.cacheOnly) {
-      revalidatePath(`/outpost_details/${id}`);
+      revalidatePath(AppPages.outpostDetails(id));
     }
 
     return NextResponse.json(
@@ -47,7 +48,7 @@ export async function POST(
           : `Outpost details page and cache for ID ${id} has been revalidated`,
         revalidatedPath: options.cacheOnly
           ? undefined
-          : `/outpost_details/${id}`,
+          : AppPages.outpostDetails(id),
         revalidatedTags: [`outpost-details-${id}`],
       },
       { status: 200 }

@@ -1,4 +1,5 @@
 import { AppLink } from "app/components/AppLink";
+import { AppPages } from "app/lib/routes";
 
 const steps = [
   {
@@ -76,7 +77,7 @@ export function HowItWorksSection() {
       {/* Call to action */}
       <div className="mt-16 text-center relative z-10">
         <AppLink
-          href="/create_outpost"
+          href={AppPages.createOutpost}
           underline={false}
           className="bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white px-8 py-4 rounded-full text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
         >

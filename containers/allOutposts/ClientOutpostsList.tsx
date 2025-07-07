@@ -67,7 +67,7 @@ const Content = ({ initialOutposts }: ClientOutpostsListProps) => {
   );
 
   // Combine SSR and client-side outposts, remove initialOutposts
-  const allOutposts = [...clientOutposts].filter(
+  const allOutposts = [...(clientOutposts ?? [])].filter(
     (outpost) => !initialOutposts.some((o) => o.uuid === outpost.uuid)
   );
 

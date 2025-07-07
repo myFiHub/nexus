@@ -1,4 +1,5 @@
 import { globalActions } from "app/containers/global/slice";
+import { AppPages } from "app/lib/routes";
 import {
   HomeIcon,
   LogOutIcon,
@@ -12,18 +13,18 @@ import { logoutDialog, searchDialog } from "../Dialog";
 import { NavigationSection } from "./NavigationSection";
 import { QuickActionsSection } from "./QuickActionsSection";
 import { Separator } from "./separator";
-import { UserSection } from "./UserSection";
 import { SidebarItemProps, SidebarProps } from "./types";
+import { UserSection } from "./UserSection";
 
 export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
   const dispatch = useDispatch();
   const router = useRouter();
   const currentPath = usePathname();
   const isHome = currentPath === "/";
-  const isMyOutposts = currentPath === "/my_outposts";
-  const isProfile = currentPath === "/profile";
-  const isCreateOutpost = currentPath === "/create_outpost";
-  const isAllOutposts = currentPath === "/all_outposts";
+  const isMyOutposts = currentPath === AppPages.myOutposts;
+  const isProfile = currentPath === AppPages.profile;
+  const isCreateOutpost = currentPath === AppPages.createOutpost;
+  const isAllOutposts = currentPath === AppPages.allOutposts;
 
   const navigationItems: SidebarItemProps[] = [
     {
@@ -42,7 +43,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "All Outposts",
       imageSrc: "/outpost.png",
       onClick: () => {
-        router.push("/all_outposts");
+        router.push(AppPages.allOutposts);
       },
       isOpen: isOpen,
       isMobile: isMobile,
@@ -53,7 +54,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "My Outposts",
       imageSrc: "/flag.png",
       onClick: () => {
-        router.push("/my_outposts");
+        router.push(AppPages.myOutposts);
       },
       isOpen: isOpen,
       isMobile: isMobile,
@@ -65,7 +66,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
-        router.push("/create_outpost");
+        router.push(AppPages.createOutpost);
       },
       isOpen: isOpen,
       isMobile: isMobile,
@@ -76,7 +77,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Profile",
       icon: UserIcon,
       onClick: () => {
-        router.push("/profile");
+        router.push(AppPages.profile);
       },
       isOpen: isOpen,
       isMobile: isMobile,

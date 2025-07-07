@@ -2,7 +2,7 @@ import { RootState } from "../../store";
 
 export const allOutpostsDomains = {
   root: (state: RootState) => state.allOutposts,
-  outposts: (state: RootState) => state.allOutposts?.outposts ?? [],
+  outposts: (state: RootState) => state.allOutposts?.outposts,
   isLoadingOutposts: (state: RootState) =>
     state.allOutposts?.loadingOutposts ?? false,
   isLoadingMoreOutposts: (state: RootState) =>

@@ -3,6 +3,7 @@ import { OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
+import { globalActions } from "../global/slice";
 import {
   onGoingOutpostActions,
   useOnGoingOutpostSlice,

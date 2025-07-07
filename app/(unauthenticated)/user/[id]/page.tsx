@@ -1,5 +1,6 @@
 import { UserDetails } from "app/containers/userDetails";
 import { CookieKeys } from "app/lib/client-cookies";
+import { AppPages } from "app/lib/routes";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
@@ -65,7 +66,7 @@ export default async function UserPage({ params }: Props) {
     (myUserId && myUserId === id) ||
     (myUserMoveAddress && myUserMoveAddress === id)
   ) {
-    redirect("/profile");
+    redirect(AppPages.profile);
   }
 
   const [user, passBuyers, followers, followings] = await Promise.all([

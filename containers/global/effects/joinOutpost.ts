@@ -8,6 +8,7 @@ import {
   onGoingOutpostActions,
   useOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel } from "app/services/api/types";
@@ -15,10 +16,10 @@ import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select } from "redux-saga/effects";
- import { globalActions } from "../slice";
+import { GlobalSelectors } from "../selectors";
+import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
 import { OutpostAccesses } from "./types";
-import { GlobalSelectors } from "../selectors";
 
 const BuyableTicketTypes = {
   onlyPodiumPassHolders: "podium_pass_holders",
@@ -225,7 +226,7 @@ function* openOutpost({
   if (success) {
     yield put(onGoingOutpostActions.setOutpost(outpost));
     yield put(onGoingOutpostActions.setAccesses(accesses));
-    router.push(`/ongoing_outpost/${outpost.uuid}`);
+    router.push(AppPages.ongoingOutpost(outpost.uuid));
   } else {
     toast.error("Failed to join Outpost");
   }

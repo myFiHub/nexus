@@ -1,5 +1,6 @@
 "use client";
 
+import { AppPages } from "app/lib/routes";
 import { ReduxProvider } from "app/store/Provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -12,7 +13,7 @@ const Content = ({ id }: { id: string }) => {
   useEffect(() => {
     if (myUser?.uuid === id || myUser?.aptos_address === id) {
       //   redirect to profile page
-      router.replace(`/profile`);
+      router.replace(AppPages.profile);
     }
   }, [myUser]);
 

@@ -1,5 +1,6 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Crown, LogIn } from "lucide-react";
@@ -50,7 +51,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
     );
   }
   const openMyProfile = () => {
-    router.push("/profile");
+    router.push(AppPages.profile);
   };
 
   return (

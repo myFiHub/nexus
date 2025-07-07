@@ -2,6 +2,7 @@ import OutpostLink from "app/components/AppLink/outpostLink";
 import { Img } from "app/components/Img";
 import { OutpostModel } from "app/services/api/types";
 import { AppLink } from "../../components/AppLink";
+import { AppPages } from "../../lib/routes";
 
 export function TrendingSection({
   trendingOutposts,
@@ -66,7 +67,7 @@ export function TrendingSection({
       </div>
 
       <AppLink
-        href="/all_outposts"
+        href={AppPages.allOutposts}
         className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:text-purple-600 text-lg group transition-colors duration-200"
       >
         <span>View All Outposts</span>

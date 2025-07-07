@@ -3,6 +3,7 @@ import {
   CheerBooAmountDialogResult,
 } from "app/components/Dialog/cheerBooAmountDialog";
 import { checkAudioPermission } from "app/lib/audioPermissions";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -72,7 +73,7 @@ function* leaveOutpost(
   };
   wsClient.send(leaveMessage);
   const router: AppRouterInstance = yield select(GlobalSelectors.router);
-  router.replace(`/outpost_details/${outpost.uuid}`);
+  router.replace(AppPages.outpostDetails(outpost.uuid));
 }
 
 function* like(action: ReturnType<typeof onGoingOutpostActions.like>) {

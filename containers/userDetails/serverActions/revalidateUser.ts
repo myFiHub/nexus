@@ -1,9 +1,10 @@
 "use server";
 
+import { AppPages } from "app/lib/routes";
 import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function revalidateUserProfile(userId: string) {
-  revalidatePath(`/user/${userId}`);
+  revalidatePath(AppPages.userDetails(userId));
 }
 
 /**

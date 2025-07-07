@@ -1,3 +1,4 @@
+import { ApiEndpoints } from "app/lib/routes";
 import axios, { AxiosInstance } from "axios";
 
 // Types and Interfaces
@@ -67,7 +68,7 @@ export interface AddHostModel {
 }
 
 // Constants
-export const LUMA_BASE_URL = "/api/luma"; // Proxy URL for client-side
+export const LUMA_BASE_URL = ApiEndpoints.luma; // Proxy URL for client-side
 export const LUMA_DIRECT_URL = "https://api.lu.ma"; // Direct URL for server-side
 
 // Default headers

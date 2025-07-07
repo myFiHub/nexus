@@ -17,6 +17,8 @@ interface UserDataRevalidateOptions {
   all?: boolean;
 }
 
+import { ApiEndpoints } from "app/lib/routes";
+
 class RevalidateService {
   private readonly baseUrl: string;
 
@@ -81,7 +83,9 @@ class RevalidateService {
       throw new Error("User ID is required");
     }
 
-    return this.makeRequest<RevalidateResponse>(`/user/${userId}`);
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.user(userId)
+    );
   }
 
   /**
@@ -99,7 +103,7 @@ class RevalidateService {
     }
 
     return this.makeRequest<RevalidateResponse>(
-      `/user/${userId}`,
+      ApiEndpoints.revalidate.user(userId),
       "POST",
       options
     );
@@ -155,7 +159,9 @@ class RevalidateService {
    * @returns Promise with revalidation result
    */
   async revalidateAllOutposts(): Promise<RevalidateResponse> {
-    return this.makeRequest<RevalidateResponse>("/all-outposts");
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.allOutposts
+    );
   }
 
   /**
@@ -171,7 +177,7 @@ class RevalidateService {
     }
 
     return this.makeRequest<RevalidateResponse>(
-      `/outpost-details/${outpostId}`,
+      ApiEndpoints.revalidate.outpostDetails(outpostId),
       "POST",
       { cacheOnly: true }
     );

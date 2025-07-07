@@ -51,11 +51,8 @@ export const GlobalSelectors = {
   viewArchivedOutposts: GlobalDomains.viewArchivedOutposts,
   numberOfOnlineUsers: GlobalDomains.numberOfOnlineUsers,
   objectOfOnlineUsersToGet: GlobalDomains.objectOfOnlineUsersToGet,
-  numberOfOnlineUsersForOutpost: (id: string) =>
-    createSelector(
-      GlobalDomains.numberOfOnlineUsers,
-      (objectOfOnlineUsers) => objectOfOnlineUsers[id] ?? 0
-    ),
+  numberOfOnlineUsersForOutpost: (id: string) => (state: RootState) =>
+    state.global?.numberOfOnlineUsers?.[id] ?? 0,
   switchingAccount: GlobalDomains.switchingAccount,
   isPrimaryAccount: createSelector(
     GlobalDomains.podiumUserInfo,
