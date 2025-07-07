@@ -19,6 +19,7 @@ import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
 import { easyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
+import { getStore } from "app/store";
 
 const BuyableTicketTypes = {
   onlyPodiumPassHolders: "podium_pass_holders",
@@ -72,7 +73,8 @@ function* getOutpostAccesses({
   outpost: OutpostModel;
   joiningByLink: boolean;
 }): Generator<any, OutpostAccesses | undefined, any> {
-  const myUser = easyAccess.myUser;
+  const store = getStore();
+  const myUser = store.getState().global.podiumUserInfo!;
   ///////////////////////////////////////////////////
   const iAmOutpostCreator = outpost.creator_user_uuid == myUser.uuid;
   if (iAmOutpostCreator) {
@@ -91,7 +93,7 @@ function* getOutpostAccesses({
   }
 
   //////////////////////////////////////////////////
-  if (outpost.has_adult_content && !easyAccess.myUser.is_over_18) {
+  if (outpost.has_adult_content && !myUser.is_over_18) {
     const res: ConfirmDialogResult = yield confirmDialog({
       title: "Adult Content",
       content: "This Outpost has adult content, are you sure you want to join?",
