@@ -19,7 +19,6 @@ import {
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
-import { easyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -200,7 +199,8 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       console.error("Outpost not found to boo");
       return;
     }
-    const isSelfReaction = targetUserAddress === easyAccess.myUser?.address;
+
+    const isSelfReaction = targetUserAddress === myUser.address;
     let amount = "0";
     const results: CheerBooAmountDialogResult = yield cheerBooAmountDialog({
       cheer,
@@ -371,6 +371,11 @@ function* incomingUserReaction(
 function* setIsRecording(
   action: ReturnType<typeof onGoingOutpostActions.statrtStopRecording>
 ) {
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    toast.error("you are not logged in");
+    return;
+  }
   const outpost: OutpostModel | undefined = yield select(
     onGoingOutpostSelectors.outpost
   );
@@ -378,7 +383,7 @@ function* setIsRecording(
     console.error("Outpost not found to start recording");
     return;
   }
-  const amICreator = outpost.creator_user_uuid === easyAccess.myUser?.uuid;
+  const amICreator = outpost.creator_user_uuid === myUser.uuid;
   if (!amICreator) {
     console.error("You are not the creator of the outpost");
     return;

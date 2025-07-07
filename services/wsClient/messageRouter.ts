@@ -1,5 +1,4 @@
 "use client";
-import { easyAccess } from "app/containers/global/effects/quickAccess";
 import {
   NOTIFICATIONS_UPDATED,
   notificationsEventBus,
@@ -74,7 +73,9 @@ export class WebSocketMessageRouter {
   }
 
   private static handleUserJoined(message: IncomingMessage): void {
-    const myUserAddress = easyAccess.myUser?.address;
+    const store = getStore();
+    const myUser = store.getState().global.podiumUserInfo!;
+    const myUserAddress = myUser.address;
 
     if (message.data.address === myUserAddress) {
       const joinId = `join-${myUserAddress}`;
@@ -86,14 +87,14 @@ export class WebSocketMessageRouter {
       }
       WebSocketService.instance.completeJoinRequest(joinId);
     }
-    const store = getStore();
     store!.dispatch(onGoingOutpostActions.getLiveMembers());
   }
 
   private static handleUserLeft(message: IncomingMessage): void {
     const userAddress = message.data.address;
     const store = getStore();
-    if (userAddress !== easyAccess.myUser?.address) {
+    const myUser = store.getState().global.podiumUserInfo!;
+    if (userAddress !== myUser.address) {
       store!.dispatch(onGoingOutpostActions.getLiveMembers());
     }
   }

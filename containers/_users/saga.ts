@@ -1,11 +1,10 @@
 import { sendFollowEvent } from "app/lib/messenger";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { FollowUnfollowRequest } from "app/services/api/types";
+import { FollowUnfollowRequest, User } from "app/services/api/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeEvery } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
-import { easyAccess } from "../global/effects/quickAccess";
 import { GlobalSelectors } from "../global/selectors";
 import { usersActions } from "./slice";
 
@@ -26,11 +25,12 @@ function* followUnfollowUser(
       sendFollowEvent({ id, followed: follow });
       toast.success(`${toastString} user`);
       yield put(usersActions.updateFollowStatusCache({ id, follow }));
+      const myUser: User = yield select(GlobalSelectors.podiumUserInfo);
       // invalidate user data using client-side revalidation
       try {
         yield all([
           revalidateService.revalidateUserFollowers(id),
-          revalidateService.revalidateUserFollowings(easyAccess.myUser?.uuid),
+          revalidateService.revalidateUserFollowings(myUser.uuid),
         ]);
         const router: AppRouterInstance | undefined = yield select(
           GlobalSelectors.router

@@ -1,6 +1,6 @@
-import { easyAccess } from "app/containers/global/effects/quickAccess";
 import { isDev } from "app/lib/utils";
 import { WebSocketService } from "./client";
+import { getStore } from "app/store";
 
 /**
  * Manages join requests and their lifecycle
@@ -18,7 +18,9 @@ export class JoinRequestManager {
   }
 
   generateJoinId(): string {
-    const userAddress = easyAccess.myUser?.address;
+    const store = getStore();
+    const myUser = store.getState().global.podiumUserInfo!;
+    const userAddress = myUser.address;
     return `join-${userAddress}`;
   }
 

@@ -16,7 +16,6 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { all, put, select, takeLatest } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
 import { canISpeakWithoutTicket } from "../global/effects/joinOutpost";
-import { easyAccess } from "../global/effects/quickAccess";
 import { OutpostAccesses } from "../global/effects/types";
 import { GlobalSelectors } from "../global/selectors";
 import {
@@ -217,12 +216,12 @@ function* buyPassFromUser(
             }
           }
         }
-
+        const myUser = yield select(GlobalSelectors.podiumUserInfo);
         // Revalidate user profile using client-side service
         try {
           yield all([
             revalidateService.revalidateUserPassBuyers(user.uuid),
-            revalidateService.revalidateUserPassBuyers(easyAccess.myUser!.uuid),
+            revalidateService.revalidateUserPassBuyers(myUser!.uuid),
           ]);
         } catch (error) {
           console.error("Failed to revalidate user page:", error);
@@ -307,7 +306,7 @@ function* sellOneOfMyBoughtPasses(
         toast.success("Pass sold successfully");
         yield all([
           revalidateService.revalidateUserPassBuyers(seller.uuid),
-          revalidateService.revalidateUserPassBuyers(easyAccess.myUser!.uuid),
+          revalidateService.revalidateUserPassBuyers(myUser!.uuid),
         ]);
         const router: AppRouterInstance | undefined = yield select(
           GlobalSelectors.router

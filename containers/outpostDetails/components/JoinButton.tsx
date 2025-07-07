@@ -23,10 +23,10 @@ const JoinButtonContent = ({
   outpost: passedOutpost,
   fromCard,
 }: JoinButtonProps) => {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    setIsMounted(true);
+    setIsClient(true);
   }, []);
 
   useOnGoingOutpostSlice();
@@ -38,16 +38,7 @@ const JoinButtonContent = ({
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const wsConnectionStatus = useSelector(GlobalSelectors.wsConnectionStatus);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
-  const joining = joiningId === outpost.uuid;
 
-  // Only calculate timer info after mounting to prevent hydration mismatch
-  const timerInfo = isMounted
-    ? getTimerInfo(outpost.scheduled_for)
-    : { displayText: "Loading...", isPassed: false };
-  const { displayText, isPassed } = timerInfo;
-
-  const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
-  if (!outpost) return null;
   const join = () => {
     if (wsConnectionStatus.state !== ConnectionState.CONNECTED) {
       toast.error("Please check your connection and try again");
@@ -56,19 +47,31 @@ const JoinButtonContent = ({
     dispatch(globalActions.joinOutpost({ outpost }));
   };
 
-  if (!myUser && !logingIn) return <LoginButton className="w-full" />;
-  const loading = joining || logingIn;
+  if (!outpost) return null;
 
-  const disabledIfIAmCreator = loading;
-  const disabledIfImNotCreator = !isPassed || loading;
+  // Show loading state until client-side hydration is complete
+  if (!isClient) {
+    return (
+      <Button className="w-full" disabled>
+        <span className="font-medium">Loading...</span>
+      </Button>
+    );
+  }
+
+  // Client-side only logic
+  const joining = joiningId === outpost.uuid;
+  const timerInfo = getTimerInfo(outpost.scheduled_for);
+  const { displayText, isPassed } = timerInfo;
+  const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
+
+  if (!myUser && !logingIn) return <LoginButton className="w-full" />;
+
+  const loading = joining || logingIn;
+  const disabled = iAmCreator ? loading : !isPassed || loading;
 
   return (
-    <Button
-      className={`w-full text-center bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:transform-none disabled:opacity-60`}
-      onClick={join}
-      disabled={iAmCreator ? disabledIfIAmCreator : disabledIfImNotCreator}
-    >
-      {loading && isMounted ? (
+    <Button className="w-full" onClick={join} disabled={disabled}>
+      {loading ? (
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>{joining ? "Joining..." : "Loading..."}</span>

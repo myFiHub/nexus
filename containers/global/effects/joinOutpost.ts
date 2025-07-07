@@ -12,14 +12,13 @@ import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
+import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { put, select } from "redux-saga/effects";
 import { GlobalDomains } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
-import { easyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
-import { getStore } from "app/store";
 
 const BuyableTicketTypes = {
   onlyPodiumPassHolders: "podium_pass_holders",
@@ -201,8 +200,10 @@ function* openOutpost({
   const outpost = { ...receivedOutpost };
   const router: AppRouterInstance = yield select(GlobalDomains.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
+  const store = getStore();
+  const myUser = store.getState().global.podiumUserInfo!;
   const iAmMember: LiveMember | undefined = currentMembers.find(
-    (member) => member.uuid === easyAccess.myUser.uuid
+    (member) => member.uuid === myUser.uuid
   );
   if (!iAmMember) {
     const added: boolean = yield podiumApi.addMeAsMember(outpost.uuid);
@@ -254,7 +255,9 @@ export const canEnterWithoutATicket = (outpost: OutpostModel): boolean => {
 };
 
 export const canISpeakWithoutTicket = (outpost: OutpostModel): boolean => {
-  const myId = easyAccess.myUser.uuid;
+  const store = getStore();
+  const myUser = store.getState().global.podiumUserInfo!;
+  const myId = myUser.uuid;
   const iAmTheCreator = outpost.creator_user_uuid === myId;
   if (iAmTheCreator) return true;
   if (outpost.speak_type === FreeOutpostAccessTypes.invited_users) {
