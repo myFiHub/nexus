@@ -17,7 +17,7 @@ import { put, select } from "redux-saga/effects";
 import { GlobalDomains } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
-import { easyAccess, EasyAccess } from "./quickAccess";
+import { easyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
 
 const BuyableTicketTypes = {
@@ -59,6 +59,7 @@ export function* joinOutpost(
     }
   } catch (error) {
     toast.error("error while getting outpost data");
+    console.error(error);
   } finally {
     yield put(globalActions.setJoiingOutpostId(undefined));
   }
