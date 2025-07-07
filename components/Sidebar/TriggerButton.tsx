@@ -49,7 +49,7 @@ export function TriggerButton({
       {!isMobile && (
         <motion.button
           onClick={onClick}
-          className="absolute top-[240px] -right-4 z-50 h-8 w-8 rounded-full border-2 border-primary bg-background shadow-lg hover:bg-primary hover:text-primary-foreground transition-all duration-200 flex items-center justify-center group"
+          className="absolute top-[240px] -right-4 z-50 h-8 w-8 rounded-full border-2 border-primary bg-background shadow-lg hover:bg-primary hover:text-primary-foreground transition-all duration-200 flex items-center justify-center group cursor-pointer"
           animate={controls}
           whileTap={{ scale: 0.9 }}
         >
