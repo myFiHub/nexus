@@ -1,23 +1,28 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
 
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
-  outpost: (state: RootState) => state.onGoingOutpost.outpost,
-  isGettingOutpost: (state: RootState) => state.onGoingOutpost.isGettingOutpost,
+  outpost: (state: RootState) => state.onGoingOutpost?.outpost,
+  isGettingOutpost: (state: RootState) =>
+    state.onGoingOutpost?.isGettingOutpost,
   isGettingLiveMembers: (state: RootState) =>
-    state.onGoingOutpost.isGettingLiveMembers,
+    state.onGoingOutpost?.isGettingLiveMembers,
   accesses: (state: RootState) => state.onGoingOutpost?.accesses,
   members: (state: RootState) => state.onGoingOutpost?.liveMembers || {},
   isCheeringAddress: (state: RootState) =>
-    state.onGoingOutpost.isCheeringAddress,
-  isBooingAddress: (state: RootState) => state.onGoingOutpost.isBooingAddress,
-  amIMuted: (state: RootState) => state.onGoingOutpost.amIMuted,
-  meetApiObj: (state: RootState) => state.onGoingOutpost.meetApiObj,
-  joined: (state: RootState) => state.onGoingOutpost.joined,
-  raisedHandUsers: (state: RootState) => state.onGoingOutpost.raisedHandUsers,
-  isRecording: (state: RootState) => state.onGoingOutpost.isRecording,
+    state.onGoingOutpost?.isCheeringAddress,
+  isBooingAddress: (state: RootState) => state.onGoingOutpost?.isBooingAddress,
+  amIMuted: (state: RootState) => state.onGoingOutpost?.amIMuted,
+  meetApiObj: (state: RootState) => state.onGoingOutpost?.meetApiObj,
+  joined: (state: RootState) => state.onGoingOutpost?.joined,
+  raisedHandUsers: (state: RootState) => state.onGoingOutpost?.raisedHandUsers,
+  isRecording: (state: RootState) => state.onGoingOutpost?.isRecording,
   podiumUserInfo: (state: RootState) => state.global.podiumUserInfo,
+  creatorJoined: (state: RootState) =>
+    state.onGoingOutpost?.outpost?.creator_joined,
+  tick: (state: RootState) => state.global?.tick ?? 0,
 };
 
 export const onGoingOutpostSelectors = {
@@ -99,4 +104,16 @@ export const onGoingOutpostSelectors = {
       }
     ),
   isRecording: onGoingOutpostDomains.isRecording,
+  creatorJoined: onGoingOutpostDomains.creatorJoined,
+  shouldWaitForCreator: createSelector(
+    [onGoingOutpostDomains.outpost, onGoingOutpostDomains.tick],
+    (outpost, tick) => {
+      if (tick < 0) {
+        return false;
+      }
+      if (!outpost) return false;
+      const shouldWait = shouldWaitForCreator({ outpost });
+      return shouldWait;
+    }
+  ),
 };

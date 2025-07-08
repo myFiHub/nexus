@@ -136,8 +136,15 @@ const onGoingOutpostSlice = createSlice({
     setMeetApiObj(state, action: PayloadAction<any>) {
       state.meetApiObj = action.payload;
     },
+    waitForCreator(_, __) {},
     setJoined(state, action: PayloadAction<boolean>) {
       state.joined = action.payload;
+    },
+    setCreatorJoined(state, action: PayloadAction<boolean>) {
+      if (state.outpost) {
+        toast.success(`Creator of ${state.outpost.name} joined the outpost`);
+        state.outpost.creator_joined = action.payload;
+      }
     },
     addToRaisedHand(
       state,

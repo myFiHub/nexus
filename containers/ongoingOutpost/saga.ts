@@ -398,6 +398,48 @@ function* setIsRecording(
   });
 }
 
+function* setJoined(
+  action: ReturnType<typeof onGoingOutpostActions.setJoined>
+) {
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to set joined");
+    return;
+  }
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    console.error("You are not logged in");
+    return;
+  }
+  const iAmCreator = outpost.creator_user_uuid === myUser.uuid;
+  const isJoined = action.payload;
+  if (outpost.creator_joined != true && iAmCreator && isJoined) {
+    yield podiumApi.setCreatorJoinedToTrue(outpost.uuid);
+  }
+}
+
+function* waitForCreator() {
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to wait for creator");
+    return;
+  }
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    console.error("You are not logged in");
+    return;
+  }
+  const outgoingMessage: OutgoingMessage = {
+    message_type: OutgoingMessageType.WAIT_FOR_CREATOR,
+    outpost_uuid: outpost.uuid,
+  };
+  wsClient.send(outgoingMessage);
+}
+
 export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.getOutpost, getOutpost);
   yield takeLatest(onGoingOutpostActions.leaveOutpost, leaveOutpost);
@@ -409,6 +451,8 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
   yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
   yield takeLatest(onGoingOutpostActions.statrtStopRecording, setIsRecording);
+  yield takeLatest(onGoingOutpostActions.setJoined, setJoined);
+  yield takeLatest(onGoingOutpostActions.waitForCreator, waitForCreator);
   yield takeLatest(
     onGoingOutpostActions.incomingUserReaction,
     incomingUserReaction

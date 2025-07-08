@@ -153,35 +153,21 @@ export class WebSocketMessageRouter {
     store!.dispatch(notificationsActions.getNotifications());
   }
 
-  private static handleWaitlistUpdated(message: IncomingMessage): void {
-    // TODO: Call outpost detail controller to handle waitlist update
-    // if (Get.isRegistered<OutpostDetailController>()) {
-    //   const controller = Get.find<OutpostDetailController>();
-    //   controller.onMembersUpdated(message);
-    // }
+  private static handleWaitlistUpdated(_: IncomingMessage): void {
+    const store = getStore();
+    store!.dispatch(onGoingOutpostActions.getLiveMembers());
   }
 
   private static handleCreatorJoined(message: IncomingMessage): void {
-    // TODO: Call outpost detail controller to handle creator joined
-    // if (Get.isRegistered<OutpostDetailController>()) {
-    //   const controller = Get.find<OutpostDetailController>();
-    //   controller.onCreatorJoined(message);
-    // }
+    const store = getStore();
+    const correntOngoingOutpost = store.getState().onGoingOutpost.outpost;
+    if (message.data.outpost_uuid == correntOngoingOutpost?.uuid) {
+      store!.dispatch(onGoingOutpostActions.setCreatorJoined(true));
+    }
   }
 
   private static handleUserRecording(isRecording: boolean): void {
     const store = getStore();
     store!.dispatch(onGoingOutpostActions.setIsRecording(isRecording));
   }
-
-  // private static withController<T>(action: (controller: T) => void): void {
-  //   // TODO: Implement controller lookup logic
-  //   // if (!Get.isRegistered<T>()) {
-  //   //   if (isDev) {
-  //   //     console.warn(`[WARN] ${T.toString()} not registered, cannot process message`);
-  //   //   }
-  //   //   return;
-  //   // }
-  //   // action(Get.find<T>());
-  // }
 }
