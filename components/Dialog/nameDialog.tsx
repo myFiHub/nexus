@@ -159,7 +159,7 @@ export const NameDialogProvider = () => {
                     transition={{ delay: 0.4, duration: 0.3 }}
                     className="text-xs text-muted-foreground text-center"
                   >
-                    {inputValue.length}/3 characters minimum
+                    {inputValue.trim().length}/3 characters minimum
                   </motion.div>
                 </div>
               </motion.div>
