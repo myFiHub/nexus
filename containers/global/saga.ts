@@ -361,9 +361,9 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       const evmAddress = evmWallet.address;
 
       const loginRequest: LoginRequest = {
-        signature: "placeholder",
+        signature: "placeholder", //this will be handled and changed in next step
         username: evmAddress,
-        timestamp: 0,
+        timestamp: 0, //this will be handled and changed in next step
         aptos_address: aptosAddress,
         has_ticket: hasCreatorPass,
         login_type_identifier: identifierId,
@@ -441,6 +441,10 @@ function* detached_continueWithLoginRequestAndAdditionalData({
         privateKey,
         retried: true,
       });
+      return;
+    } else {
+      toast.error("you need to be referred by a user to join");
+      yield put(globalActions.logout());
       return;
     }
   } else if (!response.user && response.error) {

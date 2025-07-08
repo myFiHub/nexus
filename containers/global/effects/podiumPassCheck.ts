@@ -29,5 +29,6 @@ export function* hasCreatorPodiumPass({
       hasPass({ sellerAddress: address, buyerAddress })
     )
   );
-  return results.some((result) => result);
+  const res = results.some((result) => result);
+  return res;
 }
