@@ -198,4 +198,12 @@ export {
   PromptNotificationsDialogProvider,
   resetNotificationsDeclined,
 } from "./promptNotifications";
+
+// Export referrer dialog components
+export { referrerDialog, ReferrerDialogProvider } from "./referrerDialog";
+export type { ReferrerDialogResult } from "./referrerDialog";
+
+// Export name dialog components
+export { nameDialog, NameDialogProvider } from "./nameDialog";
+export type { NameDialogResult } from "./nameDialog";
 export type { PromptNotificationsResult } from "./promptNotifications";

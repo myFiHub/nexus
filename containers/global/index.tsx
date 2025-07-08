@@ -4,7 +4,9 @@ import {
   BuyOrSellPassDialogProvider,
   LogoutDialogProvider,
   LumaUserDialogProvider,
+  NameDialogProvider,
   PromptNotificationsDialogProvider,
+  ReferrerDialogProvider,
   SearchDialogProvider,
   UserSelectDialogProvider,
 } from "app/components/Dialog";
@@ -44,6 +46,8 @@ const Container = () => {
     <>
       <Toaster richColors closeButton position="top-right" />
       <ConfirmDialogProvider />
+      <ReferrerDialogProvider />
+      <NameDialogProvider />
       <UserSelectDialogProvider />
       <SearchDialogProvider />
       <OutpostAccessesDialogProvider />

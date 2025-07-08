@@ -6,11 +6,13 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
-import { promptNotifications } from "app/components/Dialog";
 import {
-  confirmDialog,
-  ConfirmDialogResult,
-} from "app/components/Dialog/confirmDialog";
+  nameDialog,
+  NameDialogResult,
+  promptNotifications,
+  referrerDialog,
+  ReferrerDialogResult,
+} from "app/components/Dialog";
 import { CookieKeys } from "app/lib/client-cookies";
 import {
   deleteServerCookieViaAPI,
@@ -422,16 +424,8 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   } = yield podiumApi.login(loginRequest, additionalDataForLogin);
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
-    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
-      {
-        title: "do you have a referrer",
-        content: "",
-        inputOpts: {
-          inputType: "text",
-          inputPlaceholder: "referrer id",
-        },
-      }
-    );
+    const { confirmed, enteredText }: ReferrerDialogResult =
+      yield referrerDialog();
     if (confirmed && enteredText) {
       referrerId = enteredText;
       loginRequest.referrer_user_uuid = referrerId;
@@ -456,16 +450,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   let canContinue = true;
   if (!savedName) {
     canContinue = false;
-    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
-      {
-        title: "please enter your name",
-        content: "",
-        inputOpts: {
-          inputType: "text",
-          inputPlaceholder: "name",
-        },
-      }
-    );
+    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
     if (confirmed && (enteredText?.trim().length || 0) > 0) {
       const resultsForUpdate: User | undefined =
         yield podiumApi.updateMyUserData({ name: enteredText });
