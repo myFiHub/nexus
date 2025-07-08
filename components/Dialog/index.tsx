@@ -184,3 +184,10 @@ export type { CheerBooAmountDialogResult } from "./cheerBooAmountDialog";
 
 // Export logout dialog components
 export { logoutDialog, LogoutDialogProvider } from "./logoutDialog";
+
+// Export leave outpost warning dialog components
+export {
+  leaveOutpostWarningDialog,
+  LeaveOutpostWarningDialogProvider,
+} from "../../containers/ongoingOutpost/dialogs/leaveOutpostWarning";
+export type { LeaveOutpostWarningDialogResult } from "../../containers/ongoingOutpost/dialogs/leaveOutpostWarning";

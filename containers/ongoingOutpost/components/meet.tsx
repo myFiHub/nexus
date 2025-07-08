@@ -6,6 +6,7 @@ import { Loader2 } from "lucide-react";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
+import { LeaveOutpostWarningDialogProvider } from "../dialogs/leaveOutpostWarning";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
 import { MeetEventListeners } from "./listener";
@@ -54,6 +55,7 @@ export const Meet = memo(
 
     return (
       <div className="space-y-4">
+        <LeaveOutpostWarningDialogProvider />
         <div
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >
