@@ -141,7 +141,7 @@ const onGoingOutpostSlice = createSlice({
       state.joined = action.payload;
     },
     setCreatorJoined(state, action: PayloadAction<boolean>) {
-      if (state.outpost) {
+      if (state.outpost && !state.outpost.creator_joined) {
         toast.success(`Creator of ${state.outpost.name} joined the outpost`);
         state.outpost.creator_joined = action.payload;
       }
