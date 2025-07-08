@@ -4,6 +4,7 @@ import {
   BuyOrSellPassDialogProvider,
   LogoutDialogProvider,
   LumaUserDialogProvider,
+  PromptNotificationsDialogProvider,
   SearchDialogProvider,
   UserSelectDialogProvider,
 } from "app/components/Dialog";
@@ -52,6 +53,7 @@ const Container = () => {
       <UserSelectToInviteDialogProvider />
       <BuyOrSellPassDialogProvider />
       <LogoutDialogProvider />
+      <PromptNotificationsDialogProvider />
     </>
   );
 };

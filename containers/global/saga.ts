@@ -6,6 +6,7 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
+import { promptNotifications } from "app/components/Dialog";
 import {
   confirmDialog,
   ConfirmDialogResult,
@@ -17,7 +18,10 @@ import {
 } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
-import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
+import {
+  checkPushNotificationPermission,
+  requestPushNotificationPermission,
+} from "app/lib/pushNotificationPermissions";
 import {
   signMessage,
   signMessageWithTimestamp,
@@ -82,6 +86,13 @@ function* initOneSignal(
 ) {
   const myId: string = action.payload.myId;
   try {
+    const hasPermision: boolean = yield checkPushNotificationPermission();
+    if (!hasPermision) {
+      const result: boolean = yield promptNotifications();
+      if (!result) {
+        return;
+      }
+    }
     const result: boolean = yield requestPushNotificationPermission();
     if (!result) {
       toast.error("Push notification permission is denied");
