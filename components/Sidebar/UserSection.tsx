@@ -84,6 +84,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
               >
                 <Img
                   src={myUser?.image}
+                  useImgTag
                   className="h-10 w-10 rounded-full"
                   alt={myUser?.name ?? ""}
                 />
@@ -113,6 +114,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
               <div className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-br from-accent/50 to-accent/30 border border-accent/50 relative">
                 <Img
                   src={myUser?.image}
+                  useImgTag
                   className="h-4 w-4 rounded-full"
                   alt={myUser?.name ?? ""}
                 />
