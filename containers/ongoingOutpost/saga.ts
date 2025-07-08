@@ -276,7 +276,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
             : cheer
             ? "Cheer"
             : "Boo"
-        } successful`
+        } successful${isSelfReaction ? "ly!" : ""}`
       );
       const booMessage: OutgoingMessage = {
         message_type: cheer
