@@ -104,7 +104,7 @@ export const ReferrerDialogProvider = () => {
               >
                 <div className="space-y-4">
                   <div className="text-center text-sm text-muted-foreground">
-                    Please enter your referrer's UUID to continue
+                    Please enter your referrer&apos;s UUID to continue
                   </div>
 
                   <motion.div
