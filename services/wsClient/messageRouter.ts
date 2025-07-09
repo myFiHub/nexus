@@ -132,7 +132,7 @@ export class WebSocketMessageRouter {
     const store = getStore();
     store!.dispatch(
       onGoingOutpostActions.incomingUserReaction({
-        userAddress: message.data.address!,
+        userAddress: message.data.react_to_user_address!,
         reaction: message.name as IncomingReactionType,
       })
     );
