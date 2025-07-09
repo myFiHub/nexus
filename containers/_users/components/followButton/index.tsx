@@ -19,12 +19,14 @@ const Content = ({
   followed: initialFollowed,
   size,
   className,
+  noRouterRefresh,
 }: {
   id: string;
   address: string;
   followed: boolean;
   size?: ButtonProps["size"];
   className?: string;
+  noRouterRefresh?: boolean;
 }) => {
   useUsersSlice();
   const dispatch = useDispatch();
@@ -83,6 +85,7 @@ const Content = ({
       usersActions.followUnfollowUser({
         id: id,
         follow: !followed,
+        noRouterRefresh,
       })
     );
   };
@@ -126,12 +129,14 @@ export const FollowButton = ({
   address,
   size = "sm",
   className,
+  noRouterRefresh,
 }: {
   id: string;
   followed: boolean;
   address: string;
   size?: ButtonProps["size"];
   className?: string;
+  noRouterRefresh?: boolean;
 }) => {
   return (
     <ReduxProvider>
@@ -141,6 +146,7 @@ export const FollowButton = ({
         address={address}
         size={size}
         className={className}
+        noRouterRefresh={noRouterRefresh}
       />
     </ReduxProvider>
   );

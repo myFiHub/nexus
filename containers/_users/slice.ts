@@ -19,7 +19,11 @@ const usersSlice = createSlice({
   reducers: {
     followUnfollowUser: (
       state,
-      action: PayloadAction<{ id: string; follow: boolean }>
+      action: PayloadAction<{
+        id: string;
+        follow: boolean;
+        noRouterRefresh?: boolean;
+      }>
     ) => {},
     updateFollowStatusCache: (
       state,

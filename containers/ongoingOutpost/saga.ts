@@ -310,9 +310,14 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
 function* getLiveMembers(
   action: ReturnType<typeof onGoingOutpostActions.getLiveMembers>
 ) {
-  yield put(onGoingOutpostActions.isGettingLiveMembers(true));
+  const { silent } = action.payload || { silent: false };
+  if (!silent) {
+    yield put(onGoingOutpostActions.isGettingLiveMembers(true));
+  }
   yield detatched_getLiveMembers();
-  yield put(onGoingOutpostActions.isGettingLiveMembers(false));
+  if (!silent) {
+    yield put(onGoingOutpostActions.isGettingLiveMembers(false));
+  }
 }
 
 function* detatched_getLiveMembers() {

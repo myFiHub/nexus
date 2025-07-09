@@ -11,7 +11,7 @@ import { usersActions } from "./slice";
 function* followUnfollowUser(
   action: ReturnType<typeof usersActions.followUnfollowUser>
 ): Generator<any, void, any> {
-  const { id, follow } = action.payload;
+  const { id, follow, noRouterRefresh } = action.payload;
   sendFollowEvent({ id, loading: true });
   const followUnfollowRequest: FollowUnfollowRequest = {
     uuid: id,
@@ -35,7 +35,7 @@ function* followUnfollowUser(
         const router: AppRouterInstance | undefined = yield select(
           GlobalSelectors.router
         );
-        if (router) {
+        if (router && !noRouterRefresh) {
           router.refresh();
         }
       } catch (error) {

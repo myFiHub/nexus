@@ -15,10 +15,6 @@ export const MemberAvatar = ({ member }: MemberAvatarProps) => {
         className="w-12 h-12 rounded-full border-2 border-primary/20"
         useImgTag
       />
-
-      {!member.is_present && (
-        <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-gray-400 rounded-full border-2 border-background" />
-      )}
     </div>
   );
 };

@@ -12,6 +12,7 @@ export const FollowUserButton = ({ member }: FollowButtonProps) => {
       followed={member.followed_by_me ?? false}
       address={member.address}
       size="xxs"
+      noRouterRefresh
       className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
     />
   );

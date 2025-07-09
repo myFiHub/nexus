@@ -75,7 +75,7 @@ const onGoingOutpostSlice = createSlice({
     startSpeaking() {},
     stopSpeaking() {},
     startRecording() {},
-    getLiveMembers() {},
+    getLiveMembers(_, __: PayloadAction<{ silent: boolean } | undefined>) {},
     statrtStopRecording(state, action: PayloadAction<boolean>) {},
     setIsRecording(state, action: PayloadAction<boolean>) {
       state.isRecording = action.payload;

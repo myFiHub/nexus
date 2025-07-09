@@ -87,7 +87,7 @@ export class WebSocketMessageRouter {
       }
       WebSocketService.instance.completeJoinRequest(joinId);
     }
-    store!.dispatch(onGoingOutpostActions.getLiveMembers());
+    store!.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   }
 
   private static handleUserLeft(message: IncomingMessage): void {
@@ -95,7 +95,7 @@ export class WebSocketMessageRouter {
     const store = getStore();
     const myUser = store.getState().global.podiumUserInfo!;
     if (userAddress !== myUser.address) {
-      store!.dispatch(onGoingOutpostActions.getLiveMembers());
+      store!.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
     }
   }
 
