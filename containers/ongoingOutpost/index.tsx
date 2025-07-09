@@ -9,7 +9,6 @@ import { useUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
 import { RecordingIndicator } from "./components/header/RecordingIndicator";
-import { JoiningOutpost } from "./components/JoiningOutpost";
 import { LoginState } from "./components/LoginState";
 import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
@@ -44,16 +43,16 @@ const Content = () => {
     }
   }, [id, myUser, outpost]);
 
-  if (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid) {
-    return <JoiningOutpost />;
-  }
-
   if (!myUser?.uuid) {
     return <LoginState />;
   }
 
-  if (loading || !outpost) {
-    return <OngoingOutpostSkeleton />;
+  if (
+    loading ||
+    !outpost ||
+    (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid)
+  ) {
+    return <OngoingOutpostSkeleton className="mt-4" />;
   }
 
   // Show waiting for creator screen if creator hasn't joined yet

@@ -31,7 +31,7 @@ export const OngoingOutpostMembers = memo(
               dispatch(onGoingOutpostActions.getLiveMembers());
             }
           }
-        }, 5000);
+        }, 2000);
       }
     }, [outpost?.uuid]);
 
