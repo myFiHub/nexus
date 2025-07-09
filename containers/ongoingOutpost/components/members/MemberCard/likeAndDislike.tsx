@@ -1,10 +1,10 @@
 import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
 import { cn } from "app/lib/utils";
 import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { onGoingOutpostActions } from "../../slice";
 
 // Circular Progress Component
 const CircularProgress = ({

@@ -1,7 +1,7 @@
 import { InviteUsersButton } from "app/containers/outpostDetails/components/InviteUsersButton";
 import { wsClient } from "app/services/wsClient/client";
 import { Loader2, Users } from "lucide-react";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
 import { onGoingOutpostActions } from "../../slice";
@@ -15,6 +15,25 @@ export const OngoingOutpostMembers = memo(
       onGoingOutpostSelectors.isGettingLiveMembers
     );
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
+    const numberOfMembersRef = useRef(numberOfMembers);
+
+    useEffect(() => {
+      numberOfMembersRef.current = numberOfMembers;
+    }, [numberOfMembers]);
+
+    useEffect(() => {
+      if (outpost?.uuid) {
+        setTimeout(async () => {
+          if (numberOfMembersRef.current === 0) {
+            // const joinedOutpostId=wsClient.
+            const success = await wsClient.asyncJoinOutpost(outpost?.uuid);
+            if (success) {
+              dispatch(onGoingOutpostActions.getLiveMembers());
+            }
+          }
+        }, 5000);
+      }
+    }, [outpost?.uuid]);
 
     // Fetch live members when component mounts
     useEffect(() => {
@@ -22,18 +41,6 @@ export const OngoingOutpostMembers = memo(
         dispatch(onGoingOutpostActions.getLiveMembers());
       }
       //after 5 seconds, if livemembers length is 0, join again
-      if (outpost?.uuid) {
-        setTimeout(async () => {
-          if (numberOfMembers === 0) {
-            const success = await wsClient.asyncJoinOutpostWithRetry(
-              outpost?.uuid
-            );
-            if (success) {
-              dispatch(onGoingOutpostActions.getLiveMembers());
-            }
-          }
-        }, 5000);
-      }
     }, [dispatch, outpost?.uuid]);
 
     // Show loading state when getting live members
