@@ -1,4 +1,5 @@
 import { InviteUsersButton } from "app/containers/outpostDetails/components/InviteUsersButton";
+import { wsClient } from "app/services/wsClient/client";
 import { Loader2, Users } from "lucide-react";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,6 +20,19 @@ export const OngoingOutpostMembers = memo(
     useEffect(() => {
       if (outpost?.uuid) {
         dispatch(onGoingOutpostActions.getLiveMembers());
+      }
+      //after 5 seconds, if livemembers length is 0, join again
+      if (outpost?.uuid) {
+        setTimeout(async () => {
+          if (numberOfMembers === 0) {
+            const success = await wsClient.asyncJoinOutpostWithRetry(
+              outpost?.uuid
+            );
+            if (success) {
+              dispatch(onGoingOutpostActions.getLiveMembers());
+            }
+          }
+        }, 5000);
       }
     }, [dispatch, outpost?.uuid]);
 

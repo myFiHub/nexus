@@ -4,8 +4,8 @@ import { cn } from "app/lib/utils";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useDispatch, useSelector } from "react-redux";
-import { onGoingOutpostSelectors } from "../../selectors";
-import { onGoingOutpostActions } from "../../slice";
+import { onGoingOutpostSelectors } from "../../../selectors";
+import { onGoingOutpostActions } from "../../../slice";
 
 export const CheerAndBoo = ({
   cheer,

@@ -37,7 +37,6 @@ function* getOutpost(
       yield put(onGoingOutpostActions.setHasAudioPermission(false));
       toast.error("Microphone permission is denied");
     }
-
     yield put(onGoingOutpostActions.setHasAudioPermission(true));
 
     const { id } = action.payload;

@@ -58,12 +58,6 @@ const BooIcon = ({ color }: { color: string }) => (
   />
 );
 
-const StarIcon = ({ color }: { color: string }) => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill={color}>
-    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-  </svg>
-);
-
 interface ConfettiPiece {
   id: string;
   type: IncomingMessageType;
@@ -121,7 +115,6 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
           if (eventAddress === address) {
             // Create multiple confetti pieces
             const pieces: ConfettiPiece[] = [];
-            const { colors, gravity } = getConfettiConfig(type);
 
             // Determine number of pieces based on reaction type
             const pieceCount =

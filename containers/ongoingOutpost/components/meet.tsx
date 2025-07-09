@@ -53,13 +53,10 @@ export const Meet = memo(
 
     const showIframeClassName = joined ? "opacity-100" : "opacity-0";
 
-    if (!joined) {
-      return <JoiningStatus />;
-    }
-
     return (
-      <div className="space-y-4">
+      <div className="space-y-4 relative">
         <LeaveOutpostWarningDialogProvider />
+        {!joined && <JoiningStatus />}
         <div
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >

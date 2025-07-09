@@ -1,6 +1,6 @@
 import { Mic } from "lucide-react";
 import { useSelector } from "react-redux";
-import { onGoingOutpostSelectors } from "../../selectors";
+import { onGoingOutpostSelectors } from "../../../selectors";
 
 export const IsTalkingIndicator = ({ address }: { address: string }) => {
   const isTalking = useSelector(onGoingOutpostSelectors.isTalking(address));
