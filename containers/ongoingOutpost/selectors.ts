@@ -50,6 +50,13 @@ export const onGoingOutpostSelectors = {
       const bTime = new Date(b.last_speaked_at_timestamp ?? 0).getTime();
       return bTime - aTime;
     });
+
+    const sortedIds = sortedList.map((member) => ({
+      id: member.address,
+      time: member.last_speaked_at_timestamp,
+    }));
+    console.log({ sortedIds });
+
     return sortedList;
   }),
   membersCount: createSelector(

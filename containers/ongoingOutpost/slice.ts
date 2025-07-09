@@ -111,10 +111,14 @@ const onGoingOutpostSlice = createSlice({
       state,
       action: PayloadAction<{ userAddress: string; isTalking: boolean }>
     ) {
-      state.liveMembers[action.payload.userAddress] = {
-        ...state.liveMembers[action.payload.userAddress],
+      const now = Date.now();
+      const members = { ...state.liveMembers };
+      members[action.payload.userAddress] = {
+        ...members[action.payload.userAddress],
         is_speaking: action.payload.isTalking,
+        last_speaked_at_timestamp: now,
       };
+      state.liveMembers = members;
     },
 
     incomingUserReaction(

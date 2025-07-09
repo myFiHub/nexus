@@ -11,11 +11,11 @@ import {
 import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { LiveMember, OutpostModel } from "app/services/api/types";
+import { LiveMember, OutpostModel, User } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { put, select } from "redux-saga/effects";
+import { all, put, select } from "redux-saga/effects";
 import { GlobalSelectors } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
@@ -34,6 +34,7 @@ const FreeOutpostAccessTypes = {
 export function* joinOutpost(
   action: ReturnType<typeof globalActions.joinOutpost>
 ) {
+  useOnGoingOutpostSlice();
   const joiningId: string | undefined = yield select(
     GlobalSelectors.joiningOutpostId
   );
@@ -201,8 +202,11 @@ function* openOutpost({
   const outpost = { ...receivedOutpost };
   const router: AppRouterInstance = yield select(GlobalSelectors.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
-  const store = getStore();
-  const myUser = store.getState().global.podiumUserInfo!;
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    toast.error("You are not logged in");
+    return;
+  }
   const iAmMember: LiveMember | undefined = currentMembers.find(
     (member) => member.uuid === myUser.uuid
   );
@@ -224,9 +228,17 @@ function* openOutpost({
     outpost.uuid
   );
   if (success) {
-    yield put(onGoingOutpostActions.setOutpost(outpost));
-    yield put(onGoingOutpostActions.setAccesses(accesses));
-    router.push(AppPages.ongoingOutpost(outpost.uuid));
+    yield all([
+      put(onGoingOutpostActions.setOutpost(outpost)),
+      put(onGoingOutpostActions.setAccesses(accesses)),
+      put(onGoingOutpostActions.getLiveMembers()),
+    ]);
+    if (typeof window !== "undefined") {
+      const correntRoute = window.location.pathname;
+      if (!correntRoute.includes(AppPages.ongoingOutpost(outpost.uuid))) {
+        router.push(AppPages.ongoingOutpost(outpost.uuid));
+      }
+    }
   } else {
     toast.error("Failed to join Outpost");
   }

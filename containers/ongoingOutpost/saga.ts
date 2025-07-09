@@ -19,7 +19,7 @@ import {
   OutgoingMessageType,
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { all, put, select, takeLatest } from "redux-saga/effects";
+import { all, debounce, put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -70,7 +70,7 @@ function* leaveOutpost(
     message_type: OutgoingMessageType.LEAVE,
     outpost_uuid: outpost.uuid,
   };
-  wsClient.send(leaveMessage);
+  yield wsClient.send(leaveMessage);
   const router: AppRouterInstance = yield select(GlobalSelectors.router);
   router.replace(AppPages.outpostDetails(outpost.uuid));
 }
@@ -328,14 +328,21 @@ function* detatched_getLiveMembers() {
     console.error("Outpost not found to get live members");
     return [];
   }
-  const liveData: OutpostLiveData | undefined =
+  let liveData: OutpostLiveData | undefined | false =
     yield podiumApi.getLatestLiveData(outpost.uuid);
+  if (liveData === false) {
+    const success: boolean = yield wsClient.asyncJoinOutpost(outpost.uuid);
+    if (success) {
+      liveData = yield podiumApi.getLatestLiveData(outpost.uuid);
+    }
+  }
   if (!liveData) {
     console.error("Failed to get live members");
     return [];
   }
   const liveMembers: { [address: string]: LiveMember } = {};
   liveData.members.forEach((member) => {
+    member.last_speaked_at_timestamp ??= 0;
     liveMembers[member.address] = member;
   });
   yield put(onGoingOutpostActions.setLiveMembers(liveMembers));
@@ -453,7 +460,7 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.stopSpeaking, stopSpeaking);
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
-  yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield debounce(500, onGoingOutpostActions.getLiveMembers, getLiveMembers);
   yield takeLatest(onGoingOutpostActions.statrtStopRecording, setIsRecording);
   yield takeLatest(onGoingOutpostActions.setJoined, setJoined);
   yield takeLatest(onGoingOutpostActions.waitForCreator, waitForCreator);

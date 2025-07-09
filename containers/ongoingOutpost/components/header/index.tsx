@@ -1,12 +1,9 @@
-import { useSelector } from "react-redux";
-import { onGoingOutpostSelectors } from "../../selectors";
 import { Controlls } from "./actions";
 import { MuteUnmuteButton } from "./actions/mute_unmute_button";
 import { MyTimer } from "./myTimer";
 import { TitleAndDescription } from "./titleAndDescription";
 
 export const OutpostHeader = () => {
-  const isRecording = useSelector(onGoingOutpostSelectors.isRecording);
   return (
     <div className="bg-card border-b border-border shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

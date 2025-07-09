@@ -17,14 +17,19 @@ export const OngoingOutpostMembers = memo(
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const numberOfMembersRef = useRef(numberOfMembers);
 
-    useEffect(() => {
-      numberOfMembersRef.current = numberOfMembers;
-    }, [numberOfMembers]);
+    const joined = useSelector(onGoingOutpostSelectors.joined);
+    const joinedRef = useRef(joined);
 
     useEffect(() => {
+      numberOfMembersRef.current = numberOfMembers;
+      joinedRef.current = joined;
+    }, [numberOfMembers, joined]);
+
+    useEffect(() => {
+      let timeoutId: NodeJS.Timeout;
       if (outpost?.uuid) {
-        setTimeout(async () => {
-          if (numberOfMembersRef.current === 0) {
+        timeoutId = setTimeout(async () => {
+          if (numberOfMembersRef.current === 0 && !joinedRef.current) {
             // const joinedOutpostId=wsClient.
             const success = await wsClient.asyncJoinOutpost(outpost?.uuid);
             if (success) {
@@ -32,15 +37,13 @@ export const OngoingOutpostMembers = memo(
             }
           }
         }, 30000);
+        return () => {
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+        };
       }
-    }, [outpost?.uuid]);
-
-    // Fetch live members when component mounts
-    useEffect(() => {
-      if (outpost?.uuid) {
-        dispatch(onGoingOutpostActions.getLiveMembers());
-      }
-    }, [dispatch, outpost?.uuid]);
+    }, [outpost?.uuid, joinedRef]);
 
     // Show loading state when getting live members
     if (isGettingLiveMembers && numberOfMembers === 0) {

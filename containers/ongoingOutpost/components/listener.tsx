@@ -50,7 +50,6 @@ export const MeetEventListeners = () => {
   }: {
     muted: boolean;
   }) => {
-    console.log("Audio mute status changed:", isMuted);
     if (firstTimeUnmuted.current) {
       firstTimeUnmuted.current = false;
       return;

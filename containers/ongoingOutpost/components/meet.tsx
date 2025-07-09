@@ -24,7 +24,7 @@ export const Meet = memo(
 
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
     useEffect(() => {
-      if (outpost?.uuid && !accesses?.canEnter) {
+      if (!!outpost?.uuid && !accesses?.canEnter && !joined) {
         dispatch(globalActions.joinOutpost({ outpost }));
       }
     }, [outpost]);
