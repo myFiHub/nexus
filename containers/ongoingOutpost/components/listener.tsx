@@ -75,14 +75,14 @@ export const MeetEventListeners = () => {
     if (isDev) {
       console.log("Participant left:", id);
     }
-    dispatch(onGoingOutpostActions.getLiveMembers());
+    dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   };
 
   const handleParticipantJoined = (id: string) => {
     if (isDev) {
       console.log("Participant joined:", id);
     }
-    dispatch(onGoingOutpostActions.getLiveMembers());
+    dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   };
 
   const handleRaisedHand = (event: {

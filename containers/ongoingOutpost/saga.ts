@@ -58,7 +58,6 @@ function* leaveOutpost(
   const outpost = action.payload;
 
   yield all([
-    put(onGoingOutpostActions.setOutpost(undefined)),
     put(
       onGoingOutpostActions.setAccesses({ canEnter: false, canSpeak: false })
     ),

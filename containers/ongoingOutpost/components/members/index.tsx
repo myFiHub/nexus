@@ -40,7 +40,6 @@ export const OngoingOutpostMembers = memo(
       if (outpost?.uuid) {
         dispatch(onGoingOutpostActions.getLiveMembers());
       }
-      //after 5 seconds, if livemembers length is 0, join again
     }, [dispatch, outpost?.uuid]);
 
     // Show loading state when getting live members

@@ -91,10 +91,14 @@ export class WebSocketMessageRouter {
   }
 
   private static handleUserLeft(message: IncomingMessage): void {
-    const userAddress = message.data.address;
+    const addressOfUserThatLeft = message.data.address;
     const store = getStore();
+    console.log({
+      addressOfUserThatLeft,
+      myUserAddress: store.getState().global.podiumUserInfo?.address,
+    });
     const myUser = store.getState().global.podiumUserInfo!;
-    if (userAddress !== myUser.address) {
+    if (addressOfUserThatLeft !== myUser.address) {
       store!.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
     }
   }
@@ -155,7 +159,7 @@ export class WebSocketMessageRouter {
 
   private static handleWaitlistUpdated(_: IncomingMessage): void {
     const store = getStore();
-    store!.dispatch(onGoingOutpostActions.getLiveMembers());
+    store!.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   }
 
   private static handleCreatorJoined(message: IncomingMessage): void {
