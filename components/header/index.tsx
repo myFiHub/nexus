@@ -63,7 +63,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
                 className="w-6 h-6"
                 sizes="24px"
               />
-              Podium Nexus
+              <span className="hidden lg:block">Podium Nexus</span>
             </AppLink>
           </div>
           {/* Desktop nav */}
