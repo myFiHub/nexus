@@ -64,6 +64,7 @@ function* leaveOutpost(
     put(onGoingOutpostActions.setMeetApiObj(undefined)),
     put(onGoingOutpostActions.setJoined(false)),
     put(onGoingOutpostActions.setAmIMuted(true)),
+    put(onGoingOutpostActions.setLiveMembers({})),
   ]);
   const leaveMessage: OutgoingMessage = {
     message_type: OutgoingMessageType.LEAVE,

@@ -33,6 +33,11 @@ const Content = () => {
   const shouldWaitForCreator = useSelector(
     onGoingOutpostSelectors.shouldWaitForCreator
   );
+  useEffect(() => {
+    return () => {
+      dispatch(onGoingOutpostActions.setOutpost(undefined));
+    };
+  }, []);
 
   useEffect(() => {
     if (myUser && outpost) {
