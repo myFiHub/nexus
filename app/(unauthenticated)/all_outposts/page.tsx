@@ -19,7 +19,7 @@ const getCachedOutposts = unstable_cache(
   },
   ["all-outposts"],
   {
-    revalidate: 10, // Revalidate every 10 seconds
+    revalidate: 60, // Revalidate every 60 seconds
     tags: ["outposts"],
   }
 );
