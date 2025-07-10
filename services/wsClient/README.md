@@ -1,198 +1,218 @@
 # WebSocket Client
 
-This is a TypeScript port of the Dart WebSocket client for the Nexus application. It provides a robust WebSocket connection with automatic reconnection, message handling, and join request management.
+A simplified, robust WebSocket client for the Nexus application. This client provides automatic reconnection, message handling, and asynchronous outpost joining functionality in a single, easy-to-use class.
 
 ## Features
 
+- **Simplified Architecture**: All WebSocket functionality consolidated into one class
 - **Singleton Pattern**: Single WebSocket service instance across the application
-- **Automatic Reconnection**: Exponential backoff with jitter for reliable reconnection
-- **Message Routing**: Centralized message handling and routing
-- **Join Request Management**: Handles outpost join requests with timeouts
-- **Connection State Management**: Tracks connection state and provides status information
-- **Ping/Pong**: Automatic heartbeat to keep connections alive
-- **Colorful Logging**: Development-only colored console logs for easy debugging
+- **Automatic Reconnection**: Exponential backoff with configurable retry limits
+- **Message Handling**: Built-in message routing and Redux store integration
+- **Asynchronous Join Requests**: Handles outpost joins with timeouts and retries
+- **Connection State Management**: Real-time connection status tracking
+- **Keep-Alive Ping**: Automatic heartbeat to maintain connections
+- **Error Handling**: Comprehensive error handling with user-friendly toast notifications
+- **Development Logging**: Clean console logging for debugging
+
+## Quick Start
+
+```typescript
+import { wsClient } from "./services/wsClient";
+
+// Connect to WebSocket server
+const success = await wsClient.connect(token);
+
+// Send a message
+await wsClient.send({
+  message_type: OutgoingMessageType.JOIN,
+  outpost_uuid: "your-outpost-id",
+});
+
+// Join an outpost with retry
+const joined = await wsClient.asyncJoinOutpostWithRetry("outpost-id");
+```
 
 ## Configuration
 
-### WebSocket Server URL
-
-The WebSocket client needs to know the server URL. You can configure it using environment variables:
-
-#### For Next.js:
+### Environment Variables
 
 ```bash
-# .env.local
-NEXT_PUBLIC_WEBSOCKET_URL=wss://your-server.com/ws
+# .env.local (Next.js)
+NEXT_PUBLIC_WEBSOCKET_ADDRESS=wss://your-server.com/ws
 ```
 
-#### For React (Create React App):
+## API Reference
 
-```bash
-# .env
-REACT_APP_WEBSOCKET_URL=wss://your-server.com/ws
-```
-
-#### For Node.js:
-
-```bash
-# .env
-WEBSOCKET_URL=wss://your-server.com/ws
-```
-
-#### Default Fallback:
-
-If no environment variable is set, it defaults to `wss://localhost:8080/ws`
-
-### User Store Integration
-
-The service needs access to the current user's address for join request management:
+### Connection Management
 
 ```typescript
-// TODO: Replace with your actual user store
-const userAddress = getUserAddress(); // Get from your user store
+// Connect to server
+await wsClient.connect(token: string, address?: string): Promise<boolean>
+
+// Check connection status
+wsClient.connected: boolean
+wsClient.isConnecting: boolean
+wsClient.connectionStatus: ConnectionStatus
+
+// Close connection
+wsClient.close(): void
+
+// Force reset connection
+wsClient.forceResetConnection(): void
 ```
 
-## Usage
-
-### Basic Setup
+### Message Handling
 
 ```typescript
-import { WebSocketService } from "./services/wsClient";
+// Send any message
+await wsClient.send(message: OutgoingMessage): Promise<boolean>
 
-// Get the singleton instance
-const wsService = WebSocketService.instance;
-
-// Connect to WebSocket server
-const success = await wsService.connect(token, websocketAddress);
-```
-
-### Sending Messages
-
-```typescript
-import { OutgoingMessageType } from "./services/wsClient";
-
-// Send a join message
-await wsService.send({
+// Example messages
+await wsClient.send({
   message_type: OutgoingMessageType.JOIN,
-  outpost_uuid: "outpost-id",
+  outpost_uuid: "outpost-id"
 });
 
-// Send a reaction
-await wsService.send({
+await wsClient.send({
   message_type: OutgoingMessageType.LIKE,
   outpost_uuid: "outpost-id",
-  data: {
-    react_to_user_address: "user-address",
-    amount: 1.0,
-  },
+  data: { react_to_user_address: "user-address" }
 });
 ```
 
-### Joining Outposts
+### Outpost Joining
 
 ```typescript
-// Join an outpost with automatic retry
-const success = await wsService.asyncJoinOutpostWithRetry("outpost-id");
+// Join outpost (single attempt)
+await wsClient.asyncJoinOutpost(outpostId: string, force?: boolean): Promise<boolean>
 
-// Force join (ignore if already joined)
-const success = await wsService.asyncJoinOutpost("outpost-id", true);
+// Join outpost with retry (recommended)
+await wsClient.asyncJoinOutpostWithRetry(outpostId: string): Promise<boolean>
 ```
 
-### Monitoring Connection Status
+## Message Types
+
+### Incoming Messages
+
+- `USER_JOINED` / `USER_LEFT` - User presence updates
+- `USER_LIKED` / `USER_DISLIKED` / `USER_BOOED` / `USER_CHEERED` - User reactions
+- `USER_STARTED_SPEAKING` / `USER_STOPPED_SPEAKING` - Speaking state changes
+- `USER_STARTED_RECORDING` / `USER_STOPPED_RECORDING` - Recording state changes
+- `REMAINING_TIME_UPDATED` - Time remaining updates
+- `TIME_IS_UP` - Time expiration notifications
+- `USER_INVITED` / `USER_FOLLOWED` - Social notifications
+- `WAITLIST_UPDATED` - Waitlist changes
+- `CREATOR_JOINED` - Creator presence updates
+
+### Outgoing Messages
+
+- `JOIN` / `LEAVE` - Outpost membership
+- `LIKE` / `DISLIKED` / `BOO` / `CHEER` - User reactions
+- `START_SPEAKING` / `STOP_SPEAKING` - Speaking control
+- `START_RECORDING` / `STOP_RECORDING` - Recording control
+- `WAIT_FOR_CREATOR` - Creator waiting
+
+## Redux Integration
+
+The client automatically dispatches actions to your Redux store:
 
 ```typescript
-// Check connection state
-console.log(wsService.connectionState); // 'disconnected' | 'connecting' | 'connected'
-console.log(wsService.connected); // boolean
-console.log(wsService.isConnecting); // boolean
-
-// Get detailed status
-const status = wsService.connectionStatus;
-console.log(status);
-// {
-//   state: 'connected',
-//   isConnecting: false,
-//   connected: true,
-//   hasChannel: true,
-//   hasToken: true
-// }
+// Automatically handled
+onGoingOutpostActions.updateRemainingTime();
+onGoingOutpostActions.updateUserIsTalking();
+onGoingOutpostActions.incomingUserReaction();
+onGoingOutpostActions.handleTimeIsUp();
+onGoingOutpostActions.getLiveMembers();
+onGoingOutpostActions.setCreatorJoined();
+onGoingOutpostActions.setIsRecording();
+notificationsActions.getNotifications();
+globalActions.setWsConnectionStatus();
 ```
 
-### Listening to Join Events
+## Error Handling
+
+The client provides comprehensive error handling:
+
+### Automatic Reconnection
+
+- Exponential backoff with jitter
+- Configurable retry limits (default: 10 attempts)
+- Automatic connection recovery
+
+### User Notifications
+
+- Toast notifications for connection issues
+- Reload button for critical failures
+- Silent handling of transient errors
+
+### Development Logging
+
+- Clean, prefixed console logs
+- Error details and stack traces
+- Connection state changes
+
+## Configuration Options
 
 ```typescript
-// Listen for join completions
-wsService.joinStream.addEventListener("join", (event) => {
-  const joinId = event.detail;
-  console.log("Join completed:", joinId);
-});
+// Internal configuration (modify in client.ts)
+private maxReconnectAttempts = 10;        // Max reconnection attempts
+private reconnectDelay = 1000;            // Initial delay (1 second)
+private maxReconnectDelay = 30000;        // Max delay (30 seconds)
+private readonly pingInterval = 30000;    // Keep-alive interval
+private readonly joinTimeout = 10000;     // Join request timeout
 ```
 
 ## Architecture
 
-### Core Components
+The simplified architecture consists of:
 
-1. **WebSocketService**: Main service class that orchestrates all components
-2. **ConnectionManager**: Handles connection lifecycle and reconnection logic
-3. **JoinRequestManager**: Manages join requests with timeouts and retries
-4. **WebSocketMessageRouter**: Routes incoming messages to appropriate handlers
-5. **Lock**: Provides synchronization for concurrent operations
+1. **WebSocketService**: Main singleton class handling all WebSocket operations
+2. **Built-in Message Router**: Integrated message handling and Redux dispatch
+3. **Connection Management**: Automatic reconnection with exponential backoff
+4. **Join Request Manager**: Timeout-based outpost joining with retry logic
+5. **Error Handling**: User-friendly error notifications and recovery
 
-### Message Types
+## Migration from Complex Architecture
 
-#### Incoming Messages
+If migrating from the previous multi-class architecture:
 
-- User joined/left events
-- User reactions (like, dislike, boo, cheer)
-- Speaking state changes
-- Recording state changes
-- Time updates
-- Waitlist updates
-- Creator events
+```typescript
+// Old way (multiple classes)
+connectionManager.connect(...)
+joinRequestManager.joinOutpost(...)
+messageRouter.routeMessage(...)
 
-#### Outgoing Messages
+// New way (single class)
+wsClient.connect(...)
+wsClient.asyncJoinOutpost(...)
+// Message routing handled automatically
+```
 
-- Join/leave outpost
-- Send reactions
-- Start/stop speaking
-- Start/stop recording
-- Wait for creator
+## Development
 
-## Controller Integration
+### Debugging
 
-The message router contains TODO comments for controller integration. You'll need to:
+- Set environment to development for detailed logging
+- All logs are prefixed with `[WebSocket]`
+- Connection state changes are clearly logged
 
-1. Replace controller calls with your actual controller/storage system
-2. Implement user store access
-3. Set up proper error handling and toast notifications
-4. Configure the WebSocket server address via environment variables
+### Testing
 
-## Error Handling
+- Use `wsClient.forceResetConnection()` to simulate connection issues
+- Monitor `wsClient.connectionStatus` for state verification
+- Check Redux DevTools for automatic action dispatching
 
-The service includes comprehensive error handling:
+## Best Practices
 
-- Connection timeouts
-- Message parsing errors
-- Reconnection failures
-- Join request timeouts
+1. **Always use retry methods** for joining outposts
+2. **Check connection status** before critical operations
+3. **Handle connection errors gracefully** in your UI
+4. **Use the singleton instance** (`wsClient`) rather than creating new instances
+5. **Monitor Redux state** for real-time updates
 
-All errors are logged and the service attempts to recover automatically where possible.
+## Performance
 
-## Testing
-
-The service is designed to be testable with dependency injection for:
-
-- Logger implementation
-- User store access
-- Controller integration
-- WebSocket server configuration
-
-## Migration Notes
-
-This TypeScript version maintains the same API as the original Dart implementation, making migration straightforward. Key differences:
-
-- Uses native WebSocket instead of web_socket_channel
-- Uses EventTarget instead of RxDart streams
-- Uses Node.js timers instead of Dart timers
-- Simplified logger interface
-- Colorful development logging
+- Automatic connection pooling (singleton pattern)
+- Efficient message routing without intermediate objects
+- Minimal memory footprint with integrated architecture
+- Optimized reconnection strategy with exponential backoff

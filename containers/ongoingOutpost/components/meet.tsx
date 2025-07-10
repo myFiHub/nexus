@@ -1,8 +1,9 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { truncate } from "app/lib/utils";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { logoUrl } from "../../../lib/constants";
 import { LeaveOutpostWarningDialogProvider } from "../dialogs/leaveOutpostWarning";
@@ -21,13 +22,20 @@ export const Meet = memo(
 
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
     const joined = useSelector(onGoingOutpostSelectors.joined);
+    const joinedOnceRef = useRef(false);
+
+    useEffect(() => {
+      if (joined) {
+        joinedOnceRef.current = true;
+      }
+    }, [joined]);
 
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
     useEffect(() => {
-      if (!!outpost?.uuid && !accesses?.canEnter && !joined) {
+      if (!!outpost?.uuid && !accesses?.canEnter && !joinedOnceRef.current) {
         dispatch(globalActions.joinOutpost({ outpost }));
       }
-    }, [outpost]);
+    }, [outpost?.uuid, joined]);
     if (!outpost || !myUser) {
       console.log("No outpost data available");
       return null;
@@ -67,7 +75,9 @@ export const Meet = memo(
             domain={process.env.NEXT_PUBLIC_OUTPOST_SERVER}
             roomName={outpost.uuid}
             userInfo={{
-              displayName: myUser.name ?? "",
+              displayName: myUser.name?.includes("@")
+                ? truncate(myUser.name, 8)
+                : myUser.name ?? truncate(myUser.uuid),
               email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
             configOverwrite={{

@@ -40,10 +40,10 @@ const Content = () => {
   }, []);
 
   useEffect(() => {
-    if (myUser && outpost) {
+    if (myUser && outpost?.uuid) {
       dispatch(onGoingOutpostActions.waitForCreator(true));
     }
-    if (myUser && !outpost) {
+    if (myUser && !outpost?.uuid) {
       dispatch(onGoingOutpostActions.getOutpost({ id: id as string }));
     }
   }, [id, myUser, outpost]);

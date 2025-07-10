@@ -224,9 +224,7 @@ function* openOutpost({
     return;
   }
 
-  const success: boolean = yield wsClient.asyncJoinOutpostWithRetry(
-    outpost.uuid
-  );
+  const success: boolean = yield wsClient.asyncJoin(outpost.uuid);
   if (success) {
     yield all([
       put(onGoingOutpostActions.setOutpost(outpost)),

@@ -24,7 +24,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
     <div
       className={cn(
         "group bg-card border border-border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md relative",
-        member.is_speaking && "ring-2 ring-primary/50 bg-primary/5",
+        member.is_speaking && "bg-primary/5",
         isCurrentUser && "ring-2 ring-secondary/50"
       )}
     >

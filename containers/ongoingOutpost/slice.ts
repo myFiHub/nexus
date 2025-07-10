@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "app/lib/toast";
 import { LiveMember, OutpostModel } from "app/services/api/types";
-import { IncomingReactionType } from "app/services/wsClient/messageRouter";
+import { IncomingReactionType } from "app/services/wsClient/client";
 import { injectContainer } from "app/store";
 import { OutpostAccesses } from "../global/effects/types";
 import { onGoingOutpostSaga } from "./saga";
