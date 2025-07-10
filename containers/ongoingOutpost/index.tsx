@@ -1,42 +1,23 @@
 "use client";
 import { CheerBooAmountDialogProvider } from "app/components/Dialog/cheerBooAmountDialog";
-import { User } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
+import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
+import { RecordingIndicator } from "./components/header/RecordingIndicator";
+import { LoginState } from "./components/LoginState";
 import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
+import { WaitingForCreator } from "./components/waitingForCreator";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
-import { useUsersSlice } from "../_users/slice";
-
-const OngoingOutpostContent = ({
-  myUser,
-  loading,
-}: {
-  myUser?: User;
-  loading: boolean;
-}) => {
-  useUsersSlice();
-  if (loading) {
-    return <OngoingOutpostSkeleton />;
-  }
-  if (!myUser) {
-    return <div>Please login to view this page</div>;
-  }
-  return (
-    <div className="space-y-6">
-      <CheerBooAmountDialogProvider />
-      <OutpostHeader />
-      <Meet />
-    </div>
-  );
-};
 
 const Content = () => {
+  useUsersSlice();
   useOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const { id } = useParams();
@@ -48,17 +29,55 @@ const Content = () => {
   const loading = gettingMyUser || isGettingOutpost;
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
   const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
+
+  const shouldWaitForCreator = useSelector(
+    onGoingOutpostSelectors.shouldWaitForCreator
+  );
   useEffect(() => {
-    if (myUser && !outpost) {
+    return () => {
+      dispatch(onGoingOutpostActions.setOutpost(undefined));
+    };
+  }, []);
+
+  useEffect(() => {
+    if (myUser && outpost?.uuid) {
+      dispatch(onGoingOutpostActions.waitForCreator(true));
+    }
+    if (myUser && !outpost?.uuid) {
       dispatch(onGoingOutpostActions.getOutpost({ id: id as string }));
     }
-  }, [id, myUser]);
-  if (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid) {
-    return <div>Joining outpost...</div>;
+  }, [id, myUser, outpost]);
+
+  if (!myUser?.uuid) {
+    return <LoginState />;
   }
+
+  if (
+    loading ||
+    !outpost ||
+    (joiningOutpostId !== undefined && joiningOutpostId === outpost?.uuid)
+  ) {
+    return <OngoingOutpostSkeleton className="mt-4" />;
+  }
+
+  // Show waiting for creator screen if creator hasn't joined yet
+  if (shouldWaitForCreator) {
+    return <WaitingForCreator outpost={outpost} />;
+  }
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <OngoingOutpostContent myUser={myUser} loading={loading} />
+    <div className="container !max-w-full px-4 py-8">
+      <motion.div
+        className="space-y-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <CheerBooAmountDialogProvider />
+        <OutpostHeader />
+        <Meet />
+        <RecordingIndicator />
+      </motion.div>
     </div>
   );
 };

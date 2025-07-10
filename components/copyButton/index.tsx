@@ -57,7 +57,7 @@ export const CopyButton = ({ text }: CopyButtonProps) => {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent>Copy</TooltipContent>
+      <TooltipContent className="text-white">Copy</TooltipContent>
     </Tooltip>
   );
 };

@@ -19,7 +19,7 @@ const initialState: AllOutpostsState = {
   loadingOutposts: false,
   loadingMoreOutposts: false,
   errorLoadingOutposts: undefined,
-  currentPage: 0,
+  currentPage: 1,
   hasMoreOutposts: true,
   pageSize: PAGE_SIZE,
 };
@@ -72,8 +72,8 @@ export const {
 
 export const useAllOutpostsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: allOutpostsReducer,
+    name: allOutpostsSlice.name,
+    reducer: allOutpostsSlice.reducer,
     saga: allOutpostsSaga,
   });
 };

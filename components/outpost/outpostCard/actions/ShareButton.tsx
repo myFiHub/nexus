@@ -59,7 +59,9 @@ const Content = ({ outpost, className }: ShareButtonProps) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{copied ? "Copied!" : "Share outpost"}</TooltipContent>
+      <TooltipContent className="text-white">
+        {copied ? "Copied!" : "Share outpost"}
+      </TooltipContent>
     </Tooltip>
   );
 };

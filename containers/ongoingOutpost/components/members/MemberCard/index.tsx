@@ -2,9 +2,9 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { useSelector } from "react-redux";
 import { cn } from "../../../../../lib/utils";
 import { onGoingOutpostSelectors } from "../../../selectors";
-import { ConfettiContainer } from "../confettiContainer";
-import { IsTalkingIndicator } from "../isTalkingIndicator";
+import { ConfettiContainer } from "./confettiContainer";
 import { FollowUserButton } from "./FollowButton";
+import { IsTalkingIndicator } from "./isTalkingIndicator";
 import { MemberActions } from "./MemberActions";
 import { MemberAvatar } from "./MemberAvatar";
 import { MemberHeader } from "./MemberHeader";
@@ -24,7 +24,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
     <div
       className={cn(
         "group bg-card border border-border rounded-lg p-4 shadow-sm transition-all duration-200 hover:shadow-md relative",
-        member.is_speaking && "ring-2 ring-primary/50 bg-primary/5",
+        member.is_speaking && "bg-primary/5",
         isCurrentUser && "ring-2 ring-secondary/50"
       )}
     >
@@ -36,7 +36,7 @@ export const MemberCard = ({ address }: MemberCardProps) => {
       </div>
 
       {/* IsTalkingIndicator in top-right corner (below follow button) */}
-      <div className="absolute top-2 right-12 z-10">
+      <div className="absolute top-2 right-2 z-10">
         <IsTalkingIndicator address={address} />
       </div>
 

@@ -1,16 +1,12 @@
-import { type AppLinkProps } from "./index";
-import { UserLinkClient } from "./userLinkClient";
-import { UserLinkServer } from "./userLinkServer";
+import { AppPages } from "app/lib/routes";
+import { AppLink, type AppLinkProps } from "./index";
 
 export interface UserLinkProps extends Omit<AppLinkProps, "href"> {
   id: string;
 }
 
 export const UserLink = ({ id, ...props }: UserLinkProps) => {
-  if (typeof window !== "undefined") {
-    return <UserLinkClient id={id} {...props} />;
-  }
-  return <UserLinkServer id={id} {...props} />;
+  return <AppLink href={AppPages.userDetails(id)} {...props} />;
 };
 
 export default UserLink;

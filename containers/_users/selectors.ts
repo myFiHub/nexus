@@ -1,4 +1,3 @@
-import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 
 export const usersDomains = {
@@ -8,9 +7,6 @@ export const usersDomains = {
 
 export const usersSelectors = {
   followStatusCache: usersDomains.followStatusCache,
-  isFollowedFromCache: (id: string) =>
-    createSelector(
-      usersDomains.followStatusCache,
-      (followStatusCache) => followStatusCache[id]
-    ),
+  isFollowedFromCache: (id: string) => (state: RootState) =>
+    (state.users?.followStatusCache || {})[id],
 };

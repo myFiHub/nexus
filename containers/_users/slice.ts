@@ -19,7 +19,11 @@ const usersSlice = createSlice({
   reducers: {
     followUnfollowUser: (
       state,
-      action: PayloadAction<{ id: string; follow: boolean }>
+      action: PayloadAction<{
+        id: string;
+        follow: boolean;
+        noRouterRefresh?: boolean;
+      }>
     ) => {},
     updateFollowStatusCache: (
       state,
@@ -38,8 +42,8 @@ export const {
 
 export const useUsersSlice = () => {
   injectContainer({
-    name: name,
-    reducer: usersReducer,
+    name: usersSlice.name,
+    reducer: usersSlice.reducer,
     saga: usersSaga,
   });
 };

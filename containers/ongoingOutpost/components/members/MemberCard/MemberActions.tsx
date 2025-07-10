@@ -1,5 +1,5 @@
-import { CheerAndBoo } from "../cheerAndBoo";
-import { LikeAndDislike } from "../likeAndDislike";
+import { CheerAndBoo } from "./cheerAndBoo";
+import { LikeAndDislike } from "./likeAndDislike";
 
 interface MemberActionsProps {
   address: string;

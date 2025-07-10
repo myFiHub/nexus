@@ -13,6 +13,7 @@ export const TitleAndDescription = () => {
           src={outpost?.image || logoUrl}
           alt={outpost?.name || "Outpost"}
           className="w-full h-full object-cover"
+          sizes="64px"
         />
       </div>
 

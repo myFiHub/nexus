@@ -21,7 +21,7 @@ export const MemberStatus = ({ address }: MemberStatusProps) => {
         >
           <Clock className="w-3 h-3" />
           <span>
-            <RemainingTimeText address={address} />
+            <RemainingTimeText address={address} userUuId={member.uuid} />
           </span>
         </div>
       ) : (

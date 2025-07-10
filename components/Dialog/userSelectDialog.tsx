@@ -22,9 +22,9 @@
 // };
 
 import { Img } from "app/components/Img";
+import { GlobalSelectors } from "app/containers/global/selectors";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
-import { RootState } from "app/store";
 import { Check, Loader2, Search, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -79,7 +79,7 @@ export const UserSelectDialogProvider = () => {
   const [dialogContent, setDialogContent] =
     useState<UserSelectDialogProps | null>(null);
 
-  const myUser = useSelector((state: RootState) => state.global.podiumUserInfo);
+  const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     const handleShowDialog = (event: CustomEvent<UserSelectDialogProps>) => {

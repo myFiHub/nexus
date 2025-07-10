@@ -63,10 +63,10 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
         <Button
           onClick={handleArchive}
           disabled={isLoading}
-          className={`${
+          className={`w-10 h-10 p-0 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:opacity-60 ${
             !isArchivedState
-              ? "bg-orange-500 hover:bg-orange-600"
-              : "bg-green-300 hover:bg-green-400"
+              ? "bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
+              : "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white"
           }`}
         >
           {isArchivedState ? (
@@ -76,7 +76,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
           )}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>
+      <TooltipContent className="text-foreground">
         {isArchivedState ? "Unarchive the Outpost" : "Archive the Outpost"}
       </TooltipContent>
     </Tooltip>

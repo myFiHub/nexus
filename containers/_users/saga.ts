@@ -1,15 +1,17 @@
 import { sendFollowEvent } from "app/lib/messenger";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { FollowUnfollowRequest } from "app/services/api/types";
-import { put, takeEvery } from "redux-saga/effects";
+import { FollowUnfollowRequest, User } from "app/services/api/types";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { all, put, select, takeEvery } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
+import { GlobalSelectors } from "../global/selectors";
 import { usersActions } from "./slice";
 
 function* followUnfollowUser(
   action: ReturnType<typeof usersActions.followUnfollowUser>
 ): Generator<any, void, any> {
-  const { id, follow } = action.payload;
+  const { id, follow, noRouterRefresh } = action.payload;
   sendFollowEvent({ id, loading: true });
   const followUnfollowRequest: FollowUnfollowRequest = {
     uuid: id,
@@ -23,9 +25,19 @@ function* followUnfollowUser(
       sendFollowEvent({ id, followed: follow });
       toast.success(`${toastString} user`);
       yield put(usersActions.updateFollowStatusCache({ id, follow }));
+      const myUser: User = yield select(GlobalSelectors.podiumUserInfo);
       // invalidate user data using client-side revalidation
       try {
-        yield revalidateService.revalidateUser(id);
+        yield all([
+          revalidateService.revalidateUserFollowers(id),
+          revalidateService.revalidateUserFollowings(myUser.uuid),
+        ]);
+        const router: AppRouterInstance | undefined = yield select(
+          GlobalSelectors.router
+        );
+        if (router && !noRouterRefresh) {
+          router.refresh();
+        }
       } catch (error) {
         console.error("Failed to revalidate user page:", error);
       }

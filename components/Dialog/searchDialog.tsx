@@ -15,6 +15,7 @@
 // };
 
 import { logoUrl } from "app/lib/constants";
+import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { OutpostModel, TagModel, User } from "app/services/api/types";
@@ -35,6 +36,28 @@ import { Img } from "../Img";
 import { Input } from "../Input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../Tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./index";
+
+// TabTriggerWithCount Component
+interface TabTriggerWithCountProps {
+  value: string;
+  children: ReactNode;
+  count: number;
+}
+
+const TabTriggerWithCount = ({
+  value,
+  children,
+  count,
+}: TabTriggerWithCountProps) => (
+  <TabsTrigger value={value}>
+    {children}
+    {count > 0 && (
+      <span className="ml-1 px-2 py-0.5 text-xs font-medium bg-primary text-white rounded-full">
+        {count}
+      </span>
+    )}
+  </TabsTrigger>
+);
 
 interface SearchDialogProps {
   title?: ReactNode;
@@ -230,11 +253,15 @@ export const SearchDialogProvider = () => {
         {/* Tabs */}
         <Tabs defaultValue="users" className="flex-1">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="users">Users ({usersCount})</TabsTrigger>
-            <TabsTrigger value="outposts">
-              Outposts ({outpostsCount})
-            </TabsTrigger>
-            <TabsTrigger value="tags">Tags ({tagsCount})</TabsTrigger>
+            <TabTriggerWithCount value="users" count={usersCount}>
+              Users
+            </TabTriggerWithCount>
+            <TabTriggerWithCount value="outposts" count={outpostsCount}>
+              Outposts
+            </TabTriggerWithCount>
+            <TabTriggerWithCount value="tags" count={tagsCount}>
+              Tags
+            </TabTriggerWithCount>
           </TabsList>
 
           <div className="mt-4 h-[400px] overflow-y-auto">
@@ -246,43 +273,49 @@ export const SearchDialogProvider = () => {
                   <p>No users found</p>
                 </div>
               ) : (
-                Object.values(usersResults).map((user) => (
-                  <AppLink
+                Object.values(usersResults).map((user, index) => (
+                  <motion.div
                     key={user.uuid}
-                    onClick={() => {
-                      handleClose();
-                    }}
-                    underline={false}
-                    href={`/user/${user.uuid}`}
-                    className="block p-4 rounded-lg border border-border   transition-all duration-200 group"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <Img
-                          src={user.image || logoUrl}
-                          alt={user.name || "User"}
-                          className="w-12 h-12 rounded-full border-2 border-gradient-to-br from-blue-500/80 to-purple-500/80 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300"
-                          useImgTag
-                        />
+                    <AppLink
+                      onClick={() => {
+                        handleClose();
+                      }}
+                      underline={false}
+                      href={AppPages.userDetails(user.uuid)}
+                      className="block p-4 rounded-lg border border-border   transition-all duration-200 group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="relative">
+                          <Img
+                            src={user.image || logoUrl}
+                            alt={user.name || "User"}
+                            className="w-12 h-12 rounded-full border-2 border-gradient-to-br from-blue-500/80 to-purple-500/80 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300"
+                            useImgTag
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {user.name || "Anonymous User"}
+                          </h4>
+                          {user.aptos_address && (
+                            <p className="text-sm text-muted-foreground font-mono">
+                              {truncate(user.aptos_address)}
+                            </p>
+                          )}
+                          {user.uuid && (
+                            <p className="text-sm text-muted-foreground font-mono">
+                              {truncate(user.uuid)}
+                            </p>
+                          )}
+                        </div>
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors opacity-0 group-hover:opacity-100" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {user.name || "Anonymous User"}
-                        </h4>
-                        {user.aptos_address && (
-                          <p className="text-sm text-muted-foreground font-mono">
-                            {truncate(user.aptos_address)}
-                          </p>
-                        )}
-                        {user.uuid && (
-                          <p className="text-sm text-muted-foreground font-mono">
-                            {truncate(user.uuid)}
-                          </p>
-                        )}
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors opacity-0 group-hover:opacity-100" />
-                    </div>
-                  </AppLink>
+                    </AppLink>
+                  </motion.div>
                 ))
               )}
             </TabsContent>
@@ -295,38 +328,44 @@ export const SearchDialogProvider = () => {
                   <p>No outposts found</p>
                 </div>
               ) : (
-                Object.values(outposts).map((outpost) => (
-                  <AppLink
+                Object.values(outposts).map((outpost, index) => (
+                  <motion.div
                     key={outpost.uuid}
-                    underline={false}
-                    onClick={() => {
-                      handleClose();
-                    }}
-                    href={`/outpost_details/${outpost.uuid}`}
-                    className="block p-4 rounded-lg border transition-all duration-200 group"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: index * 0.05 }}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <Img
-                          src={outpost.image || logoUrl}
-                          alt={outpost.name}
-                          className="w-full h-full object-cover"
-                        />
+                    <AppLink
+                      underline={false}
+                      onClick={() => {
+                        handleClose();
+                      }}
+                      href={AppPages.outpostDetails(outpost.uuid)}
+                      className="block p-4 rounded-lg border transition-all duration-200 group"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                          <Img
+                            src={outpost.image || logoUrl}
+                            alt={outpost.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
+                            {outpost.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground line-clamp-2">
+                            {outpost.subject}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            by {outpost.creator_user_name}
+                          </p>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors">
-                          {outpost.name}
-                        </h4>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {outpost.subject}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          by {outpost.creator_user_name}
-                        </p>
-                      </div>
-                      <ExternalLink className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </AppLink>
+                    </AppLink>
+                  </motion.div>
                 ))
               )}
             </TabsContent>
@@ -443,7 +482,7 @@ export const SearchDialogProvider = () => {
                             onClick={() => {
                               handleClose();
                             }}
-                            href={`/outpost_details/${outpost.uuid}`}
+                            href={AppPages.outpostDetails(outpost.uuid)}
                             className="block p-4 rounded-lg border transition-all duration-200 group"
                           >
                             <div className="flex items-center gap-3">

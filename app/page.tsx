@@ -1,6 +1,10 @@
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { HomeContainer } from "../containers/home";
+import { generateMetadata } from "./_metadata";
+
+// Export the metadata function
+export { generateMetadata };
 
 // Cache the trending outposts data with ISR
 const getCachedTrendingOutposts = unstable_cache(

@@ -1,8 +1,9 @@
 "use client";
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import { initialState } from "./slice";
 
-export const GlobalDomains = {
+const GlobalDomains = {
   root: (state: RootState) => state,
   router: (state: RootState) => state.global?.router,
   web3Auth: (state: RootState) => state.global?.web3Auth,
@@ -12,6 +13,8 @@ export const GlobalDomains = {
     state.global?.initializingWeb3Auth,
   initialized: (state: RootState) => !!state.global?.web3Auth,
   logingIn: (state: RootState) => state.global?.logingIn,
+  wsConnectionStatus: (state: RootState) =>
+    state.global?.wsConnectionStatus ?? initialState.wsConnectionStatus,
   logingOut: (state: RootState) => state.global?.logingOut,
   podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
   joiningOutpostId: (state: RootState) => state.global?.joiningOutpostId,
@@ -39,6 +42,7 @@ export const GlobalSelectors = {
   initializingWeb3Auth: GlobalDomains.initializingWeb3Auth,
   initialized: GlobalDomains.initialized,
   logingIn: GlobalDomains.logingIn,
+  wsConnectionStatus: GlobalDomains.wsConnectionStatus,
   logingOut: GlobalDomains.logingOut,
   podiumUserInfo: GlobalDomains.podiumUserInfo,
   joiningOutpostId: GlobalDomains.joiningOutpostId,
@@ -47,16 +51,14 @@ export const GlobalSelectors = {
   viewArchivedOutposts: GlobalDomains.viewArchivedOutposts,
   numberOfOnlineUsers: GlobalDomains.numberOfOnlineUsers,
   objectOfOnlineUsersToGet: GlobalDomains.objectOfOnlineUsersToGet,
-  numberOfOnlineUsersForOutpost: (id: string) =>
-    createSelector(
-      GlobalDomains.numberOfOnlineUsers,
-      (objectOfOnlineUsers) => objectOfOnlineUsers[id] ?? 0
-    ),
+  numberOfOnlineUsersForOutpost: (id: string) => (state: RootState) =>
+    state.global?.numberOfOnlineUsers?.[id] ?? 0,
   switchingAccount: GlobalDomains.switchingAccount,
   isPrimaryAccount: createSelector(
     GlobalDomains.podiumUserInfo,
     (podiumUserInfo) => {
       const connectedAccounts = podiumUserInfo?.accounts ?? [];
+      if (connectedAccounts.length === 0) return true;
       const currentAccount = connectedAccounts.find(
         (account) => account.address === podiumUserInfo?.address
       );

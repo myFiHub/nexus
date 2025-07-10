@@ -60,6 +60,13 @@
   --light-hover: oklch(0.97 0 0 / 0.9);
   --dark: oklch(0.145 0 0);
   --dark-hover: oklch(0.145 0 0 / 0.9);
+  --sidebar-width: 260px;
+  
+  /* Scrollbar variables */
+  --scrollbar-track: oklch(0.97 0 0);
+  --scrollbar-thumb: oklch(0.85 0 0);
+  --scrollbar-thumb-hover: oklch(0.75 0 0);
+  --scrollbar-corner: var(--background);
 }
 
 @theme inline {
@@ -173,6 +180,11 @@
   --light-hover: oklch(0.269 0 0 / 0.9);
   --dark: oklch(0.985 0 0);
   --dark-hover: oklch(0.985 0 0 / 0.9);
+  
+  /* Dark theme scrollbar variables */
+  --scrollbar-track: oklch(0.205 0 0);
+  --scrollbar-thumb: oklch(0.35 0 0);
+  --scrollbar-thumb-hover: oklch(0.45 0 0);
 }
 
 @layer base {
@@ -183,4 +195,174 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Modern Scrollbar Styles */
+@layer base {
+  /* Webkit Scrollbars (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+    border-radius: calc(var(--radius) / 2);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: calc(var(--radius) / 2);
+    border: 1px solid transparent;
+    background-clip: padding-box;
+    transition: background-color 0.2s ease-in-out;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: var(--scrollbar-corner);
+  }
+
+  /* Firefox Scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  }
+
+  /* Smooth scrolling for modern browsers */
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Custom scrollbar for specific components */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary) var(--muted);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--muted);
+    border-radius: var(--radius);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, var(--primary), var(--primary-hover));
+    border-radius: var(--radius);
+    border: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, var(--primary-hover), var(--primary));
+  }
+
+  /* Invisible scrollbar variant */
+  .invisible-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .invisible-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Overlay scrollbar variant (floating over content) */
+  .overlay-scrollbar {
+    overflow: overlay;
+  }
+
+  .overlay-scrollbar::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+    background: transparent;
+  }
+
+  .overlay-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .overlay-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 6px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    backdrop-filter: blur(10px);
+  }
+
+  .overlay-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .overlay-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .dark .overlay-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Sidebar content pushing */
+main {
+  margin-left: var(--sidebar-width);
+  transition: margin-left 300ms ease-in-out;
+  /* Center content within the remaining space */
+  width: calc(100vw - var(--sidebar-width));
+  display: flex;
+  justify-content: center;
+}
+
+main > * {
+  width: 100%;
+  max-width: 1280px; /* max-w-7xl equivalent */
+}
+
+  /* Mobile: no margin */
+  @media (max-width: 768px) {
+    main {
+      margin-left: 0;
+      width: 100vw;
+    }
+  }
+
+  /* Custom animation for talking indicator */
+  @keyframes pulse-outline {
+    0% {
+      transform: scale(0);
+      opacity: 0;
+      border-width: 6px;
+      border-color: #065f46;
+    }
+    50% {
+      border-color: #10b981;
+      opacity: 0.8;
+    }
+    90% {
+      transform: scale(3.2);
+      opacity: 0.2;
+      border-width: 1px;
+      border-color: #34d399;
+    }
+    100% {
+      transform: scale(3.3);
+      opacity: 0;
+      border-width: 0.5px;
+      border-color: #6ee7b7;
+    }
+  }
+  
+  .pulse-ring {
+    animation: pulse-outline 3s ease-out infinite;
+  }
+  
+  .pulse-ring-delayed {
+    animation: pulse-outline 3s ease-out infinite;
+    animation-delay: 1.5s;
+  }
  

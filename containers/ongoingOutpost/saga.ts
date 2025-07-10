@@ -3,6 +3,7 @@ import {
   CheerBooAmountDialogResult,
 } from "app/components/Dialog/cheerBooAmountDialog";
 import { checkAudioPermission } from "app/lib/audioPermissions";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import {
@@ -18,8 +19,7 @@ import {
   OutgoingMessageType,
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { all, put, select, takeLatest } from "redux-saga/effects";
-import { EasyAccess } from "../global/effects/quickAccess";
+import { all, debounce, put, select, takeLatest } from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -37,7 +37,6 @@ function* getOutpost(
       yield put(onGoingOutpostActions.setHasAudioPermission(false));
       toast.error("Microphone permission is denied");
     }
-
     yield put(onGoingOutpostActions.setHasAudioPermission(true));
 
     const { id } = action.payload;
@@ -59,21 +58,21 @@ function* leaveOutpost(
   const outpost = action.payload;
 
   yield all([
-    put(onGoingOutpostActions.setOutpost(undefined)),
     put(
       onGoingOutpostActions.setAccesses({ canEnter: false, canSpeak: false })
     ),
     put(onGoingOutpostActions.setMeetApiObj(undefined)),
     put(onGoingOutpostActions.setJoined(false)),
     put(onGoingOutpostActions.setAmIMuted(true)),
+    put(onGoingOutpostActions.setLiveMembers({})),
   ]);
   const leaveMessage: OutgoingMessage = {
     message_type: OutgoingMessageType.LEAVE,
     outpost_uuid: outpost.uuid,
   };
-  wsClient.send(leaveMessage);
+  yield wsClient.send(leaveMessage);
   const router: AppRouterInstance = yield select(GlobalSelectors.router);
-  router.replace(`/outpost_details/${outpost.uuid}`);
+  router.replace(AppPages.outpostDetails(outpost.uuid));
 }
 
 function* like(action: ReturnType<typeof onGoingOutpostActions.like>) {
@@ -200,8 +199,8 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
       console.error("Outpost not found to boo");
       return;
     }
-    const isSelfReaction =
-      targetUserAddress === EasyAccess.getInstance().myUser?.address;
+
+    const isSelfReaction = targetUserAddress === myUser.address;
     let amount = "0";
     const results: CheerBooAmountDialogResult = yield cheerBooAmountDialog({
       cheer,
@@ -276,7 +275,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
             : cheer
             ? "Cheer"
             : "Boo"
-        } successful`
+        } successful${isSelfReaction ? "ly!" : ""}`
       );
       const booMessage: OutgoingMessage = {
         message_type: cheer
@@ -311,9 +310,14 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
 function* getLiveMembers(
   action: ReturnType<typeof onGoingOutpostActions.getLiveMembers>
 ) {
-  yield put(onGoingOutpostActions.isGettingLiveMembers(true));
+  const { silent } = action.payload || { silent: false };
+  if (!silent) {
+    yield put(onGoingOutpostActions.isGettingLiveMembers(true));
+  }
   yield detatched_getLiveMembers();
-  yield put(onGoingOutpostActions.isGettingLiveMembers(false));
+  if (!silent) {
+    yield put(onGoingOutpostActions.isGettingLiveMembers(false));
+  }
 }
 
 function* detatched_getLiveMembers() {
@@ -324,14 +328,21 @@ function* detatched_getLiveMembers() {
     console.error("Outpost not found to get live members");
     return [];
   }
-  const liveData: OutpostLiveData | undefined =
+  let liveData: OutpostLiveData | undefined | false =
     yield podiumApi.getLatestLiveData(outpost.uuid);
+  if (liveData === false) {
+    const success: boolean = yield wsClient.asyncJoinOutpost(outpost.uuid);
+    if (success) {
+      liveData = yield podiumApi.getLatestLiveData(outpost.uuid);
+    }
+  }
   if (!liveData) {
     console.error("Failed to get live members");
     return [];
   }
   const liveMembers: { [address: string]: LiveMember } = {};
   liveData.members.forEach((member) => {
+    member.last_speaked_at_timestamp ??= 0;
     liveMembers[member.address] = member;
   });
   yield put(onGoingOutpostActions.setLiveMembers(liveMembers));
@@ -369,6 +380,77 @@ function* incomingUserReaction(
   confettiEventBus.next({ address, type: reaction });
 }
 
+function* setIsRecording(
+  action: ReturnType<typeof onGoingOutpostActions.statrtStopRecording>
+) {
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    toast.error("you are not logged in");
+    return;
+  }
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to start recording");
+    return;
+  }
+  const amICreator = outpost.creator_user_uuid === myUser.uuid;
+  if (!amICreator) {
+    console.error("You are not the creator of the outpost");
+    return;
+  }
+  const isRecording = action.payload;
+  wsClient.send({
+    message_type: isRecording
+      ? OutgoingMessageType.START_RECORDING
+      : OutgoingMessageType.STOP_RECORDING,
+    outpost_uuid: outpost.uuid,
+  });
+}
+
+function* setJoined(
+  action: ReturnType<typeof onGoingOutpostActions.setJoined>
+) {
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to set joined");
+    return;
+  }
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    console.error("You are not logged in");
+    return;
+  }
+  const iAmCreator = outpost.creator_user_uuid === myUser.uuid;
+  const isJoined = action.payload;
+  if (outpost.creator_joined != true && iAmCreator && isJoined) {
+    yield podiumApi.setCreatorJoinedToTrue(outpost.uuid);
+  }
+}
+
+function* waitForCreator() {
+  const outpost: OutpostModel | undefined = yield select(
+    onGoingOutpostSelectors.outpost
+  );
+  if (!outpost) {
+    console.error("Outpost not found to wait for creator");
+    return;
+  }
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    console.error("You are not logged in");
+    return;
+  }
+  const outgoingMessage: OutgoingMessage = {
+    message_type: OutgoingMessageType.WAIT_FOR_CREATOR,
+    outpost_uuid: outpost.uuid,
+  };
+  wsClient.send(outgoingMessage);
+}
+
 export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.getOutpost, getOutpost);
   yield takeLatest(onGoingOutpostActions.leaveOutpost, leaveOutpost);
@@ -378,7 +460,10 @@ export function* onGoingOutpostSaga() {
   yield takeLatest(onGoingOutpostActions.stopSpeaking, stopSpeaking);
   yield takeLatest(onGoingOutpostActions.startRecording, startRecording);
   yield takeLatest(onGoingOutpostActions.cheerBoo, cheerBoo);
-  yield takeLatest(onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield debounce(500, onGoingOutpostActions.getLiveMembers, getLiveMembers);
+  yield takeLatest(onGoingOutpostActions.statrtStopRecording, setIsRecording);
+  yield takeLatest(onGoingOutpostActions.setJoined, setJoined);
+  yield takeLatest(onGoingOutpostActions.waitForCreator, waitForCreator);
   yield takeLatest(
     onGoingOutpostActions.incomingUserReaction,
     incomingUserReaction

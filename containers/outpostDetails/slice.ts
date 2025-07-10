@@ -12,7 +12,7 @@ const initialState: OutpostDetailsState = {
   editingScheduledDate: false,
 };
 
-const globalSlice = createSlice({
+const outpostDetailsSlice = createSlice({
   name: "outpostDetails",
   initialState,
   reducers: {
@@ -31,12 +31,12 @@ export const {
   reducer: outpostDetailsReducer,
   name,
   actions: outpostDetailsActions,
-} = globalSlice;
+} = outpostDetailsSlice;
 
 export const useOutpostDetailsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: outpostDetailsReducer,
+    name: outpostDetailsSlice.name,
+    reducer: outpostDetailsSlice.reducer,
     saga: outpostDetailsSaga,
   });
 };

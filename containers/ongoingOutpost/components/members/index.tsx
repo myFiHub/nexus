@@ -1,6 +1,7 @@
 import { InviteUsersButton } from "app/containers/outpostDetails/components/InviteUsersButton";
+import { wsClient } from "app/services/wsClient/client";
 import { Loader2, Users } from "lucide-react";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
 import { onGoingOutpostActions } from "../../slice";
@@ -14,16 +15,38 @@ export const OngoingOutpostMembers = memo(
       onGoingOutpostSelectors.isGettingLiveMembers
     );
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
+    const numberOfMembersRef = useRef(numberOfMembers);
 
-    // Fetch live members when component mounts
+    const joined = useSelector(onGoingOutpostSelectors.joined);
+    const joinedRef = useRef(joined);
+
     useEffect(() => {
+      numberOfMembersRef.current = numberOfMembers;
+      joinedRef.current = joined;
+    }, [numberOfMembers, joined]);
+
+    useEffect(() => {
+      let timeoutId: NodeJS.Timeout;
       if (outpost?.uuid) {
-        dispatch(onGoingOutpostActions.getLiveMembers());
+        timeoutId = setTimeout(async () => {
+          if (numberOfMembersRef.current === 0 && !joinedRef.current) {
+            // const joinedOutpostId=wsClient.
+            const success = await wsClient.asyncJoinOutpost(outpost?.uuid);
+            if (success) {
+              dispatch(onGoingOutpostActions.getLiveMembers());
+            }
+          }
+        }, 30000);
+        return () => {
+          if (timeoutId) {
+            clearTimeout(timeoutId);
+          }
+        };
       }
-    }, [dispatch, outpost?.uuid]);
+    }, [outpost?.uuid, joinedRef]);
 
     // Show loading state when getting live members
-    if (isGettingLiveMembers || numberOfMembers === 0) {
+    if (isGettingLiveMembers && numberOfMembers === 0) {
       return (
         <div className="absolute top-0 right-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg p-4 shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-50">
           <div className="flex items-center gap-2 mb-3">

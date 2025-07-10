@@ -189,8 +189,8 @@ export const {
 
 export const useAssetsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: assetsReducer,
+    name: assetsSlice.name,
+    reducer: assetsSlice.reducer,
     saga: assetsSaga, // Add saga if needed later
   });
 };

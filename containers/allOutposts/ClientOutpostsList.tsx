@@ -66,8 +66,10 @@ const Content = ({ initialOutposts }: ClientOutpostsListProps) => {
     [isLoadingMore, hasMore, dispatch]
   );
 
-  // Combine SSR and client-side outposts
-  const allOutposts = [...initialOutposts, ...clientOutposts];
+  // Combine SSR and client-side outposts, remove initialOutposts
+  const allOutposts = [...(clientOutposts ?? [])].filter(
+    (outpost) => !initialOutposts.some((o) => o.uuid === outpost.uuid)
+  );
 
   // Remove duplicates based on UUID
   const uniqueOutposts = allOutposts.filter(

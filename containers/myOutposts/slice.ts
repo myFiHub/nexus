@@ -78,8 +78,8 @@ export const {
 
 export const useMyOutpostsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: myOutpostsReducer,
+    name: myOutpostsSlice.name,
+    reducer: myOutpostsSlice.reducer,
     saga: myOutpostsSaga,
   });
 };

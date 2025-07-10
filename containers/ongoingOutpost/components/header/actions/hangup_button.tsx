@@ -1,5 +1,5 @@
 import { Button } from "app/components/Button";
-import { confirmDialog } from "app/components/Dialog/confirmDialog";
+import { leaveOutpostWarningDialog } from "app/containers/ongoingOutpost/dialogs/leaveOutpostWarning";
 import { Loader2, PhoneOff } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -7,19 +7,18 @@ import { onGoingOutpostSelectors } from "../../../selectors";
 
 export const HangupButton = () => {
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
+  const outpost = useSelector(onGoingOutpostSelectors.outpost);
+  const onlineMembersCount = useSelector(onGoingOutpostSelectors.membersCount);
   const [isHangingUp, setIsHangingUp] = useState(false);
+
   const handleHangup = async () => {
-    if (apiObj) {
+    if (apiObj && outpost) {
       setIsHangingUp(true);
-      const response = await confirmDialog({
-        title: "Leavint the outpost",
-        content: "Do you want to leave the outpost?",
-        confirmOpts: {
-          text: "LEAVE",
-          colorScheme: "danger",
-        },
+      const shouldLeave = await leaveOutpostWarningDialog({
+        outpostName: outpost.name,
+        onlineMembersCount: onlineMembersCount || 0,
       });
-      if (response.confirmed) {
+      if (shouldLeave) {
         apiObj.executeCommand("hangup");
       } else {
         setIsHangingUp(false);

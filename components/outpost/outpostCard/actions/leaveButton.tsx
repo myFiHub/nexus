@@ -52,12 +52,14 @@ const Content = ({ outpost: passedOutpost }: { outpost: OutpostModel }) => {
         <Button
           onClick={handleLeave}
           disabled={isLoading}
-          className="bg-red-500 hover:bg-red-600"
+          className="w-10 h-10 p-0 rounded-lg bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white shadow-md hover:shadow-lg transition-all duration-200 transform hover:scale-105 disabled:transform-none disabled:opacity-60"
         >
           <LogOut className="w-4 h-4" />
         </Button>
       </TooltipTrigger>
-      <TooltipContent>Leave the Outpost</TooltipContent>
+      <TooltipContent className="text-foreground">
+        Leave the Outpost
+      </TooltipContent>
     </Tooltip>
   );
 };

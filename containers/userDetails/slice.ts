@@ -39,9 +39,10 @@ export const {
 
 export const useUserDetailsSlice = () => {
   injectContainer({
-    name: name,
-    reducer: userDetailsReducer,
+    name: userDetailsSlice.name,
+    reducer: userDetailsSlice.reducer,
     saga: userDetailsSaga,
     // No saga for userDetails
   });
+  return userDetailsSlice;
 };

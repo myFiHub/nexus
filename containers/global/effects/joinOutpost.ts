@@ -8,16 +8,17 @@ import {
   onGoingOutpostActions,
   useOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { LiveMember, OutpostModel } from "app/services/api/types";
+import { LiveMember, OutpostModel, User } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
+import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { put, select } from "redux-saga/effects";
-import { GlobalDomains } from "../selectors";
+import { all, put, select } from "redux-saga/effects";
+import { GlobalSelectors } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
-import { EasyAccess } from "./quickAccess";
 import { OutpostAccesses } from "./types";
 
 const BuyableTicketTypes = {
@@ -33,8 +34,9 @@ const FreeOutpostAccessTypes = {
 export function* joinOutpost(
   action: ReturnType<typeof globalActions.joinOutpost>
 ) {
+  useOnGoingOutpostSlice();
   const joiningId: string | undefined = yield select(
-    GlobalDomains.joiningOutpostId
+    GlobalSelectors.joiningOutpostId
   );
   if (joiningId !== undefined) {
     return;
@@ -59,6 +61,7 @@ export function* joinOutpost(
     }
   } catch (error) {
     toast.error("error while getting outpost data");
+    console.error(error);
   } finally {
     yield put(globalActions.setJoiingOutpostId(undefined));
   }
@@ -71,7 +74,8 @@ function* getOutpostAccesses({
   outpost: OutpostModel;
   joiningByLink: boolean;
 }): Generator<any, OutpostAccesses | undefined, any> {
-  const myUser = EasyAccess.getInstance().myUser;
+  const store = getStore();
+  const myUser = store.getState().global.podiumUserInfo!;
   ///////////////////////////////////////////////////
   const iAmOutpostCreator = outpost.creator_user_uuid == myUser.uuid;
   if (iAmOutpostCreator) {
@@ -90,10 +94,7 @@ function* getOutpostAccesses({
   }
 
   //////////////////////////////////////////////////
-  if (
-    outpost.has_adult_content &&
-    !EasyAccess.getInstance().myUser.is_over_18
-  ) {
+  if (outpost.has_adult_content && !myUser.is_over_18) {
     const res: ConfirmDialogResult = yield confirmDialog({
       title: "Adult Content",
       content: "This Outpost has adult content, are you sure you want to join?",
@@ -199,10 +200,15 @@ function* openOutpost({
 }) {
   useOnGoingOutpostSlice();
   const outpost = { ...receivedOutpost };
-  const router: AppRouterInstance = yield select(GlobalDomains.router);
+  const router: AppRouterInstance = yield select(GlobalSelectors.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
+  const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
+  if (!myUser) {
+    toast.error("You are not logged in");
+    return;
+  }
   const iAmMember: LiveMember | undefined = currentMembers.find(
-    (member) => member.uuid === EasyAccess.getInstance().myUser.uuid
+    (member) => member.uuid === myUser.uuid
   );
   if (!iAmMember) {
     const added: boolean = yield podiumApi.addMeAsMember(outpost.uuid);
@@ -218,13 +224,19 @@ function* openOutpost({
     return;
   }
 
-  const success: boolean = yield wsClient.asyncJoinOutpostWithRetry(
-    outpost.uuid
-  );
+  const success: boolean = yield wsClient.asyncJoin(outpost.uuid);
   if (success) {
-    yield put(onGoingOutpostActions.setOutpost(outpost));
-    yield put(onGoingOutpostActions.setAccesses(accesses));
-    router.push(`/ongoing_outpost/${outpost.uuid}`);
+    yield all([
+      put(onGoingOutpostActions.setOutpost(outpost)),
+      put(onGoingOutpostActions.setAccesses(accesses)),
+      put(onGoingOutpostActions.getLiveMembers()),
+    ]);
+    if (typeof window !== "undefined") {
+      const correntRoute = window.location.pathname;
+      if (!correntRoute.includes(AppPages.ongoingOutpost(outpost.uuid))) {
+        router.push(AppPages.ongoingOutpost(outpost.uuid));
+      }
+    }
   } else {
     toast.error("Failed to join Outpost");
   }
@@ -254,7 +266,9 @@ export const canEnterWithoutATicket = (outpost: OutpostModel): boolean => {
 };
 
 export const canISpeakWithoutTicket = (outpost: OutpostModel): boolean => {
-  const myId = EasyAccess.getInstance().myUser.uuid;
+  const store = getStore();
+  const myUser = store.getState().global.podiumUserInfo!;
+  const myId = myUser.uuid;
   const iAmTheCreator = outpost.creator_user_uuid === myId;
   if (iAmTheCreator) return true;
   if (outpost.speak_type === FreeOutpostAccessTypes.invited_users) {

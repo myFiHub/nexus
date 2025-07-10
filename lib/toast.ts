@@ -1,3 +1,4 @@
+"use client";
 import { toast as sonnerToast } from "sonner";
 
 interface ToastAction {
@@ -8,12 +9,14 @@ interface ToastAction {
 interface ToastOptions {
   duration?: number;
   action?: ToastAction;
+  permanent?: boolean;
 }
 
 export const toast = {
   success: (message: string, options?: ToastOptions) => {
-    sonnerToast.success(message, {
-      duration: options?.duration || 4000,
+    const toastId = sonnerToast.success(message, {
+      duration: options?.permanent ? Infinity : options?.duration || 4000,
+      dismissible: !options?.permanent,
       action: options?.action
         ? {
             label: options.action.label,
@@ -21,11 +24,13 @@ export const toast = {
           }
         : undefined,
     });
+    return toastId;
   },
 
   error: (message: string, options?: ToastOptions) => {
-    sonnerToast.error(message, {
-      duration: options?.duration || 4000,
+    const toastId = sonnerToast.error(message, {
+      duration: options?.permanent ? Infinity : options?.duration || 4000,
+      dismissible: !options?.permanent,
       action: options?.action
         ? {
             label: options.action.label,
@@ -33,11 +38,13 @@ export const toast = {
           }
         : undefined,
     });
+    return toastId;
   },
 
   warning: (message: string, options?: ToastOptions) => {
-    sonnerToast.warning(message, {
-      duration: options?.duration || 4000,
+    const toastId = sonnerToast.warning(message, {
+      duration: options?.permanent ? Infinity : options?.duration || 4000,
+      dismissible: !options?.permanent,
       action: options?.action
         ? {
             label: options.action.label,
@@ -45,11 +52,13 @@ export const toast = {
           }
         : undefined,
     });
+    return toastId;
   },
 
   info: (message: string, options?: ToastOptions) => {
-    sonnerToast.info(message, {
-      duration: options?.duration || 4000,
+    const toastId = sonnerToast.info(message, {
+      duration: options?.permanent ? Infinity : options?.duration || 4000,
+      dismissible: !options?.permanent,
       action: options?.action
         ? {
             label: options.action.label,
@@ -57,6 +66,7 @@ export const toast = {
           }
         : undefined,
     });
+    return toastId;
   },
 
   promise: <T>(
@@ -66,11 +76,13 @@ export const toast = {
       success,
       error,
       action,
+      permanent,
     }: {
       loading: string;
       success: string;
       error: string;
       action?: ToastAction;
+      permanent?: boolean;
     }
   ) => {
     return sonnerToast.promise(promise, {
@@ -83,6 +95,12 @@ export const toast = {
             onClick: action.onClick,
           }
         : undefined,
+      duration: permanent ? Infinity : undefined,
+      dismissible: !permanent,
     });
+  },
+
+  dismiss: (toastId: string | number) => {
+    sonnerToast.dismiss(toastId);
   },
 };

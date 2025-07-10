@@ -1,5 +1,4 @@
-"use client";
-import { OutpostCardSkeleton } from "./OutpostCardSkeleton";
+import { OutpostCardSkeleton } from "./outpostCard/skeleton";
 
 interface LoadingOutpostsProps {
   count?: number;

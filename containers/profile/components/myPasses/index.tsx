@@ -2,6 +2,7 @@ import { AppLink } from "app/components/AppLink";
 import { Button } from "app/components/Button";
 import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
+import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
 import { ExternalLink, Heart, Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
@@ -36,7 +37,7 @@ const PassCard = ({ pass }: { pass: any }) => {
             </div>
             <div className="flex-1 min-w-0">
               <AppLink
-                href={`/user/${pass.podium_pass_owner_address}`}
+                href={AppPages.userDetails(pass.podium_pass_owner_address)}
                 className="p-0"
               >
                 <h3 className="font-medium text-white truncate">{pass.name}</h3>

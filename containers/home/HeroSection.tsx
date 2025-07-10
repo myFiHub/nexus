@@ -1,4 +1,5 @@
 import { AppLink } from "../../components/AppLink";
+import { AppPages } from "../../lib/routes";
 
 export function HeroSection() {
   return (
@@ -38,7 +39,7 @@ export function HeroSection() {
               Discover Creators
             </AppLink>
             <AppLink
-              href="/create_outpost"
+              href={AppPages.createOutpost}
               variant="outline"
               size="default"
               className="border-2 border-[var(--primary)] text-[var(--primary)] px-8 py-4 rounded-full text-lg font-bold hover:bg-[var(--primary)] hover:text-white transition-all duration-200 hover:scale-105 backdrop-blur-sm"
@@ -47,7 +48,7 @@ export function HeroSection() {
             </AppLink>
           </div>
           <AppLink
-            href="/all_outposts"
+            href={AppPages.allOutposts}
             className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:text-purple-600 text-lg group transition-colors duration-200 mb-12"
           >
             <span>View All Outposts</span>

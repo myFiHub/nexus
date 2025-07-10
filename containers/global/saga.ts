@@ -7,9 +7,12 @@ import {
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
 import {
-  confirmDialog,
-  ConfirmDialogResult,
-} from "app/components/Dialog/confirmDialog";
+  nameDialog,
+  NameDialogResult,
+  promptNotifications,
+  referrerDialog,
+  ReferrerDialogResult,
+} from "app/components/Dialog";
 import { CookieKeys } from "app/lib/client-cookies";
 import {
   deleteServerCookieViaAPI,
@@ -17,7 +20,10 @@ import {
 } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
-import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
+import {
+  checkPushNotificationPermission,
+  requestPushNotificationPermission,
+} from "app/lib/pushNotificationPermissions";
 import {
   signMessage,
   signMessageWithTimestamp,
@@ -82,6 +88,13 @@ function* initOneSignal(
 ) {
   const myId: string = action.payload.myId;
   try {
+    const hasPermision: boolean = yield checkPushNotificationPermission();
+    if (!hasPermision) {
+      const result: boolean = yield promptNotifications();
+      if (!result) {
+        return;
+      }
+    }
     const result: boolean = yield requestPushNotificationPermission();
     if (!result) {
       toast.error("Push notification permission is denied");
@@ -105,7 +118,7 @@ function* initializeWeb3Auth(
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
           : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      ssr: true,
+      ssr: false,
     },
   };
 
@@ -350,9 +363,9 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       const evmAddress = evmWallet.address;
 
       const loginRequest: LoginRequest = {
-        signature: "placeholder",
+        signature: "placeholder", //this will be handled and changed in next step
         username: evmAddress,
-        timestamp: 0,
+        timestamp: 0, //this will be handled and changed in next step
         aptos_address: aptosAddress,
         has_ticket: hasCreatorPass,
         login_type_identifier: identifierId,
@@ -411,16 +424,8 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   } = yield podiumApi.login(loginRequest, additionalDataForLogin);
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
-    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
-      {
-        title: "do you have a referrer",
-        content: "",
-        inputOpts: {
-          inputType: "text",
-          inputPlaceholder: "referrer id",
-        },
-      }
-    );
+    const { confirmed, enteredText }: ReferrerDialogResult =
+      yield referrerDialog();
     if (confirmed && enteredText) {
       referrerId = enteredText;
       loginRequest.referrer_user_uuid = referrerId;
@@ -430,6 +435,10 @@ function* detached_continueWithLoginRequestAndAdditionalData({
         privateKey,
         retried: true,
       });
+      return;
+    } else {
+      toast.error("you need to be referred by a user to join");
+      yield put(globalActions.logout());
       return;
     }
   } else if (!response.user && response.error) {
@@ -441,16 +450,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   let canContinue = true;
   if (!savedName) {
     canContinue = false;
-    const { confirmed, enteredText }: ConfirmDialogResult = yield confirmDialog(
-      {
-        title: "please enter your name",
-        content: "",
-        inputOpts: {
-          inputType: "text",
-          inputPlaceholder: "name",
-        },
-      }
-    );
+    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
     if (confirmed && (enteredText?.trim().length || 0) > 0) {
       const resultsForUpdate: User | undefined =
         yield podiumApi.updateMyUserData({ name: enteredText });
@@ -486,7 +486,11 @@ function* detached_afterGettingPodiumUser({
 }) {
   yield put(notificationsActions.getNotifications());
   yield put(globalActions.initOneSignal({ myId: user.uuid }));
-  yield setServerCookieViaAPI(CookieKeys.myUserId, user.uuid);
+  yield all([
+    setServerCookieViaAPI(CookieKeys.myUserId, user.uuid),
+    setServerCookieViaAPI(CookieKeys.myMoveAddress, user.aptos_address!),
+  ]);
+
   if (token) {
     yield wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!);
   }
@@ -592,4 +596,10 @@ export function* globalSaga() {
     globalActions.toggleOutpostFromOnlineObject,
     getLatestOnlineUsersForOutposts
   );
+  // Example retry usage - uncomment and replace with your actual action and function
+  // yield retry(
+  //   5,
+  //   globalActions.yourAction, // Replace with your actual action
+  //   yourRetryableFunction
+  // );
 }

@@ -23,7 +23,6 @@ import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
 
-let store: Store<RootState, AnyAction>;
 // Create the saga middleware
 const sagaMiddleware = createSagaMiddleware();
 
@@ -33,8 +32,11 @@ const injectedReducers: Record<string, Reducer<any, AnyAction>> = {};
 // Create an object to store injected sagas
 const injectedSagas: Record<string, any> = {};
 
-// Function to get or create store
-export const getStore = (): Store<RootState, AnyAction> => {
+// Declare store variable
+let store: Store<RootState, AnyAction>;
+
+// Function to get or create store - using function declaration for hoisting
+export function getStore(): Store<RootState, AnyAction> {
   if (!store) {
     // Configure the store
     store = configureStore({
@@ -50,10 +52,10 @@ export const getStore = (): Store<RootState, AnyAction> => {
     sagaMiddleware.run(rootSaga);
   }
   return store;
-};
+}
 
 // Function to inject a reducer
-const injectReducer = (key: string, reducer: Reducer<any, UnknownAction>) => {
+function injectReducer(key: string, reducer: Reducer<any, UnknownAction>) {
   if (typeof window !== "undefined") {
     if (injectedReducers[key]) {
       return;
@@ -69,34 +71,38 @@ const injectReducer = (key: string, reducer: Reducer<any, UnknownAction>) => {
     ) as Reducer<RootState, UnknownAction>;
 
     getStore().replaceReducer(combinedReducer);
-    console.log("injected reducer", key);
+    if (isDev) {
+      console.log("injected reducer", key);
+    }
   }
-};
+}
 
 // Function to inject a saga
-const injectSaga = (key: string, saga: any) => {
+function injectSaga(key: string, saga: any) {
   if (typeof window !== "undefined") {
     if (injectedSagas[key]) {
       return;
     }
     injectedSagas[key] = saga;
     sagaMiddleware.run(saga);
-    console.log("injected saga", key);
+    if (isDev) {
+      console.log("injected saga", key);
+    }
   }
-};
+}
 
-export const injectContainer = (container: {
+export function injectContainer(container: {
   name: string;
   reducer: any;
   saga: any;
-}) => {
+}) {
   injectReducer(container.name, container.reducer);
   injectSaga(container.name, container.saga);
-};
+}
 
-export const isRegisteredSlice = ({ name }: { name: string }) => {
+export function isRegisteredSlice({ name }: { name: string }) {
   return !!injectedReducers[name] && !!injectedSagas[name];
-};
+}
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = {
@@ -112,4 +118,4 @@ export type RootState = {
   notifications: NotificationsState;
   allOutposts: AllOutpostsState;
 };
-export type AppDispatch = typeof store.dispatch;
+export type AppDispatch = ReturnType<typeof getStore>["dispatch"];

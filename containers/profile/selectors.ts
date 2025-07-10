@@ -1,21 +1,24 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
-import { GlobalDomains } from "../global/selectors";
 
 export const myProfileDomains = {
   root: (state: RootState) => state,
   addressOfAccountThatIsBeingMadePrimary: (state: RootState) =>
     state.profile.addressOfAccountThatIsBeingMadePrimary,
+  podiumUserInfo: (state: RootState) => state.global.podiumUserInfo,
 };
 
 export const myProfileSelectors = {
   addressOfAccountThatIsBeingMadePrimary:
     myProfileDomains.addressOfAccountThatIsBeingMadePrimary,
   isAccountPrimary: (address: string) =>
-    createSelector(
-      GlobalDomains.podiumUserInfo,
-      (podiumUserInfo) =>
-        podiumUserInfo?.accounts.find((account) => account.address === address)
+    createSelector(myProfileDomains.podiumUserInfo, (podiumUserInfo) => {
+      if (!podiumUserInfo) return false;
+      const connectedAccounts = podiumUserInfo.accounts;
+      if (connectedAccounts.length === 0) return true;
+      return (
+        connectedAccounts.find((account) => account.address === address)
           ?.is_primary ?? false
-    ),
+      );
+    }),
 };

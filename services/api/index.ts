@@ -603,13 +603,16 @@ class PodiumApi {
 
   async getLatestLiveData(
     outpostId: string
-  ): Promise<OutpostLiveData | undefined> {
+  ): Promise<OutpostLiveData | undefined | false> {
     try {
       const response = await this.axiosInstance.get(`/outposts/online-data`, {
         params: { uuid: outpostId },
       });
       return response.data.data;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response.status === 422) {
+        return false;
+      }
       console.error("Get latest live data error:", error);
       return undefined;
     }

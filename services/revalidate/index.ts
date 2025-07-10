@@ -2,11 +2,22 @@ interface RevalidateResponse {
   success: boolean;
   message: string;
   revalidatedPath: string;
+  revalidatedTags?: string[];
 }
 
 interface RevalidateError {
   error: string;
 }
+
+interface UserDataRevalidateOptions {
+  userData?: boolean;
+  passBuyers?: boolean;
+  followers?: boolean;
+  followings?: boolean;
+  all?: boolean;
+}
+
+import { ApiEndpoints } from "app/lib/routes";
 
 class RevalidateService {
   private readonly baseUrl: string;
@@ -40,7 +51,8 @@ class RevalidateService {
 
   private async makeRequest<T>(
     endpoint: string,
-    method: "GET" | "POST" = "POST"
+    method: "GET" | "POST" = "POST",
+    body?: any
   ): Promise<T> {
     const url = `${this.baseUrl}/api/revalidate${endpoint}`;
     const response = await fetch(url, {
@@ -48,6 +60,7 @@ class RevalidateService {
       headers: {
         "Content-Type": "application/json",
       },
+      body: body ? JSON.stringify(body) : undefined,
     });
 
     if (!response.ok) {
@@ -61,7 +74,7 @@ class RevalidateService {
   }
 
   /**
-   * Revalidates a user profile page
+   * Revalidates a user profile page (path only)
    * @param userId - The user ID to revalidate
    * @returns Promise with revalidation result
    */
@@ -70,7 +83,75 @@ class RevalidateService {
       throw new Error("User ID is required");
     }
 
-    return this.makeRequest<RevalidateResponse>(`/user/${userId}`);
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.user(userId)
+    );
+  }
+
+  /**
+   * Revalidates user data with cache tag options
+   * @param userId - The user ID to revalidate
+   * @param options - Object specifying which cache tags to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateUserData(
+    userId: string,
+    options: UserDataRevalidateOptions = { all: false }
+  ): Promise<RevalidateResponse> {
+    if (!userId) {
+      throw new Error("User ID is required");
+    }
+
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.user(userId),
+      "POST",
+      options
+    );
+  }
+
+  /**
+   * Revalidates only the user's basic data cache
+   * @param userId - The user ID to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateUserBasicData(userId: string): Promise<RevalidateResponse> {
+    return this.revalidateUserData(userId, { userData: true });
+  }
+
+  /**
+   * Revalidates only the user's followers cache
+   * @param userId - The user ID to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateUserFollowers(userId: string): Promise<RevalidateResponse> {
+    return this.revalidateUserData(userId, { followers: true });
+  }
+
+  /**
+   * Revalidates only the user's followings cache
+   * @param userId - The user ID to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateUserFollowings(userId: string): Promise<RevalidateResponse> {
+    return this.revalidateUserData(userId, { followings: true });
+  }
+
+  /**
+   * Revalidates only the user's pass buyers cache
+   * @param userId - The user ID to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateUserPassBuyers(userId: string): Promise<RevalidateResponse> {
+    return this.revalidateUserData(userId, { passBuyers: true });
+  }
+
+  /**
+   * Revalidates all user data cache tags
+   * @param userId - The user ID to revalidate
+   * @returns Promise with revalidation result
+   */
+  async revalidateAllUserData(userId: string): Promise<RevalidateResponse> {
+    return this.revalidateUserData(userId, { all: true });
   }
 
   /**
@@ -78,7 +159,9 @@ class RevalidateService {
    * @returns Promise with revalidation result
    */
   async revalidateAllOutposts(): Promise<RevalidateResponse> {
-    return this.makeRequest<RevalidateResponse>("/all-outposts");
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.allOutposts
+    );
   }
 
   /**
@@ -94,7 +177,9 @@ class RevalidateService {
     }
 
     return this.makeRequest<RevalidateResponse>(
-      `/outpost-details/${outpostId}`
+      ApiEndpoints.revalidate.outpostDetails(outpostId),
+      "POST",
+      { cacheOnly: true }
     );
   }
 
@@ -107,11 +192,18 @@ class RevalidateService {
     userId?: string;
     outpostId?: string;
     allOutposts?: boolean;
+    userDataOptions?: UserDataRevalidateOptions;
   }): Promise<RevalidateResponse[]> {
     const promises: Promise<RevalidateResponse>[] = [];
 
     if (options.userId) {
-      promises.push(this.revalidateUser(options.userId));
+      if (options.userDataOptions) {
+        promises.push(
+          this.revalidateUserData(options.userId, options.userDataOptions)
+        );
+      } else {
+        promises.push(this.revalidateUser(options.userId));
+      }
     }
 
     if (options.outpostId) {
@@ -138,4 +230,4 @@ export const createRevalidateService = (baseUrl: string) =>
   new RevalidateService(baseUrl);
 
 export { RevalidateService, revalidateService };
-export type { RevalidateError, RevalidateResponse };
+export type { RevalidateError, RevalidateResponse, UserDataRevalidateOptions };

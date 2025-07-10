@@ -1,3 +1,4 @@
+import { AppPages } from "app/lib/routes";
 import { AppLink, type AppLinkProps } from "./index";
 
 interface OutpostLinkProps extends Omit<AppLinkProps, "href"> {
@@ -6,7 +7,7 @@ interface OutpostLinkProps extends Omit<AppLinkProps, "href"> {
 }
 
 export const OutpostLink = ({ id, ...props }: OutpostLinkProps) => {
-  return <AppLink href={`/outpost_details/${id}`} {...props} />;
+  return <AppLink href={AppPages.outpostDetails(id)} {...props} />;
 };
 
 export default OutpostLink;

@@ -1,4 +1,5 @@
 import { AppLink } from "app/components/AppLink";
+import { AppPages } from "app/lib/routes";
 
 export default function NotFound() {
   return (
@@ -18,7 +19,7 @@ export default function NotFound() {
             Go Home
           </AppLink>
           <AppLink
-            href="/all_outposts"
+            href={AppPages.allOutposts}
             className="inline-flex items-center justify-center px-6 py-3 border border-[var(--primary)] text-[var(--primary)] rounded-full hover:bg-[var(--primary)] hover:text-white transition-colors"
           >
             Browse Outposts

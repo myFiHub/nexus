@@ -12,6 +12,7 @@ import {
 } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
 import { canISpeakWithoutTicket } from "../global/effects/joinOutpost";
@@ -215,10 +216,13 @@ function* buyPassFromUser(
             }
           }
         }
-
+        const myUser = yield select(GlobalSelectors.podiumUserInfo);
         // Revalidate user profile using client-side service
         try {
-          yield revalidateService.revalidateUser(user.uuid);
+          yield all([
+            revalidateService.revalidateUserPassBuyers(user.uuid),
+            revalidateService.revalidateUserPassBuyers(myUser!.uuid),
+          ]);
         } catch (error) {
           console.error("Failed to revalidate user page:", error);
         }
@@ -300,6 +304,16 @@ function* sellOneOfMyBoughtPasses(
       });
       if (response) {
         toast.success("Pass sold successfully");
+        yield all([
+          revalidateService.revalidateUserPassBuyers(seller.uuid),
+          revalidateService.revalidateUserPassBuyers(myUser!.uuid),
+        ]);
+        const router: AppRouterInstance | undefined = yield select(
+          GlobalSelectors.router
+        );
+        if (router) {
+          router.refresh();
+        }
       } else {
         toast.error("Error, while selling the Pass. Please try again.");
       }

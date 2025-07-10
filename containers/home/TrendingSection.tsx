@@ -2,6 +2,7 @@ import OutpostLink from "app/components/AppLink/outpostLink";
 import { Img } from "app/components/Img";
 import { OutpostModel } from "app/services/api/types";
 import { AppLink } from "../../components/AppLink";
+import { AppPages } from "../../lib/routes";
 
 export function TrendingSection({
   trendingOutposts,
@@ -30,6 +31,7 @@ export function TrendingSection({
                 src={outpost.image}
                 alt={outpost.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
               <div className="absolute bottom-4 left-4 right-4">
@@ -65,7 +67,7 @@ export function TrendingSection({
       </div>
 
       <AppLink
-        href="/all_outposts"
+        href={AppPages.allOutposts}
         className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:text-purple-600 text-lg group transition-colors duration-200"
       >
         <span>View All Outposts</span>

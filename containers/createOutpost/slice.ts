@@ -217,8 +217,8 @@ export const {
 
 export const useCreateOutpostSlice = () => {
   injectContainer({
-    name: name,
-    reducer: createOutpostReducer,
+    name: createOutpostSlice.name,
+    reducer: createOutpostSlice.reducer,
     saga: createOutpostSaga,
   });
 };

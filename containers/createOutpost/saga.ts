@@ -3,6 +3,7 @@ import {
   ReminderDialogResult,
 } from "app/components/Dialog/reminder";
 import { BuyableTicketTypes } from "app/components/outpost/types";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import { generateOutpostShareUrl, isDev } from "app/lib/utils";
 import podiumApi from "app/services/api";
@@ -275,7 +276,7 @@ function* createOutpost(
     } catch (error) {
       console.error("Failed to revalidate pages:", error);
     }
-    router.push(`/outpost_details/${outpost.uuid}`);
+    router.push(AppPages.outpostDetails(outpost.uuid));
   } catch (error) {
     console.log({ error });
   } finally {

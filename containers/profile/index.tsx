@@ -14,7 +14,6 @@ import { MyPasses } from "./components/myPasses";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountCardActionSelectDialogProvider } from "./components/SecuritySection/dialogs/accountCardActionSelectDialog";
-import { ExportPrivateKeyDialogProvider } from "./components/SecuritySection/dialogs/exportPrivateKeyDialog";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";

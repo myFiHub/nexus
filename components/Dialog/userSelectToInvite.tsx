@@ -20,11 +20,11 @@
 // };
 
 import { Img } from "app/components/Img";
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { canInviteToSpeak } from "app/lib/outpostPermissions";
 import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { InviteModel, OutpostModel, User } from "app/services/api/types";
-import { RootState } from "app/store";
 import { Loader2, Search, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -89,7 +89,7 @@ export const UserSelectToInviteDialogProvider = () => {
   const [dialogContent, setDialogContent] =
     useState<UserSelectToInviteDialogProps | null>(null);
 
-  const myUser = useSelector((state: RootState) => state.global.podiumUserInfo);
+  const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     const handleShowDialog = (
