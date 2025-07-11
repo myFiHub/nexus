@@ -350,7 +350,7 @@ function* detatched_getLiveMembers(forceJoin?: boolean) {
   if (liveData === false && !forceJoin) {
     if (isDev) console.log("live data is false");
     return [];
-  } else if (forceJoin) {
+  } else if (!liveData && forceJoin) {
     const joined: boolean = yield wsClient.asyncJoin(outpost.uuid);
     if (joined) {
       liveData = yield podiumApi.getLatestLiveData(outpost.uuid);

@@ -11,7 +11,9 @@ export const RefreshButton = () => {
   );
   const onClick = () => {
     if (!isRefreshingLiveMembers) {
-      dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
+      dispatch(
+        onGoingOutpostActions.getLiveMembers({ silent: true, forceJoin: true })
+      );
     }
   };
   return (
