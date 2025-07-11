@@ -426,6 +426,7 @@ export class WebSocketService {
       console.error(
         `[WebSocket] Health check failed after ${maxAttempts} attempts`
       );
+    toast.error("Check your internet connection and try again.");
     return false;
   }
 
