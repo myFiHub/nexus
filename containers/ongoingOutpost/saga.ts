@@ -5,6 +5,7 @@ import {
 import { checkAudioPermission } from "app/lib/audioPermissions";
 import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
+import { isDev } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import {
   LiveMember,
@@ -323,6 +324,7 @@ function* getLiveMembers(
   if (!silent) {
     yield put(onGoingOutpostActions.isGettingLiveMembers(true));
   }
+
   yield detatched_getLiveMembers();
   if (!silent) {
     yield put(onGoingOutpostActions.isGettingLiveMembers(false));
@@ -337,8 +339,11 @@ function* detatched_getLiveMembers() {
     console.error("Outpost not found to get live members");
     return [];
   }
+  if (isDev) console.log("getting live members");
+
   let liveData: OutpostLiveData | undefined | false =
     yield podiumApi.getLatestLiveData(outpost.uuid);
+
   if (liveData === false) {
     const success: boolean = yield wsClient.asyncJoinOutpost(outpost.uuid);
     if (success) {

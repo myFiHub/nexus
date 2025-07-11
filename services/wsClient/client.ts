@@ -5,9 +5,11 @@ import {
 } from "app/containers/notifications/eventBus";
 import { notificationsActions } from "app/containers/notifications/slice";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
+import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
 import { getStore } from "app/store";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import podiumApi from "../api";
 import {
   ConnectionState,
@@ -63,8 +65,6 @@ export class WebSocketService {
   // Connection health
   private lastMessageReceived = 0;
   private connectionHealthy = false;
-  private healthCheckInterval?: number;
-  private readonly healthCheckTimeout = 5000; // 5 seconds
 
   // Toast management
   private connectionToastId?: string | number;
@@ -404,7 +404,6 @@ export class WebSocketService {
           this.connectionHealthy = true; // Initially healthy
           this.lastMessageReceived = Date.now();
           this.setupPingTimer();
-          this.setupHealthMonitoring();
           this.processJoinQueue();
           this.dismissConnectionToast();
           if (isDev) console.log("[WebSocket] Connected successfully");
@@ -597,9 +596,18 @@ export class WebSocketService {
 
     if (message.data.address === myUserAddress) {
       const joinId = this.generateJoinId(message.data.outpost_uuid!);
-      this.completeJoinRequest(joinId);
-    }
+      const store = getStore();
+      const router: AppRouterInstance | undefined =
+        store.getState().global.router;
 
+      this.completeJoinRequest({
+        joinId,
+      });
+
+      if (router) {
+        router.push(AppPages.ongoingOutpost(message.data.outpost_uuid!));
+      }
+    }
     store.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   }
 
@@ -610,7 +618,7 @@ export class WebSocketService {
     }
   }
 
-  private completeJoinRequest(joinId: string): void {
+  private completeJoinRequest({ joinId }: { joinId: string }): void {
     const request = this.joinRequests.get(joinId);
     if (request) {
       if (isDev) console.log(`[WebSocket] Join completed: ${joinId}`);
@@ -681,36 +689,9 @@ export class WebSocketService {
     this.clearPingTimer();
     this.pingTimer = window.setInterval(() => {
       if (this.isConnectionValid()) {
-        // Just check if we've received messages recently
-        const timeSinceLastMessage = Date.now() - this.lastMessageReceived;
-        if (timeSinceLastMessage > this.pingInterval * 3) {
-          if (isDev)
-            console.warn(
-              "[WebSocket] No recent messages, connection may be stale"
-            );
-          this.connectionHealthy = false;
-          this.handleConnectionError();
-        }
+        this.pong();
       }
     }, this.pingInterval);
-  }
-
-  private setupHealthMonitoring(): void {
-    if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-    }
-
-    this.healthCheckInterval = window.setInterval(() => {
-      if (this.connected) {
-        const timeSinceLastMessage = Date.now() - this.lastMessageReceived;
-
-        // Consider connection unhealthy if we haven't received any messages in a while
-        if (timeSinceLastMessage > this.pingInterval * 3) {
-          if (isDev) console.warn("[WebSocket] Connection appears stale");
-          this.connectionHealthy = false;
-        }
-      }
-    }, this.pingInterval / 2); // Check more frequently than ping
   }
 
   private processJoinQueue(): void {
@@ -745,10 +726,6 @@ export class WebSocketService {
     if (this.connectionTimeout) {
       clearTimeout(this.connectionTimeout);
       this.connectionTimeout = undefined;
-    }
-    if (this.healthCheckInterval) {
-      clearInterval(this.healthCheckInterval);
-      this.healthCheckInterval = undefined;
     }
   }
 
@@ -820,6 +797,34 @@ export class WebSocketService {
       );
     }
     return address;
+  }
+
+  private async pong(): Promise<void> {
+    if (this.connectionState !== ConnectionState.CONNECTING && this.token) {
+      if (this.isConnectionValid()) {
+        try {
+          // Send pong frame (0x8A)
+          this.socket!.send(new Uint8Array([0x8a]));
+        } catch (error) {
+          if (isDev) {
+            console.error(
+              `%c[ERROR] Error sending pong: ${error}`,
+              "color: #F44336; font-weight: bold;"
+            );
+          }
+          this.updateConnectionState(ConnectionState.DISCONNECTED);
+          await this.reconnect();
+        }
+      } else if (this.token) {
+        if (isDev) {
+          console.warn(
+            "%c[WARN] Not connected, attempting to reconnect before sending pong",
+            "color: #FF9800; font-weight: bold;"
+          );
+        }
+        await this.reconnect();
+      }
+    }
   }
 }
 

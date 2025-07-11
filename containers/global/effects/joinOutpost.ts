@@ -200,7 +200,6 @@ function* openOutpost({
 }) {
   useOnGoingOutpostSlice();
   const outpost = { ...receivedOutpost };
-  const router: AppRouterInstance = yield select(GlobalSelectors.router);
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);
   if (!myUser) {
@@ -231,12 +230,13 @@ function* openOutpost({
       put(onGoingOutpostActions.setAccesses(accesses)),
       put(onGoingOutpostActions.getLiveMembers()),
     ]);
-    if (typeof window !== "undefined") {
-      const correntRoute = window.location.pathname;
-      if (!correntRoute.includes(AppPages.ongoingOutpost(outpost.uuid))) {
-        router.push(AppPages.ongoingOutpost(outpost.uuid));
-      }
-    }
+    // this part is moved to wsclient.ts
+    // if (typeof window !== "undefined") {
+    //   const correntRoute = window.location.pathname;
+    //   if (!correntRoute.includes(AppPages.ongoingOutpost(outpost.uuid))) {
+    //     router.push(AppPages.ongoingOutpost(outpost.uuid));
+    //   }
+    // }
   } else {
     toast.error("Failed to join Outpost");
   }
