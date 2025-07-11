@@ -15,6 +15,7 @@ export interface OnGoingOutpostState {
   isCheeringAddress?: string;
   isBooingAddress?: string;
   amIMuted: boolean;
+  leaving: boolean;
   meetApiObj?: any;
   hasAudioPermission: boolean;
   raisedHandUsers: {
@@ -36,6 +37,7 @@ export const initialState: OnGoingOutpostState = {
   amIMuted: true,
   joined: false,
   raisedHandUsers: {},
+  leaving: false,
 };
 
 const onGoingOutpostSlice = createSlice({
@@ -159,6 +161,9 @@ const onGoingOutpostSlice = createSlice({
     removeFromRaisedHand(state, action: PayloadAction<string>) {
       const { [action.payload]: _, ...rest } = state.raisedHandUsers;
       state.raisedHandUsers = rest;
+    },
+    setLeaving(state, action: PayloadAction<boolean>) {
+      state.leaving = action.payload;
     },
   },
 });
