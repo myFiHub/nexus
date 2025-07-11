@@ -16,7 +16,7 @@ import { globalSaga } from "./saga";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
-
+  wsHealthChecking: boolean;
   logingIn: boolean;
   switchingAccount: boolean;
   logingOut: boolean;
@@ -38,6 +38,7 @@ export interface GlobalState {
 
 export const initialState: GlobalState = {
   initializingWeb3Auth: true,
+  wsHealthChecking: false,
   logingIn: false,
   switchingAccount: false,
   logingOut: false,
@@ -161,6 +162,9 @@ const globalSlice = createSlice({
     },
     setWsConnectionStatus(state, action: PayloadAction<ConnectionStatus>) {
       state.wsConnectionStatus = action.payload;
+    },
+    setWsHealthChecking(state, action: PayloadAction<boolean>) {
+      state.wsHealthChecking = action.payload;
     },
   },
 });

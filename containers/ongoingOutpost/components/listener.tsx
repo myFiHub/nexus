@@ -1,5 +1,6 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { isDev } from "app/lib/utils";
+import { wsClient } from "app/services/wsClient/client";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../selectors";
@@ -46,7 +47,7 @@ export const MeetEventListeners = () => {
     }
   };
 
-  const handleAudioMuteStatusChanged = ({
+  const handleAudioMuteStatusChanged = async ({
     muted: isMuted,
   }: {
     muted: boolean;
@@ -56,6 +57,11 @@ export const MeetEventListeners = () => {
       return;
     } else {
       if (!isMuted) {
+        const isWsHealthy = await wsClient.healthCheck();
+        if (!isWsHealthy) {
+          apiObj.executeCommand("toggleAudio");
+          return;
+        }
         if (remainingTimeRef.current && remainingTimeRef.current <= 0) {
           apiObj.executeCommand("toggleAudio");
           return;

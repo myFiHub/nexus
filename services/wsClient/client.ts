@@ -10,6 +10,7 @@ import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
 import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { v4 as uuidv4 } from "uuid";
 import podiumApi from "../api";
 import {
   ConnectionState,
@@ -61,6 +62,13 @@ export class WebSocketService {
     resolve: (success: boolean) => void;
     retryCount: number;
   }> = [];
+
+  // Health check requests
+  private healthCheckRequests = new Map<
+    string,
+    { resolve: (success: boolean) => void; timeout: number }
+  >();
+  private readonly healthCheckTimeout = 5000; // 5 seconds
 
   // Connection health
   private lastMessageReceived = 0;
@@ -357,6 +365,118 @@ export class WebSocketService {
   }
 
   /**
+   * Health check method that sends an echo message and waits for response
+   * Retries up to 2 times (3 total attempts) with 5-second timeout
+   */
+  async healthCheck(): Promise<boolean> {
+    if (isDev) console.log("[WebSocket] Health check requested");
+
+    // Step 1: Ensure connection is established
+    if (!this.connected) {
+      if (isDev)
+        console.log("[WebSocket] Not connected, attempting to connect...");
+      if (this.token) {
+        const connected = await this.reconnect();
+        if (!connected) {
+          if (isDev)
+            console.error(
+              "[WebSocket] Failed to establish connection for health check"
+            );
+          return false;
+        }
+      } else {
+        if (isDev)
+          console.error("[WebSocket] No token available for connection");
+        return false;
+      }
+    }
+
+    // Step 2: Attempt health check with retry (max 3 attempts)
+    const maxAttempts = 3;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      if (isDev)
+        console.log(
+          `[WebSocket] Health check attempt ${attempt}/${maxAttempts}`
+        );
+
+      const success = await this.performHealthCheck();
+      if (success) {
+        if (isDev) console.log(`[WebSocket] Health check successful`);
+        return true;
+      }
+
+      if (attempt < maxAttempts) {
+        // Test connection before retry
+        if (!this.isConnectionValid()) {
+          if (isDev)
+            console.warn(
+              "[WebSocket] Connection became invalid during health check, reconnecting..."
+            );
+          await this.reconnect();
+        }
+
+        // Progressive delay between attempts
+        const delay = Math.min(1000 * attempt, 3000);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+
+    if (isDev)
+      console.error(
+        `[WebSocket] Health check failed after ${maxAttempts} attempts`
+      );
+    return false;
+  }
+
+  /**
+   * Perform a single health check attempt
+   */
+  private async performHealthCheck(): Promise<boolean> {
+    // Verify connection is valid
+    if (!this.isConnectionValid()) {
+      if (isDev)
+        console.warn("[WebSocket] Connection invalid for health check");
+      return false;
+    }
+
+    // Generate unique UUID for this health check
+    const healthCheckId = uuidv4();
+    if (isDev) console.log(`[WebSocket] Health check ID: ${healthCheckId}`);
+
+    return new Promise<boolean>((resolve) => {
+      // Set up timeout
+      const timeoutId = window.setTimeout(() => {
+        if (this.healthCheckRequests.has(healthCheckId)) {
+          if (isDev)
+            console.warn(`[WebSocket] Health check timeout: ${healthCheckId}`);
+          this.healthCheckRequests.delete(healthCheckId);
+          resolve(false);
+        }
+      }, this.healthCheckTimeout);
+
+      // Store request
+      this.healthCheckRequests.set(healthCheckId, {
+        resolve,
+        timeout: timeoutId,
+      });
+
+      // Send echo message
+      this.send({
+        message_type: OutgoingMessageType.ECHO,
+        outpost_uuid: "00000000-0000-0000-0000-000000000000", // Not needed for health check
+        data: { uuid: healthCheckId } as any,
+      }).then((success) => {
+        if (!success) {
+          clearTimeout(timeoutId);
+          this.healthCheckRequests.delete(healthCheckId);
+          resolve(false);
+        }
+      });
+    });
+  }
+
+  /**
    * Close connection and cleanup
    */
   close(): void {
@@ -587,6 +707,9 @@ export class WebSocketService {
           )
         );
         break;
+      case IncomingMessageType.MESSAGE_ECHOED:
+        this.handleMessageEchoed(message);
+        break;
     }
   }
 
@@ -623,6 +746,14 @@ export class WebSocketService {
     }
   }
 
+  private handleMessageEchoed(message: IncomingMessage): void {
+    const healthCheckId = message.data.uuid;
+    if (healthCheckId) {
+      if (isDev) console.log(`[WebSocket] Message echoed: ${healthCheckId}`);
+      this.completeHealthCheckRequest(healthCheckId);
+    }
+  }
+
   private completeJoinRequest({ joinId }: { joinId: string }): void {
     const request = this.joinRequests.get(joinId);
     if (request) {
@@ -630,6 +761,17 @@ export class WebSocketService {
       clearTimeout(request.timeout);
       request.resolve(true);
       this.joinRequests.delete(joinId);
+    }
+  }
+
+  private completeHealthCheckRequest(healthCheckId: string): void {
+    const request = this.healthCheckRequests.get(healthCheckId);
+    if (request) {
+      if (isDev)
+        console.log(`[WebSocket] Health check completed: ${healthCheckId}`);
+      clearTimeout(request.timeout);
+      request.resolve(true);
+      this.healthCheckRequests.delete(healthCheckId);
     }
   }
 
@@ -756,6 +898,13 @@ export class WebSocketService {
       request.resolve(false);
     });
     this.joinRequests.clear();
+
+    // Clear health check requests
+    this.healthCheckRequests.forEach((request) => {
+      clearTimeout(request.timeout);
+      request.resolve(false);
+    });
+    this.healthCheckRequests.clear();
 
     // Clear join queue
     this.joinQueue.forEach((queuedJoin) => {

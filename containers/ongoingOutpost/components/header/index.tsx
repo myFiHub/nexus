@@ -1,9 +1,21 @@
+import { GlobalSelectors } from "app/containers/global/selectors";
+import { useSelector } from "react-redux";
+import { onGoingOutpostSelectors } from "../../selectors";
 import { Controlls } from "./actions";
 import { MuteUnmuteButton } from "./actions/mute_unmute_button";
 import { MyTimer } from "./myTimer";
 import { TitleAndDescription } from "./titleAndDescription";
 
 export const OutpostHeader = () => {
+  const accesses = useSelector(onGoingOutpostSelectors.accesses);
+  const leaving = useSelector(onGoingOutpostSelectors.leaving);
+  const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
+
+  if (!accesses?.canEnter && !leaving && !joiningOutpostId) {
+    console.log("Access denied");
+    return <></>;
+  }
+
   return (
     <div className="bg-card border-b border-border shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
