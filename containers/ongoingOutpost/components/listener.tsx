@@ -32,6 +32,7 @@ export const MeetEventListeners = () => {
     if (isDev) {
       console.log("Conference joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
+    dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
     handleJoined(true);
   };
 
