@@ -2,7 +2,7 @@ import { Button } from "app/components/Button";
 import { JoinButton } from "app/containers/outpostDetails/components/JoinButton";
 import { AppPages } from "app/lib/routes";
 import { OutpostModel } from "app/services/api/types";
-import { AlertCircle, Lock, Shield } from "lucide-react";
+import { AlertCircle, Lock, Shield, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 
@@ -48,6 +48,10 @@ export const AccessDenied = ({ outpost }: AccessDeniedProps) => {
             <div className="flex items-start gap-2">
               <Shield className="w-4 h-4 mt-0.5 text-green-500" />
               <span>Certain membership requirements need to be met</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <X className="w-4 h-4 mt-0.5 text-red-500" />
+              <span>There was an error joining the outpost</span>
             </div>
           </div>
         </div>

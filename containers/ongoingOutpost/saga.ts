@@ -360,7 +360,7 @@ function* detatched_getLiveMembers() {
     liveMembers[member.address] = member;
   });
   yield put(onGoingOutpostActions.setLiveMembers(liveMembers));
-  return liveData.members;
+  return members;
 }
 
 function* clockTicked() {

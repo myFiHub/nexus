@@ -447,7 +447,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   }
   let savedName = response.user?.name;
   let canContinue = true;
-  if (!savedName) {
+  if (!savedName || savedName.includes("@")) {
     canContinue = false;
     const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
     if (confirmed && (enteredText?.trim().length || 0) > 0) {
