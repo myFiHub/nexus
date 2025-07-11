@@ -19,7 +19,7 @@ export const Meet = memo(
 
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const accesses = useSelector(onGoingOutpostSelectors.accesses);
-
+    const leaving = useSelector(onGoingOutpostSelectors.leaving);
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
     const joined = useSelector(onGoingOutpostSelectors.joined);
     const joinedOnceRef = useRef(false);
@@ -50,7 +50,7 @@ export const Meet = memo(
       );
     }
 
-    if (!accesses?.canEnter) {
+    if (!accesses?.canEnter && !leaving) {
       return <div>You are not allowed to enter this outpost</div>;
     }
 

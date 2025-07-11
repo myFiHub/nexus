@@ -229,7 +229,7 @@ export class WebSocketService {
       return true;
     }
 
-    const joinId = this.generateJoinId();
+    const joinId = this.generateJoinId(outpostId);
     if (isDev)
       console.log(`[WebSocket] Joining outpost: ${outpostId} (${joinId})`);
 
@@ -427,7 +427,7 @@ export class WebSocketService {
         };
 
         this.socket!.onclose = () => {
-          if (isDev) console.warn("[WebSocket] Connection closed");
+          if (isDev) console.warn("[WebSocket] Connection closed", new Date());
           this.handleConnectionError();
         };
       });
@@ -596,7 +596,7 @@ export class WebSocketService {
     const myUserAddress = myUser.address;
 
     if (message.data.address === myUserAddress) {
-      const joinId = `join-${myUserAddress}`;
+      const joinId = this.generateJoinId(message.data.outpost_uuid!);
       this.completeJoinRequest(joinId);
     }
 
@@ -620,10 +620,10 @@ export class WebSocketService {
     }
   }
 
-  private generateJoinId(): string {
+  private generateJoinId(outpostId: string): string {
     const store = getStore();
     const myUser = store.getState().global.podiumUserInfo!;
-    return `join-${myUser.address}`;
+    return `join-${myUser.address}-${outpostId}`;
   }
 
   private async isAlreadyJoined(outpostId: string): Promise<boolean> {

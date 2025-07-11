@@ -23,6 +23,7 @@ export const onGoingOutpostDomains = {
   creatorJoined: (state: RootState) =>
     state.onGoingOutpost?.outpost?.creator_joined,
   tick: (state: RootState) => state.global?.tick ?? 0,
+  leaving: (state: RootState) => state.onGoingOutpost?.leaving,
 };
 
 export const onGoingOutpostSelectors = {
@@ -117,4 +118,5 @@ export const onGoingOutpostSelectors = {
       return shouldWait;
     }
   ),
+  leaving: onGoingOutpostDomains.leaving,
 };

@@ -611,6 +611,7 @@ class PodiumApi {
       return response.data.data;
     } catch (error: any) {
       if (error.response.status === 422) {
+        console.log("422 error", error);
         return false;
       }
       console.error("Get latest live data error:", error);

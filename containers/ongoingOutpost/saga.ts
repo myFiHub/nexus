@@ -19,7 +19,14 @@ import {
   OutgoingMessageType,
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { all, debounce, put, select, takeLatest } from "redux-saga/effects";
+import {
+  all,
+  debounce,
+  delay,
+  put,
+  select,
+  takeLatest,
+} from "redux-saga/effects";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -56,7 +63,7 @@ function* leaveOutpost(
   action: ReturnType<typeof onGoingOutpostActions.leaveOutpost>
 ) {
   const outpost = action.payload;
-
+  yield put(onGoingOutpostActions.setLeaving(true));
   yield all([
     put(
       onGoingOutpostActions.setAccesses({ canEnter: false, canSpeak: false })
@@ -73,6 +80,8 @@ function* leaveOutpost(
   yield wsClient.send(leaveMessage);
   const router: AppRouterInstance = yield select(GlobalSelectors.router);
   router.replace(AppPages.outpostDetails(outpost.uuid));
+  yield delay(5000);
+  yield put(onGoingOutpostActions.setLeaving(false));
 }
 
 function* like(action: ReturnType<typeof onGoingOutpostActions.like>) {
