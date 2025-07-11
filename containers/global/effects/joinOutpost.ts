@@ -8,14 +8,12 @@ import {
   onGoingOutpostActions,
   useOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
-import { AppPages } from "app/lib/routes";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel, User } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { all, put, select } from "redux-saga/effects";
+import { all, delay, put, select } from "redux-saga/effects";
 import { GlobalSelectors } from "../selectors";
 import { globalActions } from "../slice";
 import { _checkLumaAccess } from "./luma";
@@ -42,7 +40,7 @@ export function* joinOutpost(
     return;
   }
   const { outpost: outpostData } = action.payload;
-  yield put(globalActions.setJoiingOutpostId(outpostData.uuid));
+  yield put(globalActions.setJoingOutpostId(outpostData.uuid));
   try {
     const outpost: OutpostModel | undefined = yield podiumApi.getOutpost(
       outpostData.uuid
@@ -63,7 +61,8 @@ export function* joinOutpost(
     toast.error("error while getting outpost data");
     console.error(error);
   } finally {
-    yield put(globalActions.setJoiingOutpostId(undefined));
+    yield delay(3000);
+    yield put(globalActions.setJoingOutpostId(undefined));
   }
 }
 

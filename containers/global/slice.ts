@@ -105,7 +105,7 @@ const globalSlice = createSlice({
       state.podiumUserInfo = action.payload;
     },
     joinOutpost(state, action: PayloadAction<{ outpost: OutpostModel }>) {},
-    setJoiingOutpostId(state, action: PayloadAction<string | undefined>) {
+    setJoingOutpostId(state, action: PayloadAction<string | undefined>) {
       state.joiningOutpostId = action.payload;
     },
     setMyUserIsOver18(state, action: PayloadAction<boolean>) {
