@@ -23,7 +23,6 @@ const Content = () => {
   const dispatch = useDispatch();
   const { id } = useParams();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  const isLeaving = useSelector(onGoingOutpostSelectors.leaving);
   const gettingMyUser = useSelector(GlobalSelectors.logingIn);
   const isGettingOutpost = useSelector(
     onGoingOutpostSelectors.isGettingOutpost
@@ -49,10 +48,6 @@ const Content = () => {
       dispatch(onGoingOutpostActions.getOutpost({ id: id as string }));
     }
   }, [id, myUser, outpost]);
-
-  if (isLeaving) {
-    return <LeavingAnimation />;
-  }
 
   if (!myUser?.uuid) {
     return <LoginState />;
