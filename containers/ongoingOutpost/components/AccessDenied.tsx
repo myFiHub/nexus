@@ -58,7 +58,7 @@ export const AccessDenied = ({ outpost }: AccessDeniedProps) => {
 
         {/* Actions */}
         <div className="w-full space-y-3">
-          <Button onClick={goBack} className="w-full gap-2" variant="primary">
+          <Button onClick={goBack} className="w-full gap-2" variant="outline">
             View Outpost Details
           </Button>
 

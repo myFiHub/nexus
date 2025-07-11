@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
 import { onGoingOutpostActions } from "../../slice";
 import { MembersList } from "./list";
+import { RefreshButton } from "./refreshButton";
 
 export const OngoingOutpostMembers = memo(
   () => {
@@ -66,6 +67,7 @@ export const OngoingOutpostMembers = memo(
             <h3 className="font-semibold text-sm">
               Live Members ({numberOfMembers})
             </h3>
+            <RefreshButton />
           </div>
           {outpost && (
             <InviteUsersButton

@@ -320,18 +320,21 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
 function* getLiveMembers(
   action: ReturnType<typeof onGoingOutpostActions.getLiveMembers>
 ) {
-  const { silent } = action.payload || { silent: false };
+  const { silent, forceJoin } = action.payload || { silent: false };
+  yield put(onGoingOutpostActions.setIsRefreshingLiveMembers(true));
+
   if (!silent) {
     yield put(onGoingOutpostActions.isGettingLiveMembers(true));
   }
 
-  yield detatched_getLiveMembers();
+  yield detatched_getLiveMembers(forceJoin);
   if (!silent) {
     yield put(onGoingOutpostActions.isGettingLiveMembers(false));
   }
+  yield put(onGoingOutpostActions.setIsRefreshingLiveMembers(false));
 }
 
-function* detatched_getLiveMembers() {
+function* detatched_getLiveMembers(forceJoin?: boolean) {
   const outpost: OutpostModel | undefined = yield select(
     onGoingOutpostSelectors.outpost
   );
@@ -344,9 +347,14 @@ function* detatched_getLiveMembers() {
   let liveData: OutpostLiveData | undefined | false =
     yield podiumApi.getLatestLiveData(outpost.uuid);
 
-  if (liveData === false) {
+  if (liveData === false && !forceJoin) {
     if (isDev) console.log("live data is false");
     return [];
+  } else if (forceJoin) {
+    const joined: boolean = yield wsClient.asyncJoin(outpost.uuid);
+    if (joined) {
+      liveData = yield podiumApi.getLatestLiveData(outpost.uuid);
+    }
   }
   if (!liveData) {
     if (isDev) console.error("Failed to get live members");

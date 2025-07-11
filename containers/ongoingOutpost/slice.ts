@@ -14,6 +14,7 @@ export interface OnGoingOutpostState {
   isGettingLiveMembers: boolean;
   isCheeringAddress?: string;
   isBooingAddress?: string;
+  isRefreshingLiveMembers: boolean;
   amIMuted: boolean;
   leaving: boolean;
   meetApiObj?: any;
@@ -31,6 +32,7 @@ export const initialState: OnGoingOutpostState = {
   isRecording: false,
   isGettingOutpost: false,
   isGettingLiveMembers: false,
+  isRefreshingLiveMembers: false,
   accesses: { canEnter: false, canSpeak: false },
   liveMembers: {},
   hasAudioPermission: true,
@@ -77,7 +79,12 @@ const onGoingOutpostSlice = createSlice({
     startSpeaking() {},
     stopSpeaking() {},
     startRecording() {},
-    getLiveMembers(_, __: PayloadAction<{ silent: boolean } | undefined>) {},
+    getLiveMembers(
+      state,
+      __: PayloadAction<{ silent: boolean; forceJoin?: boolean } | undefined>
+    ) {
+      state.isRefreshingLiveMembers = true;
+    },
     statrtStopRecording(state, action: PayloadAction<boolean>) {},
     setIsRecording(state, action: PayloadAction<boolean>) {
       state.isRecording = action.payload;
@@ -170,6 +177,9 @@ const onGoingOutpostSlice = createSlice({
     },
     setLeaving(state, action: PayloadAction<boolean>) {
       state.leaving = action.payload;
+    },
+    setIsRefreshingLiveMembers(state, action: PayloadAction<boolean>) {
+      state.isRefreshingLiveMembers = action.payload;
     },
   },
 });
