@@ -10,12 +10,14 @@ import { LeaveOutpostWarningDialogProvider } from "../dialogs/leaveOutpostWarnin
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
 import { JoiningStatus } from "./JoiningStatus";
+import LeavingAnimation from "./LeavingAnimation";
 import { MeetEventListeners } from "./listener";
 import { OngoingOutpostMembers } from "./members";
 
 export const Meet = memo(
   () => {
     const dispatch = useDispatch();
+    const isLeaving = useSelector(onGoingOutpostSelectors.leaving);
 
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const accesses = useSelector(onGoingOutpostSelectors.accesses);
@@ -39,6 +41,10 @@ export const Meet = memo(
     if (!outpost || !myUser) {
       console.log("No outpost data available");
       return null;
+    }
+
+    if (isLeaving) {
+      return <LeavingAnimation />;
     }
 
     if (!process.env.NEXT_PUBLIC_OUTPOST_SERVER) {
