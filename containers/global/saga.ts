@@ -47,7 +47,6 @@ import {
   delay,
   put,
   select,
-  takeEvery,
   takeLatest,
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
@@ -585,7 +584,7 @@ export function* globalSaga() {
   yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
   yield takeLatest(globalActions.switchAccount, switchAccount);
   yield takeLatest(globalActions.logout, logout);
-  yield takeEvery(globalActions.joinOutpost, joinOutpost);
+  yield takeLatest(globalActions.joinOutpost, joinOutpost);
   yield takeLatest(globalActions.checkIfIHavePass, checkIfIHavePass);
   yield takeLatest(
     globalActions.setViewArchivedOutposts,

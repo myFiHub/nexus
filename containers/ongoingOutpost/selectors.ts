@@ -52,11 +52,12 @@ export const onGoingOutpostSelectors = {
       return bTime - aTime;
     });
 
-    return sortedList;
+    return sortedList.filter((member) => member.is_present);
   }),
   membersCount: createSelector(
     [onGoingOutpostDomains.members],
-    (members) => Object.keys(members).length
+    (members) =>
+      Object.values(members).filter((member) => member.is_present).length
   ),
   member: (id: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {

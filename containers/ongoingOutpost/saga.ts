@@ -345,17 +345,17 @@ function* detatched_getLiveMembers() {
     yield podiumApi.getLatestLiveData(outpost.uuid);
 
   if (liveData === false) {
-    const success: boolean = yield wsClient.asyncJoinOutpost(outpost.uuid);
-    if (success) {
-      liveData = yield podiumApi.getLatestLiveData(outpost.uuid);
-    }
-  }
-  if (!liveData) {
-    console.error("Failed to get live members");
+    if (isDev) console.log("live data is false");
     return [];
   }
+  if (!liveData) {
+    if (isDev) console.error("Failed to get live members");
+    return [];
+  }
+  if (isDev) console.log({ members: liveData.members });
+  const members = liveData.members.filter((member) => member.is_present);
   const liveMembers: { [address: string]: LiveMember } = {};
-  liveData.members.forEach((member) => {
+  members.forEach((member) => {
     member.last_speaked_at_timestamp ??= 0;
     liveMembers[member.address] = member;
   });
