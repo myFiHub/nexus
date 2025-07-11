@@ -17,11 +17,13 @@ import { outpostDetailsSelectors } from "../selectors";
 interface JoinButtonProps {
   outpost: OutpostModel;
   fromCard?: boolean;
+  joinComponent?: React.ReactNode;
 }
 
 const JoinButtonContent = ({
   outpost: passedOutpost,
   fromCard,
+  joinComponent,
 }: JoinButtonProps) => {
   const [isClient, setIsClient] = useState(false);
 
@@ -77,16 +79,20 @@ const JoinButtonContent = ({
           <span>{joining ? "Joining..." : "Loading..."}</span>
         </div>
       ) : (
-        <span className="font-medium">{displayText}</span>
+        joinComponent ?? <span className="font-medium">{displayText}</span>
       )}
     </Button>
   );
 };
 
-export function JoinButton({ outpost, fromCard }: JoinButtonProps) {
+export function JoinButton({ outpost, fromCard, joinComponent }: JoinButtonProps) {
   return (
     <ReduxProvider>
-      <JoinButtonContent outpost={outpost} fromCard={fromCard} />
+      <JoinButtonContent
+        outpost={outpost}
+        fromCard={fromCard}
+        joinComponent={joinComponent}
+      />
     </ReduxProvider>
   );
 }

@@ -1,5 +1,4 @@
 import { InviteUsersButton } from "app/containers/outpostDetails/components/InviteUsersButton";
-import { wsClient } from "app/services/wsClient/client";
 import { Loader2, Users } from "lucide-react";
 import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -30,11 +29,7 @@ export const OngoingOutpostMembers = memo(
       if (outpost?.uuid) {
         timeoutId = setTimeout(async () => {
           if (numberOfMembersRef.current === 0 && !joinedRef.current) {
-            // const joinedOutpostId=wsClient.
-            const success = await wsClient.asyncJoinOutpost(outpost?.uuid);
-            if (success) {
-              dispatch(onGoingOutpostActions.getLiveMembers());
-            }
+            dispatch(onGoingOutpostActions.getLiveMembers());
           }
         }, 30000);
         return () => {

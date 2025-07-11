@@ -1,6 +1,5 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { globalActions } from "app/containers/global/slice";
 import { truncate } from "app/lib/utils";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 import { memo, useEffect, useRef } from "react";
@@ -9,6 +8,7 @@ import { logoUrl } from "../../../lib/constants";
 import { LeaveOutpostWarningDialogProvider } from "../dialogs/leaveOutpostWarning";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
+import { AccessDenied } from "./AccessDenied";
 import { JoiningStatus } from "./JoiningStatus";
 import LeavingAnimation from "./LeavingAnimation";
 import { MeetEventListeners } from "./listener";
@@ -18,7 +18,7 @@ export const Meet = memo(
   () => {
     const dispatch = useDispatch();
     const isLeaving = useSelector(onGoingOutpostSelectors.leaving);
-
+    const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const accesses = useSelector(onGoingOutpostSelectors.accesses);
     const leaving = useSelector(onGoingOutpostSelectors.leaving);
@@ -33,11 +33,7 @@ export const Meet = memo(
     }, [joined]);
 
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
-    useEffect(() => {
-      if (!!outpost?.uuid && !accesses?.canEnter && !joinedOnceRef.current) {
-        dispatch(globalActions.joinOutpost({ outpost }));
-      }
-    }, [outpost?.uuid, joined]);
+
     if (!outpost || !myUser) {
       console.log("No outpost data available");
       return null;
@@ -47,17 +43,8 @@ export const Meet = memo(
       return <LeavingAnimation />;
     }
 
-    if (!process.env.NEXT_PUBLIC_OUTPOST_SERVER) {
-      console.error("NEXT_PUBLIC_OUTPOST_SERVER is not defined");
-      return (
-        <div className="text-red-500">
-          outpost server configuration is missing
-        </div>
-      );
-    }
-
-    if (!accesses?.canEnter && !leaving) {
-      return <div>You are not allowed to enter this outpost</div>;
+    if (!accesses?.canEnter && !leaving && !joiningOutpostId) {
+      return <AccessDenied outpost={outpost} />;
     }
 
     const handleApiReady = (apiObj: any) => {
@@ -87,6 +74,7 @@ export const Meet = memo(
               email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
             configOverwrite={{
+              apiLogLevel: ["error"],
               startWithAudioMuted: true,
               startWithVideoMuted: true,
               startScreenSharing: true,

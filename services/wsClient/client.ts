@@ -595,6 +595,7 @@ export class WebSocketService {
     const myUserAddress = myUser.address;
 
     if (message.data.address === myUserAddress) {
+      console.log("user joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! from ws");
       const joinId = this.generateJoinId(message.data.outpost_uuid!);
       const store = getStore();
       const router: AppRouterInstance | undefined =
@@ -606,9 +607,13 @@ export class WebSocketService {
 
       if (router) {
         router.push(AppPages.ongoingOutpost(message.data.outpost_uuid!));
+        setTimeout(() => {
+          store.dispatch(
+            onGoingOutpostActions.getLiveMembers({ silent: true })
+          );
+        }, 5000);
       }
     }
-    store.dispatch(onGoingOutpostActions.getLiveMembers({ silent: true }));
   }
 
   private handleUserLeft(message: IncomingMessage, store: any): void {

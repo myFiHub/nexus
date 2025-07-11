@@ -104,10 +104,16 @@ const onGoingOutpostSlice = createSlice({
       action: PayloadAction<{ userAddress: string; remainingTime: number }>
     ) {
       const { userAddress, remainingTime } = action.payload;
-      state.liveMembers[userAddress] = {
-        ...state.liveMembers[userAddress],
-        remaining_time: remainingTime,
-      };
+      if (state.liveMembers[userAddress]) {
+        const member = state.liveMembers[userAddress];
+        state.liveMembers = {
+          ...state.liveMembers,
+          [userAddress]: {
+            ...member,
+            remaining_time: remainingTime,
+          },
+        };
+      }
     },
     updateUserIsTalking(
       state,
