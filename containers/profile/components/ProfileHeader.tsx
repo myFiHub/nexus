@@ -1,4 +1,6 @@
+import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
+import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
 
 interface ProfileHeaderProps {
@@ -20,7 +22,12 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
         {user?.name || "Anonymous User"}
       </h1>
       {user?.email && (
-        <p className="text-muted-foreground mt-1 truncate">{user.email}</p>
+        <div className="flex gap-2 items-center content-center">
+          <p className="text-muted-foreground mt-1 truncate">
+            {truncate(user.email)}
+          </p>
+          <CopyButton text={user.email} className="mt-1" />
+        </div>
       )}
       <div className="flex space-x-4 mt-2">
         <div className="text-sm text-muted-foreground">

@@ -1,12 +1,14 @@
 "use client";
+import { cn } from "app/lib/utils";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 
 interface CopyButtonProps {
   text: string;
+  className?: string;
 }
 
-export const CopyButton = ({ text }: CopyButtonProps) => {
+export const CopyButton = ({ text, className }: CopyButtonProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -24,7 +26,10 @@ export const CopyButton = ({ text }: CopyButtonProps) => {
       <TooltipTrigger asChild>
         <button
           onClick={handleCopy}
-          className="ml-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          className={cn(
+            "ml-2 p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors cursor-pointer",
+            className
+          )}
         >
           {copied ? (
             <svg

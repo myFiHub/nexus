@@ -288,11 +288,10 @@ export const DeleteAccountDialogProvider = () => {
                     <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                     <div>
                       <h4 className="font-semibold text-green-800 dark:text-green-200">
-                        Private Key Exported Successfully
+                        Private Key Export ready
                       </h4>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        Your private key has been copied to clipboard. Store it
-                        securely.
+                        Copy your private key and save it in a secure location.
                       </p>
                     </div>
                   </div>
