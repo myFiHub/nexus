@@ -114,7 +114,7 @@ export const Meet = memo(
               DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
               SHOW_JITSI_WATERMARK: false,
               SHOW_WATERMARK_FOR_GUESTS: false,
-              SHOW_BRAND_WATERMARK: true,
+              SHOW_BRAND_WATERMARK: false,
               SHOW_POWERED_BY: false,
               DEFAULT_WELCOME_PAGE_LOGO_URL: logoUrl,
               BRAND_WATERMARK_LINK: logoUrl,
