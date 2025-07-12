@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+  <ShortName>Podium Nexus</ShortName>
+  <Description>Search outposts and users on Podium Nexus - Connect, Create, Collaborate</Description>
+  <Tags>social platform outposts community events collaboration</Tags>
+  <Contact>team@podiumnexus.com</Contact>
+  <Url type="text/html" method="get" template="https://podiumnexus.com/all_outposts?search={searchTerms}"/>
+  <Url type="application/rss+xml" method="get" template="https://podiumnexus.com/api/search?q={searchTerms}&amp;format=rss"/>
+  <Url type="application/json" method="get" template="https://podiumnexus.com/api/search?q={searchTerms}"/>
+  <Image height="16" width="16" type="image/png">https://podiumnexus.com/logo.png</Image>
+  <Image height="64" width="64" type="image/png">https://podiumnexus.com/logo.png</Image>
+  <Query role="example" searchTerms="blockchain"/>
+  <Query role="example" searchTerms="community"/>
+  <Query role="example" searchTerms="live events"/>
+  <Developer>Podium Nexus Team</Developer>
+  <Attribution>Search data provided by Podium Nexus</Attribution>
+  <SyndicationRight>open</SyndicationRight>
+  <AdultContent>false</AdultContent>
+  <Language>en-us</Language>
+  <InputEncoding>UTF-8</InputEncoding>
+  <OutputEncoding>UTF-8</OutputEncoding>
+</OpenSearchDescription>

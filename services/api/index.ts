@@ -14,10 +14,14 @@ import {
   OutpostModel,
   PodiumAppMetadata,
   PodiumPassBuyerModel,
+  RecentlyJoinedUser,
   RejectInvitationRequest,
   SetOrRemoveReminderRequest,
   Tag,
   TagModel,
+  TopOwner,
+  Trade,
+  TradingVolume,
   UpdateOutpostRequest,
   User,
 } from "./types";
@@ -748,6 +752,57 @@ class PodiumApi {
       const response = await this.axiosInstance.get(
         `/podium-passes/recent-holders`,
         { params: { page, page_size, address, uuid } }
+      );
+      return response.data.data;
+    } catch {
+      return [];
+    }
+  }
+
+  async getRecentlyJoinedUsers(
+    page = 0,
+    page_size = 50
+  ): Promise<RecentlyJoinedUser[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/recently-joined-users`,
+        { params: { page, page_size } }
+      );
+      return response.data.data;
+    } catch {
+      return [];
+    }
+  }
+  async getTopOwners(page = 0, page_size = 50): Promise<TopOwner[]> {
+    try {
+      const response = await this.axiosInstance.get(`/dashboard/top-owners`, {
+        params: { page, page_size },
+      });
+      return response.data.data;
+    } catch {
+      return [];
+    }
+  }
+  async getTrades(
+    page = 0,
+    page_size = 50,
+    trade_type?: "buy" | "sell"
+  ): Promise<Trade[]> {
+    try {
+      const response = await this.axiosInstance.get(`/dashboard/trades`, {
+        params: { page, page_size, trade_type },
+      });
+      return response.data.data;
+    } catch {
+      return [];
+    }
+  }
+
+  async getTradingVolume(page = 0, page_size = 50): Promise<TradingVolume[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/trading-volume`,
+        { params: { page, page_size } }
       );
       return response.data.data;
     } catch {
