@@ -1,7 +1,9 @@
 "use client";
 import { Button } from "app/components/Button";
 import { onGoingOutpostSelectors } from "app/containers/ongoingOutpost/selectors";
-import { Mic, MicOff } from "lucide-react";
+import { wsClient } from "app/services/wsClient/client";
+import { Loader2, Mic, MicOff } from "lucide-react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 
 export const MuteUnmuteButton = () => {
@@ -9,9 +11,18 @@ export const MuteUnmuteButton = () => {
   const joined = useSelector(onGoingOutpostSelectors.joined);
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
   const accesses = useSelector(onGoingOutpostSelectors.accesses);
+  const [loading, setLoading] = useState(false);
 
-  const handleMuteUnmute = () => {
+  const handleMuteUnmute = async () => {
     if (joined && apiObj && accesses?.canSpeak) {
+      setLoading(true);
+      const healtchCheckResult = await wsClient.healthCheck();
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
+      if (!healtchCheckResult) {
+        return;
+      }
       apiObj.executeCommand("toggleAudio");
     }
   };
@@ -31,7 +42,13 @@ export const MuteUnmuteButton = () => {
         amIMuted ? "" : " animate-pulse"
       }`}
     >
-      {amIMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+      {loading ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : amIMuted ? (
+        <MicOff className="w-4 h-4" />
+      ) : (
+        <Mic className="w-4 h-4" />
+      )}
     </Button>
   );
 };

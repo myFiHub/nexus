@@ -23,6 +23,7 @@ export enum IncomingMessageType {
   CREATOR_JOINED = "creator.joined",
   USER_STARTED_RECORDING = "user.started_recording",
   USER_STOPPED_RECORDING = "user.stopped_recording",
+  MESSAGE_ECHOED = "message.echoed",
 }
 
 // Outgoing message types
@@ -38,6 +39,7 @@ export enum OutgoingMessageType {
   WAIT_FOR_CREATOR = "wait_for_creator",
   START_RECORDING = "start_recording",
   STOP_RECORDING = "stop_recording",
+  ECHO = "echo",
 }
 
 // Incoming message data interface
@@ -61,9 +63,10 @@ export interface IncomingMessage {
 // Outgoing message data interface
 export interface OutgoingMessageData {
   amount?: number;
-  react_to_user_address: string;
+  react_to_user_address?: string;
   chain_id?: number;
   tx_hash?: string;
+  uuid?: string; // For health check echo messages
 }
 
 // Outgoing message interface

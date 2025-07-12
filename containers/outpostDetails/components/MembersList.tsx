@@ -4,7 +4,6 @@ import { FollowButton } from "app/containers/_users/components/followButton";
 import { truncate } from "app/lib/utils";
 import { User, Users } from "lucide-react";
 import { Img } from "../../../components/Img";
-import { logoUrl } from "../../../lib/constants";
 import { OutpostModel } from "../../../services/api/types";
 
 interface MembersListProps {
@@ -39,7 +38,7 @@ export function MembersList({ outpost }: MembersListProps) {
             {/* Avatar with online indicator */}
             <div className="relative flex-shrink-0">
               <Img
-                src={member.image || logoUrl}
+                src={member.image}
                 alt={member.name}
                 className="w-12 h-12 rounded-full border-2 border-primary/20 shadow-sm"
                 useImgTag

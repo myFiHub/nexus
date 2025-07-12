@@ -46,6 +46,7 @@
     "react": "^19.0.0",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.0.0",
+    "react-draggable": "^4.5.0",
     "react-onesignal": "^3.2.3",
     "react-redux": "^9.2.0",
     "react-tag-input-component": "^2.0.2",
@@ -55,6 +56,7 @@
     "rxjs": "^7.8.2",
     "sonner": "^2.0.5",
     "tailwind-merge": "^3.3.1",
+    "uuid": "^11.1.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -64,6 +66,7 @@
     "@types/nprogress": "^0.2.3",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
     "patch-package": "^8.0.0",

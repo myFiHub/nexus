@@ -29,6 +29,8 @@ const GlobalDomains = {
     state.global?.numberOfOnlineUsers ?? {},
   switchingAccount: (state: RootState) =>
     state.global?.switchingAccount ?? false,
+  wsHealthChecking: (state: RootState) =>
+    state.global?.wsHealthChecking ?? false,
 };
 
 export const GlobalSelectors = {
@@ -54,6 +56,7 @@ export const GlobalSelectors = {
   numberOfOnlineUsersForOutpost: (id: string) => (state: RootState) =>
     state.global?.numberOfOnlineUsers?.[id] ?? 0,
   switchingAccount: GlobalDomains.switchingAccount,
+  wsHealthChecking: GlobalDomains.wsHealthChecking,
   isPrimaryAccount: createSelector(
     GlobalDomains.podiumUserInfo,
     (podiumUserInfo) => {

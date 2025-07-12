@@ -114,8 +114,8 @@ export const LikeAndDislike = ({
       className={cn(
         "flex-1 flex items-center justify-center gap-1 p-2 text-xs rounded transition-colors",
         like
-          ? "bg-green-500/10 hover:bg-green-500/20 text-green-600 disabled:opacity-50"
-          : "bg-red-500/10 hover:bg-red-500/20 text-red-600 disabled:opacity-50"
+          ? "bg-green-500/30 hover:bg-green-500/50 text-green-600 disabled:opacity-50"
+          : "bg-red-500/60 hover:bg-red-500/80 text-red-600 disabled:opacity-50"
       )}
       title={like ? "Like" : "Dislike"}
     >

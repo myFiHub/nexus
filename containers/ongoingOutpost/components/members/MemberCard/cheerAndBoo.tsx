@@ -44,8 +44,8 @@ export const CheerAndBoo = ({
       onClick={handleCheer}
       size="xs"
       className={cn(
-        "flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-green-500/10 hover:bg-green-500/20 text-green-600 rounded transition-colors",
-        isCheering && "bg-green-500/10 hover:bg-green-500/20 text-green-600"
+        "flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-green-500/60 hover:bg-green-500/80 text-green-600 rounded transition-colors",
+        isCheering && "bg-green-500/60 hover:bg-green-500/20 text-green-600"
       )}
       title="Cheer"
     >
@@ -67,8 +67,8 @@ export const CheerAndBoo = ({
       onClick={handleBoo}
       size="xs"
       className={cn(
-        "flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-red-500/10 hover:bg-red-500/20 text-red-600 rounded transition-colors",
-        isBooing && "bg-red-500/10 hover:bg-red-500/20 text-red-600"
+        "flex-1 flex items-center justify-center gap-1 p-2 text-xs bg-red-500/60 hover:bg-red-500/80 text-red-600 rounded transition-colors",
+        isBooing && "bg-red-500/60 hover:bg-red-500/20 text-red-600"
       )}
       title="Boo"
     >

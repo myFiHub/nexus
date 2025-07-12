@@ -88,7 +88,8 @@ export const UserSelectToInviteDialogProvider = () => {
   const [invitedUsers, setInvitedUsers] = useState<InvitedUser[]>([]);
   const [dialogContent, setDialogContent] =
     useState<UserSelectToInviteDialogProps | null>(null);
-
+  const outpost = dialogContent?.outpost;
+  const members = outpost?.members ?? [];
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
@@ -429,7 +430,9 @@ export const UserSelectToInviteDialogProvider = () => {
             {Object.values(allUsers).map((user: User) => {
               const invitedUser = getInvitedUser(user);
               const existingInvite = getExistingInvite(user);
-
+              const isMember = members.some(
+                (member) => member.uuid === user.uuid
+              );
               return (
                 <div
                   key={user.uuid}
@@ -456,11 +459,19 @@ export const UserSelectToInviteDialogProvider = () => {
                           <CopyButton text={user.aptos_address} />
                         </div>
                       )}
-                      {existingInvite && (
+                      {isMember ? (
                         <div className="text-xs text-blue-600 font-medium">
-                          Already invited{" "}
-                          {existingInvite.can_speak ? "to speak" : "to listen"}
+                          Already a member
                         </div>
+                      ) : (
+                        existingInvite && (
+                          <div className="text-xs text-blue-600 font-medium">
+                            Already invited{" "}
+                            {existingInvite.can_speak
+                              ? "to speak"
+                              : "to listen"}
+                          </div>
+                        )
                       )}
                     </div>
                   </div>
@@ -472,7 +483,7 @@ export const UserSelectToInviteDialogProvider = () => {
                       variant={invitedUser?.invited ? "primary" : "outline"}
                       onClick={() => handleInviteOption(user, "invite")}
                       className="text-xs px-2 py-1 h-7"
-                      disabled={!!existingInvite}
+                      disabled={!!existingInvite || isMember}
                     >
                       Only Invite
                     </Button>
@@ -486,7 +497,7 @@ export const UserSelectToInviteDialogProvider = () => {
                           handleInviteOption(user, "inviteToSpeak")
                         }
                         className="text-xs px-2 py-1 h-7"
-                        disabled={!!existingInvite}
+                        disabled={!!existingInvite || isMember}
                       >
                         Invite to Speak
                       </Button>

@@ -24,6 +24,8 @@ export const onGoingOutpostDomains = {
     state.onGoingOutpost?.outpost?.creator_joined,
   tick: (state: RootState) => state.global?.tick ?? 0,
   leaving: (state: RootState) => state.onGoingOutpost?.leaving,
+  isRefreshingLiveMembers: (state: RootState) =>
+    state.onGoingOutpost?.isRefreshingLiveMembers,
 };
 
 export const onGoingOutpostSelectors = {
@@ -120,4 +122,5 @@ export const onGoingOutpostSelectors = {
     }
   ),
   leaving: onGoingOutpostDomains.leaving,
+  isRefreshingLiveMembers: onGoingOutpostDomains.isRefreshingLiveMembers,
 };

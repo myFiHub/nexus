@@ -1,6 +1,51 @@
 # WebSocket Client
 
-A simplified, robust WebSocket client for the Nexus application. This client provides automatic reconnection, message handling, and asynchronous outpost joining functionality in a single, easy-to-use class.
+This WebSocket client provides real-time communication capabilities for the application.
+
+## Usage
+
+### Health Check
+
+The `healthCheck` method sends an echo message to the server and waits for a response to verify connection health:
+
+```typescript
+import { wsClient } from "services/wsClient";
+
+// Perform a health check
+const isHealthy = await wsClient.healthCheck();
+if (isHealthy) {
+  console.log("WebSocket connection is healthy");
+} else {
+  console.log("WebSocket connection is unhealthy");
+}
+```
+
+**Features:**
+
+- 5-second timeout per attempt
+- Retries up to 2 times (3 total attempts)
+- Automatically reconnects if disconnected
+- Uses unique UUID for each health check to prevent conflicts
+
+### Joining Outposts
+
+```typescript
+// Reliable join with health checking
+const success = await wsClient.asyncJoin(outpostId);
+```
+
+### Connection Management
+
+```typescript
+// Connect to WebSocket
+await wsClient.connect(token);
+
+// Check connection status
+const status = wsClient.connectionStatus;
+
+// Close connection
+wsClient.close();
+```
 
 ## Features
 
