@@ -41,11 +41,10 @@ export const AssetsSelectors = {
       }
     }),
 
-  userPassesLoading: (id: string) =>
-    createSelector([AssetsDomains.pass], (passes) => {
-      const pass = passes[id];
-      return pass?.loading;
-    }),
+  userPassesLoading: (id: string) => (state: RootState) => {
+    const pass = state.assets?.passes?.[id];
+    return pass?.loading ?? false;
+  },
   balance: createSelector([AssetsDomains.balance], (balance) => {
     const tmp = { ...balance };
     const balanceValueInMove = bigIntCoinToMoveOnAptos(balance.value);

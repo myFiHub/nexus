@@ -9,13 +9,25 @@ interface ProfileHeaderProps {
 
 export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
   <div className="flex items-center space-x-6 mb-8">
-    <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0">
-      <Img
-        src={user?.image}
-        alt={user?.name || "user"}
-        className="w-full h-full object-cover"
-        useImgTag
-      />
+    <div className="relative w-32 h-32 flex-shrink-0">
+      {/* Backdrop effect - blurred larger version positioned outside */}
+      <div className="absolute inset-0 scale-125 opacity-50 blur-md rounded-full overflow-hidden">
+        <Img
+          src={user?.image}
+          alt=""
+          className="w-full h-full object-cover"
+          useImgTag
+        />
+      </div>
+      {/* Main profile image */}
+      <div className="relative z-10 w-full h-full rounded-full overflow-hidden">
+        <Img
+          src={user?.image}
+          alt={user?.name || "user"}
+          className="w-full h-full object-cover"
+          useImgTag
+        />
+      </div>
     </div>
     <div className="flex-1 min-w-0">
       <h1 className="text-3xl font-bold text-foreground truncate">
