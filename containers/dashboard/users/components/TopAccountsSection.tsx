@@ -1,3 +1,4 @@
+import { AppPages } from "app/lib/routes";
 import { TopOwner } from "app/services/api/types";
 import { Trophy } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
@@ -14,8 +15,7 @@ export const TopAccountsSection = ({ topOwners }: TopAccountsSectionProps) => {
         icon={<Trophy className="w-5 h-5 text-yellow-500" />}
         title="Top Accounts"
         seeMore={{
-          href: "/all_outposts",
-          params: { filter: "top_accounts" },
+          href: AppPages.users + "/top_accounts",
         }}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">

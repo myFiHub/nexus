@@ -25,7 +25,7 @@ export const Users = ({
     <div className="min-h-screen bg-background p-6">
       {/* Search Bar */}
       <div className="mb-8">
-        <div className="relative max-w-2xl">
+        <div className="relative  ">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
           <input
             type="text"

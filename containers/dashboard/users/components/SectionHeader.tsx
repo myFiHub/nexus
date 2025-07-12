@@ -33,7 +33,7 @@ export const SectionHeader = ({ icon, title, seeMore }: SectionHeaderProps) => {
       {seeMore && (
         <button
           onClick={handleSeeMore}
-          className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          className="text-sm text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
         >
           See more
         </button>

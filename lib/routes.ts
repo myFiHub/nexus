@@ -14,6 +14,8 @@ export const AppPages = {
   outpostDetails: (outpostId: string) => `/outpost_details/${outpostId}`,
   userDetails: (userId: string) => `/user/${userId}`,
   dashboard: "/dashboard",
+  users: "/users",
+  tokens: "/tokens",
 };
 
 export const ApiEndpoints = {

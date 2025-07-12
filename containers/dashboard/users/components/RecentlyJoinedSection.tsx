@@ -1,6 +1,7 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
 import { logoUrl } from "app/lib/constants";
+import { AppPages } from "app/lib/routes";
 import { RecentlyJoinedUser } from "app/services/api/types";
 import { Clock } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
@@ -50,8 +51,7 @@ export const RecentlyJoinedSection = ({
         icon={<Clock className="w-5 h-5 text-blue-500" />}
         title="Recently Joined"
         seeMore={{
-          href: "/all_outposts",
-          params: { filter: "recently_joined" },
+          href: AppPages.users + "/recently_joined",
         }}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
