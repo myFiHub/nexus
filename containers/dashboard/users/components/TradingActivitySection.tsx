@@ -27,7 +27,7 @@ export const TradingActivitySection = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 overflow-x-auto">
       <SectionHeader
         icon={<BarChart3 className="w-5 h-5 text-green-500" />}
         title="Trading Activity"
@@ -37,7 +37,7 @@ export const TradingActivitySection = ({
         }}
       />
 
-      <div className="bg-card rounded-lg border border-border overflow-hidden">
+      <div className="bg-card rounded-lg border border-border  min-w-[1024px]  ">
         {/* Filter Row */}
         <div className="flex items-center justify-between p-4 border-b border-border/50">
           <div className="flex items-center gap-4">
