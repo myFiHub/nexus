@@ -112,7 +112,9 @@ export const NameDialogProvider = () => {
                       type="text"
                       placeholder="Enter your full name"
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={(e) =>
+                        setInputValue(e.target.value.replaceAll("@", ""))
+                      }
                       className={`transition-all duration-200 ${
                         inputValue && !isValid
                           ? "border-red-500 focus:border-red-500"

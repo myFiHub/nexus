@@ -96,6 +96,10 @@ export const Meet = memo(
               },
               prejoinPageEnabled: false,
               skipPrejoinPage: true,
+              toolbarConfig: {
+                alwaysVisible: true,
+                autoHideWhileChatIsOpen: false,
+              },
               toolbarButtons: [
                 ...(accesses?.canSpeak ? ["microphone"] : []),
                 "closedcaptions",

@@ -6,7 +6,7 @@ import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
-import { ConnectionState } from "app/services/wsClient";
+import { wsClient } from "app/services/wsClient";
 import { ReduxProvider } from "app/store/Provider";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -40,9 +40,13 @@ const JoinButtonContent = ({
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const wsConnectionStatus = useSelector(GlobalSelectors.wsConnectionStatus);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
+  const [checkingWsHealth, setCheckingWsHealth] = useState(false);
 
-  const join = () => {
-    if (wsConnectionStatus.state !== ConnectionState.CONNECTED) {
+  const join = async () => {
+    setCheckingWsHealth(true);
+    const isHealthy = await wsClient.healthCheck();
+    setCheckingWsHealth(false);
+    if (!isHealthy) {
       toast.error("Please check your connection and try again");
       return;
     }
@@ -68,7 +72,7 @@ const JoinButtonContent = ({
 
   if (!myUser && !logingIn) return <LoginButton className="w-full" />;
 
-  const loading = joining || logingIn;
+  const loading = joining || logingIn || checkingWsHealth;
   const disabled = iAmCreator ? loading : !isPassed || loading;
 
   return (
@@ -85,7 +89,11 @@ const JoinButtonContent = ({
   );
 };
 
-export function JoinButton({ outpost, fromCard, joinComponent }: JoinButtonProps) {
+export function JoinButton({
+  outpost,
+  fromCard,
+  joinComponent,
+}: JoinButtonProps) {
   return (
     <ReduxProvider>
       <JoinButtonContent
