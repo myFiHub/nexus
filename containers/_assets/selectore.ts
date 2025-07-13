@@ -28,18 +28,18 @@ export const AssetsDomains = {
 };
 
 export const AssetsSelectors = {
-  userPasses: (id: string) =>
-    createSelector([AssetsDomains.pass], (passes) => {
-      const pass = passes[id];
-      if (pass === undefined) {
-        return undefined;
-      } else {
-        const tmp = { ...pass };
-        const ownedInCoin = tmp.ownedNumber || 0;
-        tmp.ownedNumber = bigIntCoinToMoveOnAptos(ownedInCoin);
-        return tmp;
-      }
-    }),
+  userPasses: (id: string) => (state: RootState) => {
+    const passes = state.assets?.passes || {};
+    const pass = passes[id];
+    if (pass === undefined) {
+      return undefined;
+    } else {
+      const tmp = { ...pass };
+      const ownedInCoin = tmp.ownedNumber || 0;
+      tmp.ownedNumber = bigIntCoinToMoveOnAptos(ownedInCoin);
+      return tmp;
+    }
+  },
 
   userPassesLoading: (id: string) => (state: RootState) => {
     const pass = state.assets?.passes?.[id];

@@ -68,6 +68,7 @@ export function MembersList({ outpost }: MembersListProps) {
 
               <FollowButton
                 id={member.uuid}
+                noRouterRefresh
                 followed={member.followed_by_me ?? false}
                 address={member.address}
                 size="sm"

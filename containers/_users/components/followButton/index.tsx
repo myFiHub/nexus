@@ -6,7 +6,7 @@ import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Subscription } from "rxjs";
 import { Button, ButtonProps } from "../../../../components/Button";
@@ -42,11 +42,36 @@ const Content = ({
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isMyUser = myUser?.uuid === id;
   const isLoading = loading || gettingUserData;
+  const hasInitialCheckRef = useRef(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const componentRef = useRef<HTMLDivElement>(null);
+
+  // Check if component is visible
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    if (componentRef.current) {
+      observer.observe(componentRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [myUser]);
 
   useEffect(() => {
     let subscription: Subscription;
+    if (
+      myUser &&
+      address !== myUser.address &&
+      isVisible &&
+      !hasInitialCheckRef.current
+    ) {
+      hasInitialCheckRef.current = true;
 
-    if (myUser && address !== myUser.address) {
       subscription = followStateSubject.subscribe((state) => {
         if (state.id === id) {
           if (state.loading !== undefined) {
@@ -57,8 +82,9 @@ const Content = ({
           }
         }
       });
+
       const getUserData = async () => {
-        if (existsOnCache) {
+        if (existsOnCache || !isVisible) {
           return;
         }
         setGettingUserData(true);
@@ -75,8 +101,12 @@ const Content = ({
       getUserData();
     }
 
-    return () => subscription?.unsubscribe();
-  }, [address, myUser, existsOnCache]);
+    return () => {
+      if (subscription && !hasInitialCheckRef.current) {
+        subscription.unsubscribe();
+      }
+    };
+  }, [address, myUser, existsOnCache, id, dispatch, isVisible]);
 
   const handleFollowUnfollowClick = (
     e: React.MouseEvent<HTMLButtonElement>
@@ -93,34 +123,36 @@ const Content = ({
     return <></>;
   }
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{ height: "auto", opacity: 1 }}
-        exit={{ height: 0, opacity: 0 }}
-        transition={{ duration: 0.3, ease: "easeOut" }}
-        style={{ overflow: "hidden" }}
-      >
-        <Button
-          variant="outline"
-          size={size}
-          onClick={handleFollowUnfollowClick}
-          disabled={isLoading}
-          className={cn("min-w-22", className)}
-          colorScheme={followed ? "danger" : "primary"}
+    <div ref={componentRef}>
+      <AnimatePresence>
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: "auto", opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          style={{ overflow: "hidden" }}
         >
-          {isLoading ? (
-            <div className="h-5 flex items-center justify-center">
-              <Loader2 className="animate-spin" size={15} />
-            </div>
-          ) : followed ? (
-            "Unfollow"
-          ) : (
-            "Follow"
-          )}
-        </Button>
-      </motion.div>
-    </AnimatePresence>
+          <Button
+            variant="outline"
+            size={size}
+            onClick={handleFollowUnfollowClick}
+            disabled={isLoading}
+            className={cn("min-w-22", className)}
+            colorScheme={followed ? "danger" : "primary"}
+          >
+            {isLoading ? (
+              <div className="h-5 flex items-center justify-center">
+                <Loader2 className="animate-spin" size={15} />
+              </div>
+            ) : followed ? (
+              "Unfollow"
+            ) : (
+              "Follow"
+            )}
+          </Button>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 };
 export const FollowButton = ({
