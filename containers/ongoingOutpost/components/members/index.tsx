@@ -25,7 +25,7 @@ export const OngoingOutpostMembers = memo(
         >
           <div
             ref={nodeRef}
-            className="absolute top-0 pt-4 right-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-50"
+            className="absolute top-0 pt-4 right-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-1"
           >
             {/* Drag Handle */}
             <div className="drag-handle absolute top-0 left-0 w-full h-6 bg-muted/80 hover:bg-muted border border-border rounded cursor-move flex items-center justify-center group z-10">

@@ -1,20 +1,23 @@
 "use client";
 
+import { GlobalSelectors } from "app/containers/global/selectors";
+import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { cn } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { SidebarContent } from "./SidebarContent";
 import { TriggerButton } from "./TriggerButton";
 
 const Content = () => {
+  const dispatch = useDispatch();
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = useState(isMobile ? false : true);
   const [hasBeenClicked, setHasBeenClicked] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const triggerControls = useAnimation();
-
+  const isOpen = useSelector(GlobalSelectors.isSidebarOpen);
   // Check localStorage for previous mobile menu interaction
   useEffect(() => {
     if (isMobile && typeof window !== "undefined") {
@@ -53,7 +56,7 @@ const Content = () => {
   }, [triggerControls]);
 
   const toggle = () => {
-    setIsOpen(!isOpen);
+    dispatch(globalActions.setIsSidebarOpen(!isOpen));
     // Mark as clicked on first mobile interaction and save to localStorage
     if (isMobile && !hasBeenClicked) {
       setHasBeenClicked(true);

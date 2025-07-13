@@ -3,7 +3,7 @@ import { Loader2 } from "lucide-react";
 
 export const JoiningStatus = () => {
   return (
-    <div className=" inset-0 flex items-center justify-center z-10 bg-background/80 backdrop-blur-sm  absolute w-full h-[100vh] -top-[220px]">
+    <div className=" inset-0 flex items-center justify-center z-10 bg-background/80 backdrop-blur-sm  absolute w-full h-[100vh] -top-[270px]">
       <div className="flex flex-col items-center gap-4">
         <motion.div
           animate={{ rotate: 360 }}
