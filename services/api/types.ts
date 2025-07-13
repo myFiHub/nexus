@@ -319,3 +319,42 @@ export interface InviteModel {
   invitee_uuid: string;
   can_speak: boolean;
 }
+
+export interface RecentlyJoinedUser {
+  name: string;
+  created_at: number;
+  address: string;
+  image: string;
+  aptos_address: string;
+}
+export interface TopOwner {
+  address: string;
+  aptos_address: string;
+  podium_pass_price: number;
+  name: string;
+  image: string;
+}
+export interface Trade {
+  count: number;
+  created_at: number;
+  fees_earned: number;
+  podium_pass_left: number;
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  price: number;
+  trade_type: "buy" | "sell";
+  user_address: string;
+  user_image: string;
+  user_name: string;
+  uuid: string;
+}
+
+export interface TradingVolume {
+  address: string;
+  image: string;
+  aptos_address: string;
+  name: string;
+  podium_pass_price: number;
+  volume: number;
+}

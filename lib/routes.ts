@@ -13,6 +13,9 @@ export const AppPages = {
   ongoingOutpost: (outpostId: string) => `/ongoing_outpost/${outpostId}`,
   outpostDetails: (outpostId: string) => `/outpost_details/${outpostId}`,
   userDetails: (userId: string) => `/user/${userId}`,
+  dashboard: "/dashboard",
+  users: "/users",
+  tokens: "/tokens",
 };
 
 export const ApiEndpoints = {
@@ -20,6 +23,10 @@ export const ApiEndpoints = {
     user: (userId: string) => `/user/${userId}`,
     outpostDetails: (outpostId: string) => `/outpost-details/${outpostId}`,
     allOutposts: "/all-outposts",
+    dashboard: "/dashboard",
+    dashboardRecentUsers: "/dashboard/recent-users",
+    dashboardTopOwners: "/dashboard/top-owners",
+    dashboardTrades: "/dashboard/trades",
   },
   cookies: "/api/cookies",
   luma: "/api/luma",

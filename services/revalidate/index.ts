@@ -165,6 +165,46 @@ class RevalidateService {
   }
 
   /**
+   * Revalidates the dashboard page (all cache tags)
+   * @returns Promise with revalidation result
+   */
+  async revalidateDashboard(): Promise<RevalidateResponse> {
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.dashboard
+    );
+  }
+
+  /**
+   * Revalidates only the dashboard recent users cache
+   * @returns Promise with revalidation result
+   */
+  async revalidateDashboardRecentUsers(): Promise<RevalidateResponse> {
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.dashboardRecentUsers
+    );
+  }
+
+  /**
+   * Revalidates only the dashboard top owners cache
+   * @returns Promise with revalidation result
+   */
+  async revalidateDashboardTopOwners(): Promise<RevalidateResponse> {
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.dashboardTopOwners
+    );
+  }
+
+  /**
+   * Revalidates only the dashboard trades cache
+   * @returns Promise with revalidation result
+   */
+  async revalidateDashboardTrades(): Promise<RevalidateResponse> {
+    return this.makeRequest<RevalidateResponse>(
+      ApiEndpoints.revalidate.dashboardTrades
+    );
+  }
+
+  /**
    * Revalidates an outpost details page
    * @param outpostId - The outpost ID to revalidate
    * @returns Promise with revalidation result
@@ -192,6 +232,7 @@ class RevalidateService {
     userId?: string;
     outpostId?: string;
     allOutposts?: boolean;
+    dashboard?: boolean;
     userDataOptions?: UserDataRevalidateOptions;
   }): Promise<RevalidateResponse[]> {
     const promises: Promise<RevalidateResponse>[] = [];
@@ -212,6 +253,10 @@ class RevalidateService {
 
     if (options.allOutposts) {
       promises.push(this.revalidateAllOutposts());
+    }
+
+    if (options.dashboard) {
+      promises.push(this.revalidateDashboard());
     }
 
     if (promises.length === 0) {

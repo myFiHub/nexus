@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Crown, LogIn } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
+import { AppLink } from "../AppLink";
 import { LoginButton } from "../header/LoginButton";
 import { Img } from "../Img";
 import { Separator } from "./separator";
@@ -111,17 +112,19 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
               exit={{ opacity: 0, scale: 0.8 }}
               whileHover={{ scale: 1.1 }}
             >
-              <div className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-br from-accent/50 to-accent/30 border border-accent/50 relative">
-                <Img
-                  src={myUser?.image}
-                  useImgTag
-                  className="h-4 w-4 rounded-full"
-                  alt={myUser?.name ?? ""}
-                />
-                {isPrimary && (
-                  <Crown className="absolute top-0 right-0 text-yellow-500 h-3 w-3" />
-                )}
-              </div>
+              <AppLink href={AppPages.profile} className="p-0.5">
+                <div className="flex items-center justify-center p-2 rounded-lg bg-gradient-to-br from-accent/50 to-accent/30 border border-accent/50 relative">
+                  <Img
+                    src={myUser?.image}
+                    useImgTag
+                    className="h-4 w-4 rounded-full"
+                    alt={myUser?.name ?? ""}
+                  />
+                  {isPrimary && (
+                    <Crown className="absolute top-0 right-0 text-yellow-500 h-3 w-3" />
+                  )}
+                </div>
+              </AppLink>
               <motion.div
                 className="absolute left-full ml-3 top-1/2 -translate-y-1/2 bg-black text-white text-sm px-3 py-2 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 whitespace-nowrap"
                 initial={{ scale: 0.8, x: -10 }}

@@ -13,14 +13,18 @@ export const UserProfile = ({ user }: UserProfileProps) => {
   return (
     <div className="flex flex-col sm:flex-row items-center gap-4">
       {user.image && (
-        <Img
-          src={user.image}
-          alt={user.name || "User"}
-          width={80}
-          height={80}
-          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full"
-          useImgTag
-        />
+        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
+          <div className="relative z-10 w-full h-full rounded-full overflow-hidden">
+            <Img
+              src={user.image}
+              alt={user.name || "User"}
+              width={80}
+              height={80}
+              className="w-full h-full object-cover"
+              useImgTag
+            />
+          </div>
+        </div>
       )}
       <div className="text-center sm:text-left">
         <h1 className="text-xl sm:text-2xl font-bold">

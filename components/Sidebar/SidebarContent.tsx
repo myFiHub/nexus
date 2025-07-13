@@ -2,6 +2,7 @@ import { globalActions } from "app/containers/global/slice";
 import { AppPages } from "app/lib/routes";
 import {
   HomeIcon,
+  LayoutDashboard,
   LogOutIcon,
   PlusIcon,
   SearchIcon,
@@ -25,6 +26,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
   const isProfile = currentPath === AppPages.profile;
   const isCreateOutpost = currentPath === AppPages.createOutpost;
   const isAllOutposts = currentPath === AppPages.allOutposts;
+  const isDashboard = currentPath === AppPages.dashboard;
 
   const navigationItems: SidebarItemProps[] = [
     {
@@ -40,6 +42,17 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
     },
     {
       index: 1,
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      onClick: () => {
+        router.push("/dashboard");
+      },
+      isOpen: isOpen,
+      isMobile: isMobile,
+      isActive: isDashboard,
+    },
+    {
+      index: 2,
       label: "All Outposts",
       imageSrc: "/outpost.png",
       onClick: () => {
@@ -50,7 +63,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isAllOutposts,
     },
     {
-      index: 2,
+      index: 3,
       label: "My Outposts",
       imageSrc: "/flag.png",
       onClick: () => {
@@ -62,7 +75,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isMyOutposts,
     },
     {
-      index: 3,
+      index: 4,
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
@@ -73,7 +86,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isCreateOutpost,
     },
     {
-      index: 4,
+      index: 5,
       label: "Profile",
       icon: UserIcon,
       onClick: () => {
