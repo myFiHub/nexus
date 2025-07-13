@@ -46,9 +46,11 @@ const Content = ({
   const isVisibleRef = useRef(false);
   const componentRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   // Check if component is visible
   useEffect(() => {
+    if (existsOnCache) {
+      setGettingUserData(false);
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
