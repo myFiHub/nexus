@@ -119,7 +119,7 @@ export const LikeAndDislike = ({
     setCountdown(10);
   };
 
-  // if (isMyUser) return null;
+  if (isMyUser) return null;
 
   const progress = ((10 - countdown) / 10) * 100;
   const isActive = isDisabled && acted;
@@ -127,7 +127,7 @@ export const LikeAndDislike = ({
   return (
     <Button
       onClick={like ? handleLike : handleDislike}
-      disabled={isDisabled}
+      disabled={isDisabled || checkingHealth}
       size="xs"
       className={cn(
         "flex-1 flex items-center justify-center gap-1 p-2 text-xs rounded transition-colors",
