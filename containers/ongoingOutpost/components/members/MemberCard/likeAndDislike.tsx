@@ -1,8 +1,10 @@
 import { Button } from "app/components/Button";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
+import { toast } from "app/lib/toast";
 import { cn } from "app/lib/utils";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
+import { wsClient } from "app/services/wsClient";
+import { Loader2, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -69,6 +71,7 @@ export const LikeAndDislike = ({
   const [isDisabled, setIsDisabled] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [acted, setActed] = useState(false);
+  const [checkingHealth, setCheckingHealth] = useState(false);
 
   // Countdown effect
   useEffect(() => {
@@ -83,8 +86,16 @@ export const LikeAndDislike = ({
     }
   }, [countdown, isDisabled]);
 
-  const handleLike = () => {
+  const handleLike = async () => {
     if (isDisabled) return;
+    setCheckingHealth(true);
+    const isHealthy = await wsClient.healthCheck();
+    if (!isHealthy) {
+      setCheckingHealth(false);
+      toast.error("Please check your internet connection and try again.");
+      return;
+    }
+    setCheckingHealth(false);
 
     dispatch(onGoingOutpostActions.like({ targetUserAddress: address }));
     setIsDisabled(true);
@@ -92,16 +103,23 @@ export const LikeAndDislike = ({
     setCountdown(10);
   };
 
-  const handleDislike = () => {
+  const handleDislike = async () => {
     if (isDisabled) return;
-
+    setCheckingHealth(true);
+    const isHealthy = await wsClient.healthCheck();
+    if (!isHealthy) {
+      setCheckingHealth(false);
+      toast.error("Please check your internet connection and try again.");
+      return;
+    }
+    setCheckingHealth(false);
     dispatch(onGoingOutpostActions.dislike({ targetUserAddress: address }));
     setIsDisabled(true);
     setActed(true);
     setCountdown(10);
   };
 
-  if (isMyUser) return null;
+  // if (isMyUser) return null;
 
   const progress = ((10 - countdown) / 10) * 100;
   const isActive = isDisabled && acted;
@@ -119,7 +137,9 @@ export const LikeAndDislike = ({
       )}
       title={like ? "Like" : "Dislike"}
     >
-      {isActive ? (
+      {checkingHealth ? (
+        <Loader2 className="w-3 h-3 animate-spin" />
+      ) : isActive ? (
         <CircularProgress progress={progress} size={20} strokeWidth={2}>
           {countdown}
         </CircularProgress>

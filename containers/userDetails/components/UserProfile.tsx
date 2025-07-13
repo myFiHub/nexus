@@ -14,18 +14,6 @@ export const UserProfile = ({ user }: UserProfileProps) => {
     <div className="flex flex-col sm:flex-row items-center gap-4">
       {user.image && (
         <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-          {/* Backdrop effect - blurred larger version positioned outside */}
-          <div className="absolute inset-0 scale-125 opacity-40 blur-md rounded-full overflow-hidden">
-            <Img
-              src={user.image}
-              alt=""
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-              useImgTag
-            />
-          </div>
-          {/* Main profile image */}
           <div className="relative z-10 w-full h-full rounded-full overflow-hidden">
             <Img
               src={user.image}

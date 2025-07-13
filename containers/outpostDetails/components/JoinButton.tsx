@@ -38,7 +38,6 @@ const JoinButtonContent = ({
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
-  const wsConnectionStatus = useSelector(GlobalSelectors.wsConnectionStatus);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
 
@@ -65,14 +64,14 @@ const JoinButtonContent = ({
   }
 
   // Client-side only logic
-  const joining = joiningId === outpost.uuid;
+  const joining = joiningId === outpost.uuid || checkingWsHealth;
   const timerInfo = getTimerInfo(outpost.scheduled_for);
   const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
   if (!myUser && !logingIn) return <LoginButton className="w-full" />;
 
-  const loading = joining || logingIn || checkingWsHealth;
+  const loading = joining || logingIn;
   const disabled = iAmCreator ? loading : !isPassed || loading;
 
   return (
