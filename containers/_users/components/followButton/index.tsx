@@ -37,20 +37,22 @@ const Content = ({
     isFollowedFromCache === undefined ? initialFollowed : isFollowedFromCache;
   const existsOnCache = isFollowedFromCache !== undefined;
   const [loading, setLoading] = useState(false);
-  const [gettingUserData, setGettingUserData] = useState(false);
+  const [gettingUserData, setGettingUserData] = useState(true);
   const [followed, setFollowed] = useState(initial);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isMyUser = myUser?.uuid === id;
   const isLoading = loading || gettingUserData;
-  const hasInitialCheckRef = useRef(false);
   const [isVisible, setIsVisible] = useState(false);
+  const isVisibleRef = useRef(false);
   const componentRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if component is visible
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
+        isVisibleRef.current = entry.isIntersecting;
       },
       { threshold: 0.1 }
     );
@@ -64,14 +66,8 @@ const Content = ({
 
   useEffect(() => {
     let subscription: Subscription;
-    if (
-      myUser &&
-      address !== myUser.address &&
-      isVisible &&
-      !hasInitialCheckRef.current
-    ) {
-      hasInitialCheckRef.current = true;
 
+    if (myUser && address !== myUser.address) {
       subscription = followStateSubject.subscribe((state) => {
         if (state.id === id) {
           if (state.loading !== undefined) {
@@ -82,28 +78,50 @@ const Content = ({
           }
         }
       });
-
-      const getUserData = async () => {
-        if (existsOnCache || !isVisible) {
-          return;
-        }
-        setGettingUserData(true);
-        const areFollowedByMe = await podiumApi.areFollowedByMe([address]);
-        setGettingUserData(false);
-        setFollowed(areFollowedByMe[address] || false);
-        dispatch(
-          usersActions.updateFollowStatusCache({
-            id: id,
-            follow: areFollowedByMe[address] || false,
-          })
-        );
-      };
-      getUserData();
     }
 
     return () => {
-      if (subscription && !hasInitialCheckRef.current) {
+      if (subscription) {
         subscription.unsubscribe();
+      }
+    };
+  }, [address, myUser, id]);
+
+  useEffect(() => {
+    if (myUser && address !== myUser.address && isVisible && !existsOnCache) {
+      // Clear any existing timeout
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+
+      const getUserData = async () => {
+        timeoutRef.current = setTimeout(async () => {
+          if (!isVisibleRef.current) {
+            return;
+          }
+
+          setGettingUserData(true);
+          const areFollowedByMe = await podiumApi.areFollowedByMe([address]);
+          setGettingUserData(false);
+          setFollowed(areFollowedByMe[address] || false);
+          dispatch(
+            usersActions.updateFollowStatusCache({
+              id: id,
+              follow: areFollowedByMe[address] || false,
+            })
+          );
+        }, 500);
+      };
+      getUserData();
+    } else if (!isVisible && timeoutRef.current) {
+      // Clear timeout when component becomes invisible
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
     };
   }, [address, myUser, existsOnCache, id, dispatch, isVisible]);
