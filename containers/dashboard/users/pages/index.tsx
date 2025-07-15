@@ -84,11 +84,11 @@ export function UsersPage({ users, filter }: UsersPageProps) {
         {/* Users Grid */}
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {users.map((user) => {
+            {users.map((user, index) => {
               const config = getDisplayConfig(user, filter);
               return (
                 <UserCard
-                  key={user.uuid}
+                  key={index}
                   user={user as any}
                   displayType={config.displayType}
                   displayValue={config.displayValue ?? ""}

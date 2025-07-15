@@ -51,8 +51,8 @@ export const TradingActivitySection = ({
 
         {/* Table Body */}
         <div className="divide-y divide-border/30">
-          {trades.map((trade) => (
-            <TradeRow key={trade.uuid} trade={trade} gridCols={gridCols} />
+          {trades.map((trade, index) => (
+            <TradeRow key={index} trade={trade} gridCols={gridCols} />
           ))}
           <ClientSideList />
         </div>

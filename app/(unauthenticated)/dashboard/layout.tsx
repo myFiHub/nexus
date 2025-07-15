@@ -8,11 +8,11 @@ import {
 export default function DashboardLayout({
   children,
   users,
-  tokens,
+  leaderboard,
 }: {
   children: React.ReactNode;
   users: React.ReactNode;
-  tokens: React.ReactNode;
+  leaderboard: React.ReactNode;
 }) {
   return (
     <div className="p-6">
@@ -21,15 +21,15 @@ export default function DashboardLayout({
       <Tabs defaultValue="users" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="tokens">Tokens</TabsTrigger>
+          <TabsTrigger value="leaderboard">Leader board</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">
           {users}
         </TabsContent>
 
-        <TabsContent value="tokens" className="mt-6">
-          {tokens}
+        <TabsContent value="leaderboard" className="mt-6">
+          {leaderboard}
         </TabsContent>
       </Tabs>
     </div>

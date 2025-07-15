@@ -1,0 +1,19 @@
+import UserLink from "app/components/AppLink/userLink";
+import { Img } from "app/components/Img";
+import { logoUrl } from "app/lib/constants";
+import { MostFeeEarned } from "app/services/api/types";
+
+export const LeaderboardAvatar = ({ user }: { user: MostFeeEarned }) => (
+  <UserLink
+    id={user.podium_pass_owner_uuid}
+    underline={false}
+    ignore={!user.podium_pass_owner_uuid}
+    className="p-0"
+  >
+    <Img
+      src={user.podium_pass_owner_image || logoUrl}
+      alt={user.podium_pass_owner_name}
+      className="w-10 h-10 rounded-full object-cover border border-[#23262F]"
+    />
+  </UserLink>
+);

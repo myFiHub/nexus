@@ -1,9 +1,9 @@
+import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { AppPages } from "app/lib/routes";
 import { TopOwner } from "app/services/api/types";
 import { Trophy } from "lucide-react";
 import { SectionHeader } from "../SectionHeader";
 import { UserCard } from "../UserCard";
-import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 
 interface TopAccountsSectionProps {
   topOwners: TopOwner[];
@@ -26,7 +26,7 @@ export const TopAccountsSection = ({ topOwners }: TopAccountsSectionProps) => {
             user={owner}
             displayType="price"
             displayValue={owner.podium_pass_price}
-            displayColor="text-destructive"
+            displayColor="text-green-500"
           />
         ))}
         {topOwners.length === 0 && (

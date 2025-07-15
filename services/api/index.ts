@@ -1,3 +1,10 @@
+import { TOP_FEE_EARNED_PAGE_SIZE } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
+import {
+  RECENTLY_JOINED_PAGE_SIZE,
+  TOP_OWNERS_PAGE_SIZE,
+  TRADE_PAGE_SIZE,
+  TRADING_VOLUME_PAGE_SIZE,
+} from "app/containers/dashboard/users/configs";
 import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
@@ -33,7 +40,6 @@ import {
   UpdateOutpostRequest,
   User,
 } from "./types";
-import { RECENTLY_JOINED_PAGE_SIZE, TOP_OWNERS_PAGE_SIZE, TRADE_PAGE_SIZE, TRADING_VOLUME_PAGE_SIZE } from "app/containers/dashboard/users/configs";
 
 class PodiumApi {
   private readonly baseUrl: string;
@@ -870,7 +876,10 @@ class PodiumApi {
       return [];
     }
   }
-  async getMostFeeEarned(page = 0, page_size = 50): Promise<MostFeeEarned[]> {
+  async getMostFeeEarned(
+    page = 0,
+    page_size = TOP_FEE_EARNED_PAGE_SIZE
+  ): Promise<MostFeeEarned[]> {
     try {
       const response = await this.axiosInstance.get(
         `/dashboard/most-fee-earned`,

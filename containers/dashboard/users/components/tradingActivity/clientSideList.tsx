@@ -11,8 +11,8 @@ const Content = () => {
   const trades = useSelector(dashboardUsersSelectors.trades);
   return (
     <>
-      {trades.map((trade) => (
-        <TradeRow key={trade.uuid} trade={trade} gridCols={gridCols} />
+      {trades.map((trade, index) => (
+        <TradeRow key={index} trade={trade} gridCols={gridCols} />
       ))}
       <ListEndObserver />
     </>

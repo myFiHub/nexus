@@ -32,7 +32,7 @@ export const UserCard = ({
       case "followers":
         return "Followers";
       case "joinedAt":
-        return "Ago";
+        return "";
       default:
         return "";
     }
@@ -48,13 +48,14 @@ export const UserCard = ({
       case "volume":
         return value.toFixed(2); // 2 decimal places for price and volume
       case "joinedAt":
-        return formatDistanceToNow(new Date(value * 1000));
+        return formatDistanceToNow(new Date(value * 1000), {
+          addSuffix: true,
+        });
       default:
         return value.toString();
     }
   };
   const userImage = user.image || logoUrl;
-
   return (
     <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border hover:border-border/80 transition-colors">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -75,20 +76,28 @@ export const UserCard = ({
             <p className="text-sm   truncate font-mono">
               {user.name || "Anonymous"}
             </p>
-
             <p className="text-sm text-muted-foreground truncate font-mono">
-              {user.aptos_address.slice(0, 6)}...{user.aptos_address.slice(-4)}
+              {user.aptos_address}
             </p>
           </div>
         </UserLink>
       </div>
       <div className="flex items-center gap-2 ml-4 flex-shrink-0">
         {displayIcon && displayIcon}
-        <div className="text-right">
-          <p className={`font-semibold ${displayColor}`}>
+        <div className="text-right flex gap-1 content-center items-center">
+          <p className="text-xs text-muted-foreground">{getDisplayLabel()}</p>
+          <p
+            className={`font-semibold ${displayColor} flex items-center gap-1  `}
+          >
             {formatDisplayValue(displayValue)}
           </p>
-          <p className="text-xs text-muted-foreground">{getDisplayLabel()}</p>
+          {displayType === "price" && (
+            <Img
+              src="/movement_logo.svg"
+              alt="Movement Logo"
+              className="w-2 h-2"
+            />
+          )}
         </div>
       </div>
     </div>
