@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "app/components/Button";
+import { podiumPassTradeDialog } from "app/components/Dialog";
 import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { assetsActions } from "app/containers/_assets/slice";
@@ -24,11 +25,21 @@ const Content = ({ address }: { address: string }) => {
   const [isSelling, setIsSelling] = useState(false);
 
   const continueWithAction = async (type: "buy" | "sell", user: User) => {
+    const res = await podiumPassTradeDialog({
+      sellerUser: user,
+      type,
+    });
+    if (!res?.confirmed) {
+      return;
+    }
+
     if (type === "buy") {
       dispatch(assetsActions.buyPassFromUser({ user, numberOfPasses: 1 }));
+      return;
     }
     if (type === "sell") {
       dispatch(assetsActions.sellPass({ seller: user }));
+      return;
     }
   };
 
@@ -73,7 +84,10 @@ const Content = ({ address }: { address: string }) => {
 
   const loadingBuy = isBuying || isBuyingPass;
   const loadingSell = isSelling || isSellingPass;
-
+  const isMyUser = myUser?.aptos_address === address;
+  if (isMyUser) {
+    return null;
+  }
   return (
     <div className="flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
       <Button

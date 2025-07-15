@@ -1,6 +1,6 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
-import { logoUrl } from "app/lib/constants";
+import { logoUrl, movementLogoUrl } from "app/lib/constants";
 import {
   RecentlyJoinedUser,
   TopOwner,
@@ -95,7 +95,7 @@ export const UserCard = ({
             </p>
             {displayType === "price" && (
               <Img
-                src="/movement_logo.svg"
+                src={movementLogoUrl}
                 alt="Movement Logo"
                 className="w-2 h-2"
               />

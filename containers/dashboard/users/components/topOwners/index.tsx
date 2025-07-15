@@ -14,7 +14,7 @@ export const TopAccountsSection = ({ topOwners }: TopAccountsSectionProps) => {
     <div className="space-y-4">
       <SectionHeader
         icon={<Trophy className="w-5 h-5 text-yellow-500" />}
-        title="Top Owners"
+        title="Top Passes"
         seeMore={{
           href: AppPages.users + `/${UserTags.TopOwners}`,
         }}

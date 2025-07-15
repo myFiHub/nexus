@@ -55,7 +55,7 @@ const Content = ({ user }: { user: User }) => {
       ] as any[];
       if (alreadyOwnedNumber > 0) {
         callArray.push(
-          movementService.getTicketSellPriceForPodiumPass({
+          movementService.getSellPriceForPodiumPass({
             sellerAddress: user.aptos_address!,
             numberOfTickets: 1,
           })

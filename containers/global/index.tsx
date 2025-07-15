@@ -6,6 +6,7 @@ import {
   LogoutDialogProvider,
   LumaUserDialogProvider,
   NameDialogProvider,
+  PodiumPassTradeDialogProvider,
   PromptNotificationsDialogProvider,
   ReferrerDialogProvider,
   SearchDialogProvider,
@@ -60,6 +61,7 @@ const Container = () => {
       <LogoutDialogProvider />
       <PromptNotificationsDialogProvider />
       <LoginPromptDialogProvider />
+      <PodiumPassTradeDialogProvider />
     </>
   );
 };

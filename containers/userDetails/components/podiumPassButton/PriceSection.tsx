@@ -1,3 +1,4 @@
+import { movementLogoUrl } from "app/lib/constants";
 import { Coins } from "lucide-react";
 import Image from "next/image";
 
@@ -14,7 +15,7 @@ export const PriceSection = ({ price }: PriceSectionProps) => {
         <span className="text-sm font-medium text-white/90">MOVE</span>
         <div>
           <Image
-            src="/movement_logo.svg"
+            src={movementLogoUrl}
             alt="MOVE"
             width={16}
             height={16}
