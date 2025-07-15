@@ -3,7 +3,7 @@ import { AppPages } from "app/lib/routes";
 import { RecentlyJoinedUser } from "app/services/api/types";
 import { Clock } from "lucide-react";
 import { SectionHeader } from "../SectionHeader";
-import { UserCard } from "../UserCard";
+import { UserCard } from "../userCard";
 
 interface RecentlyJoinedSectionProps {
   recentlyJoinedUsers: RecentlyJoinedUser[];

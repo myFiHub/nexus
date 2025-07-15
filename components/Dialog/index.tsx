@@ -207,3 +207,10 @@ export type { ReferrerDialogResult } from "./referrerDialog";
 export { nameDialog, NameDialogProvider } from "./nameDialog";
 export type { NameDialogResult } from "./nameDialog";
 export type { PromptNotificationsResult } from "./promptNotifications";
+
+// Export login prompt dialog components
+export {
+  loginPromptDialog,
+  LoginPromptDialogProvider,
+} from "./loginPromptDialog";
+export type { LoginPromptDialogResult } from "./loginPromptDialog";

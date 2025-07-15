@@ -12,8 +12,6 @@ interface TradingActivitySectionProps {
 export const TradingActivitySection = ({
   trades,
 }: TradingActivitySectionProps) => {
-  console.log({ trades });
-
   // Common grid classes for header and rows
 
   return (

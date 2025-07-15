@@ -55,6 +55,7 @@ export interface AssetsState {
     };
   };
   sellingPass: boolean;
+  buyingPass: boolean;
 }
 
 const initialState: AssetsState = {
@@ -76,6 +77,7 @@ const initialState: AssetsState = {
   },
   outpostPassSellers: {},
   sellingPass: false,
+  buyingPass: false,
 };
 
 const assetsSlice = createSlice({
@@ -86,8 +88,8 @@ const assetsSlice = createSlice({
     setBalance(state, action: PayloadAction<Balance>) {
       state.balance = action.payload;
     },
-    getUserPassInfo(state, action: PayloadAction<{ address: string }>) {},
-    getPassesBoughtByMe(state, action: PayloadAction<{ page: number }>) {},
+    getUserPassInfo(_, __: PayloadAction<{ address: string }>) {},
+    getPassesBoughtByMe(_, __: PayloadAction<{ page: number }>) {},
     setIsGettingMyPasses(state, action: PayloadAction<boolean>) {
       state.myPasses.loading = action.payload;
     },
@@ -102,16 +104,19 @@ const assetsSlice = createSlice({
       state.passes[address] = pass;
     },
     buyPassFromUser(
-      state,
-      action: PayloadAction<{
+      _,
+      __: PayloadAction<{
         user: User;
-        numberOfTickets: number;
+        numberOfPasses: number;
         buyingToHaveAccessToOutpostWithId?: string;
       }>
     ) {},
-    sellPass(state, action: PayloadAction<{ seller: User }>) {},
+    sellPass(_, __: PayloadAction<{ seller: User }>) {},
     setSellingPass(state, action: PayloadAction<boolean>) {
       state.sellingPass = action.payload;
+    },
+    setBuyingPass(state, action: PayloadAction<boolean>) {
+      state.buyingPass = action.payload;
     },
     setPassesListBoughtByMePage(state, action: PayloadAction<number>) {
       state.passesListBoughtByMe.page = action.payload;

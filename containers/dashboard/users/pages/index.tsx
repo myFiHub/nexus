@@ -1,5 +1,5 @@
 import { UserTags } from "../../../../app/(unauthenticated)/users/[filter]/_filters";
-import { UserCard } from "../components/UserCard";
+import { UserCard } from "../components/userCard";
 import ClientSideList from "./clientSideList";
 import { InjectUsersPage } from "./injector";
 

@@ -1,7 +1,7 @@
 import { TradingVolume } from "app/services/api/types";
 import { TrendingUp } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
-import { UserCard } from "./UserCard";
+import { UserCard } from "./userCard";
 
 interface TrendingVolumeSectionProps {
   tradingVolume: TradingVolume[];

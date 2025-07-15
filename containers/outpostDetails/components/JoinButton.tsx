@@ -1,5 +1,5 @@
 "use client";
-import { LoginButton } from "app/components/header/LoginButton";
+import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { outpostDetailsSelectors } from "../selectors";
+import { LoginPromptContent } from "./LoginPromptContent";
 
 interface JoinButtonProps {
   outpost: OutpostModel;
@@ -41,7 +42,7 @@ const JoinButtonContent = ({
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
 
-  const join = async () => {
+  const continueWithJoin = async () => {
     setCheckingWsHealth(true);
     const isHealthy = await wsClient.healthCheck();
     setCheckingWsHealth(false);
@@ -50,6 +51,14 @@ const JoinButtonContent = ({
       return;
     }
     dispatch(globalActions.joinOutpost({ outpost }));
+  };
+
+  const join = async () => {
+    await loginPromptDialog({
+      actionDescription: "join this outpost",
+      action: continueWithJoin,
+      additionalComponent: <LoginPromptContent outpost={outpost} />,
+    });
   };
 
   if (!outpost) return null;
@@ -68,8 +77,6 @@ const JoinButtonContent = ({
   const timerInfo = getTimerInfo(outpost.scheduled_for);
   const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
-
-  if (!myUser && !logingIn) return <LoginButton className="w-full" />;
 
   const loading = joining || logingIn;
   const disabled = iAmCreator ? loading : !isPassed || loading;

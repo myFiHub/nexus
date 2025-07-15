@@ -3,7 +3,7 @@ import { AppPages } from "app/lib/routes";
 import { TopOwner } from "app/services/api/types";
 import { Trophy } from "lucide-react";
 import { SectionHeader } from "../SectionHeader";
-import { UserCard } from "../UserCard";
+import { UserCard } from "../userCard";
 
 interface TopAccountsSectionProps {
   topOwners: TopOwner[];

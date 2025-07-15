@@ -7,6 +7,7 @@ import {
   TradingVolume,
 } from "app/services/api/types";
 import { formatDistanceToNow } from "date-fns";
+import { UserCardActions } from "./actions";
 
 interface UserCardProps {
   user: RecentlyJoinedUser | TopOwner | TradingVolume;
@@ -57,7 +58,7 @@ export const UserCard = ({
   };
   const userImage = user.image || logoUrl;
   return (
-    <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border hover:border-border/80 transition-colors">
+    <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border hover:border-border/80 transition-colors group">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <UserLink
           id={user.aptos_address}
@@ -82,22 +83,27 @@ export const UserCard = ({
           </div>
         </UserLink>
       </div>
-      <div className="flex items-center gap-2 ml-4 flex-shrink-0">
-        {displayIcon && displayIcon}
-        <div className="text-right flex gap-1 content-center items-center">
-          <p className="text-xs text-muted-foreground">{getDisplayLabel()}</p>
-          <p
-            className={`font-semibold ${displayColor} flex items-center gap-1  `}
-          >
-            {formatDisplayValue(displayValue)}
-          </p>
-          {displayType === "price" && (
-            <Img
-              src="/movement_logo.svg"
-              alt="Movement Logo"
-              className="w-2 h-2"
-            />
-          )}
+      <div className="flex flex-col gap-1">
+        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+          {displayIcon && displayIcon}
+          <div className="text-right flex gap-1 content-center items-center">
+            <p className="text-xs text-muted-foreground">{getDisplayLabel()}</p>
+            <p
+              className={`font-semibold ${displayColor} flex items-center gap-1  `}
+            >
+              {formatDisplayValue(displayValue)}
+            </p>
+            {displayType === "price" && (
+              <Img
+                src="/movement_logo.svg"
+                alt="Movement Logo"
+                className="w-2 h-2"
+              />
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+          {user.name ? <UserCardActions address={user.aptos_address} /> : <></>}
         </div>
       </div>
     </div>
