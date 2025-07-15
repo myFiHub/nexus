@@ -1,3 +1,4 @@
+import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
 import {
   CallObject,
   CallObjectResponse,
@@ -172,8 +173,10 @@ function* buyPassFromUser(
         correntPassInfo,
       });
     }
+    const myBalanceNumber = bigIntCoinToMoveOnAptos(myBalance);
+    const priceNumber = price * numberOfTickets;
 
-    if (myBalance < Number(correntPassInfo?.price) * numberOfTickets) {
+    if (myBalanceNumber < priceNumber) {
       toast.error(
         `Insufficient balance, you need ${price} MOVE to buy ${numberOfTickets} Pass`
       );
