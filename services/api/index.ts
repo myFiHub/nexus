@@ -1,3 +1,4 @@
+import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
   AdditionalDataForLogin,
@@ -9,9 +10,16 @@ import {
   FollowUnfollowRequest,
   InviteRequestModel,
   LoginRequest,
+  MostFeeEarned,
+  MostPassHeld,
+  MostSoldPass,
+  MostUniquePassHeld,
+  MostVolumeTradedPasses,
   NotificationModel,
+  OutpostInvitation,
   OutpostLiveData,
   OutpostModel,
+  Pnl,
   PodiumAppMetadata,
   PodiumPassBuyerModel,
   RecentlyJoinedUser,
@@ -25,6 +33,7 @@ import {
   UpdateOutpostRequest,
   User,
 } from "./types";
+import { TRADE_PAGE_SIZE } from "app/containers/dashboard/users/configs";
 
 class PodiumApi {
   private readonly baseUrl: string;
@@ -78,6 +87,7 @@ class PodiumApi {
         token: null,
       };
     } catch (error: any) {
+      if (isDev) console.log("error", error);
       console.error("Login error:", error);
       return {
         user: undefined,
@@ -115,6 +125,7 @@ class PodiumApi {
 
       return user;
     } catch (error) {
+      if (isDev) console.log("error", error);
       console.error("Get my user data error:", error);
       return undefined;
     }
@@ -128,6 +139,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       console.error("Update my user data error:", error);
       return undefined;
     }
@@ -140,6 +152,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       try {
         const user = await this.getUserByAptosAddress(id);
         if (user) {
@@ -170,6 +183,7 @@ class PodiumApi {
         return acc;
       }, {} as Record<string, User>);
     } catch (error) {
+      if (isDev) console.log("error", error);
       return {};
     }
   }
@@ -185,6 +199,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       return undefined;
     }
   }
@@ -208,6 +223,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       console.error(error);
       return undefined;
     }
@@ -219,6 +235,7 @@ class PodiumApi {
       const response = await this.axiosInstance.post("/users/follow", request);
       return response.status === 200;
     } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -233,6 +250,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       return {};
     }
   }
@@ -266,6 +284,7 @@ class PodiumApi {
         };
       });
     } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -278,6 +297,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       // Return default metadata in case of error
       return {
         force_update: true,
@@ -304,6 +324,7 @@ class PodiumApi {
       const response = await this.axiosInstance.get("/tags");
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -317,6 +338,7 @@ class PodiumApi {
       );
       return response.data.data;
     } catch (error) {
+      if (isDev) console.log("error", error);
       console.error("Get user by Aptos address error:", error);
       return undefined;
     }
@@ -339,7 +361,8 @@ class PodiumApi {
       );
       const users = await Promise.all(promises);
       return users.filter(Boolean) as User[];
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -381,7 +404,8 @@ class PodiumApi {
         params: { uuid, page, page_size },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -391,7 +415,7 @@ class PodiumApi {
     page_size?: number
   ): Promise<FollowerModel[]> {
     try {
-      const response = await this.axiosInstance.get(`/users/followers`, {
+      const response = await this.axiosInstance.get(`/users/my-followers`, {
         params: { page, page_size },
       });
       return response.data.data;
@@ -405,11 +429,12 @@ class PodiumApi {
     page_size?: number
   ): Promise<FollowerModel[]> {
     try {
-      const response = await this.axiosInstance.get(`/users/followings`, {
+      const response = await this.axiosInstance.get(`/users/my-followings`, {
         params: { page, page_size },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -418,7 +443,8 @@ class PodiumApi {
     try {
       const response = await this.axiosInstance.post(`/users/deactivate`);
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -430,7 +456,8 @@ class PodiumApi {
         request
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -442,7 +469,8 @@ class PodiumApi {
         { address }
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -455,7 +483,8 @@ class PodiumApi {
         { params: { uuid: outpostId } }
       );
       return response.data.data.count;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return 0;
     }
   }
@@ -467,7 +496,8 @@ class PodiumApi {
         { uuid: outpostId }
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -483,7 +513,8 @@ class PodiumApi {
       });
       const outposts: OutpostModel[] = response.data.data;
       return Object.fromEntries(outposts.map((o) => [o.uuid, o]));
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return {};
     }
   }
@@ -495,7 +526,8 @@ class PodiumApi {
         request
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -509,7 +541,8 @@ class PodiumApi {
         params: { page, page_size },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return Error();
     }
   }
@@ -525,7 +558,8 @@ class PodiumApi {
       });
       const outposts: OutpostModel[] = response.data.data;
       return Object.fromEntries(outposts.map((o) => [o.uuid, o]));
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return {};
     }
   }
@@ -540,7 +574,8 @@ class PodiumApi {
         params: { include_archived, page, page_size },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -576,7 +611,8 @@ class PodiumApi {
         { uuid: outpostId, inviter_uuid: inviterId }
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -604,6 +640,17 @@ class PodiumApi {
       return false;
     }
   }
+  async getOutpostInvitations(outpostId: string): Promise<OutpostInvitation[]> {
+    try {
+      const response = await this.axiosInstance.get(`/outposts/invitations`, {
+        params: { uuid: outpostId },
+      });
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
 
   async getLatestLiveData(
     outpostId: string
@@ -615,7 +662,7 @@ class PodiumApi {
       return response.data.data;
     } catch (error: any) {
       if (error.response.status === 422) {
-        console.log("422 error", error);
+        if (isDev) console.log("422 error", error);
         return false;
       }
       console.error("Get latest live data error:", error);
@@ -632,7 +679,8 @@ class PodiumApi {
         request
       );
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -696,9 +744,10 @@ class PodiumApi {
         `/podium-passes/trade`,
         request
       );
-      console.log("response", response);
+      if (isDev) console.log("response", response);
       return response.status === 200;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return false;
     }
   }
@@ -732,7 +781,8 @@ class PodiumApi {
         { params: { uuid, page, page_size } }
       );
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -754,7 +804,8 @@ class PodiumApi {
         { params: { page, page_size, address, uuid } }
       );
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -769,7 +820,8 @@ class PodiumApi {
         { params: { page, page_size } }
       );
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -779,13 +831,14 @@ class PodiumApi {
         params: { page, page_size },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
   async getTrades(
     page = 0,
-    page_size = 50,
+    page_size = TRADE_PAGE_SIZE,
     trade_type?: "buy" | "sell"
   ): Promise<Trade[]> {
     try {
@@ -793,7 +846,8 @@ class PodiumApi {
         params: { page, page_size, trade_type },
       });
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }
@@ -805,7 +859,91 @@ class PodiumApi {
         { params: { page, page_size } }
       );
       return response.data.data;
-    } catch {
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getMostFeeEarned(page = 0, page_size = 50): Promise<MostFeeEarned[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/most-fee-earned`,
+        {
+          params: { page, page_size },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getMostPassHeld(page = 0, page_size = 50): Promise<MostPassHeld[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/most-pass-held`,
+        {
+          params: { page, page_size },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getMostSoldPasses(page = 0, page_size = 50): Promise<MostSoldPass[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/most-sold-passes`,
+        {
+          params: { page, page_size },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getMostUniquePassHolders(
+    page = 0,
+    page_size = 50
+  ): Promise<MostUniquePassHeld[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/most-unique-pass-held`,
+        { params: { page, page_size } }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getMostVolumeTradedPasses(
+    page = 0,
+    page_size = 50
+  ): Promise<MostVolumeTradedPasses[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/dashboard/most-volume-traded-passes`,
+        { params: { page, page_size } }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+  async getPnls(page = 0, page_size = 50): Promise<Pnl[]> {
+    try {
+      const response = await this.axiosInstance.get(`/dashboard/pnls`, {
+        params: { page, page_size },
+      });
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
       return [];
     }
   }

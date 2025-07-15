@@ -35,6 +35,21 @@ export const UserCard = ({
     }
   };
 
+  const formatDisplayValue = (value: string | number) => {
+    if (typeof value === "string") return value;
+
+    switch (displayType) {
+      case "followers":
+        return Math.floor(value).toString(); // Whole numbers for followers
+      case "price":
+      case "volume":
+        return value.toFixed(2); // 2 decimal places for price and volume
+      default:
+        return value.toString();
+    }
+  };
+  const userImage = user.image || logoUrl;
+
   return (
     <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border hover:border-border/80 transition-colors">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -45,14 +60,16 @@ export const UserCard = ({
         >
           <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
             <Img
-              src={user.image || logoUrl}
+              src={userImage}
               alt={user.name || "User"}
               useImgTag
               className="w-full h-full object-cover"
             />
           </div>
           <div className="min-w-0 flex-1">
-            {user.name || "Anonymous"}
+            <p className="text-sm   truncate font-mono">
+              {user.name || "Anonymous"}
+            </p>
 
             <p className="text-sm text-muted-foreground truncate font-mono">
               {user.aptos_address.slice(0, 6)}...{user.aptos_address.slice(-4)}
@@ -64,9 +81,7 @@ export const UserCard = ({
         {displayIcon && displayIcon}
         <div className="text-right">
           <p className={`font-semibold ${displayColor}`}>
-            {typeof displayValue === "number"
-              ? displayValue.toFixed(2)
-              : displayValue}
+            {formatDisplayValue(displayValue)}
           </p>
           <p className="text-xs text-muted-foreground">{getDisplayLabel()}</p>
         </div>

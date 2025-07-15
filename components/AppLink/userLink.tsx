@@ -5,8 +5,15 @@ export interface UserLinkProps extends Omit<AppLinkProps, "href"> {
   id: string;
 }
 
-export const UserLink = ({ id, ...props }: UserLinkProps) => {
-  return <AppLink href={AppPages.userDetails(id)} {...props} />;
+export const UserLink = ({ id, ignore, children, ...props }: UserLinkProps) => {
+  if (ignore) {
+    return <>{children}</>;
+  }
+  return (
+    <AppLink href={AppPages.userDetails(id)} {...props}>
+      {children}
+    </AppLink>
+  );
 };
 
 export default UserLink;

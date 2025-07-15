@@ -22,6 +22,7 @@ import { isDev } from "app/lib/utils";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
+import { DashboardUsersState } from "app/containers/dashboard/users/slice";
 
 // Create the saga middleware
 const sagaMiddleware = createSagaMiddleware();
@@ -117,5 +118,6 @@ export type RootState = {
   createOutpost: CreateOutpostState;
   notifications: NotificationsState;
   allOutposts: AllOutpostsState;
+  dashboardUsers: DashboardUsersState;
 };
 export type AppDispatch = ReturnType<typeof getStore>["dispatch"];

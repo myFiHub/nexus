@@ -7,16 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import { LoginPrompt } from "./components/LoginPrompt";
 import { InfiniteScrollOutpostsList } from "./InfiniteScrollOutpostsList";
-import { myOutpostsSelectors } from "./selectors";
 import { myOutpostsActions, useMyOutpostsSlice } from "./slice";
 
 const Content = () => {
   const dispatch = useDispatch();
   useMyOutpostsSlice();
-  const isLoadingOutposts = useSelector(myOutpostsSelectors.isLoadingOutposts);
-  const errorLoadingOutposts = useSelector(
-    myOutpostsSelectors.errorLoadingOutposts
-  );
+
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
