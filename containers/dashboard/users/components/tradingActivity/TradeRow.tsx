@@ -1,6 +1,6 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
-import { logoUrl } from "app/lib/constants";
+import { logoUrl, movementLogoUrl } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
 import { Trade } from "app/services/api/types";
 
@@ -53,7 +53,7 @@ export const TradeRow = ({ trade, gridCols }: TradeRowProps) => {
         <span className="text-[8px] text-muted-foreground pl-2">MOVE</span>
         <span className="text-xs text-muted-foreground">
           <Img
-            src={"/movement_logo.svg"}
+            src={movementLogoUrl}
             alt="logo"
             useImgTag
             className="w-2 h-2 ml-1"
@@ -140,7 +140,7 @@ export const TradeRow = ({ trade, gridCols }: TradeRowProps) => {
         {/* move logo */}
         <span className="text-xs text-muted-foreground">
           <Img
-            src={"/movement_logo.svg"}
+            src={movementLogoUrl}
             alt="logo"
             useImgTag
             className="w-2 h-2 ml-1"

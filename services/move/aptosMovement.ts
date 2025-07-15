@@ -351,7 +351,7 @@ class AptosMovement {
     }
   }
 
-  async getTicketSellPriceForPodiumPass(opts: {
+  async getSellPriceForPodiumPass(opts: {
     sellerAddress: string;
     numberOfTickets?: number;
   }): Promise<bigint | null> {

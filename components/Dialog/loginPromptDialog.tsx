@@ -2,6 +2,7 @@
 
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { isDev } from "app/lib/utils";
 import { motion } from "framer-motion";
 import { Lock, LogIn, Shield, Sparkles, Zap } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
@@ -18,7 +19,7 @@ import {
 interface LoginPromptDialogProps {
   actionDescription: string;
   additionalComponent?: ReactNode;
-  action: () => void | Promise<void>;
+  action: () => void | Promise<any>;
 }
 
 export type LoginPromptDialogResult = {
@@ -90,9 +91,11 @@ const Content = () => {
 
     if (dialogContent?.action) {
       try {
-        console.log(
-          "running action . . .~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-        );
+        if (isDev) {
+          console.log(
+            "running action . . .~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
+          );
+        }
         await dialogContent.action();
         resolvePromise?.({ loggedIn: true });
       } catch (error) {
