@@ -1,16 +1,17 @@
+import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     // Revalidate the recently joined users cache tag
-    revalidateTag("recently-joined-users");
+    revalidateTag(UserTags.RecentlyJoined);
 
     return NextResponse.json(
       {
         success: true,
         message: "Recently joined users cache has been revalidated",
-        revalidatedTag: "recently-joined-users",
+        revalidatedTag: UserTags.RecentlyJoined,
       },
       { status: 200 }
     );

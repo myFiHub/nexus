@@ -35,6 +35,7 @@ export interface AppLinkProps
   extends React.AnchorHTMLAttributes<HTMLAnchorElement>,
     VariantProps<typeof appLinkVariants> {
   href: string;
+  ignore?: boolean;
   linkProps?: Omit<LinkProps, "href">;
 }
 

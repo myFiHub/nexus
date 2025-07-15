@@ -25,6 +25,7 @@ export const AssetsDomains = {
   outpostPassSellers: (state: RootState) =>
     state.assets?.outpostPassSellers || {},
   sellingPass: (state: RootState) => state.assets?.sellingPass || false,
+  buyingPass: (state: RootState) => state.assets?.buyingPass || false,
 };
 
 export const AssetsSelectors = {
@@ -110,4 +111,5 @@ export const AssetsSelectors = {
     return DEFAULT_ACCESSES;
   },
   sellingPass: AssetsDomains.sellingPass,
+  buyingPass: AssetsDomains.buyingPass,
 };

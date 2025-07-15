@@ -198,6 +198,21 @@
 
 /* Modern Scrollbar Styles */
 @layer base {
+  /* Ensure Web3Auth modals appear above our dialogs */
+  [data-testid="web3auth-modal"],
+  [data-testid="web3auth-modal"] *,
+  .w3a-modal__inner,
+  .w3a-modal__inner *,
+  .w3a-modal,
+  .w3a-modal * {
+    z-index: 9999 !important;
+  }
+
+  /* Force our login prompt dialog to have lower z-index when Web3Auth is active */
+  .login-prompt-dialog-active {
+    z-index: 10 !important;
+  }
+
   /* Webkit Scrollbars (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
     width: 8px;

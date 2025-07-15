@@ -326,6 +326,7 @@ export interface RecentlyJoinedUser {
   address: string;
   image: string;
   aptos_address: string;
+  uuid: string;
 }
 export interface TopOwner {
   address: string;
@@ -333,6 +334,7 @@ export interface TopOwner {
   podium_pass_price: number;
   name: string;
   image: string;
+  uuid: string;
 }
 export interface Trade {
   count: number;
@@ -342,11 +344,13 @@ export interface Trade {
   podium_pass_owner_address: string;
   podium_pass_owner_image: string;
   podium_pass_owner_name: string;
+  podium_pass_owner_uuid: string;
   price: number;
   trade_type: "buy" | "sell";
   user_address: string;
   user_image: string;
   user_name: string;
+  user_uuid: string;
   uuid: string;
 }
 
@@ -357,4 +361,63 @@ export interface TradingVolume {
   name: string;
   podium_pass_price: number;
   volume: number;
+}
+export interface MostFeeEarned {
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  podium_pass_owner_uuid: string;
+  total_fee: number;
+  total_volume: number;
+}
+
+export interface MostPassHeld {
+  held_count: number;
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  podium_pass_owner_uuid: string;
+}
+
+export interface MostSoldPass {
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  podium_pass_owner_uuid: string;
+  total_sold_amount: number;
+}
+
+export interface MostUniquePassHeld {
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  unique_held_count: number;
+  podium_pass_owner_uuid: string;
+}
+export interface MostVolumeTradedPasses {
+  podium_pass_owner_address: string;
+  podium_pass_owner_image: string;
+  podium_pass_owner_name: string;
+  total_traded_volume: number;
+  podium_pass_owner_uuid: string;
+}
+
+export interface OutpostInvitation {
+  can_speak: boolean;
+  created_at: number;
+  invite_type: string;
+  inviter_image: string;
+  inviter_user_name: string;
+  inviter_user_uuid: string;
+  is_accepted: boolean;
+  outpost_name: string;
+  outpost_uuid: string;
+}
+
+export interface Pnl {
+  image: string;
+  name: string;
+  pnl: number;
+  user_address: string;
+  user_uuid: string;
 }

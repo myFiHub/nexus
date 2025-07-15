@@ -31,6 +31,7 @@ const GlobalDomains = {
     state.global?.switchingAccount ?? false,
   wsHealthChecking: (state: RootState) =>
     state.global?.wsHealthChecking ?? false,
+  isSidebarOpen: (state: RootState) => state.global?.isSidebarOpen ?? false,
 };
 
 export const GlobalSelectors = {
@@ -68,4 +69,5 @@ export const GlobalSelectors = {
       return currentAccount?.is_primary ?? false;
     }
   ),
+  isSidebarOpen: GlobalDomains.isSidebarOpen,
 };

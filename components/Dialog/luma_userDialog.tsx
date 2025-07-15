@@ -182,7 +182,7 @@ export const LumaUserDialogProvider = () => {
       open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
-          handleConfirm();
+          handleCancel();
         }
       }}
     >

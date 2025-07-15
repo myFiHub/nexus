@@ -2,6 +2,7 @@
 import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
 import {
   BuyOrSellPassDialogProvider,
+  LoginPromptDialogProvider,
   LogoutDialogProvider,
   LumaUserDialogProvider,
   NameDialogProvider,
@@ -58,6 +59,7 @@ const Container = () => {
       <BuyOrSellPassDialogProvider />
       <LogoutDialogProvider />
       <PromptNotificationsDialogProvider />
+      <LoginPromptDialogProvider />
     </>
   );
 };

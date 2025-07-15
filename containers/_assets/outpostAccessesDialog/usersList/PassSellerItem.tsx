@@ -29,7 +29,7 @@ export const PassSellerItem = ({
       dispatch(
         assetsActions.buyPassFromUser({
           user: passSeller.userInfo,
-          numberOfTickets: 1,
+          numberOfPasses: 1,
         })
       );
     }

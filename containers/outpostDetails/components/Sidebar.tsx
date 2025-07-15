@@ -4,7 +4,7 @@ import { generateOutpostShareUrl } from "app/lib/utils";
 import { OutpostModel } from "../../../services/api/types";
 import { InviteUsersButton } from "./InviteUsersButton";
 import { JoinButton } from "./JoinButton";
-import { MembersList } from "./MembersList";
+import { MembersList } from "./members";
 
 interface SidebarProps {
   outpost: OutpostModel;

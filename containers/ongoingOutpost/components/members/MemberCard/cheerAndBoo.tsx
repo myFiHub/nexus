@@ -102,7 +102,7 @@ export const CheerAndBoo = ({
           alt="Boo"
           width={16}
           height={16}
-          className="w-4 h-4 brightness-0   filter brightness-0 invert drop-shadow-lg"
+          className="w-4 h-4   filter brightness-0 invert drop-shadow-lg"
         />
       )}
     </Button>

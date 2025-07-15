@@ -74,7 +74,7 @@ const Content = ({ user }: { user: User }) => {
         sellPrice: sellPriceInMove.toString(),
       });
       if (dialogResults === "buy") {
-        dispatch(assetsActions.buyPassFromUser({ user, numberOfTickets: 1 }));
+        dispatch(assetsActions.buyPassFromUser({ user, numberOfPasses: 1 }));
       } else if (dialogResults === "sell") {
         dispatch(assetsActions.sellPass({ seller: user }));
       }

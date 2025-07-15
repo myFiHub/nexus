@@ -13,12 +13,14 @@ import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
+import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
   wsHealthChecking: boolean;
   logingIn: boolean;
   switchingAccount: boolean;
+  isSidebarOpen: boolean;
   logingOut: boolean;
   web3Auth?: Web3Auth;
   web3AuthUserInfo?: Partial<UserInfo>;
@@ -41,6 +43,8 @@ export const initialState: GlobalState = {
   wsHealthChecking: false,
   logingIn: false,
   switchingAccount: false,
+  isSidebarOpen:
+    typeof window !== "undefined" ? window.innerWidth > MOBILE_BREAKPOINT : false,
   logingOut: false,
   tick: 0,
   numberOfOnlineUsers: {},
@@ -63,6 +67,9 @@ const globalSlice = createSlice({
     initializeWeb3Auth() {},
     initOneSignal(_, __: PayloadAction<{ myId: string }>) {},
     startTicker() {},
+    setIsSidebarOpen(state, action: PayloadAction<boolean>) {
+      state.isSidebarOpen = action.payload;
+    },
     increaseTick_(state) {
       state.tick++;
     },

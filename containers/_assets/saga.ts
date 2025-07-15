@@ -104,8 +104,12 @@ function* getUserPassInfo(
 function* buyPassFromUser(
   action: ReturnType<typeof assetsActions.buyPassFromUser>
 ): Generator<any, void, any> {
-  const { user, numberOfTickets, buyingToHaveAccessToOutpostWithId } =
-    action.payload;
+  yield put(assetsActions.setBuyingPass(true));
+  const {
+    user,
+    numberOfPasses: numberOfTickets,
+    buyingToHaveAccessToOutpostWithId,
+  } = action.payload;
   const correntPassInfo = yield select(
     AssetsSelectors.userPasses(user.aptos_address!)
   );
@@ -116,7 +120,10 @@ function* buyPassFromUser(
         label: "Retry",
         onClick: () => {
           getStore().dispatch(
-            assetsActions.buyPassFromUser({ user, numberOfTickets })
+            assetsActions.buyPassFromUser({
+              user,
+              numberOfPasses: numberOfTickets,
+            })
           );
         },
       },
@@ -236,6 +243,7 @@ function* buyPassFromUser(
     errorToaset();
   } finally {
     yield put(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
+    yield put(assetsActions.setBuyingPass(false));
   }
 }
 

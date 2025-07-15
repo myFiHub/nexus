@@ -1,10 +1,11 @@
 import { Users } from "app/containers/dashboard/users";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
+import { TradesTags, UserTags } from "../../users/[filter]/_filters";
 
 const getRecentlyJoinedUsersWithCache = unstable_cache(
   async () => podiumApi.getRecentlyJoinedUsers(),
-  ["recently-joined-users"],
+  [UserTags.RecentlyJoined],
   {
     revalidate: 600, // 10 minutes
   }
@@ -12,7 +13,7 @@ const getRecentlyJoinedUsersWithCache = unstable_cache(
 
 const getTopOwnersWithCache = unstable_cache(
   async () => podiumApi.getTopOwners(),
-  ["top-owners"],
+  [UserTags.TopOwners],
   {
     revalidate: 3600, // 1 hour
   }
@@ -20,7 +21,7 @@ const getTopOwnersWithCache = unstable_cache(
 
 const getTradesWithCache = unstable_cache(
   async () => podiumApi.getTrades(),
-  ["trades"],
+  [TradesTags.Trades],
   {
     revalidate: 60, // 1 minute
   }
@@ -28,7 +29,7 @@ const getTradesWithCache = unstable_cache(
 
 const getTradingVolumeWithCache = unstable_cache(
   async () => podiumApi.getTradingVolume(),
-  ["trading-volume"],
+  [TradesTags.TradingVolume],
   {
     revalidate: 60, // 1 minute
   }
