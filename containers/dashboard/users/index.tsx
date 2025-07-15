@@ -4,8 +4,8 @@ import {
   Trade,
   TradingVolume,
 } from "app/services/api/types";
-import { RecentlyJoinedSection } from "./components/RecentlyJoinedSection";
-import { TopAccountsSection } from "./components/TopAccountsSection";
+import { RecentlyJoinedSection } from "./components/recentlyJoined";
+import { TopAccountsSection } from "./components/topOwners";
 import { TradingActivitySection } from "./components/tradingActivity";
 import { TrendingVolumeSection } from "./components/TrendingVolumeSection";
 import { DashboardUsersInjector } from "./injector";

@@ -33,7 +33,7 @@ import {
   UpdateOutpostRequest,
   User,
 } from "./types";
-import { TRADE_PAGE_SIZE } from "app/containers/dashboard/users/configs";
+import { RECENTLY_JOINED_PAGE_SIZE, TOP_OWNERS_PAGE_SIZE, TRADE_PAGE_SIZE, TRADING_VOLUME_PAGE_SIZE } from "app/containers/dashboard/users/configs";
 
 class PodiumApi {
   private readonly baseUrl: string;
@@ -812,7 +812,7 @@ class PodiumApi {
 
   async getRecentlyJoinedUsers(
     page = 0,
-    page_size = 50
+    page_size = RECENTLY_JOINED_PAGE_SIZE
   ): Promise<RecentlyJoinedUser[]> {
     try {
       const response = await this.axiosInstance.get(
@@ -825,7 +825,10 @@ class PodiumApi {
       return [];
     }
   }
-  async getTopOwners(page = 0, page_size = 50): Promise<TopOwner[]> {
+  async getTopOwners(
+    page = 0,
+    page_size = TOP_OWNERS_PAGE_SIZE
+  ): Promise<TopOwner[]> {
     try {
       const response = await this.axiosInstance.get(`/dashboard/top-owners`, {
         params: { page, page_size },
@@ -852,7 +855,10 @@ class PodiumApi {
     }
   }
 
-  async getTradingVolume(page = 0, page_size = 50): Promise<TradingVolume[]> {
+  async getTradingVolume(
+    page = 0,
+    page_size = TRADING_VOLUME_PAGE_SIZE
+  ): Promise<TradingVolume[]> {
     try {
       const response = await this.axiosInstance.get(
         `/dashboard/trading-volume`,

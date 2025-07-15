@@ -1,35 +1,13 @@
+import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { AppPages } from "app/lib/routes";
 import { RecentlyJoinedUser } from "app/services/api/types";
 import { Clock } from "lucide-react";
-import { SectionHeader } from "./SectionHeader";
-import { UserCard } from "./UserCard";
+import { SectionHeader } from "../SectionHeader";
+import { UserCard } from "../UserCard";
 
 interface RecentlyJoinedSectionProps {
   recentlyJoinedUsers: RecentlyJoinedUser[];
 }
-
-// Mock follower data - in real app this would come from API
-const mockFollowerData = [
-  { address: "0x1234", followers: 0 },
-  { address: "0x5678", followers: 18 },
-  { address: "0x9abc", followers: 0 },
-];
-
-const formatTime = (timestamp: number) => {
-  const now = Date.now();
-  const diff = now - timestamp * 1000;
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-
-  if (minutes < 60) {
-    return `${minutes}m ago`;
-  } else if (hours < 24) {
-    return `${hours}h ago`;
-  } else {
-    const days = Math.floor(hours / 24);
-    return `${days}d ago`;
-  }
-};
 
 export const RecentlyJoinedSection = ({
   recentlyJoinedUsers,
@@ -39,8 +17,6 @@ export const RecentlyJoinedSection = ({
     .slice(0, 3)
     .map((user, index) => ({
       ...user,
-      followers:
-        mockFollowerData[index]?.followers || Math.floor(Math.random() * 50),
     }));
 
   return (
@@ -49,7 +25,7 @@ export const RecentlyJoinedSection = ({
         icon={<Clock className="w-5 h-5 text-blue-500" />}
         title="Recently Joined"
         seeMore={{
-          href: AppPages.users + "/recently_joined",
+          href: AppPages.users + `/${UserTags.RecentlyJoined}`,
         }}
       />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -58,7 +34,7 @@ export const RecentlyJoinedSection = ({
             key={user.address}
             user={user}
             displayType="followers"
-            displayValue={user.followers}
+            displayValue={0}
             displayColor="text-primary"
           />
         ))}

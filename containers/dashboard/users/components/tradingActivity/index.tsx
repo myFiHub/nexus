@@ -21,10 +21,6 @@ export const TradingActivitySection = ({
       <SectionHeader
         icon={<BarChart3 className="w-5 h-5 text-green-500" />}
         title="Trading Activity"
-        seeMore={{
-          href: "/all_outposts",
-          params: { filter: "trading_activity" },
-        }}
       />
 
       <div className="bg-card rounded-lg border border-border  min-w-[1024px]  ">

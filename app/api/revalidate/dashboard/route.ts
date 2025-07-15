@@ -1,18 +1,23 @@
+import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { revalidateTag } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
     // Revalidate all dashboard-related cache tags
-    revalidateTag("recently-joined-users");
-    revalidateTag("top-owners");
-    revalidateTag("trades");
+    revalidateTag(UserTags.RecentlyJoined);
+    revalidateTag(UserTags.TopOwners);
+    revalidateTag(UserTags.Trades);
 
     return NextResponse.json(
       {
         success: true,
         message: "Dashboard cache has been revalidated",
-        revalidatedTags: ["recently-joined-users", "top-owners", "trades"],
+        revalidatedTags: [
+          UserTags.RecentlyJoined,
+          UserTags.TopOwners,
+          UserTags.Trades,
+        ],
       },
       { status: 200 }
     );
