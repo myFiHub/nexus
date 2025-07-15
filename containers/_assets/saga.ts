@@ -1,10 +1,10 @@
+import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
 import {
   CallObject,
   CallObjectResponse,
   promiseWithUid,
 } from "app/lib/promiseWithUid";
 import { toast } from "app/lib/toast";
-import { isDev } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import {
   OutpostModel,
@@ -164,20 +164,14 @@ function* buyPassFromUser(
     if (referrerUser) {
       referrerAddress = referrerUser.address;
     }
-    if (isDev) {
-      console.log({
-        myBalance,
-        price,
-        numberOfTickets,
-        correntPassInfo,
-      });
-    }
 
-    if (myBalance < Number(correntPassInfo?.price) * numberOfTickets) {
+    const myBalanceNumber = bigIntCoinToMoveOnAptos(myBalance);
+    const priceNumber = price * numberOfTickets;
+
+    if (myBalanceNumber < priceNumber) {
       toast.error(
-        `Insufficient balance, you need ${price} MOVE to buy ${numberOfTickets} Pass`
+        `Insufficient balance, you need ${price} MOVE to buy ${numberOfTickets} Pass from ${user.name}`
       );
-
       return;
     }
 
