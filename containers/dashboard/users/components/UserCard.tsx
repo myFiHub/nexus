@@ -6,10 +6,11 @@ import {
   TopOwner,
   TradingVolume,
 } from "app/services/api/types";
+import { formatDistanceToNow } from "date-fns";
 
 interface UserCardProps {
   user: RecentlyJoinedUser | TopOwner | TradingVolume;
-  displayType: "price" | "volume" | "followers";
+  displayType: "price" | "volume" | "followers" | "joinedAt";
   displayValue: string | number;
   displayIcon?: React.ReactNode;
   displayColor?: string;
@@ -30,6 +31,8 @@ export const UserCard = ({
         return "Volume";
       case "followers":
         return "Followers";
+      case "joinedAt":
+        return "Ago";
       default:
         return "";
     }
@@ -44,6 +47,8 @@ export const UserCard = ({
       case "price":
       case "volume":
         return value.toFixed(2); // 2 decimal places for price and volume
+      case "joinedAt":
+        return formatDistanceToNow(new Date(value * 1000));
       default:
         return value.toString();
     }

@@ -13,12 +13,7 @@ export const RecentlyJoinedSection = ({
   recentlyJoinedUsers,
 }: RecentlyJoinedSectionProps) => {
   // Create mock users with follower data
-  const usersWithFollowers = recentlyJoinedUsers
-    .slice(0, 3)
-    .map((user, index) => ({
-      ...user,
-    }));
-
+  const usersWithFollowers = recentlyJoinedUsers.slice(0, 3);
   return (
     <div className="space-y-4">
       <SectionHeader
@@ -33,8 +28,8 @@ export const RecentlyJoinedSection = ({
           <UserCard
             key={user.address}
             user={user}
-            displayType="followers"
-            displayValue={0}
+            displayType="joinedAt"
+            displayValue={user.created_at}
             displayColor="text-primary"
           />
         ))}
