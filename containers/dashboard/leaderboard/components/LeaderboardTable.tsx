@@ -1,5 +1,8 @@
 import { MostFeeEarned } from "app/services/api/types";
+import { LeaderboardHeader } from "./LeaderboardHeader";
 import { LeaderboardRow } from "./LeaderboardRow";
+import ClientSideList from "./clientSideList";
+import ListEndObserver from "./listEndObserver";
 
 export const LeaderboardTable = ({
   mostFeeEarned,
@@ -7,6 +10,7 @@ export const LeaderboardTable = ({
   mostFeeEarned: MostFeeEarned[];
 }) => (
   <div className="overflow-x-auto">
+    <LeaderboardHeader />
     <table className="min-w-full text-left text-sm bg-[#181A20] rounded-lg">
       <thead>
         <tr className="text-[#A3A3A3] text-xs font-medium border-b border-[#23262F]">
@@ -23,7 +27,9 @@ export const LeaderboardTable = ({
             rank={idx + 1}
           />
         ))}
+        <ClientSideList />
       </tbody>
     </table>
+    <ListEndObserver />
   </div>
 );
