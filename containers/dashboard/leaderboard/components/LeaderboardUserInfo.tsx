@@ -12,7 +12,7 @@ export const LeaderboardUserInfo = ({
   user: MostFeeEarned | MostPassHeld | MostUniquePassHeld;
 }) => (
   <div className="flex flex-col">
-    <span className="font-semibold text-[#F4F4F4] leading-tight">
+    <span className="font-semibold text-[var(--card-foreground)] leading-tight">
       <UserLink
         id={user.podium_pass_owner_uuid}
         underline={false}
@@ -22,7 +22,7 @@ export const LeaderboardUserInfo = ({
         {user.podium_pass_owner_name ?? "External user"}
       </UserLink>
     </span>
-    <span className="text-xs text-[#A3A3A3]">
+    <span className="text-xs text-[var(--muted-foreground)]">
       {truncate(user.podium_pass_owner_address, 10)}
     </span>
   </div>

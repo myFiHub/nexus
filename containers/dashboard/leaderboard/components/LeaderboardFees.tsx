@@ -14,7 +14,7 @@ const content = (
   switch (type) {
     case LeaderboardTags.TopFeeEarned:
       return (
-        <span className="flex items-center justify-end gap-2 font-semibold text-[#F4F4F4]">
+        <span className="flex items-center justify-end gap-2 font-semibold text-[var(--card-foreground)]">
           <Img src={movementLogoUrl} alt="logo" className="w-4 h-4" />
           {(user as MostFeeEarned)?.total_fee?.toLocaleString(undefined, {
             minimumFractionDigits: 2,
@@ -24,14 +24,14 @@ const content = (
       );
     case LeaderboardTags.MostPassHeld:
       return (
-        <span className="flex items-center justify-end gap-2 font-semibold text-[#F4F4F4]">
+        <span className="flex items-center justify-end gap-2 font-semibold text-[var(--card-foreground)]">
           <Img src={logoUrl} alt="logo" className="w-4 h-4" />
           {(user as MostPassHeld).held_count}
         </span>
       );
     case LeaderboardTags.MostUniquePassHolders:
       return (
-        <span className="flex items-center justify-end gap-2 font-semibold text-[#F4F4F4]">
+        <span className="flex items-center justify-end gap-2 font-semibold text-[var(--card-foreground)]">
           <Img src={logoUrl} alt="logo" className="w-4 h-4" />
           {(user as MostUniquePassHeld).unique_held_count}
         </span>

@@ -43,30 +43,33 @@ export const LeaderboardTable = ({
 }) => {
   return (
     <div>
-      <div className="mb-6 mt-2 text-2xl font-bold text-center text-[#FFD700] drop-shadow-sm tracking-wide">
+      <div className="mb-6 mt-2 text-2xl font-bold text-center text-[var(--primary)] drop-shadow-sm tracking-wide sticky top-0 z-20 bg-[var(--background)] rounded-2xl">
         {leaderboardTitle(type)}
       </div>
       <div className="overflow-x-auto">
-        <table className="min-w-full text-left text-sm bg-[#181A20] rounded-lg">
-          <thead>
-            <tr className="text-[#A3A3A3] text-xs font-medium border-b border-[#23262F]">
-              <th className="py-3 px-4">Rank</th>
-              <th className="py-3 px-4">User</th>
-              <th className="py-3 px-4 text-right">{lastColTitle(type)}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user, idx) => (
-              <LeaderboardRow
-                type={type}
-                key={user.podium_pass_owner_uuid || idx}
-                user={user}
-                rank={idx + 1}
-              />
-            ))}
-            <ClientSideList type={type} />
-          </tbody>
-        </table>
+        <div className="relative rounded-lg shadow-lg bg-[var(--card)] p-1    ">
+          <table className="min-w-full text-left text-sm rounded-lg overflow-hidden backdrop-blur-md bg-[var(--card)] text-[var(--card-foreground)]">
+            <thead>
+              <tr className="text-[var(--primary)] text-xs font-bold border-b border-[var(--border)] bg-[var(--card)]">
+                <th className="py-3 px-4">Rank</th>
+                <th className="py-3 px-4">User</th>
+                <th className="py-3 px-4 text-right">{lastColTitle(type)}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user, idx) => (
+                <LeaderboardRow
+                  type={type}
+                  key={user.podium_pass_owner_uuid || idx}
+                  user={user}
+                  rank={idx + 1}
+                />
+              ))}
+              <ClientSideList type={type} />
+            </tbody>
+          </table>
+          <div className="pointer-events-none absolute inset-0 rounded-lg border-2 border-[var(--primary)]/20 shadow-[0_0_32px_4px_var(--primary)]/10" />
+        </div>
         <ListEndObserver type={type} />
       </div>
     </div>
