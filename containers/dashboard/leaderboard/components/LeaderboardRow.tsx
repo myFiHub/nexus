@@ -20,7 +20,7 @@ export const LeaderboardRow = ({
   return (
     <tr className="border-b border-[#23262F] hover:bg-[#23262F] transition">
       <td className="py-3 px-4 font-semibold text-[#F4F4F4] w-6">{rank}</td>
-      <td className="py-3 px-4 flex items-center gap-3 min-w-[100px]">
+      <td className="py-3 px-4 flex items-center gap-3  flex-1">
         <LeaderboardAvatar user={user} />
         <LeaderboardUserInfo user={user} />
       </td>
