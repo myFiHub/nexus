@@ -83,11 +83,11 @@ const JoinButtonContent = ({
   const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
-  const disabled = iAmCreator ? loading : !isPassed || loading;
+  const disabled = (iAmCreator ? loading : !isPassed || loading) || joining;
 
   return (
     <Button className="w-full" onClick={join} disabled={disabled}>
-      {loading ? (
+      {loading || joining ? (
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
           <span>{joining ? "Joining..." : ""}</span>
