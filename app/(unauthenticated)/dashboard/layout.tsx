@@ -21,7 +21,7 @@ export default function DashboardLayout({
       <Tabs defaultValue="users" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="users">Users</TabsTrigger>
-          <TabsTrigger value="leaderboard">Leader board</TabsTrigger>
+          <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users" className="mt-6">

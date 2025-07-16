@@ -13,6 +13,7 @@ export const LeaderboardAvatar = ({ user }: { user: MostFeeEarned }) => (
     <Img
       src={user.podium_pass_owner_image || logoUrl}
       alt={user.podium_pass_owner_name}
+      useImgTag
       className="w-10 h-10 rounded-full object-cover border border-[#23262F]"
     />
   </UserLink>
