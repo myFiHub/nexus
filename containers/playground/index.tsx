@@ -1,5 +1,5 @@
-import { Tut1 } from "./components/tut_1";
+import { Tut2 } from "./components/tut2";
 
 export const Playground = () => {
-  return <Tut1 />;
+  return <Tut2 />;
 };

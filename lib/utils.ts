@@ -39,7 +39,7 @@ const formatCountdown = (seconds: number) => {
 export function getTimerInfo(
   endsAt: number,
   notPassedText: string = "Starts in",
-  passedText: string = "Open"
+  passedText: string = "Join Now"
 ) {
   const eventTime = new Date(endsAt);
   const now = new Date();
