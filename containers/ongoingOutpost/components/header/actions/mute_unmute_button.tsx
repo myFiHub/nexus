@@ -37,7 +37,7 @@ export const MuteUnmuteButton = () => {
   return (
     <Button
       onClick={handleMuteUnmute}
-      colorScheme={amIMuted ? "danger" : "primary"}
+      variant={amIMuted ? "destructive" : "primary"}
       className={`w-full h-full px-4 py-3 rounded-none font-medium transition-all duration-200 flex items-center justify-center gap-2 hover:shadow-lg border-0 shadow-none min-w-[108px] bg-green-500 hover:bg-green-600 text-white ${
         amIMuted ? "" : " animate-pulse"
       }`}

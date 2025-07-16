@@ -99,7 +99,7 @@ function* getOutpostAccesses({
       content: "This Outpost has adult content, are you sure you want to join?",
       confirmOpts: {
         text: "I am over 18",
-        colorScheme: "warning",
+        variant: "destructive",
       },
       cancelOpts: {
         text: "cancel",

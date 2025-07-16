@@ -29,7 +29,7 @@ export const HangupButton = () => {
   return (
     <Button
       onClick={handleHangup}
-      colorScheme="danger"
+      variant="destructive"
       className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl min-w-[108px]"
     >
       {isHangingUp ? (

@@ -151,17 +151,11 @@ export const ConfirmAddOrSwitchAccountDialogProvider = () => {
             transition={{ duration: 0.4, delay: 0.4 }}
             className="flex w-full gap-3"
           >
-            <Button
-              colorScheme="primary"
-              onClick={handleCancel}
-              variant="outline"
-              className="flex-1"
-            >
+            <Button onClick={handleCancel} variant="outline" className="flex-1">
               Cancel
             </Button>
             <Button
               onClick={handleConfirm}
-              colorScheme="primary"
               variant="primary"
               className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
             >

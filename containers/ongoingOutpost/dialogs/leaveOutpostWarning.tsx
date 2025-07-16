@@ -244,7 +244,6 @@ export const LeaveOutpostWarningDialogProvider = () => {
                     className="flex-1"
                   >
                     <Button
-                      colorScheme="primary"
                       onClick={handleCancel}
                       variant="ghost"
                       className="w-full relative overflow-hidden"
@@ -280,8 +279,7 @@ export const LeaveOutpostWarningDialogProvider = () => {
                   >
                     <Button
                       onClick={handleConfirm}
-                      colorScheme="danger"
-                      variant="primary"
+                      variant="destructive"
                       className="w-full relative overflow-hidden"
                     >
                       <motion.div

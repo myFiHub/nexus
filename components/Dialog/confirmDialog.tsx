@@ -19,12 +19,10 @@ interface ConfirmDialogProps {
     inputPlaceholder?: string;
   };
   confirmOpts?: {
-    colorScheme?: ButtonProps["colorScheme"];
     text?: string;
     variant?: ButtonProps["variant"];
   };
   cancelOpts?: {
-    colorScheme?: ButtonProps["colorScheme"];
     text?: string;
     variant?: ButtonProps["variant"];
   };
@@ -130,7 +128,6 @@ export const ConfirmDialogProvider = () => {
         )}
         <DialogFooter>
           <Button
-            colorScheme={cancelOpts?.colorScheme || "primary"}
             onClick={handleCancel}
             variant={cancelOpts?.variant || "ghost"}
           >
@@ -138,7 +135,6 @@ export const ConfirmDialogProvider = () => {
           </Button>
           <Button
             onClick={handleConfirm}
-            colorScheme={confirmOpts?.colorScheme || "primary"}
             variant={confirmOpts?.variant || "primary"}
           >
             {confirmOpts?.text || "Confirm"}

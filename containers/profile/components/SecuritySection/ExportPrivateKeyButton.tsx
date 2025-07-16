@@ -14,7 +14,7 @@ export const ExportPrivateKeyButton = () => {
     <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
       <Button
         onClick={handleExportPrivateKey}
-        colorScheme="danger"
+        variant="destructive"
         className="bg-red-600 hover:bg-red-700 text-white font-semibold"
       >
         <div className="flex items-center gap-2">

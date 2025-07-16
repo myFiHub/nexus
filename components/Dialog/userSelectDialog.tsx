@@ -278,7 +278,6 @@ export const UserSelectDialogProvider = () => {
             <Button
               className="w-full"
               onClick={handleConfirm}
-              colorScheme={"primary"}
               variant={"primary"}
             >
               {"Done"}

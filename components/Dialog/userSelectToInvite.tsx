@@ -520,7 +520,6 @@ export const UserSelectToInviteDialogProvider = () => {
           <Button
             className="w-full"
             onClick={handleConfirm}
-            colorScheme={"primary"}
             variant={"primary"}
             disabled={!hasChanges()}
           >

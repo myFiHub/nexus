@@ -215,7 +215,6 @@ export const LumaUserDialogProvider = () => {
             onClick={handleAddUser}
             disabled={!isEmailValid}
             className="w-full"
-            colorScheme="primary"
             variant="primary"
           >
             <Plus className="h-4 w-4 mr-2" />
@@ -257,12 +256,7 @@ export const LumaUserDialogProvider = () => {
         </div>
 
         <DialogFooter className="mt-4">
-          <Button
-            className="w-full"
-            onClick={handleConfirm}
-            colorScheme="primary"
-            variant="primary"
-          >
+          <Button className="w-full" onClick={handleConfirm} variant="primary">
             Done
           </Button>
         </DialogFooter>

@@ -19,7 +19,7 @@ export const RaiseHand = () => {
     return null;
   }
   return (
-    <Button onClick={() => {}} colorScheme="primary">
+    <Button onClick={() => {}}>
       <Hand className="w-4 h-4" />
       Raise Hand
     </Button>
