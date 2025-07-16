@@ -34,6 +34,7 @@
 //   }
 // };
 
+import { Loader } from "app/components/Loader";
 import { movementLogoUrl } from "app/lib/constants";
 import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
 import { User } from "app/services/api/types";
@@ -44,7 +45,6 @@ import {
   ArrowLeft,
   ArrowRight,
   Crown,
-  Loader2,
   Shield,
   Sparkles,
   TrendingDown,
@@ -455,16 +455,7 @@ const Content = () => {
                 animate={{ opacity: 1 }}
                 className="flex flex-col items-center space-y-4"
               >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 1,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                >
-                  <Loader2 className="w-8 h-8 text-primary" />
-                </motion.div>
+                <Loader className="w-8 h-8 text-primary" />
                 <p className="text-center text-muted-foreground">
                   Loading pass data...
                 </p>

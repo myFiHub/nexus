@@ -1,11 +1,11 @@
 "use client";
+import { Loader } from "app/components/Loader";
 import { usersActions, useUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Subscription } from "rxjs";
@@ -168,7 +168,7 @@ const Content = ({
           >
             {isLoading ? (
               <div className="h-5 flex items-center justify-center">
-                <Loader2 className="animate-spin" size={15} />
+                <Loader className="animate-spin" size={15} />
               </div>
             ) : followed ? (
               "Unfollow"

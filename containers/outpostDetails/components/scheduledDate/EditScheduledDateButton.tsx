@@ -1,9 +1,10 @@
 "use client";
 
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
-import { Edit, Loader2 } from "lucide-react";
+import { Edit } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { outpostDetailsSelectors } from "../../selectors";
 import { outpostDetailsActions } from "../../slice";
@@ -35,7 +36,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
       title="Edit scheduled date"
     >
       {editingScheduledDate ? (
-        <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+        <Loader className="w-4 h-4 text-muted-foreground animate-spin" />
       ) : (
         <Edit className="w-4 h-4 text-muted-foreground" />
       )}

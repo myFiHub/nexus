@@ -1,9 +1,9 @@
 import { Button } from "app/components/Button";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { toast } from "app/lib/toast";
 import { cn } from "app/lib/utils";
 import { wsClient } from "app/services/wsClient";
-import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -72,7 +72,7 @@ export const CheerAndBoo = ({
       title="Cheer"
     >
       {loadingCheer ? (
-        <Loader2 className="w-3 h-3 animate-spin" />
+        <Loader className="w-3 h-3 animate-spin" />
       ) : (
         <Image
           src="/cheer.png"
@@ -95,7 +95,7 @@ export const CheerAndBoo = ({
       title="Boo"
     >
       {loadingBoo ? (
-        <Loader2 className="w-3 h-3 animate-spin" />
+        <Loader className="w-3 h-3 animate-spin" />
       ) : (
         <Image
           src="/boo.png"

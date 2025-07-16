@@ -22,10 +22,11 @@
 // };
 
 import { Img } from "app/components/Img";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
-import { Check, Loader2, Search, X } from "lucide-react";
+import { Check, Search, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../Button";
@@ -211,7 +212,7 @@ export const UserSelectDialogProvider = () => {
             )}
             {isSearching && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                <Loader className="h-4 w-4 text-gray-400 animate-spin" />
               </div>
             )}
           </div>

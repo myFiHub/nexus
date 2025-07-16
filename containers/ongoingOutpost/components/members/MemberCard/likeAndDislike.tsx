@@ -1,10 +1,11 @@
 import { Button } from "app/components/Button";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { onGoingOutpostActions } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { cn } from "app/lib/utils";
 import { wsClient } from "app/services/wsClient";
-import { Loader2, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -138,7 +139,7 @@ export const LikeAndDislike = ({
       title={like ? "Like" : "Dislike"}
     >
       {checkingHealth ? (
-        <Loader2 className="w-3 h-3 animate-spin" />
+        <Loader className="w-3 h-3 animate-spin" />
       ) : isActive ? (
         <CircularProgress progress={progress} size={20} strokeWidth={2}>
           {countdown}

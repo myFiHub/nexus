@@ -1,5 +1,6 @@
 "use client";
 import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
@@ -8,7 +9,6 @@ import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
@@ -89,7 +89,7 @@ const JoinButtonContent = ({
     <Button className="w-full" onClick={join} disabled={disabled}>
       {loading || joining ? (
         <div className="flex items-center gap-2">
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader className="w-4 h-4 animate-spin" />
           <span>{joining ? "Joining..." : ""}</span>
         </div>
       ) : (

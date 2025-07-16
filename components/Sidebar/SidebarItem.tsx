@@ -1,7 +1,7 @@
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Img } from "../Img";
@@ -354,12 +354,7 @@ export function SidebarItem({
           }
         >
           {loading ? (
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            >
-              <Loader2 className="h-5 w-5" />
-            </motion.div>
+            <Loader className="h-5 w-5" />
           ) : Icon ? (
             <Icon className={cn("h-5 w-5", isDanger && "text-red-500")} />
           ) : (

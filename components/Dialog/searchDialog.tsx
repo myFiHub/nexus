@@ -14,6 +14,7 @@
 //   }
 // };
 
+import { Loader } from "app/components/Loader";
 import { logoUrl } from "app/lib/constants";
 import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
@@ -24,7 +25,6 @@ import {
   ArrowLeft,
   Calendar,
   ExternalLink,
-  Loader2,
   Search,
   Tag,
   Users,
@@ -237,7 +237,7 @@ export const SearchDialogProvider = () => {
               className="pl-10 pr-10"
             />
             {isSearching && (
-              <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 animate-spin" />
+              <Loader className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 animate-spin" />
             )}
             {searchValue.length > 0 && !isSearching && (
               <button
@@ -401,7 +401,7 @@ export const SearchDialogProvider = () => {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-500/80 to-blue-500/80 group-hover:from-purple-500 group-hover:to-blue-500 flex items-center justify-center text-white font-semibold text-sm transition-all duration-300">
                                 {isCurrentTagLoading ? (
-                                  <Loader2 className="w-6 h-6 animate-spin" />
+                                  <Loader className="w-6 h-6 animate-spin" />
                                 ) : (
                                   <Tag className="w-6 h-6" />
                                 )}
@@ -461,7 +461,7 @@ export const SearchDialogProvider = () => {
                     {/* Tag Outposts */}
                     {isTagLoading ? (
                       <div className="text-center py-8 text-muted-foreground">
-                        <Loader2 className="w-12 h-12 mx-auto mb-3 animate-spin opacity-50" />
+                        <Loader className="w-12 h-12 mx-auto mb-3 animate-spin opacity-50" />
                         <p>Loading outposts...</p>
                       </div>
                     ) : tagOutpostsCount === 0 ? (
