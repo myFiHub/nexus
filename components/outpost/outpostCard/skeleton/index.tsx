@@ -27,16 +27,6 @@ export function OutpostCardSkeleton() {
         </div>
       </div>
 
-      {/* Floating indicators skeleton */}
-      <div className="absolute -bottom-4 left-4 right-4 z-20">
-        <div className="bg-background/95 backdrop-blur-sm rounded-lg border border-border/50 shadow-sm p-3">
-          <div className="flex gap-3">
-            <div className="w-16 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-            <div className="w-20 h-4 bg-gray-300 dark:bg-gray-600 rounded"></div>
-          </div>
-        </div>
-      </div>
-
       {/* Content skeleton */}
       <div className="p-5 pt-8 flex-1 flex flex-col space-y-4">
         {/* Title and description */}

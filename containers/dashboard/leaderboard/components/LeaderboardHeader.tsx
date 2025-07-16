@@ -45,26 +45,10 @@ const RotatingStar = ({
       repeat: Infinity,
       ease: "linear",
     }}
-    className={`absolute ${size} text-yellow-300`}
+    className={`${size} text-yellow-300`}
   >
     ⭐
   </motion.div>
-);
-
-const PulsingGlow = () => (
-  <motion.div
-    initial={{ scale: 0.8, opacity: 0.3 }}
-    animate={{
-      scale: [0.8, 1.2, 0.8],
-      opacity: [0.3, 0.7, 0.3],
-    }}
-    transition={{
-      duration: 2,
-      repeat: Infinity,
-      ease: "easeInOut",
-    }}
-    className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-orange-500/20 rounded-lg"
-  />
 );
 
 export const LeaderboardHeader = () => {
@@ -98,18 +82,30 @@ export const LeaderboardHeader = () => {
       <FloatingParticle delay={1.5} x={90} y={60} />
       <FloatingParticle delay={2} x={30} y={70} />
 
-      {/* Rotating stars */}
-      <RotatingStar delay={0} size="w-6 h-6" />
-      <motion.div style={{ left: "10%", top: "20%" }}>
+      {/* Rotating stars - evenly distributed */}
+      <motion.div
+        style={{ position: "absolute", left: "5%", top: "10%", zIndex: 2 }}
+      >
+        <RotatingStar delay={0} size="w-6 h-6" />
+      </motion.div>
+      <motion.div
+        style={{ position: "absolute", left: "15%", top: "30%", zIndex: 2 }}
+      >
         <RotatingStar delay={1} size="w-4 h-4" />
       </motion.div>
-      <motion.div style={{ right: "15%", top: "30%" }}>
+      <motion.div
+        style={{ position: "absolute", right: "10%", top: "25%", zIndex: 2 }}
+      >
         <RotatingStar delay={2} size="w-5 h-5" />
       </motion.div>
-      <motion.div style={{ left: "20%", bottom: "30%" }}>
+      <motion.div
+        style={{ position: "absolute", left: "20%", bottom: "25%", zIndex: 2 }}
+      >
         <RotatingStar delay={0.5} size="w-3 h-3" />
       </motion.div>
-      <motion.div style={{ right: "25%", bottom: "20%" }}>
+      <motion.div
+        style={{ position: "absolute", right: "15%", bottom: "20%", zIndex: 2 }}
+      >
         <RotatingStar delay={1.5} size="w-4 h-4" />
       </motion.div>
 
@@ -164,30 +160,7 @@ export const LeaderboardHeader = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.8, delay: 1.5 }}
           className="flex items-center gap-3"
-        >
-          <motion.div
-            animate={{ rotate: [0, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="text-2xl"
-          >
-            💰
-          </motion.div>
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 1.8 }}
-            className="text-lg text-[#A3A3A3] font-medium"
-          >
-            See who is earning the most fees on Podium!
-          </motion.p>
-          <motion.div
-            animate={{ rotate: [0, -360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-            className="text-2xl"
-          >
-            💎
-          </motion.div>
-        </motion.div>
+        ></motion.div>
       </motion.div>
     </div>
   );

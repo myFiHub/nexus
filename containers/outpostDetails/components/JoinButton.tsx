@@ -36,13 +36,15 @@ const JoinButtonContent = ({
   useSelector(GlobalSelectors.tick);
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  const logingIn = useSelector(GlobalSelectors.logingIn);
+  // const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const continueWithJoin = async () => {
+    setLoading(true);
     setCheckingWsHealth(true);
     const isHealthy = await wsClient.healthCheck();
     setCheckingWsHealth(false);
@@ -51,14 +53,17 @@ const JoinButtonContent = ({
       return;
     }
     dispatch(globalActions.joinOutpost({ outpost }));
+    setLoading(false);
   };
 
   const join = async () => {
+    setLoading(true);
     await loginPromptDialog({
       actionDescription: "join this outpost",
       action: continueWithJoin,
       additionalComponent: <LoginPromptContent outpost={outpost} />,
     });
+    setLoading(false);
   };
 
   if (!outpost) return null;
@@ -78,7 +83,6 @@ const JoinButtonContent = ({
   const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
-  const loading = joining || logingIn;
   const disabled = iAmCreator ? loading : !isPassed || loading;
 
   return (
@@ -86,7 +90,7 @@ const JoinButtonContent = ({
       {loading ? (
         <div className="flex items-center gap-2">
           <Loader2 className="w-4 h-4 animate-spin" />
-          <span>{joining ? "Joining..." : "Loading..."}</span>
+          <span>{joining ? "Joining..." : ""}</span>
         </div>
       ) : (
         joinComponent ?? <span className="font-medium">{displayText}</span>

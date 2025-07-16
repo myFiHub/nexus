@@ -1,15 +1,17 @@
+import { Img } from "app/components/Img";
+import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { easeOut, motion } from "framer-motion";
 import {
   AlertTriangle,
   Calendar,
+  Check,
   Clock,
   Lock,
   Mic,
   MicOff,
   Sparkles,
   Unlock,
-  Users,
 } from "lucide-react";
 
 interface LoginPromptContentProps {
@@ -144,7 +146,12 @@ export const LoginPromptContent = ({ outpost }: LoginPromptContentProps) => {
           >
             <div className="flex-shrink-0">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                <Users className="w-6 h-6 text-white" />
+                <Img
+                  src={outpost.image ?? logoUrl}
+                  useImgTag
+                  alt={outpost.name}
+                  className="w-10 h-10 text-white rounded-lg"
+                />
               </div>
             </div>
             <div className="flex-1 min-w-0">
@@ -259,7 +266,9 @@ export const LoginPromptContent = ({ outpost }: LoginPromptContentProps) => {
                     Recording Enabled
                   </span>
                 </div>
-                <span className="text-xs font-medium text-purple-700">Yes</span>
+                <span className="text-xs font-medium text-purple-700">
+                  <Check className="w-3.5 h-3.5 text-purple-600" />
+                </span>
               </motion.div>
             )}
           </div>

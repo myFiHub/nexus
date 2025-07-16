@@ -1,6 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
-import { MostFeeEarned } from "app/services/api/types";
+import {
+  MostFeeEarned,
+  MostPassHeld,
+  MostUniquePassHeld,
+} from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { leaderboardSaga } from "./saga";
 
@@ -12,12 +16,36 @@ export interface LeaderboardState {
       gettingUsers: boolean;
       hasMoreData: boolean;
     };
+    [LeaderboardTags.MostPassHeld]: {
+      page: number;
+      users: MostPassHeld[];
+      gettingUsers: boolean;
+      hasMoreData: boolean;
+    };
+    [LeaderboardTags.MostUniquePassHolders]: {
+      page: number;
+      users: MostUniquePassHeld[];
+      gettingUsers: boolean;
+      hasMoreData: boolean;
+    };
   };
 }
 
 export const initialState: LeaderboardState = {
   clientSideLeaderboard: {
     [LeaderboardTags.TopFeeEarned]: {
+      page: 1,
+      users: [],
+      gettingUsers: false,
+      hasMoreData: true,
+    },
+    [LeaderboardTags.MostPassHeld]: {
+      page: 1,
+      users: [],
+      gettingUsers: false,
+      hasMoreData: true,
+    },
+    [LeaderboardTags.MostUniquePassHolders]: {
       page: 1,
       users: [],
       gettingUsers: false,
@@ -36,13 +64,16 @@ const leaderboardSlice = createSlice({
     ) => {},
     appendClientSideLeaderboard: (
       state,
-      action: PayloadAction<{ filter: LeaderboardTags; users: MostFeeEarned[] }>
+      action: PayloadAction<{
+        filter: LeaderboardTags;
+        users: MostFeeEarned[] | MostPassHeld[] | MostUniquePassHeld[];
+      }>
     ) => {
       const { filter, users } = action.payload;
       state.clientSideLeaderboard[filter].users = [
         ...state.clientSideLeaderboard[filter].users,
         ...users,
-      ];
+      ] as any;
       state.clientSideLeaderboard[filter].page += 1;
     },
     setClientSideLeaderboardGettingUsers: (
@@ -61,7 +92,10 @@ const leaderboardSlice = createSlice({
     },
     setClientSideLeaderboardUsers: (
       state,
-      action: PayloadAction<{ filter: LeaderboardTags; users: MostFeeEarned[] }>
+      action: PayloadAction<{
+        filter: LeaderboardTags;
+        users: MostFeeEarned[] | MostPassHeld[] | MostUniquePassHeld[];
+      }>
     ) => {
       const { filter, users } = action.payload;
       state.clientSideLeaderboard[filter].users = users;

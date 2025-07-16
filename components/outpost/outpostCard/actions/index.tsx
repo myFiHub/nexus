@@ -11,9 +11,9 @@ import { LeaveButton } from "./leaveButton";
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 
-  if (!myUser) {
-    return <div className="h-12 w-full" />;
-  }
+  // if (!myUser) {
+  //   return <div className="h-12 w-full" />;
+  // }
 
   return (
     <motion.div
