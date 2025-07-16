@@ -1,8 +1,16 @@
 import UserLink from "app/components/AppLink/userLink";
 import { truncate } from "app/lib/utils";
-import { MostFeeEarned } from "app/services/api/types";
+import {
+  MostFeeEarned,
+  MostPassHeld,
+  MostUniquePassHeld,
+} from "app/services/api/types";
 
-export const LeaderboardUserInfo = ({ user }: { user: MostFeeEarned }) => (
+export const LeaderboardUserInfo = ({
+  user,
+}: {
+  user: MostFeeEarned | MostPassHeld | MostUniquePassHeld;
+}) => (
   <div className="flex flex-col">
     <span className="font-semibold text-[#F4F4F4] leading-tight">
       <UserLink

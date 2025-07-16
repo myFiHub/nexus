@@ -1,9 +1,17 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
 import { logoUrl } from "app/lib/constants";
-import { MostFeeEarned } from "app/services/api/types";
+import {
+  MostFeeEarned,
+  MostPassHeld,
+  MostUniquePassHeld,
+} from "app/services/api/types";
 
-export const LeaderboardAvatar = ({ user }: { user: MostFeeEarned }) => (
+export const LeaderboardAvatar = ({
+  user,
+}: {
+  user: MostFeeEarned | MostPassHeld | MostUniquePassHeld;
+}) => (
   <UserLink
     id={user.podium_pass_owner_uuid}
     underline={false}

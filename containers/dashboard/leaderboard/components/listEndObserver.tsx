@@ -8,15 +8,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { leaderboardSelectors } from "../selectors";
 import { leaderboardActions } from "../slice";
 
-const Content = () => {
+const Content = ({ type }: { type: LeaderboardTags }) => {
   const dispatch = useDispatch();
-  const hasMoreData = useSelector(
-    leaderboardSelectors.hasMoreData(LeaderboardTags.TopFeeEarned)
-  );
-  const gettingUsers = useSelector(
-    leaderboardSelectors.gettingUsers(LeaderboardTags.TopFeeEarned)
-  );
+  const hasMoreData = useSelector(leaderboardSelectors.hasMoreData(type));
+  const gettingUsers = useSelector(leaderboardSelectors.gettingUsers(type));
   const observerRef = useRef<IntersectionObserver | null>(null);
+
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     return () => {
@@ -32,11 +29,7 @@ const Content = () => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           if (hasMoreData && !gettingUsers) {
-            dispatch(
-              leaderboardActions.getClientSideLeaderboard(
-                LeaderboardTags.TopFeeEarned
-              )
-            );
+            dispatch(leaderboardActions.getClientSideLeaderboard(type));
           }
         }
       });
@@ -76,10 +69,10 @@ const Content = () => {
   );
 };
 
-const ListEndObserver = () => {
+const ListEndObserver = ({ type }: { type: LeaderboardTags }) => {
   return (
     <ReduxProvider>
-      <Content />
+      <Content type={type} />
     </ReduxProvider>
   );
 };

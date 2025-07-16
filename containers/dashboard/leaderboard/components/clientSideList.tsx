@@ -6,14 +6,13 @@ import { useSelector } from "react-redux";
 import { leaderboardSelectors } from "../selectors";
 import { LeaderboardRow } from "./LeaderboardRow";
 
-const Content = () => {
-  const users = useSelector(
-    leaderboardSelectors.users(LeaderboardTags.TopFeeEarned)
-  );
+const Content = ({ type }: { type: LeaderboardTags }) => {
+  const users = useSelector(leaderboardSelectors.users(type));
   return (
     <>
       {users.map((user, idx) => (
         <LeaderboardRow
+          type={type}
           key={user.podium_pass_owner_uuid || idx}
           user={user}
           rank={idx + 1}
@@ -23,10 +22,10 @@ const Content = () => {
   );
 };
 
-const ClientSideList = () => {
+const ClientSideList = ({ type }: { type: LeaderboardTags }) => {
   return (
     <ReduxProvider>
-      <Content />
+      <Content type={type} />
     </ReduxProvider>
   );
 };

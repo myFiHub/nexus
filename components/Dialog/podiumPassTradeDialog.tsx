@@ -64,6 +64,95 @@ import {
   loginPromptDialog,
 } from "./index";
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0, scale: 0.8, y: 20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: "easeOut" as const,
+      staggerChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.8,
+    y: 20,
+    transition: {
+      duration: 0.3,
+      ease: "easeIn" as const,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut" as const,
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.9, rotateY: -15 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotateY: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut" as const,
+    },
+  },
+};
+
+const sparkleVariants = {
+  animate: {
+    rotate: [0, 360],
+    scale: [1, 1.2, 1],
+    opacity: [0.5, 1, 0.5],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut" as const,
+    },
+  },
+};
+
+const pulseVariants = {
+  animate: {
+    scale: [1, 1.05, 1],
+    boxShadow: [
+      "0 0 0 0 hsl(var(--primary) / 0.4)",
+      "0 0 0 10px hsl(var(--primary) / 0)",
+      "0 0 0 0 hsl(var(--primary) / 0)",
+    ],
+    transition: {
+      duration: 2,
+      repeat: Infinity,
+      ease: "easeInOut" as const,
+    },
+  },
+};
+
+const shimmerVariants = {
+  animate: {
+    x: ["-100%", "100%"],
+    transition: {
+      duration: 1.5,
+      repeat: Infinity,
+      ease: "easeInOut" as const,
+    },
+  },
+};
+
 interface PodiumPassTradeDialogProps {
   type: "buy" | "sell";
   sellerUser: User;
@@ -250,95 +339,6 @@ const Content = () => {
     setIsOpen(false);
     resolvePromise?.(undefined);
     resolvePromise = null;
-  };
-
-  // Animation variants
-  const containerVariants = {
-    hidden: { opacity: 0, scale: 0.8, y: 20 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut" as const,
-        staggerChildren: 0.1,
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.8,
-      y: 20,
-      transition: {
-        duration: 0.3,
-        ease: "easeIn" as const,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut" as const,
-      },
-    },
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9, rotateY: -15 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      rotateY: 0,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut" as const,
-      },
-    },
-  };
-
-  const sparkleVariants = {
-    animate: {
-      rotate: [0, 360],
-      scale: [1, 1.2, 1],
-      opacity: [0.5, 1, 0.5],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut" as const,
-      },
-    },
-  };
-
-  const pulseVariants = {
-    animate: {
-      scale: [1, 1.05, 1],
-      boxShadow: [
-        "0 0 0 0 hsl(var(--primary) / 0.4)",
-        "0 0 0 10px hsl(var(--primary) / 0)",
-        "0 0 0 0 hsl(var(--primary) / 0)",
-      ],
-      transition: {
-        duration: 2,
-        repeat: Infinity,
-        ease: "easeInOut" as const,
-      },
-    },
-  };
-
-  const shimmerVariants = {
-    animate: {
-      x: ["-100%", "100%"],
-      transition: {
-        duration: 1.5,
-        repeat: Infinity,
-        ease: "easeInOut" as const,
-      },
-    },
   };
 
   const isMakeTradeDisabled =
