@@ -32,7 +32,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
         </h1>
         {user.aptos_address && (
           <div className="flex items-center">
-            <p className="text-gray-600 text-sm sm:text-base">
+            <p className="text-gray-400 text-sm sm:text-base">
               {truncate(user.aptos_address, 20)}
             </p>
             <CopyButton text={user.aptos_address} />
@@ -42,6 +42,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
       <PodiumPassButton user={user} />
       <FollowButton
         id={user.uuid}
+        noScale
         size="md"
         followed={!!user.followed_by_me}
         address={user.address}

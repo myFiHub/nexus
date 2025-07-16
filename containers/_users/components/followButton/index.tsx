@@ -20,6 +20,7 @@ const Content = ({
   size,
   className,
   noRouterRefresh,
+  noScale,
 }: {
   id: string;
   address: string;
@@ -27,6 +28,7 @@ const Content = ({
   size?: ButtonProps["size"];
   className?: string;
   noRouterRefresh?: boolean;
+  noScale?: boolean;
 }) => {
   useUsersSlice();
   const dispatch = useDispatch();
@@ -157,8 +159,12 @@ const Content = ({
             size={size}
             onClick={handleFollowUnfollowClick}
             disabled={isLoading}
-            className={cn("min-w-22", className)}
-            colorScheme={followed ? "danger" : "primary"}
+            noScale={noScale}
+            className={cn(
+              "min-w-22 ",
+              className,
+              followed ? "border-destructive" : "border-primary"
+            )}
           >
             {isLoading ? (
               <div className="h-5 flex items-center justify-center">
@@ -182,6 +188,7 @@ export const FollowButton = ({
   size = "sm",
   className,
   noRouterRefresh,
+  noScale,
 }: {
   id: string;
   followed: boolean;
@@ -189,6 +196,7 @@ export const FollowButton = ({
   size?: ButtonProps["size"];
   className?: string;
   noRouterRefresh?: boolean;
+  noScale?: boolean;
 }) => {
   return (
     <ReduxProvider>
@@ -199,6 +207,7 @@ export const FollowButton = ({
         size={size}
         className={className}
         noRouterRefresh={noRouterRefresh}
+        noScale={noScale}
       />
     </ReduxProvider>
   );
