@@ -89,7 +89,11 @@ const Content = ({ address }: { address: string }) => {
     return null;
   }
   return (
-    <div className="flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
+    <div
+      className={`flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 ${
+        isMyUser ? "hidden" : ""
+      } ${loadingBuy || loadingSell ? "!opacity-100" : "opacity-0"}`}
+    >
       <Button
         className={`min-w-10 `}
         size="xxs"
