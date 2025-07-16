@@ -49,6 +49,7 @@ export function MemberCard({ member }: MemberCardProps) {
           noRouterRefresh
           followed={member.followed_by_me ?? false}
           address={member.address}
+          noScale
           size="sm"
           className="w-full"
         />

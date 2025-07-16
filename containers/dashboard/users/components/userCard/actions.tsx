@@ -94,7 +94,6 @@ const Content = ({ address }: { address: string }) => {
         className={`min-w-10 `}
         size="xxs"
         type="button"
-        colorScheme="primary"
         onClick={() => handleClick("buy")}
         disabled={loadingBuy}
       >
@@ -104,7 +103,7 @@ const Content = ({ address }: { address: string }) => {
         className={`min-w-10 `}
         size="xxs"
         type="button"
-        colorScheme="danger"
+        variant="destructive"
         onClick={() => handleClick("sell")}
         disabled={loadingSell}
       >

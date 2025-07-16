@@ -3,105 +3,53 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:pointer-events-none ring-offset-background",
+  "inline-flex items-center justify-center cursor-pointer rounded-xl text-sm font-semibold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:pointer-events-none ring-offset-background relative overflow-hidden group",
   {
     variants: {
       variant: {
-        primary: "primary",
-        outline: "border bg-transparent",
-        ghost: "bg-transparent hover:bg-transparent",
+        primary:
+          "bg-gradient-to-r from-primary to-primary/80 text-foreground shadow-[0_4px_14px_0_rgba(0,118,255,0.39)] hover:shadow-[0_6px_20px_rgba(0,118,255,0.23)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700",
+        outline:
+          "border-2 border-primary/30 bg-background/50 backdrop-blur-sm text-foreground hover:bg-primary/10 hover:border-primary/50 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
+        ghost:
+          "bg-transparent text-foreground hover:bg-accent/50 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
+        secondary:
+          "bg-gradient-to-r from-secondary to-secondary/80 text-foreground shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
+        destructive:
+          "bg-gradient-to-r from-destructive to-destructive/80 text-foreground shadow-[0_4px_14px_0_rgba(239,68,68,0.39)] hover:shadow-[0_6px_20px_rgba(239,68,68,0.23)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
       },
       size: {
         xxs: "h-6 px-2 text-xs",
         xs: "h-7 px-2.5 text-xs",
-        sm: "h-8 px-3",
-        md: "h-10 px-4 py-2",
-        lg: "h-12 px-6",
+        sm: "h-8 px-3 text-sm",
+        md: "h-10 px-4 py-2 text-sm",
+        lg: "h-12 px-6 text-base",
+        xl: "h-14 px-8 text-lg",
       },
-      colorScheme: {
-        primary: "text-white",
-        danger: "text-white",
-        warning: "text-white",
+      noScale: {
+        true: "hover:scale-100 active:scale-100",
+        false: "",
       },
     },
-    compoundVariants: [
-      // Default variant with color schemes
-      {
-        variant: "primary",
-        colorScheme: "primary",
-        className:
-          "bg-primary hover:bg-primary-hover text-white disabled:bg-muted disabled:text-muted-foreground",
-      },
-      {
-        variant: "primary",
-        colorScheme: "danger",
-        className:
-          "bg-danger hover:bg-danger-hover text-white disabled:bg-muted disabled:text-muted-foreground",
-      },
-      {
-        variant: "primary",
-        colorScheme: "warning",
-        className:
-          "bg-warning hover:bg-warning-hover text-white disabled:bg-muted disabled:text-muted-foreground",
-      },
-      // Outline variant with color schemes
-      {
-        variant: "outline",
-        colorScheme: "primary",
-        className:
-          "border-primary text-primary hover:bg-primary hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-      {
-        variant: "outline",
-        colorScheme: "danger",
-        className:
-          "border-danger text-danger hover:bg-danger hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-      {
-        variant: "outline",
-        colorScheme: "warning",
-        className:
-          "border-warning text-warning hover:bg-warning hover:text-white disabled:border-muted disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-      // Ghost variant with color schemes
-      {
-        variant: "ghost",
-        colorScheme: "primary",
-        className:
-          "text-primary hover:bg-primary/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-      {
-        variant: "ghost",
-        colorScheme: "danger",
-        className:
-          "text-danger hover:bg-danger/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-      {
-        variant: "ghost",
-        colorScheme: "warning",
-        className:
-          "text-warning hover:bg-warning/10 disabled:text-muted-foreground disabled:hover:bg-transparent",
-      },
-    ],
     defaultVariants: {
-      colorScheme: "primary",
       variant: "primary",
       size: "md",
+      noScale: false,
     },
   }
 );
 
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {}
+    VariantProps<typeof buttonVariants> {
+  noScale?: boolean;
+}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, colorScheme, ...props }, ref) => {
+  ({ className, variant, size, noScale, ...props }, ref) => {
     return (
       <button
-        className={cn(
-          buttonVariants({ variant, size, className, colorScheme })
-        )}
+        className={cn(buttonVariants({ variant, size, noScale, className }))}
         ref={ref}
         {...props}
       />
