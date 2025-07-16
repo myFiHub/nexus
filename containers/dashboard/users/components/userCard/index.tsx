@@ -102,7 +102,7 @@ export const UserCard = ({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-2 ml-4 flex-shrink-0">
+        <div className="flex items-center gap-2 ml-4 flex-shrink-0 align-end">
           {user.name ? <UserCardActions address={user.aptos_address} /> : <></>}
         </div>
       </div>
