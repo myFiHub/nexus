@@ -196,7 +196,6 @@ export const AccountCardActionSelectDialogProvider = () => {
               />
               <Button
                 onClick={handleMakePrimary}
-                colorScheme="primary"
                 variant="primary"
                 className="relative w-full h-16 bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600 text-white font-semibold text-lg shadow-lg"
               >
@@ -232,7 +231,6 @@ export const AccountCardActionSelectDialogProvider = () => {
           >
             <Button
               onClick={handleGoBack}
-              colorScheme="primary"
               variant="outline"
               className="flex-1 group"
             >

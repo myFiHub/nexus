@@ -99,7 +99,6 @@ const Content = ({
     <Button
       onClick={handleInviteUsers}
       className={className}
-      colorScheme="primary"
       variant="outline"
       disabled={isLoading}
       size={buttonSize}

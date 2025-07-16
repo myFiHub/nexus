@@ -229,11 +229,7 @@ export const BuyOrSellPassDialogProvider = () => {
               transition={{ delay: 0.5, duration: 0.3 }}
               className="w-full sm:w-auto"
             >
-              <Button
-                onClick={handleBuy}
-                className="w-full sm:w-auto"
-                colorScheme="primary"
-              >
+              <Button onClick={handleBuy} className="w-full sm:w-auto">
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -256,7 +252,6 @@ export const BuyOrSellPassDialogProvider = () => {
                   onClick={handleSell}
                   className="w-full sm:w-auto"
                   variant="outline"
-                  colorScheme="warning"
                 >
                   <motion.span
                     initial={{ opacity: 0 }}

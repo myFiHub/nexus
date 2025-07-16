@@ -15,12 +15,10 @@ interface ReminderDialogProps {
   content?: ReactNode;
   scheduledFor: number; // milliseconds timestamp
   confirmOpts?: {
-    colorScheme?: ButtonProps["colorScheme"];
     text?: string;
     variant?: ButtonProps["variant"];
   };
   cancelOpts?: {
-    colorScheme?: ButtonProps["colorScheme"];
     text?: string;
     variant?: ButtonProps["variant"];
   };
@@ -185,7 +183,6 @@ export const ReminderDialogProvider = () => {
         </div>
         <DialogFooter>
           <Button
-            colorScheme={cancelOpts?.colorScheme || "primary"}
             onClick={handleCancel}
             variant={cancelOpts?.variant || "ghost"}
           >
@@ -193,7 +190,6 @@ export const ReminderDialogProvider = () => {
           </Button>
           <Button
             onClick={handleConfirm}
-            colorScheme={confirmOpts?.colorScheme || "primary"}
             variant={confirmOpts?.variant || "primary"}
             disabled={selectedReminder === null}
           >

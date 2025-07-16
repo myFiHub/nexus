@@ -388,7 +388,6 @@ export const CheerBooAmountDialogProvider = () => {
                 whileTap={{ scale: 0.98 }}
               >
                 <Button
-                  colorScheme="primary"
                   onClick={handleCancel}
                   variant="ghost"
                   className="w-full"
@@ -436,8 +435,7 @@ export const CheerBooAmountDialogProvider = () => {
                 >
                   <Button
                     onClick={handleConfirm}
-                    colorScheme={dialogContent?.cheer ? "primary" : "danger"}
-                    variant="primary"
+                    variant={dialogContent?.cheer ? "primary" : "destructive"}
                     disabled={!isValid}
                     className="w-full"
                   >
