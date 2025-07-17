@@ -31,11 +31,7 @@ export function OutpostsList({
   }
 
   if (!outposts.length) {
-    return (
-      <div className="text-center py-12">
-        {noOutpostComponent ?? "No outposts"}
-      </div>
-    );
+    return <div className="text-center py-12">{noOutpostComponent ?? ""}</div>;
   }
 
   return (
