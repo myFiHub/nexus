@@ -4,7 +4,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { isDev } from "app/lib/utils";
 import { motion } from "framer-motion";
-import { Lock, LogIn, Shield, Sparkles, Zap } from "lucide-react";
+import { Lock, LogIn, Shield, Zap } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../Button";
@@ -229,23 +229,6 @@ const Content = () => {
             }}
           />
 
-          {/* Floating sparkles - hidden on mobile for cleaner look */}
-          <motion.div
-            variants={sparkleVariants}
-            animate="animate"
-            className="absolute top-2 right-2 sm:top-4 sm:right-4 hidden sm:block"
-          >
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-          </motion.div>
-          <motion.div
-            variants={sparkleVariants}
-            animate="animate"
-            className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 hidden sm:block"
-            style={{ animationDelay: "1s" }}
-          >
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-accent-foreground" />
-          </motion.div>
-
           <DialogHeader className="relative z-10 pb-4 sm:pb-6">
             <motion.div
               variants={itemVariants}
@@ -291,9 +274,7 @@ const Content = () => {
                 className="flex items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground px-2"
               >
                 <Shield className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                <span className="text-center">
-                  Secure authentication with Web3Auth
-                </span>
+                <span className="text-center">Secure Web3 authentication</span>
               </motion.div>
 
               {dialogContent?.additionalComponent && (

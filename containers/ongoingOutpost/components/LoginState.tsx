@@ -130,7 +130,7 @@ export const LoginState = () => {
             >
               <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
                 <Shield className="w-4 h-4" />
-                <span>Secure authentication with Web3Auth</span>
+                <span>Secure Web3 authentication</span>
               </div>
 
               <motion.div
