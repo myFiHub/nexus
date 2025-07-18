@@ -1,4 +1,7 @@
-import { TOP_FEE_EARNED_PAGE_SIZE } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
+import {
+  LEADERBOARD_PAGE_SIZE,
+  LeaderboardTags,
+} from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import {
   RECENTLY_JOINED_PAGE_SIZE,
   TOP_OWNERS_PAGE_SIZE,
@@ -878,7 +881,7 @@ class PodiumApi {
   }
   async getMostFeeEarned(
     page = 0,
-    page_size = TOP_FEE_EARNED_PAGE_SIZE
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned]
   ): Promise<MostFeeEarned[]> {
     try {
       const response = await this.axiosInstance.get(
@@ -893,7 +896,10 @@ class PodiumApi {
       return [];
     }
   }
-  async getMostPassHeld(page = 0, page_size = 50): Promise<MostPassHeld[]> {
+  async getMostPassHeld(
+    page = 0,
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld]
+  ): Promise<MostPassHeld[]> {
     try {
       const response = await this.axiosInstance.get(
         `/dashboard/most-pass-held`,
@@ -923,7 +929,7 @@ class PodiumApi {
   }
   async getMostUniquePassHolders(
     page = 0,
-    page_size = 50
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders]
   ): Promise<MostUniquePassHeld[]> {
     try {
       const response = await this.axiosInstance.get(
