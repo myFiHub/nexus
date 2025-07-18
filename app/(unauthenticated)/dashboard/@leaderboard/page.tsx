@@ -1,13 +1,13 @@
 import { Leaderboard } from "app/containers/dashboard/leaderboard";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
-import { LeaderBoardPageSize, LeaderboardTags } from "./_configs";
+import { LEADERBOARD_PAGE_SIZE, LeaderboardTags } from "./_configs";
 
 const getMostFeeEarnedWithCache = unstable_cache(
   async () =>
     podiumApi.getMostFeeEarned(
       0,
-      LeaderBoardPageSize[LeaderboardTags.TopFeeEarned]
+      LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned]
     ),
   [LeaderboardTags.TopFeeEarned],
   {
@@ -19,7 +19,7 @@ const getMostPassHeldWithCache = unstable_cache(
   async () =>
     podiumApi.getMostPassHeld(
       0,
-      LeaderBoardPageSize[LeaderboardTags.MostPassHeld]
+      LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld]
     ),
   [LeaderboardTags.MostPassHeld],
   {
@@ -31,7 +31,7 @@ const getMostUniquePassHoldersWithCache = unstable_cache(
   async () =>
     podiumApi.getMostUniquePassHolders(
       0,
-      LeaderBoardPageSize[LeaderboardTags.MostUniquePassHolders]
+      LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders]
     ),
   [LeaderboardTags.MostUniquePassHolders],
   {

@@ -1,5 +1,5 @@
 import {
-  LeaderBoardPageSize,
+  LEADERBOARD_PAGE_SIZE,
   LeaderboardTags,
 } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import podiumApi from "app/services/api";
@@ -24,27 +24,27 @@ function* getClientSideLeaderboard(
     case LeaderboardTags.TopFeeEarned:
       users = yield podiumApi.getMostFeeEarned(
         page,
-        LeaderBoardPageSize[filter]
+        LEADERBOARD_PAGE_SIZE[filter]
       );
-      if (users.length < LeaderBoardPageSize[filter]) {
+      if (users.length < LEADERBOARD_PAGE_SIZE[filter]) {
         hasMoreData = false;
       }
       break;
     case LeaderboardTags.MostPassHeld:
       users = yield podiumApi.getMostPassHeld(
         page,
-        LeaderBoardPageSize[filter]
+        LEADERBOARD_PAGE_SIZE[filter]
       );
-      if (users.length < LeaderBoardPageSize[filter]) {
+      if (users.length < LEADERBOARD_PAGE_SIZE[filter]) {
         hasMoreData = false;
       }
       break;
     case LeaderboardTags.MostUniquePassHolders:
       users = yield podiumApi.getMostUniquePassHolders(
         page,
-        LeaderBoardPageSize[filter]
+        LEADERBOARD_PAGE_SIZE[filter]
       );
-      if (users.length < LeaderBoardPageSize[filter]) {
+      if (users.length < LEADERBOARD_PAGE_SIZE[filter]) {
         hasMoreData = false;
       }
     default:

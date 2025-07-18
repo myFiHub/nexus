@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  LeaderBoardPageSize,
+  LEADERBOARD_PAGE_SIZE,
   LeaderboardTags,
 } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import { ReduxProvider } from "app/store/Provider";
@@ -18,7 +18,7 @@ const Content = ({ type }: { type: LeaderboardTags }) => {
           type={type}
           key={user.podium_pass_owner_uuid || idx}
           user={user}
-          rank={idx + LeaderBoardPageSize[type] + 1}
+          rank={idx + LEADERBOARD_PAGE_SIZE[type] + 1}
         />
       ))}
     </>
