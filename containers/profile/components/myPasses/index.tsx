@@ -8,6 +8,7 @@ import { truncate } from "app/lib/utils";
 import { ExternalLink, Heart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../../_assets/selectore";
+import { EmptyState } from "./EmptyState";
 
 const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
   <div className="mt-8">
@@ -130,7 +131,7 @@ export const MyPasses = () => {
   if (!passes || passes.length === 0) {
     return (
       <SectionWrapper>
-        <div className="text-gray-500 p-4 text-center">No passes found</div>
+        <EmptyState />
       </SectionWrapper>
     );
   }

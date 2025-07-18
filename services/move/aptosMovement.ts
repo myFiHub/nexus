@@ -1,7 +1,7 @@
 import { toast } from "app/lib/toast";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
-import { FungableTokenBalance } from "./types";
+import { FungableTokenBalance, NFTResponse } from "./types";
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -116,31 +116,54 @@ class AptosMovement {
   }
 
   async getMyNfts() {
-    const address = this.address;
     const query = `
 query GetNFTs($address: String!) {
-  current_token_ownerships(
-    where: {
-      owner_address: {_eq: $address}
-      amount: {_gt: "0"}
-    }
+ current_token_ownerships_v2(
+    where: {owner_address: {_eq: $address}, amount: {_gt: "0"}, current_token_data: {token_uri: {_neq: ""}}}
   ) {
-    token_data_id {
-      name
-      creator_address
-      collection_name
-    }
     amount
-    last_transaction_timestamp
+    current_token_data {
+      description
+      token_name
+      token_uri
+      last_transaction_timestamp
+    }
   }
 }
   `;
     const response = await axios.post(
       APTOS_INDEXER_URL,
-      { query, variables: { address } },
+      {
+        query,
+        variables: {
+          address:
+            // "0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2",
+            this.address,
+        },
+      },
       { headers: { "Content-Type": "application/json" } }
     );
-    return response.data.data.current_non_fungible_asset_balances;
+
+    // the tokenUri is the image url but it's in ipfs like :ipfs://Qm...
+    // we need to convert it to a http url
+    const nfts = response.data.data.current_token_ownerships_v2;
+    const nftsWithImageUrl = nfts
+      .map((nft: NFTResponse) => {
+        return {
+          ...nft,
+          image_url: `https://ipfs.io/ipfs/${
+            nft.current_token_data.token_uri.split("ipfs://")[1]
+          }`,
+        };
+      })
+      .sort((a: NFTResponse, b: NFTResponse) => {
+        return (
+          new Date(b.current_token_data.last_transaction_timestamp).getTime() -
+          new Date(a.current_token_data.last_transaction_timestamp).getTime()
+        );
+      });
+
+    return nftsWithImageUrl;
   }
 
   async getUserTokenBalances(address: string): Promise<FungableTokenBalance[]> {
