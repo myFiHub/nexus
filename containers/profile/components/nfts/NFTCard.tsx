@@ -103,9 +103,13 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
           <Img
             src={nft.image_url}
             alt={nft.current_token_data.token_name}
-            className={`w-full h-full object-cover transition-all duration-300 ${
-              shouldMaskBlackAndWhite ? "grayscale blur-sm" : ""
-            }`}
+            className={`w-full h-full object-cover transition-all duration-300 
+              ${
+                settingNftAsProfilePicture && !isSettingThisImage
+                  ? "grayscale blur-sm"
+                  : ""
+              }
+            `}
             onError={(e) => {
               console.error("Failed to load NFT image:", e);
             }}
@@ -119,7 +123,9 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              className="absolute inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              className={`absolute inset-0 bg-black/50  flex items-center justify-center ${
+                isSettingThisImage ? "" : "backdrop-blur-sm"
+              }`}
             >
               <div className="flex flex-col items-center space-y-3">
                 <div className="w-8 h-8 border-2 border-purple-400 border-t-transparent rounded-full animate-spin" />
@@ -144,7 +150,7 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
         </motion.div>
 
         {/* Set as Profile Picture Button - positioned over the image */}
-        {!isLoading && (
+        {!isLoading && !settingNftAsProfilePicture && (
           <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
             <motion.button
               initial={{ y: 20, scale: 0.9 }}
