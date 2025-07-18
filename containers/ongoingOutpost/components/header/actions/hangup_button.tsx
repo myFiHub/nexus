@@ -1,6 +1,7 @@
 import { Button } from "app/components/Button";
+import { Loader } from "app/components/Loader";
 import { leaveOutpostWarningDialog } from "app/containers/ongoingOutpost/dialogs/leaveOutpostWarning";
-import { Loader2, PhoneOff } from "lucide-react";
+import { PhoneOff } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../../selectors";
@@ -33,7 +34,7 @@ export const HangupButton = () => {
       className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl min-w-[108px]"
     >
       {isHangingUp ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader className="w-4 h-4 animate-spin" />
       ) : (
         <PhoneOff className="w-4 h-4" />
       )}

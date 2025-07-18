@@ -1,3 +1,4 @@
+import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { AppLink } from "../../components/AppLink";
 import { AppPages } from "../../lib/routes";
 
@@ -31,7 +32,7 @@ export function HeroSection() {
         <div>
           <div className="flex flex-col sm:flex-row gap-6 justify-center mb-4 ">
             <AppLink
-              href={`${AppPages.users}/top_accounts`}
+              href={`${AppPages.users}/${UserTags.TopOwners}`}
               variant="default"
               size="default"
               className="bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"

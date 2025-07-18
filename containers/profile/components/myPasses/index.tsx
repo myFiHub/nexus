@@ -2,9 +2,10 @@ import { AppLink } from "app/components/AppLink";
 import { Button } from "app/components/Button";
 import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
+import { Loader } from "app/components/Loader";
 import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
-import { ExternalLink, Heart, Loader2 } from "lucide-react";
+import { ExternalLink, Heart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../../_assets/selectore";
 
@@ -112,7 +113,7 @@ export const MyPasses = () => {
     return (
       <SectionWrapper>
         <div className="flex items-center justify-center p-4">
-          <Loader2 className="w-6 h-6 animate-spin" />
+          <Loader className="w-6 h-6 animate-spin" />
         </div>
       </SectionWrapper>
     );

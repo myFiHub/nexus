@@ -1,5 +1,5 @@
 import { Button } from "app/components/Button";
-import { Loader2 } from "lucide-react";
+import { Loader } from "app/components/Loader";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../selectore";
 
@@ -39,7 +39,7 @@ export const ConfirmButton = ({
   if (loadingList) {
     return (
       <Button variant="outline">
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader className="w-4 h-4 animate-spin" />
       </Button>
     );
   }

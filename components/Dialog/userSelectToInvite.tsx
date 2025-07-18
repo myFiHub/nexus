@@ -20,12 +20,13 @@
 // };
 
 import { Img } from "app/components/Img";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { canInviteToSpeak } from "app/lib/outpostPermissions";
 import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { InviteModel, OutpostModel, User } from "app/services/api/types";
-import { Loader2, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../Button";
@@ -418,7 +419,7 @@ export const UserSelectToInviteDialogProvider = () => {
             )}
             {isSearching && (
               <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <Loader2 className="h-4 w-4 text-gray-400 animate-spin" />
+                <Loader className="h-4 w-4 text-gray-400 animate-spin" />
               </div>
             )}
           </div>

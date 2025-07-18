@@ -1,5 +1,6 @@
 "use client";
 
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { cn, truncate } from "app/lib/utils";
@@ -140,7 +141,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
 
       <span className="relative z-10">
         {loading ? (
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader className="w-4 h-4 animate-spin" />
         ) : isLoggedIn && podiumUserInfo?.aptos_address ? (
           <div className="flex items-center gap-2">
             {podiumUserInfo.image && (

@@ -1,5 +1,6 @@
+import { Loader } from "app/components/Loader";
 import { OutpostModel } from "app/services/api/types";
-import { AlertCircle, Loader2, Users } from "lucide-react";
+import { AlertCircle, Users } from "lucide-react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../selectore";
 import { PassSellerItem } from "./PassSellerItem";
@@ -21,7 +22,7 @@ export const UsersList = ({ outpost }: { outpost?: OutpostModel }) => {
   if (loadingPassSellers) {
     return (
       <div className="flex flex-col items-center justify-center py-12 px-4">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mb-4" />
+        <Loader className="w-8 h-8 animate-spin text-muted-foreground mb-4" />
         <p className="text-sm text-muted-foreground text-center">
           Loading available passes...
         </p>

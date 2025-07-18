@@ -1,8 +1,8 @@
 "use client";
 
 import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
+import { Loader } from "app/components/Loader";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2 } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { dashboardUsersSelectors } from "../selectors";
@@ -49,7 +49,7 @@ const Content = ({ filter }: { filter: UserTags }) => {
     >
       {gettingUsers && (
         <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-400">
-          <Loader2 className="w-5 h-5 animate-spin" />
+          <Loader className="w-5 h-5 animate-spin" />
           <span className="text-sm font-medium">Loading more users...</span>
         </div>
       )}

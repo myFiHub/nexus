@@ -1,9 +1,10 @@
 import { Button } from "app/components/Button";
 import { confirmAddOrSwitchAccountDialog } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { ConnectedAccount } from "app/services/api/types";
-import { Loader2, Plus, Users } from "lucide-react";
+import { Plus, Users } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { ConnectedAccountCard } from "./ConnectedAccountCard";
 
@@ -40,7 +41,7 @@ export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
           className="flex items-center gap-2"
         >
           {switchingAccount ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader className="w-4 h-4 animate-spin" />
           ) : (
             <Plus className="w-4 h-4 animate-pulse" />
           )}

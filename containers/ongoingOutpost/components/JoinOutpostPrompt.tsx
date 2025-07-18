@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "app/components/Button";
 import { LoginButton } from "app/components/header/LoginButton";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
@@ -9,7 +10,7 @@ import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { ConnectionState } from "app/services/wsClient";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2, Lock, Play, Users } from "lucide-react";
+import { Lock, Play, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -131,7 +132,7 @@ const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader className="w-5 h-5 animate-spin" />
                 {joining ? "Joining..." : "Loading..."}
               </>
             ) : (

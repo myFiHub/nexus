@@ -105,7 +105,7 @@ export const LoginPrompt = () => {
             >
               <div className="inline-flex items-center gap-2 text-xs text-muted-foreground/60">
                 <div className="w-1 h-1 bg-primary/40 rounded-full animate-pulse" />
-                <span>Secure authentication</span>
+                <span>Secure Web3 authentication</span>
                 <div className="w-1 h-1 bg-primary/40 rounded-full animate-pulse" />
               </div>
             </motion.div>

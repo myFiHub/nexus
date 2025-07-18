@@ -1,13 +1,14 @@
 "use client";
+import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { toast } from "app/lib/toast";
 import { OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { BuyableTicketTypes } from "../../types";
-import { toast } from "app/lib/toast";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const dispatch = useDispatch();
@@ -50,7 +51,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
   return (
     <div className="cursor-pointer" onClick={handleLockClick}>
       {shouldShowLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader className="w-4 h-4 animate-spin" />
       ) : (
         <Lock className="w-4 h-4 text-orange-500" />
       )}

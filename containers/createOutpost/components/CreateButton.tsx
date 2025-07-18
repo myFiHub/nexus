@@ -1,8 +1,8 @@
 "use client";
 import { LoginButton } from "app/components/header/LoginButton";
+import { Loader } from "app/components/Loader";
 import { BuyableTicketTypes } from "app/components/outpost/types";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { Loader2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { createOutpostSelectors } from "../selectors";
@@ -66,7 +66,7 @@ const CreateButton = () => {
         className="w-full  bg-primary text-white rounded-lg px-4 py-3 text-base font-medium hover:bg-primary/90 transition-colors"
         disabled={disabled}
       >
-        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : "Create"}
+        {loading ? <Loader className="w-4 h-4 animate-spin" /> : "Create"}
       </Button>
       {
         <div className="text-red-500 text-sm h-4  text-center">

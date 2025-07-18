@@ -2,12 +2,13 @@
 
 import { Button, ButtonProps } from "app/components/Button";
 import { userSelectToInviteDialog } from "app/components/Dialog/userSelectToInvite";
+import { Loader } from "app/components/Loader";
 import { canInvite } from "app/lib/outpostPermissions";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { InviteRequestModel, OutpostModel } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2, UserPlus } from "lucide-react";
+import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { GlobalSelectors } from "../../global/selectors";
@@ -104,7 +105,7 @@ const Content = ({
       size={buttonSize}
     >
       {isLoading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader className="w-4 h-4 animate-spin" />
       ) : (
         <UserPlus className="w-4 h-4 mr-2" />
       )}

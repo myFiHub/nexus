@@ -3,13 +3,13 @@
 import { Button } from "app/components/Button";
 import { podiumPassTradeDialog } from "app/components/Dialog";
 import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
+import { Loader } from "app/components/Loader";
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { assetsActions } from "app/containers/_assets/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
 import { ReduxProvider } from "app/store/Provider";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UserInfoDisplay } from "./UserInfoDisplay";
@@ -89,7 +89,11 @@ const Content = ({ address }: { address: string }) => {
     return null;
   }
   return (
-    <div className="flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200">
+    <div
+      className={`flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 ${
+        isMyUser ? "hidden" : ""
+      } ${loadingBuy || loadingSell ? "!opacity-100" : "opacity-0"}`}
+    >
       <Button
         className={`min-w-10 `}
         size="xxs"
@@ -97,7 +101,7 @@ const Content = ({ address }: { address: string }) => {
         onClick={() => handleClick("buy")}
         disabled={loadingBuy}
       >
-        {loadingBuy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buy"}
+        {loadingBuy ? <Loader className="w-4 h-4 animate-spin" /> : "Buy"}
       </Button>
       <Button
         className={`min-w-10 `}
@@ -107,7 +111,7 @@ const Content = ({ address }: { address: string }) => {
         onClick={() => handleClick("sell")}
         disabled={loadingSell}
       >
-        {loadingSell ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sell"}
+        {loadingSell ? <Loader className="w-4 h-4 animate-spin" /> : "Sell"}
       </Button>
     </div>
   );

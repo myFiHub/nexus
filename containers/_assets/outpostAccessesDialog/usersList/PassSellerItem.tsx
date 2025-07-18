@@ -1,6 +1,7 @@
 import { Button } from "app/components/Button";
 import { Img } from "app/components/Img";
-import { Check, DoorOpen, Loader2, Mic } from "lucide-react";
+import { Loader } from "app/components/Loader";
+import { Check, DoorOpen, Mic } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { assetsActions, PassSeller } from "../../slice";
 
@@ -40,7 +41,7 @@ export const PassSellerItem = ({
     if (passSeller.buying) {
       return (
         <Button size="sm" variant="outline" disabled className="min-w-[80px]">
-          <Loader2 className="w-4 h-4 animate-spin" />
+          <Loader className="w-4 h-4 animate-spin" />
         </Button>
       );
     }

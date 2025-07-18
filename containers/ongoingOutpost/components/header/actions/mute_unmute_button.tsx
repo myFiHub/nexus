@@ -1,8 +1,9 @@
 "use client";
 import { Button } from "app/components/Button";
+import { Loader } from "app/components/Loader";
 import { onGoingOutpostSelectors } from "app/containers/ongoingOutpost/selectors";
 import { wsClient } from "app/services/wsClient/client";
-import { Loader2, Mic, MicOff } from "lucide-react";
+import { Mic, MicOff } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
@@ -43,7 +44,7 @@ export const MuteUnmuteButton = () => {
       }`}
     >
       {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
+        <Loader className="w-4 h-4 animate-spin" />
       ) : amIMuted ? (
         <MicOff className="w-4 h-4" />
       ) : (
