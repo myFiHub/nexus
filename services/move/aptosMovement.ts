@@ -115,6 +115,34 @@ class AptosMovement {
     }
   }
 
+  async getMyNfts() {
+    const address = this.address;
+    const query = `
+query GetNFTs($address: String!) {
+  current_token_ownerships(
+    where: {
+      owner_address: {_eq: $address}
+      amount: {_gt: "0"}
+    }
+  ) {
+    token_data_id {
+      name
+      creator_address
+      collection_name
+    }
+    amount
+    last_transaction_timestamp
+  }
+}
+  `;
+    const response = await axios.post(
+      APTOS_INDEXER_URL,
+      { query, variables: { address } },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    return response.data.data.current_non_fungible_asset_balances;
+  }
+
   async getUserTokenBalances(address: string): Promise<FungableTokenBalance[]> {
     const query = `
       query GetUserTokenBalances($address: String!) {

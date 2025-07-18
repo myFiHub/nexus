@@ -1,8 +1,6 @@
 import {
+  LeaderBoardPageSize,
   LeaderboardTags,
-  MOST_PASS_HELD_PAGE_SIZE,
-  MOST_UNIQUE_PASS_HOLDERS_PAGE_SIZE,
-  TOP_FEE_EARNED_PAGE_SIZE,
 } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import podiumApi from "app/services/api";
 import { put, select, takeEvery } from "redux-saga/effects";
@@ -24,23 +22,29 @@ function* getClientSideLeaderboard(
   let hasMoreData = true;
   switch (filter) {
     case LeaderboardTags.TopFeeEarned:
-      users = yield podiumApi.getMostFeeEarned(page, TOP_FEE_EARNED_PAGE_SIZE);
-      if (users.length < TOP_FEE_EARNED_PAGE_SIZE) {
+      users = yield podiumApi.getMostFeeEarned(
+        page,
+        LeaderBoardPageSize[filter]
+      );
+      if (users.length < LeaderBoardPageSize[filter]) {
         hasMoreData = false;
       }
       break;
     case LeaderboardTags.MostPassHeld:
-      users = yield podiumApi.getMostPassHeld(page, MOST_PASS_HELD_PAGE_SIZE);
-      if (users.length < MOST_PASS_HELD_PAGE_SIZE) {
+      users = yield podiumApi.getMostPassHeld(
+        page,
+        LeaderBoardPageSize[filter]
+      );
+      if (users.length < LeaderBoardPageSize[filter]) {
         hasMoreData = false;
       }
       break;
     case LeaderboardTags.MostUniquePassHolders:
       users = yield podiumApi.getMostUniquePassHolders(
         page,
-        MOST_UNIQUE_PASS_HOLDERS_PAGE_SIZE
+        LeaderBoardPageSize[filter]
       );
-      if (users.length < MOST_UNIQUE_PASS_HOLDERS_PAGE_SIZE) {
+      if (users.length < LeaderBoardPageSize[filter]) {
         hasMoreData = false;
       }
     default:

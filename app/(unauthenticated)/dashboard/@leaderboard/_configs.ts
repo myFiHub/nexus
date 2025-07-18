@@ -4,8 +4,8 @@ export enum LeaderboardTags {
   MostUniquePassHolders = "most-unique-pass-holders",
 }
 
-export const TOP_FEE_EARNED_PAGE_SIZE = 30;
-
-export const MOST_PASS_HELD_PAGE_SIZE = 30;
-
-export const MOST_UNIQUE_PASS_HOLDERS_PAGE_SIZE = 30;
+export const LeaderBoardPageSize = {
+  "top-fee-earned": 30,
+  "most-pass-held": 30,
+  "most-unique-pass-holders": 30,
+};
