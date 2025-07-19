@@ -4,7 +4,7 @@ import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
 import { Box } from "./box";
 
-export const Tut1 = () => {
+export const Tut3 = () => {
   const [showBox, setShowBox] = useState(true);
 
   const handleClick = () => {

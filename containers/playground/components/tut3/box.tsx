@@ -3,9 +3,37 @@ import { useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { GUI } from "lil-gui";
 import { useEffect, useRef } from "react";
-import { BoxGeometry, Clock, MathUtils, Mesh } from "three";
+import {
+  BoxGeometry,
+  Clock,
+  LoadingManager,
+  MathUtils,
+  Mesh,
+  TextureLoader,
+} from "three";
+
+import logo from "./logo.png";
+
+const loaderManager = new LoadingManager();
+loaderManager.onLoad = () => {
+  console.log("loaded");
+};
+loaderManager.onProgress = (item, loaded, total) => {
+  console.log("progress", item, loaded, total);
+};
+loaderManager.onError = (error) => {
+  console.log("error", error);
+};
+loaderManager.onStart = (e) => {
+  console.log("start", e);
+};
+
+const textureLoader = new TextureLoader(loaderManager);
+const logoTexture =
+  typeof window !== "undefined" ? textureLoader.load(logo.src) : null;
 
 export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
+  const geometry = BoxGeometry;
   const { size, scene, gl, camera } = useThree();
   const clock = useRef(new Clock());
   const timeBetweenFrames = useRef(0);
@@ -28,12 +56,11 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
     subdivision: 1,
   });
   const meshRef = useRef<Mesh>(null);
-
   useFrame(() => {
     if (meshRef.current) {
-      // Animate Y position with sine wave
+      // Animate Y position with sine wave - slower and smoother
       meshRef.current.position.y =
-        Math.sin(clock.current.getElapsedTime() * 2) * 2;
+        Math.sin(clock.current.getElapsedTime() * 0.5) * 0.3;
     }
   });
 
@@ -51,15 +78,16 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
     if (meshRef.current && guiRef.current) {
       const gui = guiRef.current;
       const mesh = meshRef.current;
-      const cubeTweaker = gui.addFolder("Cube Tweaker");
-      cubeTweaker.add(mesh.position, "y").min(-3).max(3).step(0.01).name("Y");
+
+      const tweaker = gui.addFolder("Tweaker");
+      tweaker.add(mesh.position, "y").min(-3).max(3).step(0.01).name("Y");
 
       // toggle wireframe for the mesh's material
       // @ts-ignore
-      cubeTweaker.add(mesh.material, "wireframe").name("Wireframe");
+      tweaker.add(mesh.material, "wireframe").name("Wireframe");
 
       // add color picker for the mesh's material
-      cubeTweaker
+      tweaker
         // @ts-ignore
         .addColor(debugObjectRef.current, "color")
         .onChange(() => {
@@ -68,7 +96,7 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
         })
         .name("Color");
 
-      cubeTweaker
+      tweaker
         .add(debugObjectRef.current, "subdivision")
         .name("Subdivision")
         .min(1)
@@ -76,7 +104,7 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
         .step(1)
         .onFinishChange(() => {
           mesh.geometry.dispose();
-          mesh.geometry = new BoxGeometry(
+          mesh.geometry = new geometry(
             1,
             1,
             1,
@@ -86,8 +114,8 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
           );
         });
 
-      cubeTweaker.add(debugObjectRef.current, "rotate").name("Rotate");
-      cubeTweaker.add(debugObjectRef.current, "reset").name("Reset");
+      tweaker.add(debugObjectRef.current, "rotate").name("Rotate");
+      tweaker.add(debugObjectRef.current, "reset").name("Reset");
     }
 
     // Cleanup function
@@ -105,8 +133,8 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
         ref={meshRef}
         rotation={[MathUtils.degToRad(45), MathUtils.degToRad(35), 0]}
       >
-        <boxGeometry />
-        <meshStandardMaterial color={debugObjectRef.current.color} />
+        <boxGeometry args={[1, 1, 1]} />
+        <meshStandardMaterial map={logoTexture} />
       </mesh>
     </>
   );
