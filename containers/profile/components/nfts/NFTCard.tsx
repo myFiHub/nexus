@@ -103,7 +103,9 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
           <Img
             src={nft.image_url}
             alt={nft.current_token_data.token_name}
+            useImgTag
             className={`w-full h-full object-cover transition-all duration-300 
+              
               ${
                 settingNftAsProfilePicture && !isSettingThisImage
                   ? "grayscale blur-sm"
