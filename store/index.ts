@@ -11,6 +11,8 @@ import { type AssetsState } from "app/containers/_assets/slice";
 import { UsersState } from "app/containers/_users/slice";
 import { AllOutpostsState } from "app/containers/allOutposts/slice";
 import { CreateOutpostState } from "app/containers/createOutpost/slice";
+import { LeaderboardState } from "app/containers/dashboard/leaderboard/slice";
+import { DashboardUsersState } from "app/containers/dashboard/users/slice";
 import { type GlobalState } from "app/containers/global/slice";
 import { MyOutpostsState } from "app/containers/myOutposts/slice";
 import { NotificationsState } from "app/containers/notifications/slice";
@@ -22,8 +24,6 @@ import { isDev } from "app/lib/utils";
 import createSagaMiddleware from "redux-saga";
 import { rootReducer } from "./rootReducer";
 import { rootSaga } from "./rootSaga";
-import { DashboardUsersState } from "app/containers/dashboard/users/slice";
-import { LeaderboardState } from "app/containers/dashboard/leaderboard/slice";
 
 // Create the saga middleware
 const sagaMiddleware = createSagaMiddleware();

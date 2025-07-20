@@ -57,7 +57,7 @@ export const Meet = memo(
     return (
       <div className="space-y-4 relative">
         <LeaveOutpostWarningDialogProvider />
-        {!joined && <JoiningStatus />}
+        {joined && <JoiningStatus />}
         <div
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >

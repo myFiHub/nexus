@@ -1,17 +1,25 @@
 "use client";
-import { useFrame, useThree } from "@react-three/fiber";
-import gsap from "gsap";
-import { GUI } from "lil-gui";
-import { useEffect, useRef } from "react";
+import { RootState, useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
 import {
-  BoxGeometry,
   Clock,
   LoadingManager,
   MathUtils,
   Mesh,
+  SRGBColorSpace,
   TextureLoader,
 } from "three";
 
+import doorAlpha from "./assets/door/alpha.jpg";
+import doorAmbientOcclusion from "./assets/door/ambientOcclusion.jpg";
+import doorColor from "./assets/door/color.jpg";
+import doorHeight from "./assets/door/height.jpg";
+import doorMetalness from "./assets/door/metalness.jpg";
+import doorNormal from "./assets/door/normal.jpg";
+import doorRoughness from "./assets/door/roughness.jpg";
+import gradient from "./assets/gradients/3.jpg";
+import matcap from "./assets/matcaps/8.png";
+import { Card } from "./cards/card";
 import logo from "./logo.png";
 
 const loaderManager = new LoadingManager();
@@ -29,32 +37,47 @@ loaderManager.onStart = (e) => {
 };
 
 const textureLoader = new TextureLoader(loaderManager);
+// textures used as map and matcap, should have specified color space, since they are sopposed to be encoded in sRGB
+// so we need to set the colorSpace to SRGBColorSpace
+const doorColorTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorColor.src) : null;
+if (doorColorTexture) {
+  doorColorTexture.colorSpace = SRGBColorSpace;
+}
+const matcapTexture =
+  typeof window !== "undefined" ? textureLoader.load(matcap.src) : null;
+if (matcapTexture) {
+  matcapTexture.colorSpace = SRGBColorSpace;
+}
+
+// door textures
+const doorlphaTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorAlpha.src) : null;
+const doorAmbientOcclusionTexture =
+  typeof window !== "undefined"
+    ? textureLoader.load(doorAmbientOcclusion.src)
+    : null;
+const doorHeightTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorHeight.src) : null;
+const doorNormalTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorNormal.src) : null;
+const doorMetalnessTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorMetalness.src) : null;
+const doorRoughnessTexture =
+  typeof window !== "undefined" ? textureLoader.load(doorRoughness.src) : null;
+// gradient texture
+const gradientTexture =
+  typeof window !== "undefined" ? textureLoader.load(gradient.src) : null;
+
 const logoTexture =
   typeof window !== "undefined" ? textureLoader.load(logo.src) : null;
 
-export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
-  const geometry = BoxGeometry;
-  const { size, scene, gl, camera } = useThree();
+export const Box = () => {
+  const { size, scene, gl, camera }: RootState = useThree();
   const clock = useRef(new Clock());
   const timeBetweenFrames = useRef(0);
   const fps = useRef(0);
-  const guiRef = useRef<GUI | null>(null);
-  const debugObjectRef = useRef({
-    color: "#bb00ff",
-    rotate: () => {
-      if (meshRef.current) {
-        gsap.to(meshRef.current.rotation, {
-          x: meshRef.current.rotation.x + MathUtils.degToRad(360),
-          duration: 1,
-          ease: "power2.inOut",
-        });
-      }
-    },
-    reset: () => {
-      onResetClick();
-    },
-    subdivision: 1,
-  });
+
   const meshRef = useRef<Mesh>(null);
   useFrame(() => {
     if (meshRef.current) {
@@ -64,69 +87,6 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
     }
   });
 
-  useEffect(() => {
-    console.log("rendering box");
-    // Create GUI only once
-    if (!guiRef.current) {
-      guiRef.current = new GUI({
-        width: 300,
-        title: "Box",
-        touchStyles: 1,
-      });
-    }
-
-    if (meshRef.current && guiRef.current) {
-      const gui = guiRef.current;
-      const mesh = meshRef.current;
-
-      const tweaker = gui.addFolder("Tweaker");
-      tweaker.add(mesh.position, "y").min(-3).max(3).step(0.01).name("Y");
-
-      // toggle wireframe for the mesh's material
-      // @ts-ignore
-      tweaker.add(mesh.material, "wireframe").name("Wireframe");
-
-      // add color picker for the mesh's material
-      tweaker
-        // @ts-ignore
-        .addColor(debugObjectRef.current, "color")
-        .onChange(() => {
-          // @ts-ignore
-          mesh.material.color.set(debugObjectRef.current.color);
-        })
-        .name("Color");
-
-      tweaker
-        .add(debugObjectRef.current, "subdivision")
-        .name("Subdivision")
-        .min(1)
-        .max(10)
-        .step(1)
-        .onFinishChange(() => {
-          mesh.geometry.dispose();
-          mesh.geometry = new geometry(
-            1,
-            1,
-            1,
-            debugObjectRef.current.subdivision,
-            debugObjectRef.current.subdivision,
-            debugObjectRef.current.subdivision
-          );
-        });
-
-      tweaker.add(debugObjectRef.current, "rotate").name("Rotate");
-      tweaker.add(debugObjectRef.current, "reset").name("Reset");
-    }
-
-    // Cleanup function
-    return () => {
-      if (guiRef.current) {
-        guiRef.current.destroy();
-        guiRef.current = null;
-      }
-    };
-  }, []);
-
   return (
     <>
       <mesh
@@ -135,6 +95,17 @@ export const Box = ({ onResetClick }: { onResetClick: () => void }) => {
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshStandardMaterial map={logoTexture} />
+      </mesh>
+      <mesh position={[2.5, 0, 0]}>
+        <torusGeometry args={[1, 0.4, 16, 64]} />
+        <meshStandardMaterial map={doorColorTexture} />
+      </mesh>
+      <mesh position={[-2, 0, 0]}>
+        <sphereGeometry args={[1, 32, 32]} />
+        <meshMatcapMaterial matcap={matcapTexture} />
+      </mesh>
+      <mesh position={[0, 3, 0]}>
+        <Card texture={matcapTexture!} />
       </mesh>
     </>
   );

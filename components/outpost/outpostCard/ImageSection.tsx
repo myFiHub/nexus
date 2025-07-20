@@ -1,5 +1,5 @@
 import { Img } from "app/components/Img";
-import { localLogoUrl } from "app/lib/constants";
+import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { DetailsButton } from "./detailsButton";
 import { LumaEventIndicator } from "./LumaEventIndicator";
@@ -15,7 +15,7 @@ export function ImageSection({ outpost }: ImageSectionProps) {
   return (
     <div className="relative w-full h-52 overflow-hidden rounded-t-xl">
       <Img
-        src={outpost.image || localLogoUrl}
+        src={outpost.image || logoUrl}
         alt={outpost.name}
         className="w-full h-full object-cover"
         sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"

@@ -40,7 +40,7 @@ const Container = () => {
 
   useEffect(() => {
     dispatch(globalActions.startTicker());
-    if (!initialized) {
+    if (!initialized && window.location.pathname !== "/playground") {
       dispatch(globalActions.initializeWeb3Auth());
     }
   }, []);

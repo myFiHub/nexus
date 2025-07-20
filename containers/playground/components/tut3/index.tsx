@@ -27,9 +27,10 @@ export const Tut3 = () => {
       >
         <directionalLight position={[5, 5, 5]} />
         <directionalLight position={[-5, -5, -5]} />
+        <ambientLight intensity={1} />
 
-        <gridHelper args={[10, 10]} />
-        {showBox ? <Box onResetClick={handleClick} /> : <></>}
+        <gridHelper args={[20, 20]} />
+        {showBox ? <Box /> : <></>}
         {/* <PodiumCoin /> */}
         <OrbitControls />
       </Canvas>
