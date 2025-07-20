@@ -148,9 +148,15 @@ const Content = ({
     <div ref={componentRef}>
       <AnimatePresence>
         <motion.div
-          initial={{ height: 0, opacity: 0 }}
+          initial={{
+            height: existsOnCache ? "auto" : 0,
+            opacity: existsOnCache ? 1 : 0,
+          }}
           animate={{ height: "auto", opacity: 1 }}
-          exit={{ height: 0, opacity: 0 }}
+          exit={{
+            height: existsOnCache ? "auto" : 0,
+            opacity: existsOnCache ? 1 : 0,
+          }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           style={{ overflow: "hidden" }}
         >
@@ -168,7 +174,10 @@ const Content = ({
           >
             {isLoading ? (
               <div className="h-5 flex items-center justify-center">
-                <Loader className="animate-spin" size={15} />
+                <Loader
+                  className="animate-spin"
+                  size={size == "xxs" ? 8 : 15}
+                />
               </div>
             ) : followed ? (
               "Unfollow"

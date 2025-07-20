@@ -53,6 +53,7 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
         <FollowButton
           id={user.uuid}
           size="xxs"
+          noScale
           followed={user.followed_by_me}
           address={user.address}
         />
