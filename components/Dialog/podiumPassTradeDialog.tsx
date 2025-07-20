@@ -46,7 +46,6 @@ import {
   ArrowRight,
   Crown,
   Shield,
-  Sparkles,
   TrendingDown,
   TrendingUp,
   XCircle,
@@ -387,23 +386,6 @@ const Content = () => {
               ease: "linear",
             }}
           />
-
-          {/* Floating sparkles */}
-          <motion.div
-            variants={sparkleVariants}
-            animate="animate"
-            className="absolute top-2 right-2 sm:top-4 sm:right-4 hidden sm:block"
-          >
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-          </motion.div>
-          <motion.div
-            variants={sparkleVariants}
-            animate="animate"
-            className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 hidden sm:block"
-            style={{ animationDelay: "1s" }}
-          >
-            <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-accent-foreground" />
-          </motion.div>
 
           <DialogHeader className="relative z-10 pb-3 sm:pb-4">
             <motion.div

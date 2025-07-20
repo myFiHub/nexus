@@ -4,8 +4,11 @@ import { RootState } from "app/store";
 export const myProfileDomains = {
   root: (state: RootState) => state,
   addressOfAccountThatIsBeingMadePrimary: (state: RootState) =>
-    state.profile.addressOfAccountThatIsBeingMadePrimary,
-  podiumUserInfo: (state: RootState) => state.global.podiumUserInfo,
+    state.profile?.addressOfAccountThatIsBeingMadePrimary,
+  podiumUserInfo: (state: RootState) => state.global?.podiumUserInfo,
+  nfts: (state: RootState) => state.profile?.nfts,
+  settingNftAsProfilePicture: (state: RootState) =>
+    state.profile?.settingNftAsProfilePicture,
 };
 
 export const myProfileSelectors = {
@@ -21,4 +24,6 @@ export const myProfileSelectors = {
           ?.is_primary ?? false
       );
     }),
+  nfts: myProfileDomains.nfts,
+  settingNftAsProfilePicture: myProfileDomains.settingNftAsProfilePicture,
 };

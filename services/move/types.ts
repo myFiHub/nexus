@@ -18,3 +18,15 @@ export interface OnChainPass {
   balance: number;
   currentPrice: number;
 }
+
+export interface NFTResponse {
+  amount: number;
+  image_url: string;
+  current_token_data: {
+    description: string;
+    token_data_id: string;
+    token_name: string;
+    token_uri: string;
+    last_transaction_timestamp: string;
+  };
+}

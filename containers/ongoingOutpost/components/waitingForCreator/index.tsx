@@ -1,7 +1,7 @@
 "use client";
 
 import { Img } from "app/components/Img";
-import { localLogoUrl } from "app/lib/constants";
+import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { motion } from "framer-motion";
 import {
@@ -106,7 +106,7 @@ export const WaitingForCreator = ({ outpost }: WaitingForCreatorProps) => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const creatorName = outpost?.creator_user_name || "Creator";
   const outpostName = outpost?.name || "Outpost";
-  const outpostImage = outpost?.image || localLogoUrl;
+  const outpostImage = outpost?.image || logoUrl;
 
   useEffect(() => {
     const timer = setInterval(() => {

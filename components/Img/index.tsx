@@ -16,6 +16,8 @@ interface ImgProps {
   sizes?: string;
   useImgTag?: boolean;
   id?: string;
+  priority?: boolean;
+  loading?: "lazy" | "eager";
 }
 
 export const Img = ({
@@ -30,6 +32,8 @@ export const Img = ({
   sizes,
   useImgTag = false,
   id,
+  priority = false,
+  loading = "lazy",
 }: ImgProps) => {
   const [imageState, setImageState] = useState<"loading" | "loaded" | "error">(
     "loading"
@@ -135,6 +139,7 @@ export const Img = ({
           onLoad={handleLoad}
           onError={handleError}
           id={id}
+          loading={loading}
           className={`${styles.image} ${
             imageState === "loading" ? styles.loading : ""
           }`}
@@ -187,6 +192,8 @@ export const Img = ({
         alt={alt}
         onLoad={handleLoad}
         onError={handleError}
+        priority={priority}
+        loading={loading}
         className={`${styles.image} ${
           imageState === "loading" ? styles.loading : ""
         }`}

@@ -11,6 +11,7 @@ import { ConnectedAccounts } from "./components/connectedAccounts";
 import LoadingSkeleton from "./components/LoadingSkeleton";
 import { LoginPrompt } from "./components/LoginPrompt";
 import { MyPasses } from "./components/myPasses";
+import { NFTSSection } from "./components/nfts";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountCardActionSelectDialogProvider } from "./components/SecuritySection/dialogs/accountCardActionSelectDialog";
@@ -28,9 +29,9 @@ const Content = () => {
 
   useEffect(() => {
     if (loggedIn) {
-      dispatch(profileActions.fetchProfile());
       dispatch(assetsActions.getBalance());
       dispatch(assetsActions.getPassesBoughtByMe({ page: 0 }));
+      dispatch(profileActions.fetchNfts({ silent: false }));
     }
   }, [loggedIn]);
 
@@ -53,6 +54,7 @@ const Content = () => {
           <ConnectedAccounts accounts={user.accounts} />
           <AdditionalInfo user={user} />
           <MyPasses />
+          <NFTSSection />
           <SettingsSection />
           <SecuritySection />
         </div>
