@@ -5,10 +5,8 @@ import { useEffect, useState } from "react";
 const loadingMessages = [
   "Establishing secure connection to the outpost...",
   "Loading real-time communication protocols...",
-  "Preparing your personalized experience...",
   "Synchronizing with other members...",
-  "Initializing voice and video channels...",
-  "Setting up your virtual environment...",
+  "Initializing voice channels...",
   "Configuring privacy and security settings...",
   "Loading community features and tools...",
   "Almost ready to join the conversation...",
