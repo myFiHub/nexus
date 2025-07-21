@@ -22,14 +22,15 @@ import { profileActions, useProfileSlice } from "./slice";
 const Content = () => {
   useProfileSlice();
   useAssetsSlice();
-  const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const user = useSelector(GlobalSelectors.podiumUserInfo);
   const loading = useSelector(GlobalSelectors.logingIn);
   const dispatch = useDispatch();
+  const loggedIn = !!user;
 
   useEffect(() => {
     if (loggedIn) {
       dispatch(assetsActions.getBalance());
+      dispatch(assetsActions.getMyBlockchainPasses());
       dispatch(assetsActions.getPassesBoughtByMe({ page: 0 }));
       dispatch(profileActions.fetchNfts({ silent: false }));
     }

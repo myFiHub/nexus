@@ -138,7 +138,7 @@ export const UserInfoDisplayExample = () => {
         <h3 className="font-semibold mb-2">Component Features:</h3>
         <ul className="text-sm text-gray-700 space-y-1">
           <li>• Beautiful gradient background with animated elements</li>
-          <li>• Smooth framer-motion animations for all elements</li>
+          <li>• Smooth motion animations for all elements</li>
           <li>
             • Action-specific color coding (green for buy, orange for sell)
           </li>

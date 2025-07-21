@@ -9,7 +9,6 @@ import { useUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
 import { RecordingIndicator } from "./components/header/RecordingIndicator";
-import LeavingAnimation from "./components/LeavingAnimation";
 import { LoginState } from "./components/LoginState";
 import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";

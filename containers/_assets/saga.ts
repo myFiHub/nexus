@@ -25,6 +25,7 @@ import {
 } from "./outpostAccessesDialog";
 import { AssetsSelectors } from "./selectore";
 import { assetsActions, PassSeller } from "./slice";
+import { BlockchainPassData } from "app/services/move/types";
 
 function* getBalance() {
   yield put(assetsActions.setBalance({ value: "100", loading: true }));
@@ -549,12 +550,42 @@ export function* detached_getAccesses({
   }
 }
 
+function* getMyBlockchainPasses() {
+  const correntList: BlockchainPassData[] = yield select(
+    AssetsSelectors.myBlockchainPassesPasses
+  );
+  const isEmpty = correntList.length === 0;
+
+  if (isEmpty) {
+    yield put(assetsActions.setMyBlockchainPassesLoading(true));
+  }
+  try {
+    const myBlockchainPasses: BlockchainPassData[] =
+      yield movementService.getPasses();
+    yield put(assetsActions.setMyBlockchainPasses(myBlockchainPasses));
+  } catch (error) {
+    yield put(
+      assetsActions.setMyBlockchainPassesError(
+        "Error, while getting the Passes List. Please try again."
+      )
+    );
+  } finally {
+    if (isEmpty) {
+      yield put(assetsActions.setMyBlockchainPassesLoading(false));
+    }
+  }
+}
+
 export function* assetsSaga() {
   yield takeLatest(assetsActions.getBalance.type, getBalance);
   yield takeLatest(assetsActions.getUserPassInfo.type, getUserPassInfo);
   yield takeLatest(assetsActions.buyPassFromUser.type, buyPassFromUser);
   yield takeLatest(assetsActions.getPassesBoughtByMe.type, getPassesBoughtByMe);
   yield takeLatest(assetsActions.sellPass.type, sellOneOfMyBoughtPasses);
+  yield takeLatest(
+    assetsActions.getMyBlockchainPasses.type,
+    getMyBlockchainPasses
+  );
   yield takeLatest(
     assetsActions.setPassesListBoughtByMePage.type,
     getPassesBoughtByMe

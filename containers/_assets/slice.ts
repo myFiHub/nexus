@@ -4,6 +4,7 @@ import {
   PodiumPassBuyerModel,
   User,
 } from "app/services/api/types";
+import { BlockchainPassData } from "app/services/move/types";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
 
@@ -33,6 +34,12 @@ export interface Pass {
   loading?: boolean;
 }
 export interface AssetsState {
+  myBlockchainPasses: {
+    loading: boolean;
+    passes: BlockchainPassData[];
+    error?: string;
+  };
+
   balance: Balance;
   passes: {
     [key: string]: Pass;
@@ -59,6 +66,11 @@ export interface AssetsState {
 }
 
 const initialState: AssetsState = {
+  myBlockchainPasses: {
+    loading: false,
+    passes: [],
+    error: undefined,
+  },
   passes: {},
   balance: {
     value: "",
@@ -87,6 +99,24 @@ const assetsSlice = createSlice({
     getBalance() {},
     setBalance(state, action: PayloadAction<Balance>) {
       state.balance = action.payload;
+    },
+    getMyBlockchainPasses(
+      _,
+      __: PayloadAction<{ silent: boolean } | undefined>
+    ) {},
+
+    setMyBlockchainPasses(state, action: PayloadAction<BlockchainPassData[]>) {
+      state.myBlockchainPasses = {
+        loading: false,
+        passes: action.payload,
+        error: undefined,
+      };
+    },
+    setMyBlockchainPassesLoading(state, action: PayloadAction<boolean>) {
+      state.myBlockchainPasses.loading = action.payload;
+    },
+    setMyBlockchainPassesError(state, action: PayloadAction<string>) {
+      state.myBlockchainPasses.error = action.payload;
     },
     getUserPassInfo(_, __: PayloadAction<{ address: string }>) {},
     getPassesBoughtByMe(_, __: PayloadAction<{ page: number }>) {},

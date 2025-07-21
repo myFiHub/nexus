@@ -2,7 +2,14 @@ import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
-import { FungableTokenBalance, NFTResponse } from "./types";
+import podiumApi from "../api";
+import { User } from "../api/types";
+import {
+  BlockchainPassData,
+  FungableTokenBalance,
+  NFTResponse,
+  ParsedPassData,
+} from "./types";
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -114,6 +121,66 @@ class AptosMovement {
       toast.error("Error fetching balance from indexer: " + e);
       return BigInt(0);
     }
+  }
+
+  async getPasses(address?: string): Promise<BlockchainPassData[]> {
+    const addressToUse = address || this.address;
+    const query = `
+      query GetPasses($address: String!) {
+       current_fungible_asset_balances(
+    where: {owner_address: {_eq: $address}, metadata: {project_uri: {_eq: "https://podium.fi/pass/"}}}
+  ) {
+    amount
+    metadata {
+      symbol
+    }
+  }
+      }
+    `;
+    const response = await axios.post(
+      APTOS_INDEXER_URL,
+      { query, variables: { address: addressToUse } },
+      { headers: { "Content-Type": "application/json" } }
+    );
+    const unParsed = response.data.data.current_fungible_asset_balances;
+    const parsed: ParsedPassData[] = unParsed
+      .map((item: any) => {
+        const amount = bigIntCoinToMoveOnAptos(BigInt(item.amount));
+        return {
+          amount,
+          symbol: item.metadata.symbol,
+          amountOwned: amount,
+        };
+      })
+      .filter((item: ParsedPassData) => item.amountOwned > 0);
+
+    const results = await Promise.allSettled(
+      parsed.map((item: any) => podiumApi.getUserByPassSymbol(item.symbol))
+    );
+
+    const resultsToReturn: BlockchainPassData[] = [];
+
+    results.forEach((result, index) => {
+      if (result.status === "fulfilled") {
+        const user: User = result.value!;
+        resultsToReturn.push({
+          userUuid: user.uuid,
+          userImage: user.image,
+          followedByMe: user.followed_by_me,
+          userName: user.name,
+          passSymbol: parsed[index].symbol,
+          amountOwned: parsed[index].amountOwned,
+          userAptosAddress: user.aptos_address,
+        });
+      } else {
+        resultsToReturn.push({
+          amountOwned: parsed[index].amountOwned,
+          passSymbol: parsed[index].symbol,
+        });
+      }
+    });
+
+    return resultsToReturn;
   }
 
   async getMyNfts() {

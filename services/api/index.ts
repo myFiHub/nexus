@@ -353,6 +353,20 @@ class PodiumApi {
     }
   }
 
+  async getUserByPassSymbol(passSymbol: string): Promise<User | undefined> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/users/detail/by-pass-symbol`,
+        { params: { pass_symbol: passSymbol } }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      console.error("Get user by Pass symbol error:", error);
+      return undefined;
+    }
+  }
+
   async getUsersByIds(ids: string[]): Promise<User[]> {
     try {
       const promises = ids.map((id) => this.getUserData(id));

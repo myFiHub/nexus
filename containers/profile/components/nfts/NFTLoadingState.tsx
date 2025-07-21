@@ -105,7 +105,7 @@ export const NFTLoadingState = () => {
             />
           </div>
         </div>
-        
+
         {/* Refresh button skeleton */}
         <div className="w-12 h-12 bg-muted/30 rounded-full relative overflow-hidden">
           <motion.div

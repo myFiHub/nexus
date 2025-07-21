@@ -30,3 +30,17 @@ export interface NFTResponse {
     last_transaction_timestamp: string;
   };
 }
+export interface ParsedPassData {
+  amount: number;
+  symbol: string;
+  amountOwned: number;
+}
+export interface BlockchainPassData {
+  amountOwned: number;
+  passSymbol: string;
+  userAptosAddress?: string;
+  userUuid?: string;
+  userImage?: string;
+  userName?: string;
+  followedByMe?: boolean;
+}

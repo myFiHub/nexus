@@ -63,6 +63,7 @@ export const UserCard = ({
         <UserLink
           id={user.aptos_address}
           underline={false}
+          ignore={!user.name}
           className="font-medium text-foreground hover:text-primary transition-colors line-clamp-1 flex gap-3"
         >
           <div className="relative w-10 h-10 rounded-full overflow-hidden flex-shrink-0">
@@ -75,7 +76,7 @@ export const UserCard = ({
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm   truncate font-mono">
-              {user.name || "Anonymous"}
+              {user.name || "External user"}
             </p>
             <p className="text-sm text-muted-foreground truncate font-mono">
               {user.aptos_address}
