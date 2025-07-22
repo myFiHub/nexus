@@ -50,7 +50,7 @@ export const checkPushNotificationPermission = async (): Promise<boolean> => {
   // Fallback: check notification permission directly
   if ("Notification" in window) {
     const permission = Notification.permission;
-    console.log("Notification permission:", permission);
+    console.log("Notification permission, fallback:", permission);
 
     if (permission === "denied") {
       console.warn("Push notification permission is denied");

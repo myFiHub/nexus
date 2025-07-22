@@ -61,8 +61,8 @@ export interface AssetsState {
       error?: string;
     };
   };
-  sellingPass: boolean;
-  buyingPass: boolean;
+  sellingPass?: string;
+  buyingPass?: string;
 }
 
 const initialState: AssetsState = {
@@ -88,8 +88,8 @@ const initialState: AssetsState = {
     page: 0,
   },
   outpostPassSellers: {},
-  sellingPass: false,
-  buyingPass: false,
+  sellingPass: undefined,
+  buyingPass: undefined,
 };
 
 const assetsSlice = createSlice({
@@ -142,11 +142,17 @@ const assetsSlice = createSlice({
       }>
     ) {},
     sellPass(_, __: PayloadAction<{ seller: User }>) {},
-    setSellingPass(state, action: PayloadAction<boolean>) {
-      state.sellingPass = action.payload;
+    setSellingPass(
+      state,
+      action: PayloadAction<{ sellerAptosAddress: string } | undefined>
+    ) {
+      state.sellingPass = action.payload?.sellerAptosAddress;
     },
-    setBuyingPass(state, action: PayloadAction<boolean>) {
-      state.buyingPass = action.payload;
+    setBuyingPass(
+      state,
+      action: PayloadAction<{ sellerAptosAddress: string } | undefined>
+    ) {
+      state.buyingPass = action.payload?.sellerAptosAddress;
     },
     setPassesListBoughtByMePage(state, action: PayloadAction<number>) {
       state.passesListBoughtByMe.page = action.payload;

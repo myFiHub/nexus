@@ -1,3 +1,4 @@
+"use client";
 import UserLink from "app/components/AppLink/userLink";
 import { Button } from "app/components/Button";
 import { CopyButton } from "app/components/copyButton";

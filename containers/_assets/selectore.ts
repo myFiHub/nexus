@@ -25,8 +25,8 @@ export const AssetsDomains = {
     state.assets?.passesListBoughtByMe || {},
   outpostPassSellers: (state: RootState) =>
     state.assets?.outpostPassSellers || {},
-  sellingPass: (state: RootState) => state.assets?.sellingPass || false,
-  buyingPass: (state: RootState) => state.assets?.buyingPass || false,
+  sellingPass: (state: RootState) => state.assets?.sellingPass,
+  buyingPass: (state: RootState) => state.assets?.buyingPass,
   myBlockchainPasses: (state: RootState) =>
     state.assets?.myBlockchainPasses || {},
 };
@@ -51,9 +51,8 @@ export const AssetsSelectors = {
   },
   balance: createSelector([AssetsDomains.balance], (balance) => {
     const tmp = { ...balance };
-    const balanceValueInMove = bigIntCoinToMoveOnAptos(balance.value);
-    const valueStr = balanceValueInMove.toString();
-    tmp.value = valueStr.includes(".") ? valueStr : `${valueStr}.0`;
+    const valueStr = balance.value.toString();
+    tmp.value = valueStr.includes(".") ? valueStr : `${valueStr ?? "0"}.0`;
     return tmp;
   }),
   passesListBoughtByMe: createSelector(

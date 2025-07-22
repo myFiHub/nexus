@@ -74,11 +74,11 @@ export const UserCard = ({
               className="w-full h-full object-cover"
             />
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm   truncate font-mono">
+          <div className="min-w-0 flex-1 flex flex-col gap-2">
+            <p className="text-[10px]   truncate font-mono">
               {user.name || "External user"}
             </p>
-            <p className="text-sm text-muted-foreground truncate font-mono">
+            <p className="text-[10px] text-muted-foreground truncate font-mono">
               {user.aptos_address}
             </p>
           </div>

@@ -18,8 +18,8 @@ const Content = ({ address }: { address: string }) => {
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const loggedIn = !!myUser;
-  const isBuyingPass = useSelector(AssetsSelectors.buyingPass);
-  const isSellingPass = useSelector(AssetsSelectors.sellingPass);
+  const isBuyingPass = useSelector(AssetsSelectors.buyingPass) === address;
+  const isSellingPass = useSelector(AssetsSelectors.sellingPass) === address;
   const [user, setUser] = useState<User | undefined>(undefined);
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
