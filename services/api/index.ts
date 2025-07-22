@@ -35,6 +35,7 @@ import {
   RecentlyJoinedUser,
   RejectInvitationRequest,
   SetOrRemoveReminderRequest,
+  Statistics,
   Tag,
   TagModel,
   TopOwner,
@@ -980,6 +981,16 @@ class PodiumApi {
     } catch (error) {
       if (isDev) console.log("error", error);
       return [];
+    }
+  }
+  async getStatistics(): Promise<{ result?: Statistics; error?: string }> {
+    try {
+      console.log("getStatistics");
+      const response = await this.axiosInstance.get(`/dashboard/summary`);
+      return { result: response.data.data };
+    } catch (error: any) {
+      if (isDev) console.log("error", error);
+      return { result: undefined, error: error.response?.data?.message };
     }
   }
 }

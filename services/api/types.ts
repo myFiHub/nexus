@@ -421,3 +421,9 @@ export interface Pnl {
   user_address: string;
   user_uuid: string;
 }
+
+export interface Statistics {
+  outposts_count: number;
+  total_trades_volume: number;
+  users_count: number;
+}
