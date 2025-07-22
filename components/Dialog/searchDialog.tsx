@@ -302,12 +302,12 @@ export const SearchDialogProvider = () => {
                             {user.name || "Anonymous User"}
                           </h4>
                           {user.aptos_address && (
-                            <p className="text-sm text-muted-foreground font-mono">
+                            <p className="text-[12px] text-muted-foreground font-mono">
                               {truncate(user.aptos_address)}
                             </p>
                           )}
                           {user.uuid && (
-                            <p className="text-sm text-muted-foreground font-mono">
+                            <p className="text-[12px] text-muted-foreground font-mono">
                               {truncate(user.uuid)}
                             </p>
                           )}

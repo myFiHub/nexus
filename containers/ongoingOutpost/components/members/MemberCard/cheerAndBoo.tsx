@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../../selectors";
 import { onGoingOutpostActions } from "../../../slice";
+import { assetsActions } from "app/containers/_assets/slice";
 
 export const CheerAndBoo = ({
   cheer,
@@ -54,6 +55,7 @@ export const CheerAndBoo = ({
       return;
     }
     setCheckingHealth(false);
+    dispatch(assetsActions.getBalance());
     dispatch(onGoingOutpostActions.cheerBoo({ user: member, cheer: false }));
   };
 

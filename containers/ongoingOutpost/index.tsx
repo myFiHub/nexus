@@ -9,16 +9,17 @@ import { useUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
 import { RecordingIndicator } from "./components/header/RecordingIndicator";
-import LeavingAnimation from "./components/LeavingAnimation";
 import { LoginState } from "./components/LoginState";
 import { Meet } from "./components/meet";
 import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
 import { WaitingForCreator } from "./components/waitingForCreator";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
+import { useAssetsSlice } from "../_assets/slice";
 
 const Content = () => {
   useUsersSlice();
+  useAssetsSlice();
   useOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const { id } = useParams();

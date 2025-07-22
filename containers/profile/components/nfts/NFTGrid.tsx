@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { NFTResponse } from "app/services/move/types";
+import { motion } from "framer-motion";
 import { NFTCard } from "./NFTCard";
 
 interface NFTGridProps {
@@ -28,7 +28,11 @@ export const NFTGrid = ({ nfts }: NFTGridProps) => {
       className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
       {nfts.map((nft, index) => (
-        <NFTCard key={`${nft.current_token_data.token_name}-${index}`} nft={nft} index={index} />
+        <NFTCard
+          key={`${nft.current_token_data.token_name}-${index}`}
+          nft={nft}
+          index={index}
+        />
       ))}
     </motion.div>
   );

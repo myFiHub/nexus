@@ -35,6 +35,7 @@ import {
   RecentlyJoinedUser,
   RejectInvitationRequest,
   SetOrRemoveReminderRequest,
+  Statistics,
   Tag,
   TagModel,
   TopOwner,
@@ -349,6 +350,20 @@ class PodiumApi {
     } catch (error) {
       if (isDev) console.log("error", error);
       console.error("Get user by Aptos address error:", error);
+      return undefined;
+    }
+  }
+
+  async getUserByPassSymbol(passSymbol: string): Promise<User | undefined> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/users/detail/by-pass-symbol`,
+        { params: { pass_symbol: passSymbol } }
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      console.error("Get user by Pass symbol error:", error);
       return undefined;
     }
   }
@@ -966,6 +981,16 @@ class PodiumApi {
     } catch (error) {
       if (isDev) console.log("error", error);
       return [];
+    }
+  }
+  async getStatistics(): Promise<{ result?: Statistics; error?: string }> {
+    try {
+      console.log("getStatistics");
+      const response = await this.axiosInstance.get(`/dashboard/summary`);
+      return { result: response.data.data };
+    } catch (error: any) {
+      if (isDev) console.log("error", error);
+      return { result: undefined, error: error.response?.data?.message };
     }
   }
 }

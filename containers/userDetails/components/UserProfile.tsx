@@ -41,6 +41,7 @@ export const UserProfile = ({ user }: UserProfileProps) => {
       </div>
       <PodiumPassButton user={user} />
       <FollowButton
+        className="min-w-24"
         id={user.uuid}
         noScale
         size="md"

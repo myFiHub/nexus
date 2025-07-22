@@ -40,9 +40,12 @@
  * };
  */
 
+import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { LiveMember } from "app/services/api/types";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import BalanceDisplay from "../BalanceDisplay";
 import { Button } from "../Button";
 import { Img } from "../Img";
 import { Input } from "../Input";
@@ -87,6 +90,8 @@ export const CheerBooAmountDialogProvider = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const balance = useSelector(AssetsSelectors.balance);
+  const balanceValue = balance?.value;
   const [dialogContent, setDialogContent] =
     useState<CheerBooAmountDialogProps | null>(null);
 
@@ -114,7 +119,19 @@ export const CheerBooAmountDialogProvider = () => {
 
   const validateInput = (value: string) => {
     const numValue = parseFloat(value);
-    return value.trim() !== "" && !isNaN(numValue) && numValue >= 0.1;
+    const balanceNum =
+      typeof balanceValue === "number"
+        ? balanceValue
+        : parseFloat(balanceValue || "0");
+
+    // Check if input is valid number and at least 0.1
+    const isValidAmount =
+      value.trim() !== "" && !isNaN(numValue) && numValue >= 0.1;
+
+    // Check if user has sufficient balance
+    const hasSufficientBalance = numValue <= balanceNum;
+
+    return isValidAmount && hasSufficientBalance;
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -324,6 +341,15 @@ export const CheerBooAmountDialogProvider = () => {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3, delay: 0.3 }}
           >
+            <div className="flex items-center gap-2 ">
+              <span className="text-sm font-medium text-muted-foreground pb-[10px]">
+                Your Balance:
+              </span>
+              <BalanceDisplay
+                className="text-[12px] font-medium text-muted-foreground"
+                loadingClassName="h-4 w-16 bg-muted animate-pulse rounded mx-auto"
+              />
+            </div>
             <motion.label
               className="block text-sm font-medium mb-2"
               initial={{ opacity: 0 }}
@@ -368,7 +394,23 @@ export const CheerBooAmountDialogProvider = () => {
                   animate={{ x: 0, opacity: 1 }}
                   transition={{ duration: 0.3 }}
                 >
-                  Please enter a valid amount of at least 0.1 MOVE
+                  {(() => {
+                    const numValue = parseFloat(inputValue);
+                    const balanceNum =
+                      typeof balanceValue === "number"
+                        ? balanceValue
+                        : parseFloat(balanceValue || "0");
+
+                    if (isNaN(numValue) || numValue < 0.1) {
+                      return "Please enter a valid amount of at least 0.1 MOVE";
+                    } else if (numValue > balanceNum) {
+                      return `Insufficient balance. You have ${balanceNum.toFixed(
+                        2
+                      )} MOVE available`;
+                    } else {
+                      return "Please enter a valid amount";
+                    }
+                  })()}
                 </motion.p>
               </motion.div>
             )}

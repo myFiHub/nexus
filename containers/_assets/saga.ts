@@ -12,6 +12,7 @@ import {
   User,
 } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
+import { BlockchainPassData } from "app/services/move/types";
 import { getStore } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { all, put, select, takeLatest } from "redux-saga/effects";
@@ -24,13 +25,24 @@ import {
   OutpostAccessesDialogResult,
 } from "./outpostAccessesDialog";
 import { AssetsSelectors } from "./selectore";
-import { assetsActions, PassSeller } from "./slice";
+import { assetsActions, Balance, PassSeller } from "./slice";
 
 function* getBalance() {
-  yield put(assetsActions.setBalance({ value: "100", loading: true }));
+  const correntBalance: Balance = yield select(AssetsSelectors.balance);
+  yield put(
+    assetsActions.setBalance({
+      value: correntBalance.value ?? "0",
+      loading:
+        correntBalance.value === "0" ||
+        correntBalance.value === "" ||
+        correntBalance.value === "0.0" ||
+        correntBalance.value === ".0",
+    })
+  );
   try {
     const balance: bigint = yield movementService.balance();
-    const balanceString = balance.toString();
+    const parsedValue = bigIntCoinToMoveOnAptos(balance);
+    const balanceString = parsedValue.toString();
     yield put(
       assetsActions.setBalance({
         value: balanceString,
@@ -105,12 +117,14 @@ function* getUserPassInfo(
 function* buyPassFromUser(
   action: ReturnType<typeof assetsActions.buyPassFromUser>
 ): Generator<any, void, any> {
-  yield put(assetsActions.setBuyingPass(true));
   const {
     user,
     numberOfPasses: numberOfTickets,
     buyingToHaveAccessToOutpostWithId,
   } = action.payload;
+  yield put(
+    assetsActions.setBuyingPass({ sellerAptosAddress: user.aptos_address! })
+  );
   const correntPassInfo = yield select(
     AssetsSelectors.userPasses(user.aptos_address!)
   );
@@ -247,7 +261,8 @@ function* buyPassFromUser(
     errorToaset();
   } finally {
     yield put(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
-    yield put(assetsActions.setBuyingPass(false));
+    yield put(assetsActions.setBuyingPass(undefined));
+    yield put(assetsActions.getBalance());
   }
 }
 
@@ -289,8 +304,10 @@ function* getPassesBoughtByMe(
 function* sellOneOfMyBoughtPasses(
   action: ReturnType<typeof assetsActions.sellPass>
 ): Generator<any, void, any> {
-  yield put(assetsActions.setSellingPass(true));
   const { seller } = action.payload;
+  yield put(
+    assetsActions.setSellingPass({ sellerAptosAddress: seller.aptos_address! })
+  );
   try {
     const myUser: User | undefined = yield select(
       GlobalSelectors.podiumUserInfo
@@ -336,7 +353,8 @@ function* sellOneOfMyBoughtPasses(
     yield put(
       assetsActions.getUserPassInfo({ address: seller.aptos_address! })
     );
-    yield put(assetsActions.setSellingPass(false));
+    yield put(assetsActions.setSellingPass());
+    yield put(assetsActions.getBalance());
   }
 }
 
@@ -549,12 +567,42 @@ export function* detached_getAccesses({
   }
 }
 
+function* getMyBlockchainPasses() {
+  const correntList: BlockchainPassData[] = yield select(
+    AssetsSelectors.myBlockchainPassesPasses
+  );
+  const isEmpty = correntList.length === 0;
+
+  if (isEmpty) {
+    yield put(assetsActions.setMyBlockchainPassesLoading(true));
+  }
+  try {
+    const myBlockchainPasses: BlockchainPassData[] =
+      yield movementService.getPasses();
+    yield put(assetsActions.setMyBlockchainPasses(myBlockchainPasses));
+  } catch (error) {
+    yield put(
+      assetsActions.setMyBlockchainPassesError(
+        "Error, while getting the Passes List. Please try again."
+      )
+    );
+  } finally {
+    if (isEmpty) {
+      yield put(assetsActions.setMyBlockchainPassesLoading(false));
+    }
+  }
+}
+
 export function* assetsSaga() {
   yield takeLatest(assetsActions.getBalance.type, getBalance);
   yield takeLatest(assetsActions.getUserPassInfo.type, getUserPassInfo);
   yield takeLatest(assetsActions.buyPassFromUser.type, buyPassFromUser);
   yield takeLatest(assetsActions.getPassesBoughtByMe.type, getPassesBoughtByMe);
   yield takeLatest(assetsActions.sellPass.type, sellOneOfMyBoughtPasses);
+  yield takeLatest(
+    assetsActions.getMyBlockchainPasses.type,
+    getMyBlockchainPasses
+  );
   yield takeLatest(
     assetsActions.setPassesListBoughtByMePage.type,
     getPassesBoughtByMe

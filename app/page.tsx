@@ -22,8 +22,40 @@ const getCachedTrendingOutposts = unstable_cache(
   }
 );
 
-export default async function Home() {
-  const outposts = await getCachedTrendingOutposts();
+const getCachedStatistics = unstable_cache(
+  async () => {
+    const results = await podiumApi.getStatistics();
+    console.log("results", results);
+    return results.result;
+  },
+  ["statistics"],
+  {
+    revalidate: 60 * 60 * 24, //each day
+    tags: ["statistics"],
+  }
+);
 
-  return <HomeContainer trendingOutposts={outposts} />;
+const getCachedRecentUsers = unstable_cache(
+  async () => {
+    const results = await podiumApi.getRecentlyJoinedUsers(0, 5);
+    return results;
+  },
+  ["recent-users"],
+  { revalidate: 60, tags: ["recent-users"] }
+);
+
+export default async function Home() {
+  const [outposts, statistics, recentUsers] = await Promise.all([
+    getCachedTrendingOutposts(),
+    getCachedStatistics(),
+    getCachedRecentUsers(),
+  ]);
+
+  return (
+    <HomeContainer
+      trendingOutposts={outposts}
+      statistics={statistics}
+      recentUsers={recentUsers}
+    />
+  );
 }

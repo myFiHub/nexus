@@ -65,20 +65,22 @@ export const NFTEmptyState = () => {
       </div>
 
       {/* Main content */}
-      <motion.div
-        variants={itemVariants}
-        className="relative z-10 mb-6"
-      >
+      <motion.div variants={itemVariants} className="relative z-10 mb-6">
         <div className="relative">
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ delay: 0.3, duration: 0.5, type: "spring", bounce: 0.4 }}
+            transition={{
+              delay: 0.3,
+              duration: 0.5,
+              type: "spring",
+              bounce: 0.4,
+            }}
             className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center"
           >
             <ImageIcon className="w-10 h-10 text-purple-400" />
           </motion.div>
-          
+
           {/* Glow effect */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -100,14 +102,12 @@ export const NFTEmptyState = () => {
         variants={itemVariants}
         className="text-muted-foreground max-w-md leading-relaxed"
       >
-        You do not have any NFTs in your wallet yet. Start collecting unique digital assets to see them here!
+        You do not have any NFTs in your wallet yet. Start collecting unique
+        digital assets to see them here!
       </motion.p>
 
       {/* Decorative elements */}
-      <motion.div
-        variants={itemVariants}
-        className="mt-8 flex space-x-2"
-      >
+      <motion.div variants={itemVariants} className="mt-8 flex space-x-2">
         {[...Array(3)].map((_, i) => (
           <motion.div
             key={i}

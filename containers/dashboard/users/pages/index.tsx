@@ -1,4 +1,6 @@
+import { getFilterTitle } from "app/app/(unauthenticated)/users/[filter]/_utils";
 import { UserTags } from "../../../../app/(unauthenticated)/users/[filter]/_filters";
+import Description from "../components/Description";
 import { UserCard } from "../components/userCard";
 import ClientSideList from "./clientSideList";
 import { InjectUsersPage } from "./injector";
@@ -16,28 +18,6 @@ interface UsersPageProps {
   users: User[];
   filter: UserTags;
 }
-
-export const getFilterTitle = (filter: UserTags) => {
-  switch (filter) {
-    case UserTags.RecentlyJoined:
-      return "Recently Joined Users";
-    case UserTags.TopOwners:
-      return "Top Pass Owners";
-    default:
-      return "Users";
-  }
-};
-
-export const getFilterDescription = (filter: UserTags) => {
-  switch (filter) {
-    case UserTags.RecentlyJoined:
-      return "Discover the latest members who have joined our community";
-    case UserTags.TopOwners:
-      return "Meet the top pass owners with the most valuable holdings";
-    default:
-      return "Explore our community members";
-  }
-};
 
 export const getDisplayConfig = (user: User, filter: UserTags) => {
   switch (filter) {
@@ -75,7 +55,7 @@ export function UsersPage({ users, filter }: UsersPageProps) {
                 {getFilterTitle(filter)}
               </h1>
               <p className="mt-6 text-lg leading-8 text-muted-foreground max-w-2xl mx-auto">
-                {getFilterDescription(filter)}
+                <Description filter={filter} />
               </p>
             </div>
           </div>

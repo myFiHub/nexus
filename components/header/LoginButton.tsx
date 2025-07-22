@@ -186,7 +186,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
               repeat: Infinity,
               ease: "linear",
             }}
-            className="absolute inset-0 rounded-lg -z-10"
+            className="absolute inset-0 rounded-xl -z-10"
           />
 
           {/* Static button - no rotation! */}

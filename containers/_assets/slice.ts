@@ -4,6 +4,7 @@ import {
   PodiumPassBuyerModel,
   User,
 } from "app/services/api/types";
+import { BlockchainPassData } from "app/services/move/types";
 import { injectContainer } from "app/store";
 import { assetsSaga } from "./saga";
 
@@ -33,6 +34,12 @@ export interface Pass {
   loading?: boolean;
 }
 export interface AssetsState {
+  myBlockchainPasses: {
+    loading: boolean;
+    passes: BlockchainPassData[];
+    error?: string;
+  };
+
   balance: Balance;
   passes: {
     [key: string]: Pass;
@@ -54,11 +61,16 @@ export interface AssetsState {
       error?: string;
     };
   };
-  sellingPass: boolean;
-  buyingPass: boolean;
+  sellingPass?: string;
+  buyingPass?: string;
 }
 
 const initialState: AssetsState = {
+  myBlockchainPasses: {
+    loading: false,
+    passes: [],
+    error: undefined,
+  },
   passes: {},
   balance: {
     value: "",
@@ -76,8 +88,8 @@ const initialState: AssetsState = {
     page: 0,
   },
   outpostPassSellers: {},
-  sellingPass: false,
-  buyingPass: false,
+  sellingPass: undefined,
+  buyingPass: undefined,
 };
 
 const assetsSlice = createSlice({
@@ -87,6 +99,24 @@ const assetsSlice = createSlice({
     getBalance() {},
     setBalance(state, action: PayloadAction<Balance>) {
       state.balance = action.payload;
+    },
+    getMyBlockchainPasses(
+      _,
+      __: PayloadAction<{ silent: boolean } | undefined>
+    ) {},
+
+    setMyBlockchainPasses(state, action: PayloadAction<BlockchainPassData[]>) {
+      state.myBlockchainPasses = {
+        loading: false,
+        passes: action.payload,
+        error: undefined,
+      };
+    },
+    setMyBlockchainPassesLoading(state, action: PayloadAction<boolean>) {
+      state.myBlockchainPasses.loading = action.payload;
+    },
+    setMyBlockchainPassesError(state, action: PayloadAction<string>) {
+      state.myBlockchainPasses.error = action.payload;
     },
     getUserPassInfo(_, __: PayloadAction<{ address: string }>) {},
     getPassesBoughtByMe(_, __: PayloadAction<{ page: number }>) {},
@@ -112,11 +142,17 @@ const assetsSlice = createSlice({
       }>
     ) {},
     sellPass(_, __: PayloadAction<{ seller: User }>) {},
-    setSellingPass(state, action: PayloadAction<boolean>) {
-      state.sellingPass = action.payload;
+    setSellingPass(
+      state,
+      action: PayloadAction<{ sellerAptosAddress: string } | undefined>
+    ) {
+      state.sellingPass = action.payload?.sellerAptosAddress;
     },
-    setBuyingPass(state, action: PayloadAction<boolean>) {
-      state.buyingPass = action.payload;
+    setBuyingPass(
+      state,
+      action: PayloadAction<{ sellerAptosAddress: string } | undefined>
+    ) {
+      state.buyingPass = action.payload?.sellerAptosAddress;
     },
     setPassesListBoughtByMePage(state, action: PayloadAction<number>) {
       state.passesListBoughtByMe.page = action.payload;

@@ -41,6 +41,14 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
           <CopyButton text={user.email} className="mt-1" />
         </div>
       )}
+      {user?.aptos_address && (
+        <div className="flex gap-2 items-center content-center">
+          <p className="text-muted-foreground mt-1 truncate">
+            {truncate(user.aptos_address, 30)}
+          </p>
+          <CopyButton text={user.aptos_address} className="mt-1" />
+        </div>
+      )}
       <div className="flex space-x-4 mt-2">
         <div className="text-sm text-muted-foreground">
           <span className="font-semibold">{user?.followers_count || 0}</span>{" "}

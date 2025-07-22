@@ -50,8 +50,13 @@ import {
   takeLatest,
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
+import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
-import { notificationsActions } from "../notifications/slice";
+import {
+  notificationsActions,
+  useNotificationsSlice,
+} from "../notifications/slice";
+import { profileActions, useProfileSlice } from "../profile/slice";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
@@ -483,18 +488,22 @@ function* detached_afterGettingPodiumUser({
   user: User;
   token: string;
 }) {
-  yield put(notificationsActions.getNotifications());
+  useMyOutpostsSlice();
+  useProfileSlice();
+  useAssetsSlice();
+  useNotificationsSlice();
   yield put(globalActions.initOneSignal({ myId: user.uuid }));
   yield all([
+    put(notificationsActions.getNotifications()),
+    put(assetsActions.getMyBlockchainPasses()),
+    put(assetsActions.getBalance()),
+    put(myOutpostsActions.getOutposts()),
+    put(profileActions.fetchNfts({ silent: true })),
+    put(assetsActions.getPassesBoughtByMe({ page: 0 })),
     setServerCookieViaAPI(CookieKeys.myUserId, user.uuid),
     setServerCookieViaAPI(CookieKeys.myMoveAddress, user.aptos_address!),
+    wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!),
   ]);
-
-  if (token) {
-    yield wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!);
-  }
-  useMyOutpostsSlice();
-  yield put(myOutpostsActions.getOutposts());
 }
 
 function* logout() {

@@ -90,11 +90,11 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
       {/* Glow effect */}
       <motion.div
         variants={glowVariants}
-        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 blur-xl group-hover:blur-2xl transition-all duration-500"
+        className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-blue-500/20 blur-xl group-hover:blur-2xl group-hover:transition-all group-hover:duration-500"
       />
 
       {/* Card content */}
-      <motion.div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300">
+      <motion.div className="relative bg-card/80 backdrop-blur-sm border border-border/50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl hover:transition-all hover:duration-300">
         {/* Image container */}
         <motion.div
           variants={imageVariants}
@@ -104,7 +104,7 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
             src={nft.image_url}
             alt={nft.current_token_data.token_name}
             useImgTag
-            className={`w-full h-full object-cover transition-all duration-300 
+            className={`w-full h-full object-cover hover:transition-all hover:duration-300 
               
               ${
                 settingNftAsProfilePicture && !isSettingThisImage
@@ -118,7 +118,7 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
           />
 
           {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 group-hover:transition-opacity group-hover:duration-300" />
 
           {/* Loading overlay */}
           {isLoading && (
@@ -177,7 +177,7 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.3 }}
-            className="font-semibold text-foreground line-clamp-1 group-hover:text-purple-400 transition-colors duration-300"
+            className="font-semibold text-foreground line-clamp-1 group-hover:text-purple-400 group-hover:transition-colors group-hover:duration-300"
           >
             {nft.current_token_data.token_name}
           </motion.h4>
@@ -187,7 +187,7 @@ export const NFTCard = ({ nft, index }: NFTCardProps) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6, duration: 0.3 }}
-              className="text-sm text-muted-foreground line-clamp-2 group-hover:text-muted-foreground/80 transition-colors duration-300"
+              className="text-sm text-muted-foreground line-clamp-2 group-hover:text-muted-foreground/80 group-hover:transition-colors group-hover:duration-300"
             >
               {nft.current_token_data.description}
             </motion.p>

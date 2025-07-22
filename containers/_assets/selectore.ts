@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
+import { BlockchainPassData } from "app/services/move/types";
 import { RootState } from "app/store";
 import { OutpostAccesses } from "../global/effects/types";
 
@@ -24,8 +25,10 @@ export const AssetsDomains = {
     state.assets?.passesListBoughtByMe || {},
   outpostPassSellers: (state: RootState) =>
     state.assets?.outpostPassSellers || {},
-  sellingPass: (state: RootState) => state.assets?.sellingPass || false,
-  buyingPass: (state: RootState) => state.assets?.buyingPass || false,
+  sellingPass: (state: RootState) => state.assets?.sellingPass,
+  buyingPass: (state: RootState) => state.assets?.buyingPass,
+  myBlockchainPasses: (state: RootState) =>
+    state.assets?.myBlockchainPasses || {},
 };
 
 export const AssetsSelectors = {
@@ -48,9 +51,8 @@ export const AssetsSelectors = {
   },
   balance: createSelector([AssetsDomains.balance], (balance) => {
     const tmp = { ...balance };
-    const balanceValueInMove = bigIntCoinToMoveOnAptos(balance.value);
-    const valueStr = balanceValueInMove.toString();
-    tmp.value = valueStr.includes(".") ? valueStr : `${valueStr}.0`;
+    const valueStr = balance.value.toString();
+    tmp.value = valueStr.includes(".") ? valueStr : `${valueStr ?? "0"}.0`;
     return tmp;
   }),
   passesListBoughtByMe: createSelector(
@@ -112,4 +114,40 @@ export const AssetsSelectors = {
   },
   sellingPass: AssetsDomains.sellingPass,
   buyingPass: AssetsDomains.buyingPass,
+  myBlockchainPasses: AssetsDomains.myBlockchainPasses,
+  myBlockchainPassesLoading: (state: RootState) =>
+    state.assets?.myBlockchainPasses?.loading || false,
+  myBlockchainPassesError: (state: RootState) =>
+    state.assets?.myBlockchainPasses?.error || undefined,
+  myBlockchainPassesPasses: createSelector(
+    [AssetsDomains.myBlockchainPasses, AssetsDomains.passesListBoughtByMe],
+    (myBlockchainPasses, passesListBoughtByMe) => {
+      const blockchainPasses = myBlockchainPasses.passes;
+      const passesBoughtByMe = passesListBoughtByMe.passes;
+      const uniqueList: BlockchainPassData[] = [];
+
+      blockchainPasses.forEach((pass) => {
+        uniqueList.push(pass);
+      });
+      passesBoughtByMe.forEach((pass) => {
+        const last6Charachters = pass.podium_pass_owner_address
+          .slice(-6)
+          .toUpperCase();
+        const symbol = `P${last6Charachters}`;
+        const index = uniqueList.findIndex((p) => p.passSymbol === symbol);
+        if (index === -1) {
+          uniqueList.push({
+            amountOwned: pass.count,
+            passSymbol: symbol,
+            userAptosAddress: pass.podium_pass_owner_address,
+            userUuid: pass.podium_pass_owner_address,
+            userImage: pass.image,
+            userName: pass.name,
+            followedByMe: pass.followed_by_me,
+          });
+        }
+      });
+      return uniqueList;
+    }
+  ),
 };

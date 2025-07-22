@@ -1,13 +1,10 @@
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
-import {
-  getFilterDescription,
-  getFilterTitle,
-  UsersPage,
-} from "../../../../containers/dashboard/users/pages";
+import { UsersPage } from "../../../../containers/dashboard/users/pages";
 import { UserTags } from "./_filters";
 import UsersStructuredData from "./_usersStructuredData";
+import { getFilterDescription, getFilterTitle } from "./_utils";
 
 interface Props {
   params: Promise<{ filter: UserTags }>;
