@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { myProfileSelectors } from "../../selectors";
 import { profileActions } from "../../slice";
+import { ProfileSectionTitle } from "../ProfileSectionTitle";
 import { NFTEmptyState } from "./NFTEmptyState";
 import { NFTGrid } from "./NFTGrid";
 import { NFTLoadingState } from "./NFTLoadingState";
@@ -72,14 +73,7 @@ export const NFTSSection = () => {
         className="flex items-center justify-between"
       >
         <div className="space-y-1">
-          <motion.h3
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-            className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-          >
-            My NFTs
-          </motion.h3>
+          <ProfileSectionTitle>My NFTs</ProfileSectionTitle>
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}

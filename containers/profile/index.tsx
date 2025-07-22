@@ -1,6 +1,7 @@
 "use client";
 
 import { ConfirmAddOrSwitchAccountDialogProvider } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
+import { cn } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -18,6 +19,24 @@ import { AccountCardActionSelectDialogProvider } from "./components/SecuritySect
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
+
+// Reusable styled card for profile sections
+const SectionCard = ({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) => (
+  <div
+    className={cn(
+      "bg-gradient-to-br from-white/80 to-gray-100/60 dark:from-gray-900/80 dark:to-gray-800/60 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg p-6 mb-8",
+      className
+    )}
+  >
+    {children}
+  </div>
+);
 
 const Content = () => {
   useProfileSlice();
@@ -51,13 +70,27 @@ const Content = () => {
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-card rounded-lg shadow-md p-6">
           <ProfileHeader user={user} />
-          <UserStats user={user} />
-          <ConnectedAccounts accounts={user.accounts} />
-          <AdditionalInfo user={user} />
-          <MyPasses />
-          <NFTSSection />
-          <SettingsSection />
-          <SecuritySection />
+          <SectionCard>
+            <UserStats user={user} />
+          </SectionCard>
+          <SectionCard>
+            <ConnectedAccounts accounts={user.accounts} />
+          </SectionCard>
+          <SectionCard>
+            <AdditionalInfo user={user} />
+          </SectionCard>
+          <SectionCard>
+            <MyPasses />
+          </SectionCard>
+          <SectionCard>
+            <NFTSSection />
+          </SectionCard>
+          <SectionCard>
+            <SettingsSection />
+          </SectionCard>
+          <SectionCard>
+            <SecuritySection />
+          </SectionCard>
         </div>
       </div>
     </>

@@ -2,6 +2,7 @@
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { User } from "app/services/api/types";
 import { useSelector } from "react-redux";
+import BalanceDisplay from "../../../components/BalanceDisplay";
 import { StatCard } from "./StatCard";
 
 interface UserStatsProps {
@@ -17,13 +18,7 @@ export const UserStats = ({ user }: UserStatsProps) => {
       <div className="mb-8">
         <div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-lg shadow-lg">
           <div className="text-sm text-foreground/80">Available Balance</div>
-          {isLoading ? (
-            <div className="h-8 w-32 bg-primary-foreground/20 animate-pulse rounded mt-1" />
-          ) : (
-            <div className="text-3xl font-bold text-foreground mt-1 h-8">
-              {balance?.value || "0"} MOVE
-            </div>
-          )}
+          <BalanceDisplay />
         </div>
       </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

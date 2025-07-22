@@ -11,11 +11,12 @@ import { BlockchainPassData } from "app/services/move/types";
 import { ExternalLink, Heart } from "lucide-react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../../_assets/selectore";
+import { ProfileSectionTitle } from "../ProfileSectionTitle";
 import { EmptyState } from "./EmptyState";
 
 const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
-  <div className="mt-8">
-    <h2 className="text-xl font-semibold mb-4">My Passes</h2>
+  <div>
+    <ProfileSectionTitle>My Passes</ProfileSectionTitle>
     {children}
   </div>
 );

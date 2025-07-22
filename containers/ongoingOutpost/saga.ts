@@ -28,6 +28,7 @@ import {
   select,
   takeLatest,
 } from "redux-saga/effects";
+import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -305,6 +306,8 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
     }
   } catch (error) {
   } finally {
+    useAssetsSlice();
+    yield put(assetsActions.getBalance());
     if (cheer) {
       yield put(
         onGoingOutpostActions.setIsCheeringAddress({ address: undefined })

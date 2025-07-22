@@ -15,9 +15,11 @@ import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
 import { WaitingForCreator } from "./components/waitingForCreator";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
+import { useAssetsSlice } from "../_assets/slice";
 
 const Content = () => {
   useUsersSlice();
+  useAssetsSlice();
   useOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const { id } = useParams();

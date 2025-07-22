@@ -262,6 +262,7 @@ function* buyPassFromUser(
   } finally {
     yield put(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
     yield put(assetsActions.setBuyingPass(undefined));
+    yield put(assetsActions.getBalance());
   }
 }
 
@@ -353,6 +354,7 @@ function* sellOneOfMyBoughtPasses(
       assetsActions.getUserPassInfo({ address: seller.aptos_address! })
     );
     yield put(assetsActions.setSellingPass());
+    yield put(assetsActions.getBalance());
   }
 }
 
