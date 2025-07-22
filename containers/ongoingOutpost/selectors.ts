@@ -26,6 +26,8 @@ export const onGoingOutpostDomains = {
   leaving: (state: RootState) => state.onGoingOutpost?.leaving,
   isRefreshingLiveMembers: (state: RootState) =>
     state.onGoingOutpost?.isRefreshingLiveMembers,
+  talkingUsersAddress: (state: RootState) =>
+    state.onGoingOutpost?.talkingUsersAddress,
 };
 
 export const onGoingOutpostSelectors = {
@@ -67,8 +69,8 @@ export const onGoingOutpostSelectors = {
     }),
   isTalking: (id: string) =>
     createSelector(
-      [onGoingOutpostDomains.members],
-      (liveMembers) => liveMembers[id]?.is_speaking ?? false
+      [onGoingOutpostDomains.talkingUsersAddress],
+      (talkingUsersAddress) => talkingUsersAddress.includes(id)
     ),
   remainingTime: (id?: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {

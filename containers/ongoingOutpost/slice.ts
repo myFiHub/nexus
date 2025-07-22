@@ -19,6 +19,7 @@ export interface OnGoingOutpostState {
   leaving: boolean;
   meetApiObj?: any;
   hasAudioPermission: boolean;
+  talkingUsersAddress: string[];
   raisedHandUsers: {
     [address: string]: LiveMember;
   };
@@ -40,6 +41,7 @@ export const initialState: OnGoingOutpostState = {
   joined: false,
   raisedHandUsers: {},
   leaving: false,
+  talkingUsersAddress: [],
 };
 
 const onGoingOutpostSlice = createSlice({
@@ -133,6 +135,13 @@ const onGoingOutpostSlice = createSlice({
         is_speaking: action.payload.isTalking,
         last_speaked_at_timestamp: now,
       };
+      if (action.payload.isTalking) {
+        state.talkingUsersAddress.push(action.payload.userAddress);
+      } else {
+        state.talkingUsersAddress = state.talkingUsersAddress.filter(
+          (address) => address !== action.payload.userAddress
+        );
+      }
       state.liveMembers = members;
     },
 
