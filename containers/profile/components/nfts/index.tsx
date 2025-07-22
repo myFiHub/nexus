@@ -94,11 +94,11 @@ export const NFTSSection = () => {
         <button
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className={`relative p-3 cursor-pointer rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 transition-all duration-300 group ${
+          className={`relative p-3 cursor-pointer rounded-full bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/20 hover:border-purple-500/40 hover:transition-all hover:duration-300 group ${
             isRefreshing ? "animate-spin" : ""
           }`}
         >
-          <RefreshCw className="w-5 h-5 text-purple-600 group-hover:text-purple-500 transition-colors" />
+          <RefreshCw className="w-5 h-5 text-purple-600 group-hover:text-purple-500 group-hover:transition-colors" />
 
           {/* Glow effect */}
           <motion.div
@@ -146,22 +146,22 @@ export const NFTSSection = () => {
               >
                 <button
                   onClick={handleToggleShowMore}
-                  className="group relative px-6 py-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 hover:border-purple-500/50 rounded-full transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/20"
+                  className="group relative px-6 py-3 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 hover:border-purple-500/50 rounded-full hover:transition-all hover:duration-300 hover:shadow-lg hover:shadow-purple-500/20"
                 >
                   <div className="flex items-center space-x-2">
                     {showAllNfts ? (
                       <>
-                        <span className="text-purple-600 group-hover:text-purple-500 transition-colors font-medium">
+                        <span className="text-purple-600 group-hover:text-purple-500 group-hover:transition-colors font-medium">
                           Show Less
                         </span>
-                        <ChevronUp className="w-4 h-4 text-purple-600 group-hover:text-purple-500 transition-colors" />
+                        <ChevronUp className="w-4 h-4 text-purple-600 group-hover:text-purple-500 group-hover:transition-colors" />
                       </>
                     ) : (
                       <>
-                        <span className="text-purple-600 group-hover:text-purple-500 transition-colors font-medium">
+                        <span className="text-purple-600 group-hover:text-purple-500 group-hover:transition-colors font-medium">
                           See {remainingCount} More
                         </span>
-                        <ChevronDown className="w-4 h-4 text-purple-600 group-hover:text-purple-500 transition-colors" />
+                        <ChevronDown className="w-4 h-4 text-purple-600 group-hover:text-purple-500 group-hover:transition-colors" />
                       </>
                     )}
                   </div>
