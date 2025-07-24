@@ -52,20 +52,26 @@ export function HeroSection({
         {/* Gorgeous Glassmorphism Stats Section */}
         <div className="flex flex-col sm:flex-row justify-center gap-8 mb-14">
           {/* Users Card */}
-          <div className="relative group flex-1 bg-white/30 dark:bg-black/40 rounded-3xl shadow-2xl p-8 flex flex-col items-center border border-purple-200 dark:border-purple-800 backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:rotate-[-2deg] hover:shadow-purple-300/40 hover:z-10">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-100 dark:bg-purple-900 rounded-full p-2 shadow-lg animate-fade-in">
-              {icons.users}
+          <AppLink
+            href={`${AppPages.users}/${UserTags.TopOwners}`}
+            underline={false}
+            className="flex-1 h-full p-0"
+          >
+            <div className="relative group flex-1 bg-white/30 dark:bg-black/40 rounded-3xl shadow-2xl p-8 flex flex-col items-center border border-purple-200 dark:border-purple-800 backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:rotate-[-2deg] hover:shadow-purple-300/40 hover:z-10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-purple-100 dark:bg-purple-900 rounded-full p-2 shadow-lg animate-fade-in">
+                {icons.users}
+              </div>
+              <span className="mt-8 text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
+                {totalUsers.toLocaleString()}
+              </span>
+              <span className="mt-2 text-lg font-semibold text-purple-700 dark:text-purple-300 tracking-wide">
+                Users
+              </span>
+              <span className="mt-1 text-sm text-[var(--muted-foreground)]">
+                Creators & Supporters
+              </span>
             </div>
-            <span className="mt-8 text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent drop-shadow-lg">
-              {totalUsers.toLocaleString()}
-            </span>
-            <span className="mt-2 text-lg font-semibold text-purple-700 dark:text-purple-300 tracking-wide">
-              Users
-            </span>
-            <span className="mt-1 text-sm text-[var(--muted-foreground)]">
-              Creators & Supporters
-            </span>
-          </div>
+          </AppLink>
           {/* Outposts Card */}
           <AppLink
             href={AppPages.allOutposts}
@@ -89,20 +95,26 @@ export function HeroSection({
           </AppLink>
 
           {/* Trades Card */}
-          <div className="relative group flex-1 bg-white/30 dark:bg-black/40 rounded-3xl shadow-2xl p-8 flex flex-col items-center border border-pink-200 dark:border-pink-800 backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:-rotate-2 hover:shadow-pink-300/40 hover:z-10">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-pink-100 dark:bg-pink-900 rounded-full p-2 shadow-lg animate-fade-in">
-              {icons.trades}
+          <AppLink
+            href={`${AppPages.dashboard}`}
+            underline={false}
+            className="flex-1 h-full p-0"
+          >
+            <div className="relative group flex-1 bg-white/30 dark:bg-black/40 rounded-3xl shadow-2xl p-8 flex flex-col items-center border border-pink-200 dark:border-pink-800 backdrop-blur-xl transition-transform duration-300 hover:scale-105 hover:-rotate-2 hover:shadow-pink-300/40 hover:z-10">
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-pink-100 dark:bg-pink-900 rounded-full p-2 shadow-lg animate-fade-in">
+                {icons.trades}
+              </div>
+              <span className="mt-8 text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
+                {totalTradesVolume.toLocaleString()}
+              </span>
+              <span className="mt-2 text-lg font-semibold text-pink-700 dark:text-pink-300 tracking-wide">
+                Total Trades
+              </span>
+              <span className="mt-1 text-sm text-[var(--muted-foreground)]">
+                Value Shared
+              </span>
             </div>
-            <span className="mt-8 text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent drop-shadow-lg">
-              {totalTradesVolume.toLocaleString()}
-            </span>
-            <span className="mt-2 text-lg font-semibold text-pink-700 dark:text-pink-300 tracking-wide">
-              Total Trades
-            </span>
-            <span className="mt-1 text-sm text-[var(--muted-foreground)]">
-              Value Shared
-            </span>
-          </div>
+          </AppLink>
         </div>
 
         {/* Social proof */}

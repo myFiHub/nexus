@@ -17,7 +17,7 @@ import { OutpostModel } from "app/services/api/types";
 import { revalidateService } from "app/services/revalidate";
 import { ReduxProvider } from "app/store/Provider";
 import { ArchiveRestore, ArchiveX } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
@@ -28,7 +28,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
     GlobalSelectors.viewArchivedOutposts
   );
   const amICreator = myUser?.uuid === outpost.creator_user_uuid;
-  const [isArchivedState, setIsArchivedState] = useState(outpost.is_archived);
+  const archiveRef = useRef(outpost.is_archived);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!amICreator || !myUser) {
@@ -37,7 +37,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
   const handleArchive = async () => {
     setIsLoading(true);
-    const shouldArchive = !isArchivedState;
+    const shouldArchive = !archiveRef.current;
     const result = await podiumApi.toggleOutpostArchive(
       outpost.uuid,
       shouldArchive
@@ -54,11 +54,11 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
       revalidateService.revalidateMultiple({
         outpostId: outpost.uuid,
       });
-      setIsArchivedState(!isArchivedState);
+      archiveRef.current = shouldArchive;
     }
     setIsLoading(false);
   };
-
+  const isArchivedState = archiveRef.current;
   return (
     <Tooltip>
       <TooltipTrigger asChild>

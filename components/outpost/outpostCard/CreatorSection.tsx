@@ -33,7 +33,7 @@ export function CreatorSection({ outpost }: CreatorSectionProps) {
               {outpost.creator_user_name}
             </h4>
             <p className="text-xs text-muted-foreground font-mono mt-0.5">
-              {truncate(creatorUUid)}
+              ID:{truncate(creatorUUid)}
             </p>
           </div>
         </div>
