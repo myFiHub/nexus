@@ -36,6 +36,7 @@ export interface GlobalState {
     [outpostId: string]: boolean;
   };
   numberOfOnlineUsers: { [outpostId: string]: number };
+  movePrice: number;
 }
 
 export const initialState: GlobalState = {
@@ -44,7 +45,9 @@ export const initialState: GlobalState = {
   logingIn: false,
   switchingAccount: false,
   isSidebarOpen:
-    typeof window !== "undefined" ? window.innerWidth > MOBILE_BREAKPOINT : false,
+    typeof window !== "undefined"
+      ? window.innerWidth > MOBILE_BREAKPOINT
+      : false,
   logingOut: false,
   tick: 0,
   numberOfOnlineUsers: {},
@@ -58,12 +61,17 @@ export const initialState: GlobalState = {
   },
   viewArchivedOutposts:
     getClientCookie(CookieKeys.viewArchivedOutposts) === "true",
+  movePrice: 0,
 };
 
 const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
+    getMovePrice() {},
+    setMovePrice(state, action: PayloadAction<number>) {
+      state.movePrice = action.payload;
+    },
     initializeWeb3Auth() {},
     initOneSignal(_, __: PayloadAction<{ myId: string }>) {},
     startTicker() {},

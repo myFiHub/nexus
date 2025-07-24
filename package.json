@@ -39,6 +39,7 @@
     "clsx": "^2.1.1",
     "culori": "^4.0.1",
     "date-fns": "^4.1.0",
+    "decimal.js-light": "^2.5.1",
     "ethers": "^6.14.3",
     "firebase": "^11.9.1",
     "framer-motion": "^12.23.6",

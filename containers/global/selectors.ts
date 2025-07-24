@@ -1,6 +1,7 @@
 "use client";
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import Decimal from "decimal.js-light";
 import { initialState } from "./slice";
 
 const GlobalDomains = {
@@ -32,6 +33,7 @@ const GlobalDomains = {
   wsHealthChecking: (state: RootState) =>
     state.global?.wsHealthChecking ?? false,
   isSidebarOpen: (state: RootState) => state.global?.isSidebarOpen ?? false,
+  movePrice: (state: RootState) => state.global?.movePrice ?? 0,
 };
 
 export const GlobalSelectors = {
@@ -70,4 +72,16 @@ export const GlobalSelectors = {
     }
   ),
   isSidebarOpen: GlobalDomains.isSidebarOpen,
+  movePrice: GlobalDomains.movePrice,
+  moveToUsd: (amount: number) => (state: RootState) => {
+    try {
+      const result = new Decimal(state.global?.movePrice ?? 0).times(
+        amount ?? 0
+      );
+      return result.toNumber();
+    } catch (e) {
+      console.error(e);
+      return 0;
+    }
+  },
 };

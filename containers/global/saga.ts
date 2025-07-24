@@ -62,6 +62,7 @@ import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
+import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 
 const availableSocialLogins = [
   "twitter",
@@ -586,6 +587,13 @@ function* getLatestOnlineUsersForOutposts(
   }
 }
 
+function* getMovePrice() {
+  const movePrice: number = yield fetchMovePrice();
+  yield put(globalActions.setMovePrice(movePrice));
+  yield delay(10000);
+  yield put(globalActions.getMovePrice());
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
@@ -604,6 +612,7 @@ export function* globalSaga() {
     globalActions.toggleOutpostFromOnlineObject,
     getLatestOnlineUsersForOutposts
   );
+  yield takeLatest(globalActions.getMovePrice, getMovePrice);
   // Example retry usage - uncomment and replace with your actual action and function
   // yield retry(
   //   5,
