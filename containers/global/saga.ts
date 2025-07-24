@@ -30,6 +30,7 @@ import {
 } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
+import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -62,7 +63,6 @@ import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
-import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 
 const availableSocialLogins = [
   "twitter",
