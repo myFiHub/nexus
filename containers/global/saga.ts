@@ -30,7 +30,7 @@ import {
 } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
+// Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -587,10 +587,22 @@ function* getLatestOnlineUsersForOutposts(
   }
 }
 
-function* getMovePrice() {
-  const movePrice: number = yield fetchMovePrice();
+function* getMovePrice(): Generator<any, void, any> {
+  let movePrice = 0;
+  try {
+    const response = yield fetch("/api/coingecko/price");
+    if (response.ok) {
+      const data = yield response.json();
+      const price = Number(data?.movement?.usd);
+      if (!isNaN(price)) {
+        movePrice = price;
+      }
+    }
+  } catch (error) {
+    // Optionally log error
+  }
   yield put(globalActions.setMovePrice(movePrice));
-  yield delay(10000);
+  yield delay(5 * 60 * 1000);
   yield put(globalActions.getMovePrice());
 }
 
