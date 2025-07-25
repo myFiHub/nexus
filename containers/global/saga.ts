@@ -63,6 +63,7 @@ import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 
 const availableSocialLogins = [
   "twitter",
@@ -472,7 +473,10 @@ function* detached_continueWithLoginRequestAndAdditionalData({
 
   if (response?.user) {
     yield put(
-      globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
+      globalActions.setPodiumUserInfo({
+        ...response.user,
+        name: savedName,
+      })
     );
     yield detached_afterGettingPodiumUser({
       user: response.user,

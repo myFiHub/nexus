@@ -14,6 +14,7 @@ import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -118,7 +119,16 @@ const globalSlice = createSlice({
     },
     logout() {},
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
-      state.podiumUserInfo = action.payload;
+      const { payload } = action;
+      if (payload) {
+        const { image, ...rest } = payload;
+        state.podiumUserInfo = {
+          ...rest,
+          image: parseTokenUriToImageUrl(image ?? ""),
+        };
+      } else {
+        state.podiumUserInfo = undefined;
+      }
     },
     joinOutpost(state, action: PayloadAction<{ outpost: OutpostModel }>) {},
     setJoingOutpostId(state, action: PayloadAction<string | undefined>) {

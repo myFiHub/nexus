@@ -993,6 +993,18 @@ class PodiumApi {
       return { result: undefined, error: error.response?.data?.message };
     }
   }
+  async setNftAsProfileImage(token_uri: string): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.post(
+        `/users/accounts/set-nft-image`,
+        { token_uri }
+      );
+      return response.status === 200;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return false;
+    }
+  }
 }
 
 // Create a single instance with the base URL
