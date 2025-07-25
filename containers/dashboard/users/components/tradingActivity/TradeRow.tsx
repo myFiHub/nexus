@@ -1,5 +1,6 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
+import { EquivalentPrice_StyleLess } from "app/components/styleLessInfo/equivalentPrice";
 import { logoUrl, movementLogoUrl } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
 import { Trade } from "app/services/api/types";
@@ -48,16 +49,21 @@ export const TradeRow = ({ trade, gridCols }: TradeRowProps) => {
       </div>
 
       {/* Total Price */}
-      <div className="flex items-center">
-        <span className="font-medium">{trade.price}</span>
-        <span className="text-[8px] text-muted-foreground pl-2">MOVE</span>
+      <div className="flex items-center flex-col">
+        <div className="flex items-center">
+          <span className="font-medium">{trade.price}</span>
+          <span className="text-[8px] text-muted-foreground pl-1">MOVE</span>
+          <span className="text-xs text-muted-foreground">
+            <Img
+              src={movementLogoUrl}
+              alt="logo"
+              useImgTag
+              className="w-2 h-2 ml-1"
+            />
+          </span>
+        </div>
         <span className="text-xs text-muted-foreground">
-          <Img
-            src={movementLogoUrl}
-            alt="logo"
-            useImgTag
-            className="w-2 h-2 ml-1"
-          />
+          $<EquivalentPrice_StyleLess amountInMove={trade.price} />
         </span>
       </div>
 
@@ -134,17 +140,22 @@ export const TradeRow = ({ trade, gridCols }: TradeRowProps) => {
       </UserLink>
 
       {/* Fees Earned */}
-      <div className="flex items-center">
-        <span className="font-medium">{trade.fees_earned}</span>
-        <span className="text-[8px] text-muted-foreground pl-2">MOVE</span>
-        {/* move logo */}
+      <div className="flex items-center flex-col">
+        <div className="flex items-center">
+          <span className="font-medium">{trade.fees_earned}</span>
+          <span className="text-[8px] text-muted-foreground pl-1">MOVE</span>
+          {/* move logo */}
+          <span className="text-xs text-muted-foreground">
+            <Img
+              src={movementLogoUrl}
+              alt="logo"
+              useImgTag
+              className="w-2 h-2 ml-1"
+            />
+          </span>
+        </div>
         <span className="text-xs text-muted-foreground">
-          <Img
-            src={movementLogoUrl}
-            alt="logo"
-            useImgTag
-            className="w-2 h-2 ml-1"
-          />
+          $<EquivalentPrice_StyleLess amountInMove={trade.fees_earned} />
         </span>
       </div>
 

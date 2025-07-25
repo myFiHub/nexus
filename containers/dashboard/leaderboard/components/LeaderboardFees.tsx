@@ -2,6 +2,7 @@
 import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import { Img } from "app/components/Img";
 import { GlobalSelectors } from "app/containers/global/selectors";
+
 import { logoUrl, movementLogoUrl } from "app/lib/constants";
 import {
   MostFeeEarned,
@@ -18,12 +19,8 @@ const Content = ({
   user: MostFeeEarned | MostPassHeld | MostUniquePassHeld;
   type: LeaderboardTags;
 }) => {
-  const moveToUsd = useSelector(
-    GlobalSelectors.moveToUsd(
-      type === LeaderboardTags.TopFeeEarned
-        ? (user as MostFeeEarned).total_fee
-        : 0
-    )
+  const usdValue = useSelector(
+    GlobalSelectors.moveToUsd((user as MostFeeEarned)?.total_fee ?? 0)
   );
   switch (type) {
     case LeaderboardTags.TopFeeEarned:
@@ -38,7 +35,7 @@ const Content = ({
           </span>
           <span className="flex items-center justify-end gap-2 text-xs font-normal text-[var(--muted-foreground)]">
             $
-            {moveToUsd.toLocaleString(undefined, {
+            {usdValue.toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}

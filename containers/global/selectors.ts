@@ -4,6 +4,8 @@ import { RootState } from "app/store";
 import Decimal from "decimal.js-light";
 import { initialState } from "./slice";
 
+// Factory for a memoized selector that converts MOVE to USD for a given amount
+
 const GlobalDomains = {
   root: (state: RootState) => state,
   router: (state: RootState) => state.global?.router,
@@ -73,15 +75,15 @@ export const GlobalSelectors = {
   ),
   isSidebarOpen: GlobalDomains.isSidebarOpen,
   movePrice: GlobalDomains.movePrice,
-  moveToUsd: (amount: number) => (state: RootState) => {
-    try {
-      const result = new Decimal(state.global?.movePrice ?? 0).times(
-        amount ?? 0
-      );
-      return result.toNumber();
-    } catch (e) {
-      console.error(e);
-      return 0;
-    }
-  },
+  moveToUsd: (amountInMove: number) =>
+    createSelector([GlobalDomains.movePrice], (movePrice) => {
+      try {
+        if (isNaN(movePrice)) return 0;
+        const result = new Decimal(movePrice ?? 0).times(amountInMove ?? 0);
+        return result.toNumber();
+      } catch (e) {
+        console.error(e);
+        return 0;
+      }
+    }),
 };
