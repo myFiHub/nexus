@@ -1,6 +1,7 @@
 "use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
+import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {
   CookieKeys,
   getClientCookie,
@@ -13,7 +14,6 @@ import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;

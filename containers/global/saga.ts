@@ -602,7 +602,7 @@ function* getMovePrice(): Generator<any, void, any> {
     // Optionally log error
   }
   yield put(globalActions.setMovePrice(movePrice));
-  yield delay(5 * 60 * 1000);
+  yield delay(60 * 1000);
   yield put(globalActions.getMovePrice());
 }
 
