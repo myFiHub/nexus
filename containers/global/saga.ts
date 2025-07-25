@@ -30,6 +30,7 @@ import {
 } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
+// Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -62,6 +63,7 @@ import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 
 const availableSocialLogins = [
   "twitter",
@@ -471,7 +473,10 @@ function* detached_continueWithLoginRequestAndAdditionalData({
 
   if (response?.user) {
     yield put(
-      globalActions.setPodiumUserInfo({ ...response.user, name: savedName })
+      globalActions.setPodiumUserInfo({
+        ...response.user,
+        name: savedName,
+      })
     );
     yield detached_afterGettingPodiumUser({
       user: response.user,
@@ -586,6 +591,25 @@ function* getLatestOnlineUsersForOutposts(
   }
 }
 
+function* getMovePrice(): Generator<any, void, any> {
+  let movePrice = 0;
+  try {
+    const response = yield fetch("/api/coingecko/price");
+    if (response.ok) {
+      const data = yield response.json();
+      const price = Number(data?.movement?.usd);
+      if (!isNaN(price)) {
+        movePrice = price;
+      }
+    }
+  } catch (error) {
+    // Optionally log error
+  }
+  yield put(globalActions.setMovePrice(movePrice));
+  yield delay(60 * 1000);
+  yield put(globalActions.getMovePrice());
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
@@ -604,6 +628,7 @@ export function* globalSaga() {
     globalActions.toggleOutpostFromOnlineObject,
     getLatestOnlineUsersForOutposts
   );
+  yield takeLatest(globalActions.getMovePrice, getMovePrice);
   // Example retry usage - uncomment and replace with your actual action and function
   // yield retry(
   //   5,

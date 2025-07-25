@@ -33,10 +33,11 @@ const Container = () => {
   useNotificationsSlice();
 
   useEffect(() => {
+    dispatch(globalActions.getMovePrice());
     if (router) {
       dispatch(globalActions.setRouter(router));
     }
-  }, [router]);
+  }, [router, dispatch]);
 
   useEffect(() => {
     dispatch(globalActions.startTicker());

@@ -1,9 +1,11 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
+import { User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { NFTResponse } from "app/services/move/types";
-import { delay, put, takeLatest } from "redux-saga/effects";
+import { put, select, takeLatest } from "redux-saga/effects";
+import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { profileActions } from "./slice";
 
@@ -62,12 +64,24 @@ function* useNftAsProfilePicture(action: PayloadAction<NFTResponse>) {
   yield put(
     profileActions.settingNftAsProfilePicture(action.payload.image_url)
   );
+  const tokenUri = action.payload.current_token_data.token_uri;
   try {
-    yield delay(3000);
-    //  const success = yield podiumApi.setNftAsProfilePicture(action.payload.image_url);
-    //  if (!success) {
-    //   toast.error("Failed to set nft as profile picture");
-    //  }
+    const success: boolean = yield podiumApi.setNftAsProfileImage(tokenUri);
+
+    if (!success) {
+      toast.error("Failed to set nft as profile picture");
+    } else {
+      const user: User = yield select(GlobalSelectors.podiumUserInfo);
+      if (user) {
+        yield put(
+          globalActions.setPodiumUserInfo({
+            ...user,
+            image: tokenUri,
+          })
+        );
+        toast.success("Nft is set as profile picture");
+      }
+    }
   } catch (error) {
   } finally {
     yield put(profileActions.settingNftAsProfilePicture(undefined));

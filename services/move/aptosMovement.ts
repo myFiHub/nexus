@@ -1,5 +1,5 @@
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 import { toast } from "app/lib/toast";
-import { isDev } from "app/lib/utils";
 import { AptosAccount, AptosClient, CoinClient, Types } from "aptos";
 import axios from "axios";
 import podiumApi from "../api";
@@ -199,12 +199,7 @@ query GetNFTs($address: String!) {
   }
 }
   `;
-    const address = isDev
-      ? //
-        // "0xc898a3b0a7c3ddc9ff813eeca34981b6a42b0918057a7c18ecb9f4a6ae82eefb"
-        "0x0e9583e041326faa8b549ad4b3deeb3ee935120fba63b093a46996a2f907b9f2"
-      : //
-        this.address;
+    const address = this.address;
     const response = await axios.post(
       APTOS_INDEXER_URL,
       {
@@ -223,9 +218,7 @@ query GetNFTs($address: String!) {
       .map((nft: NFTResponse) => {
         return {
           ...nft,
-          image_url: `https://ipfs.io/ipfs/${
-            nft.current_token_data.token_uri.split("ipfs://")[1]
-          }`,
+          image_url: parseTokenUriToImageUrl(nft.current_token_data.token_uri),
         };
       })
       .filter((nft: NFTResponse) => {

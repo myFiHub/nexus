@@ -1,6 +1,7 @@
 "use client";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
+import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {
   CookieKeys,
   getClientCookie,
@@ -13,7 +14,7 @@ import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -36,6 +37,7 @@ export interface GlobalState {
     [outpostId: string]: boolean;
   };
   numberOfOnlineUsers: { [outpostId: string]: number };
+  movePrice: number;
 }
 
 export const initialState: GlobalState = {
@@ -44,7 +46,9 @@ export const initialState: GlobalState = {
   logingIn: false,
   switchingAccount: false,
   isSidebarOpen:
-    typeof window !== "undefined" ? window.innerWidth > MOBILE_BREAKPOINT : false,
+    typeof window !== "undefined"
+      ? window.innerWidth > MOBILE_BREAKPOINT
+      : false,
   logingOut: false,
   tick: 0,
   numberOfOnlineUsers: {},
@@ -58,12 +62,17 @@ export const initialState: GlobalState = {
   },
   viewArchivedOutposts:
     getClientCookie(CookieKeys.viewArchivedOutposts) === "true",
+  movePrice: 0,
 };
 
 const globalSlice = createSlice({
   name: "global",
   initialState,
   reducers: {
+    getMovePrice() {},
+    setMovePrice(state, action: PayloadAction<number>) {
+      state.movePrice = action.payload;
+    },
     initializeWeb3Auth() {},
     initOneSignal(_, __: PayloadAction<{ myId: string }>) {},
     startTicker() {},
@@ -110,7 +119,16 @@ const globalSlice = createSlice({
     },
     logout() {},
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
-      state.podiumUserInfo = action.payload;
+      const { payload } = action;
+      if (payload) {
+        const { image, ...rest } = payload;
+        state.podiumUserInfo = {
+          ...rest,
+          image: parseTokenUriToImageUrl(image ?? ""),
+        };
+      } else {
+        state.podiumUserInfo = undefined;
+      }
     },
     joinOutpost(state, action: PayloadAction<{ outpost: OutpostModel }>) {},
     setJoingOutpostId(state, action: PayloadAction<string | undefined>) {
