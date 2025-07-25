@@ -79,6 +79,7 @@ function* useNftAsProfilePicture(action: PayloadAction<NFTResponse>) {
             image: tokenUri,
           })
         );
+        toast.success("Nft is set as profile picture");
       }
     }
   } catch (error) {
