@@ -11,7 +11,7 @@ const Content = ({
   decimalPlaces?: number;
 }) => {
   const usdValue = useSelector(GlobalSelectors.moveToUsd(amountInMove));
-  return <>{usdValue.toFixed(decimalPlaces)}</>;
+  return <>{Number(usdValue).toFixed(decimalPlaces)}</>;
 };
 
 export const EquivalentPrice_StyleLess = ({

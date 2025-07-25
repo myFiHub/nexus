@@ -75,12 +75,12 @@ export const GlobalSelectors = {
   ),
   isSidebarOpen: GlobalDomains.isSidebarOpen,
   movePrice: GlobalDomains.movePrice,
-  moveToUsd: (amountInMove: number) =>
+  moveToUsd: (amountInMove: number, decimals: number = 2) =>
     createSelector([GlobalDomains.movePrice], (movePrice) => {
       try {
         if (isNaN(movePrice)) return 0;
         const result = new Decimal(movePrice ?? 0).times(amountInMove ?? 0);
-        return result.toNumber();
+        return result.toFixed(decimals);
       } catch (e) {
         console.error(e);
         return 0;

@@ -1,7 +1,9 @@
+import { ReactNode } from "react";
+
 interface StatCardProps {
   title: string;
   value: number | string;
-  subtitle?: string;
+  subtitle?: ReactNode;
 }
 
 export const StatCard = ({ title, value, subtitle }: StatCardProps) => (
