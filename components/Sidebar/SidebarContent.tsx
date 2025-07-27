@@ -11,7 +11,10 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { logoutDialog, searchDialog } from "../Dialog";
-import { setRoutingEventBusId } from "../listeners/loading/eventBus";
+import {
+  clearRoutingEventBusId,
+  setRoutingEventBusId,
+} from "../listeners/loading/eventBus";
 import { NavigationSection } from "./NavigationSection";
 import { QuickActionsSection } from "./QuickActionsSection";
 import { Separator } from "./separator";
@@ -35,6 +38,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Home",
       icon: HomeIcon,
       onClick: () => {
+        if (isHome) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("Home");
         router.push("/");
       },
@@ -47,6 +54,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Dashboard",
       icon: LayoutDashboard,
       onClick: () => {
+        if (isDashboard) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("Dashboard");
         router.push("/dashboard");
       },
@@ -59,6 +70,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "All Outposts",
       imageSrc: "/outpost.png",
       onClick: () => {
+        if (isAllOutposts) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("All Outposts");
         router.push(AppPages.allOutposts);
       },
@@ -71,6 +86,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "My Outposts",
       imageSrc: "/flag.png",
       onClick: () => {
+        if (isMyOutposts) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("My Outposts");
         router.push(AppPages.myOutposts);
       },
@@ -84,6 +103,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
+        if (isCreateOutpost) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("Create Outpost");
         router.push(AppPages.createOutpost);
       },
@@ -96,6 +119,10 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Profile",
       icon: UserIcon,
       onClick: () => {
+        if (isProfile) {
+          clearRoutingEventBusId();
+          return;
+        }
         setRoutingEventBusId("Profile");
         router.push(AppPages.profile);
       },

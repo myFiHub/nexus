@@ -1,7 +1,7 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { OutpostsList } from "app/components/outpost/OutpostsList";
 import { OutpostModel } from "../../services/api/types";
 import { ClientOutpostsList } from "./ClientOutpostsList";
-import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 interface AllOutpostsContainerProps {
   initialOutposts: OutpostModel[];
