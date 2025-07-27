@@ -1,3 +1,4 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import {
   Tabs,
   TabsContent,
@@ -17,7 +18,7 @@ export default function DashboardLayout({
   return (
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-
+      <RouteLoaderCleaner />
       <Tabs defaultValue="users" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="users">Users</TabsTrigger>

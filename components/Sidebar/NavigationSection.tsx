@@ -1,6 +1,5 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { SectionHeader } from "./SectionHeader";
 import { SidebarItem } from "./SidebarItem";
@@ -11,7 +10,6 @@ export function NavigationSection({
   isMobile,
   items,
 }: SidebarSectionProps) {
-  const router = useRouter();
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   return (
     <motion.div

@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Img } from "../Img";
+import { RoutingLoadingComponent } from "../listeners/loading/componentAdnHook";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 import { SidebarItemProps } from "./types";
 
@@ -26,7 +27,7 @@ export function SidebarItem({
   const [hasAudioWavePlayed, setHasAudioWavePlayed] = useState(false); // Default to false to allow animation
   const [showAuthAnimation, setShowAuthAnimation] = useState(false);
   const [flashedOnce, setFlashedOnce] = useState(false);
-  const [loginFlashCount, setLoginFlashCount] = useState(0);
+  const [_, setLoginFlashCount] = useState(0);
 
   useEffect(() => {
     // Check if audio wave animation has already played
@@ -283,6 +284,9 @@ export function SidebarItem({
         transition: { duration: 0.1 },
       }}
     >
+      <div className="absolute right-2 top-1/2 -translate-y-1/2 z-50">
+        <RoutingLoadingComponent id={label} className="h-3 w-3" />
+      </div>
       <motion.div
         onClick={onClick}
         className={cn(

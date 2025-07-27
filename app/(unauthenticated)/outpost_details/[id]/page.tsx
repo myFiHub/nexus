@@ -4,6 +4,7 @@ import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { generateEventStructuredData, generateMetadata } from "./_metadata";
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -44,6 +45,7 @@ export default async function OutpostDetailsPage({ params }: PageProps) {
           __html: JSON.stringify(structuredData),
         }}
       />
+      <RouteLoaderCleaner />
       <OutpostDetailsContainer
         outpost={outpost}
         lumaSlot={

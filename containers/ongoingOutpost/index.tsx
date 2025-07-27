@@ -16,6 +16,7 @@ import { WaitingForCreator } from "./components/waitingForCreator";
 import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
 import { useAssetsSlice } from "../_assets/slice";
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 const Content = () => {
   useUsersSlice();
@@ -87,6 +88,7 @@ const Content = () => {
 export const OngoingOutpost = () => {
   return (
     <ReduxProvider>
+      <RouteLoaderCleaner />
       <Content />
     </ReduxProvider>
   );

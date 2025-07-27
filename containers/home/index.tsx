@@ -1,3 +1,4 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import {
   OutpostModel,
   RecentlyJoinedUser,
@@ -19,6 +20,7 @@ export const HomeContainer = ({
 }) => {
   return (
     <div className="flex flex-col items-center w-full min-h-screen">
+      <RouteLoaderCleaner />
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="pt-24 pb-16">
           <HeroSection statistics={statistics} recentUsers={recentUsers} />

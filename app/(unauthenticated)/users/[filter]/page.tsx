@@ -1,3 +1,4 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
@@ -38,6 +39,7 @@ export default async function Page({ params }: Props) {
   return (
     <>
       <UsersPage users={users} filter={filter} />
+      <RouteLoaderCleaner />
       <UsersStructuredData
         users={users}
         filterTitle={getFilterTitle(filter)}
