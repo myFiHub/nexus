@@ -1,10 +1,11 @@
 import Header from "app/components/header";
 import { cookies } from "next/headers";
 
-import LoadingIndicator from "app/app/loading-indicator";
+// import LoadingIndicator from "app/app/loading-indicator";
 import { GlobalContainer } from "app/containers/global";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import NextTopLoader from "nextjs-toploader";
 import { Sidebar } from "../components/Sidebar";
 import "./globals.css";
 
@@ -121,7 +122,8 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <LoadingIndicator />
+        {/* <LoadingIndicator /> */}
+        <NextTopLoader showSpinner={false} color="#ff00ff" />
         <GlobalContainer />
         <Header theme={theme as "light" | "dark"} />
         <Sidebar />
