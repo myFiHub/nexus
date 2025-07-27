@@ -58,13 +58,6 @@ const InitialOutpostsList = async () => {
     return <ErrorState />;
   }
 
-  const sortedOutposts = outposts.sort((a, b) => {
-    return a.last_active_at - b.last_active_at;
-  });
-  const sortedByOnlineMembers = sortedOutposts.sort((a, b) => {
-    return (b.online_users_count ?? 0) - (a.online_users_count ?? 0);
-  });
-
   // Generate structured data for better SEO
   const structuredData = generateOutpostsListStructuredData(outposts);
 
@@ -76,7 +69,7 @@ const InitialOutpostsList = async () => {
           __html: JSON.stringify(structuredData),
         }}
       />
-      <AllOutpostsContainer initialOutposts={sortedByOnlineMembers} />
+      <AllOutpostsContainer initialOutposts={outposts} />
     </>
   );
 };
