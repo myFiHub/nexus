@@ -1,4 +1,5 @@
 "use client";
+import { clearRoutingEventBusId } from "app/components/listeners/loading/eventBus";
 import { usePathname, useSearchParams } from "next/navigation";
 import NProgress from "nprogress";
 import "nprogress/nprogress.css";
@@ -57,6 +58,7 @@ export default function LoadingIndicator() {
 
     // Complete progress when navigation ends
     const handleComplete = () => {
+      clearRoutingEventBusId();
       if (isNavigating.current) {
         // Clear the fallback timeout
         if (navigationTimeout.current) {

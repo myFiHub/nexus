@@ -19,6 +19,7 @@ import { AccountCardActionSelectDialogProvider } from "./components/SecuritySect
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 // Reusable styled card for profile sections
 const SectionCard = ({
@@ -100,6 +101,7 @@ const Content = () => {
 export const Profile = () => {
   return (
     <ReduxProvider>
+      <RouteLoaderCleaner />
       <Content />
     </ReduxProvider>
   );

@@ -11,6 +11,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { logoutDialog, searchDialog } from "../Dialog";
+import { setRoutingEventBusId } from "../listeners/loading/eventBus";
 import { NavigationSection } from "./NavigationSection";
 import { QuickActionsSection } from "./QuickActionsSection";
 import { Separator } from "./separator";
@@ -34,6 +35,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Home",
       icon: HomeIcon,
       onClick: () => {
+        setRoutingEventBusId("Home");
         router.push("/");
       },
       isOpen: isOpen,
@@ -45,6 +47,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Dashboard",
       icon: LayoutDashboard,
       onClick: () => {
+        setRoutingEventBusId("Dashboard");
         router.push("/dashboard");
       },
       isOpen: isOpen,
@@ -56,6 +59,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "All Outposts",
       imageSrc: "/outpost.png",
       onClick: () => {
+        setRoutingEventBusId("All Outposts");
         router.push(AppPages.allOutposts);
       },
       isOpen: isOpen,
@@ -67,6 +71,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "My Outposts",
       imageSrc: "/flag.png",
       onClick: () => {
+        setRoutingEventBusId("My Outposts");
         router.push(AppPages.myOutposts);
       },
       isOpen: isOpen,
@@ -79,6 +84,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
+        setRoutingEventBusId("Create Outpost");
         router.push(AppPages.createOutpost);
       },
       isOpen: isOpen,
@@ -90,6 +96,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       label: "Profile",
       icon: UserIcon,
       onClick: () => {
+        setRoutingEventBusId("Profile");
         router.push(AppPages.profile);
       },
       isOpen: isOpen,

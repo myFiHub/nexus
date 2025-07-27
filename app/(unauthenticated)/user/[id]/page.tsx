@@ -6,6 +6,7 @@ import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { generateMetadata, generateStructuredData } from "./_metadata";
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -91,6 +92,7 @@ export default async function UserPage({ params }: Props) {
           __html: JSON.stringify(structuredData),
         }}
       />
+      <RouteLoaderCleaner />
       <UserDetails
         user={user}
         passBuyers={passBuyers}
