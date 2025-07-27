@@ -34,11 +34,7 @@ const Content = ({
             })}
           </span>
           <span className="flex items-center justify-end gap-2 text-xs font-normal text-[var(--muted-foreground)]">
-            $
-            {usdValue.toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
+            ${usdValue}
           </span>
         </>
       );

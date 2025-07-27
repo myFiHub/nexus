@@ -80,7 +80,7 @@ const Content = ({ user }: { user: User }) => {
       }
     }
   };
-  const loading = gettingPrices || loadingPass || sellingPass;
+  const loading = gettingPrices || loadingPass || !!sellingPass;
   return (
     <div className="w-full sm:w-auto min-w-[330px]">
       <PulsingShadow>
