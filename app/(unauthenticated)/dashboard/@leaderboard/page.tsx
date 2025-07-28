@@ -5,10 +5,10 @@ import { LEADERBOARD_PAGE_SIZE, LeaderboardTags } from "./_configs";
 
 const getMostFeeEarnedWithCache = unstable_cache(
   async () =>
-    podiumApi.getMostFeeEarned(
-      0,
-      LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned]
-    ),
+    podiumApi.getMostFeeEarned({
+      page: 0,
+      page_size: LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned],
+    }),
   [LeaderboardTags.TopFeeEarned],
   {
     revalidate: 60, // 1 minute
@@ -17,10 +17,10 @@ const getMostFeeEarnedWithCache = unstable_cache(
 
 const getMostPassHeldWithCache = unstable_cache(
   async () =>
-    podiumApi.getMostPassHeld(
-      0,
-      LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld]
-    ),
+    podiumApi.getMostPassHeld({
+      page: 0,
+      page_size: LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld],
+    }),
   [LeaderboardTags.MostPassHeld],
   {
     revalidate: 60, // 1 minute
@@ -29,10 +29,10 @@ const getMostPassHeldWithCache = unstable_cache(
 
 const getMostUniquePassHoldersWithCache = unstable_cache(
   async () =>
-    podiumApi.getMostUniquePassHolders(
-      0,
-      LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders]
-    ),
+    podiumApi.getMostUniquePassHolders({
+      page: 0,
+      page_size: LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders],
+    }),
   [LeaderboardTags.MostUniquePassHolders],
   {
     revalidate: 60, // 1 minute
