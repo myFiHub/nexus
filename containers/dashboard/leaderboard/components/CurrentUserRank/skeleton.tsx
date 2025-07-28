@@ -60,20 +60,6 @@ export const CurrentUserRankSkeleton = () => {
             </motion.div>
           </div>
         </div>
-
-        <motion.div
-          className="relative w-11 h-11 bg-white/10 rounded-full overflow-hidden"
-          variants={pulseVariants}
-          initial="initial"
-          animate="animate"
-        >
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-            variants={shimmerVariants}
-            initial="initial"
-            animate="animate"
-          />
-        </motion.div>
       </div>
     </div>
   );
