@@ -9,6 +9,20 @@ import { injectContainer } from "app/store";
 import { leaderboardSaga } from "./saga";
 
 export interface LeaderboardState {
+  currentUserRank: {
+    [LeaderboardTags.TopFeeEarned]: {
+      gettingRank: boolean;
+      rank: number;
+    };
+    [LeaderboardTags.MostPassHeld]: {
+      gettingRank: boolean;
+      rank: number;
+    };
+    [LeaderboardTags.MostUniquePassHolders]: {
+      gettingRank: boolean;
+      rank: number;
+    };
+  };
   clientSideLeaderboard: {
     [LeaderboardTags.TopFeeEarned]: {
       page: number;
@@ -32,6 +46,20 @@ export interface LeaderboardState {
 }
 
 export const initialState: LeaderboardState = {
+  currentUserRank: {
+    [LeaderboardTags.TopFeeEarned]: {
+      gettingRank: true,
+      rank: 0,
+    },
+    [LeaderboardTags.MostPassHeld]: {
+      gettingRank: true,
+      rank: 0,
+    },
+    [LeaderboardTags.MostUniquePassHolders]: {
+      gettingRank: true,
+      rank: 0,
+    },
+  },
   clientSideLeaderboard: {
     [LeaderboardTags.TopFeeEarned]: {
       page: 1,
@@ -58,6 +86,35 @@ const leaderboardSlice = createSlice({
   name: "leaderboard",
   initialState,
   reducers: {
+    getCurrentUserRank: (
+      _,
+      __: PayloadAction<{
+        filter: LeaderboardTags;
+      }>
+    ) => {},
+    setIsLoadingUserRank: (
+      state,
+      action: PayloadAction<{
+        filter: LeaderboardTags;
+        isLoading: boolean;
+      }>
+    ) => {
+      const { filter, isLoading } = action.payload;
+      state.currentUserRank[filter].gettingRank = isLoading;
+    },
+    setUserRank: (
+      state,
+      action: PayloadAction<{
+        filter: LeaderboardTags;
+        rank: number;
+      }>
+    ) => {
+      const { filter, rank } = action.payload;
+      state.currentUserRank[filter] = {
+        gettingRank: false,
+        rank,
+      };
+    },
     getClientSideLeaderboard: (
       _state,
       _action: PayloadAction<LeaderboardTags>

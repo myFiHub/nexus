@@ -4,6 +4,7 @@ import {
   MostPassHeld,
   MostUniquePassHeld,
 } from "app/services/api/types";
+import { CurrentUserRank } from "./CurrentUserRank";
 import { LeaderboardRow } from "./LeaderboardRow";
 import ClientSideList from "./clientSideList";
 import ListEndObserver from "./listEndObserver";
@@ -46,6 +47,7 @@ export const LeaderboardTable = ({
       <div className="mb-6 mt-2 text-2xl font-bold text-center text-[var(--primary)] drop-shadow-sm tracking-wide sticky top-0 z-20 bg-[var(--background)] rounded-2xl">
         {leaderboardTitle(type)}
       </div>
+      <CurrentUserRank filter={type} />
       <div className="overflow-x-auto">
         <div className="relative rounded-lg shadow-lg bg-[var(--card)] p-1    ">
           <table className="min-w-full text-left text-sm rounded-lg overflow-hidden backdrop-blur-md bg-[var(--card)] text-[var(--card-foreground)]">

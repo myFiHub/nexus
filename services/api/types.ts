@@ -369,6 +369,7 @@ export interface MostFeeEarned {
   podium_pass_owner_uuid: string;
   total_fee: number;
   total_volume: number;
+  rank: number;
 }
 
 export interface MostPassHeld {
@@ -377,6 +378,7 @@ export interface MostPassHeld {
   podium_pass_owner_image: string;
   podium_pass_owner_name: string;
   podium_pass_owner_uuid: string;
+  rank: number;
 }
 
 export interface MostSoldPass {
@@ -393,6 +395,7 @@ export interface MostUniquePassHeld {
   podium_pass_owner_name: string;
   unique_held_count: number;
   podium_pass_owner_uuid: string;
+  rank: number;
 }
 export interface MostVolumeTradedPasses {
   podium_pass_owner_address: string;

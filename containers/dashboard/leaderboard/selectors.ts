@@ -34,4 +34,10 @@ export const leaderboardSelectors = {
       initialState.clientSideLeaderboard[filter].page
     );
   },
+  currentUserRank: (filter: LeaderboardTags) => (state: RootState) => {
+    return (
+      state.leaderboard?.currentUserRank[filter] ??
+      initialState.currentUserRank[filter]
+    );
+  },
 };
