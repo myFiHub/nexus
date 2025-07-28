@@ -894,15 +894,26 @@ class PodiumApi {
       return [];
     }
   }
-  async getMostFeeEarned(
+  async getMostFeeEarned({
     page = 0,
-    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned]
-  ): Promise<MostFeeEarned[]> {
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.TopFeeEarned],
+    aptos_address,
+  }: {
+    page?: number;
+    page_size?: number;
+    aptos_address?: string;
+  }): Promise<MostFeeEarned[]> {
     try {
+      const params = aptos_address
+        ? { aptos_address }
+        : {
+            page,
+            page_size,
+          };
       const response = await this.axiosInstance.get(
         `/dashboard/most-fee-earned`,
         {
-          params: { page, page_size },
+          params,
         }
       );
       return response.data.data;
@@ -911,15 +922,26 @@ class PodiumApi {
       return [];
     }
   }
-  async getMostPassHeld(
+  async getMostPassHeld({
     page = 0,
-    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld]
-  ): Promise<MostPassHeld[]> {
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostPassHeld],
+    aptos_address,
+  }: {
+    page?: number;
+    page_size?: number;
+    aptos_address?: string;
+  }): Promise<MostPassHeld[]> {
     try {
+      const params = aptos_address
+        ? { aptos_address }
+        : {
+            page,
+            page_size,
+          };
       const response = await this.axiosInstance.get(
         `/dashboard/most-pass-held`,
         {
-          params: { page, page_size },
+          params,
         }
       );
       return response.data.data;
@@ -942,14 +964,25 @@ class PodiumApi {
       return [];
     }
   }
-  async getMostUniquePassHolders(
+  async getMostUniquePassHolders({
     page = 0,
-    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders]
-  ): Promise<MostUniquePassHeld[]> {
+    page_size = LEADERBOARD_PAGE_SIZE[LeaderboardTags.MostUniquePassHolders],
+    aptos_address,
+  }: {
+    page?: number;
+    page_size?: number;
+    aptos_address?: string;
+  }): Promise<MostUniquePassHeld[]> {
+    const params = aptos_address
+      ? { aptos_address }
+      : {
+          page,
+          page_size,
+        };
     try {
       const response = await this.axiosInstance.get(
         `/dashboard/most-unique-pass-held`,
-        { params: { page, page_size } }
+        { params }
       );
       return response.data.data;
     } catch (error) {
