@@ -5,7 +5,6 @@ import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
 import { Loader } from "app/components/Loader";
 import { logoUrl } from "app/lib/constants";
-import { AppPages } from "app/lib/routes";
 import { truncate } from "app/lib/utils";
 import { BlockchainPassData } from "app/services/move/types";
 import { ExternalLink, Heart } from "lucide-react";
@@ -23,6 +22,8 @@ const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
 
 const PassCard = ({ pass }: { pass: BlockchainPassData }) => {
   const name = pass.userName || "External User";
+  const userDetailsUrl = pass.userUuid;
+  console.log(userDetailsUrl);
   return (
     <div
       key={pass.passSymbol}
@@ -34,7 +35,7 @@ const PassCard = ({ pass }: { pass: BlockchainPassData }) => {
         <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
           <div className="flex items-center gap-3">
             <UserLink
-              id={AppPages.userDetails(pass.userUuid ?? "")}
+              id={pass.userUuid ?? ""}
               ignore={!pass.userName}
               underline={false}
               className="p-0 flex items-center gap-4"
