@@ -147,7 +147,13 @@ export const AssetsSelectors = {
           });
         }
       });
-      return uniqueList;
+      const sortedResults = uniqueList.sort((a, b) => {
+        if (a.userUuid && b.userUuid) {
+          return 0;
+        }
+        return a.userUuid ? -1 : 1;
+      });
+      return sortedResults;
     }
   ),
 };
