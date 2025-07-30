@@ -158,10 +158,11 @@ class AptosMovement {
       parsed.map((item: any) => podiumApi.getUserByPassSymbol(item.symbol))
     );
 
+    console.log({ results });
     const resultsToReturn: BlockchainPassData[] = [];
 
     results.forEach((result, index) => {
-      if (result.status === "fulfilled") {
+      if (result.status === "fulfilled" && result.value) {
         const user: User = result.value!;
         resultsToReturn.push({
           userUuid: user.uuid,

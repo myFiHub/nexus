@@ -7,7 +7,8 @@ import { Loader } from "app/components/Loader";
 import { logoUrl } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
 import { BlockchainPassData } from "app/services/move/types";
-import { ExternalLink, Heart } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink, Heart } from "lucide-react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
 import { AssetsSelectors } from "../../../_assets/selectore";
 import { ProfileSectionTitle } from "../ProfileSectionTitle";
@@ -22,8 +23,6 @@ const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
 
 const PassCard = ({ pass }: { pass: BlockchainPassData }) => {
   const name = pass.userName || "External User";
-  const userDetailsUrl = pass.userUuid;
-  console.log(userDetailsUrl);
   return (
     <div
       key={pass.passSymbol}
@@ -139,8 +138,24 @@ const PassCard = ({ pass }: { pass: BlockchainPassData }) => {
 
 export const MyPasses = () => {
   const passes = useSelector(AssetsSelectors.myBlockchainPassesPasses);
+
   const loading = useSelector(AssetsSelectors.myBlockchainPassesLoading);
   const error = useSelector(AssetsSelectors.myBlockchainPassesError);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Determine initial display count based on screen size
+  const getInitialDisplayCount = () => {
+    if (typeof window !== "undefined") {
+      return window.innerWidth >= 1024 ? 6 : 3; // lg breakpoint
+    }
+    return 3; // default for SSR
+  };
+
+  const initialDisplayCount = getInitialDisplayCount();
+  const hasMorePasses = passes && passes.length > initialDisplayCount;
+  const displayedPasses = isExpanded
+    ? passes
+    : passes?.slice(0, initialDisplayCount);
 
   if (loading) {
     return (
@@ -170,10 +185,48 @@ export const MyPasses = () => {
 
   return (
     <SectionWrapper>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {passes.map((pass) => (
-          <PassCard key={pass.passSymbol} pass={pass} />
-        ))}
+      <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {displayedPasses?.map((pass, index) => (
+            <div
+              key={pass.passSymbol}
+              className={`transition-all duration-500 ease-in-out ${
+                isExpanded
+                  ? "opacity-100 transform translate-y-0"
+                  : index >= initialDisplayCount
+                  ? "opacity-0 transform translate-y-4 h-0 overflow-hidden"
+                  : "opacity-100 transform translate-y-0"
+              }`}
+              style={{
+                animationDelay: isExpanded ? `${index * 50}ms` : "0ms",
+              }}
+            >
+              <PassCard pass={pass} />
+            </div>
+          ))}
+        </div>
+
+        {hasMorePasses && (
+          <div className="flex justify-center pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="flex items-center gap-2 transition-all duration-300 hover:scale-105"
+            >
+              {isExpanded ? (
+                <>
+                  <ChevronUp className="w-4 h-4" />
+                  Show Less
+                </>
+              ) : (
+                <>
+                  <ChevronDown className="w-4 h-4" />
+                  Show {passes.length - initialDisplayCount} More
+                </>
+              )}
+            </Button>
+          </div>
+        )}
       </div>
     </SectionWrapper>
   );

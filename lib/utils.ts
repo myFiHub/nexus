@@ -63,3 +63,9 @@ export const generateOutpostShareUrl = (outpostId: string): string => {
   const outpostDetailRoute = "/outpost_details";
   return `${websiteUrl}${outpostDetailRoute}/${outpostId}`;
 };
+
+export const isUuid = (uuid: string): boolean => {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    uuid
+  );
+};

@@ -64,6 +64,7 @@ import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
 import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
+import { isUuid } from "app/lib/utils";
 
 const availableSocialLogins = [
   "twitter",
@@ -432,7 +433,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   if (response.statusCode === 428 && !retried) {
     const { confirmed, enteredText }: ReferrerDialogResult =
       yield referrerDialog();
-    if (confirmed && enteredText) {
+    if (confirmed && enteredText && isUuid(enteredText)) {
       referrerId = enteredText;
       loginRequest.referrer_user_uuid = referrerId;
       yield detached_continueWithLoginRequestAndAdditionalData({
