@@ -1,5 +1,6 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import { useIsMobile } from "app/hooks/use-mobile";
 import { truncate } from "app/lib/utils";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 import { memo, useEffect, useRef } from "react";
@@ -25,7 +26,7 @@ export const Meet = memo(
     const myUser = useSelector(GlobalSelectors.podiumUserInfo);
     const joined = useSelector(onGoingOutpostSelectors.joined);
     const joinedOnceRef = useRef(false);
-
+    const isMobile = useIsMobile();
     useEffect(() => {
       if (joined) {
         joinedOnceRef.current = true;
@@ -100,6 +101,11 @@ export const Meet = memo(
                 alwaysVisible: true,
                 autoHideWhileChatIsOpen: false,
               },
+              ...(isMobile && {
+                deeplinking: {
+                  disabled: true,
+                },
+              }),
               toolbarButtons: [
                 ...(accesses?.canSpeak ? ["microphone"] : []),
                 "closedcaptions",
