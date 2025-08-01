@@ -7,7 +7,6 @@ import {
 import { RecentlyJoinedSection } from "./components/recentlyJoined";
 import { TopAccountsSection } from "./components/topOwners";
 import { TradingActivitySection } from "./components/tradingActivity";
-import { TrendingVolumeSection } from "./components/TrendingVolumeSection";
 import { DashboardUsersInjector } from "./injector";
 
 export const Users = ({
@@ -43,7 +42,7 @@ export const Users = ({
           <TopAccountsSection topOwners={topOwners} />
 
           {/* Trending Volume */}
-          <TrendingVolumeSection tradingVolume={tradingVolume} />
+          {/* <TrendingVolumeSection tradingVolume={tradingVolume} /> */}
 
           {/* Recently Joined */}
           <RecentlyJoinedSection recentlyJoinedUsers={recentlyJoinedUsers} />
