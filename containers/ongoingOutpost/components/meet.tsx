@@ -102,7 +102,9 @@ export const Meet = memo(
                 autoHideWhileChatIsOpen: false,
               },
               ...(isMobile && {
-                disableDeepLinking: true,
+                deeplinking: {
+                  disabled: true,
+                },
               }),
               toolbarButtons: [
                 ...(accesses?.canSpeak ? ["microphone"] : []),
