@@ -82,7 +82,7 @@ const Content = () => {
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
-    dispatch(globalActions.getAndSetWeb3AuthAccount());
+    dispatch(globalActions.login());
   };
 
   const handleLoginSuccess = async () => {

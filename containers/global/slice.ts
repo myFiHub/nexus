@@ -7,6 +7,7 @@ import {
   getClientCookie,
   setClientCookie,
 } from "app/lib/client-cookies";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 import { OutpostModel, User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
@@ -14,7 +15,6 @@ import { injectContainer } from "app/store";
 import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -104,7 +104,10 @@ const globalSlice = createSlice({
     setWeb3Auth(state, action: PayloadAction<any>) {
       state.web3Auth = action.payload;
     },
-    getAndSetWeb3AuthAccount() {},
+    login(
+      _,
+      action: PayloadAction<{ autoLoginWithSocial: boolean } | undefined>
+    ) {},
     setWeb3AuthUserInfo(
       state,
       action: PayloadAction<Partial<UserInfo> | undefined>

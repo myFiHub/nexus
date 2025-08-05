@@ -382,11 +382,14 @@ main > * {
   }
 
 /* Hide first occurrence of w3a button class */
-.w3a--flex.w3a--w-full.w3a--flex-col.w3a--items-start.w3a--justify-start.w3a--gap-y-2 .w3a--btn.\!w3a--justify-between.w3a--group.w3a--relative.w3a--overflow-hidden.w3a--rounded-full:first-of-type {
+.w3a--flex.w3a--w-full.w3a--flex-col.w3a--items-start.w3a--justify-start.w3a--gap-y-2 .w3a--btn.\!w3a--justify-between.w3a--group.w3a--relative.w3a--overflow-hidden.w3a--rounded-full  {
   display: none !important;
 }
 
 /* Hide first occurrence of w3a button class with ! */
-.w3a--flex.w3a--w-full.w3a--flex-col.w3a--items-start.w3a--justify-start.w3a--gap-y-2 .w3a--group.w3a--relative.w3a--overflow-hidden.w3a--rounded-full:first-of-type {
+.w3a--flex.w3a--w-full.w3a--flex-col.w3a--items-start.w3a--justify-start.w3a--gap-y-2 .w3a--group.w3a--relative.w3a--overflow-hidden.w3a--rounded-full  {
+  display: none !important;
+}
+.w3a--flex.w3a--w-full.w3a--items-center.w3a--gap-x-2 {
   display: none !important;
 }

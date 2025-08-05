@@ -221,3 +221,10 @@ export {
   PodiumPassTradeDialogProvider,
 } from "./podiumPassTradeDialog";
 export type { PodiumPassTradeDialogResult } from "./podiumPassTradeDialog";
+
+// Export login selection dialog components
+export {
+  LoginMethod,
+  loginSelectionDialog,
+  LoginSelectionDialogProvider,
+} from "./loginSelectionDialog";

@@ -7,6 +7,8 @@ import {
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
 import {
+  LoginMethod,
+  loginSelectionDialog,
   nameDialog,
   NameDialogResult,
   promptNotifications,
@@ -59,6 +61,7 @@ import {
   useNotificationsSlice,
 } from "../notifications/slice";
 import { profileActions, useProfileSlice } from "../profile/slice";
+import { connectToNightly } from "./connectors/nightly/connector";
 import { joinOutpost } from "./effects/joinOutpost";
 import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
@@ -140,7 +143,7 @@ function* initializeWeb3Auth(
     yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
     if (connected) {
-      yield getAndSetAccount();
+      yield put(globalActions.login({ autoLoginWithSocial: true }));
     }
   } catch (error) {
     yield put(globalActions.setLogingIn(false));
@@ -156,7 +159,28 @@ function* initializeWeb3Auth(
   }
 }
 
-function* getAndSetAccount() {
+function* login(action: ReturnType<typeof globalActions.login>) {
+  const autoLoginWithSocial: boolean =
+    action.payload?.autoLoginWithSocial ?? false;
+  if (!autoLoginWithSocial) {
+    const selectedMethod: LoginMethod | undefined =
+      yield loginSelectionDialog();
+    console.log("selectedMethod", selectedMethod);
+    if (selectedMethod === LoginMethod.SOCIAL) {
+      yield loginWithSocial();
+    } else if (selectedMethod === LoginMethod.NIGHTLY) {
+      yield loginWithNightly();
+    } else {
+      yield put(globalActions.setLogingIn(false));
+
+      return;
+    }
+  } else {
+    yield loginWithSocial();
+  }
+}
+
+function* loginWithSocial() {
   try {
     const initialized: boolean = yield select(GlobalSelectors.initialized);
     if (!initialized) {
@@ -188,8 +212,6 @@ function* getAndSetAccount() {
           method: "eth_accounts",
         });
         if (accounts && accounts.length > 0) {
-          yield detached_afterConnectWithExternalWallet(provider);
-        } else {
           yield web3Auth.logout();
           yield web3Auth.clearCache();
           yield put(globalActions.setLogingIn(false));
@@ -349,34 +371,6 @@ function* switchAccount() {
     toast.error("there was an error, please try again");
   } finally {
     yield put(globalActions.setSwitchingAccount(false));
-  }
-}
-
-function* detached_afterConnectWithExternalWallet(provider: IProvider) {
-  const accounts: string[] | undefined = yield provider?.request({
-    method: "eth_accounts",
-  });
-  if (accounts && accounts.length > 0) {
-    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-    // // Use Ethers.js to wrap the provider
-    // const ethersProvider = new ethers.BrowserProvider(provider);
-    // const correntNetwork: Network = yield ethersProvider.getNetwork();
-
-    // console.log("\x1b[32m%s\x1b[0m", "correntNetwork", correntNetwork);
-
-    // const signer: Signer = yield ethersProvider.getSigner();
-    // console.log("signer", signer);
-    // const address: string = yield signer.getAddress();
-    // console.log("address", address);
-    // const message = "Hello from Web3Auth + external wallet";
-    // const signature: string = yield signer.signMessage(message);
-    // console.log("signature", signature);
-    yield web3Auth.logout();
-    yield web3Auth.clearCache();
-    yield put(globalActions.setLogingIn(false));
-
-    toast.error("Only social login is supported for now");
-    return;
   }
 }
 
@@ -655,11 +649,17 @@ function* getMovePrice(): Generator<any, void, any> {
   yield put(globalActions.getMovePrice());
 }
 
+function* loginWithNightly() {
+  yield connectToNightly();
+  // make it big and blue
+  console.log("\x1b[34m%s\x1b[0m", "loginWithNightly");
+}
+
 export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
-  yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
+  yield takeLatest(globalActions.login, login);
   yield takeLatest(globalActions.switchAccount, switchAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeLatest(globalActions.joinOutpost, joinOutpost);
