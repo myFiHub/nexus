@@ -497,7 +497,7 @@ query GetNFTs($address: String!) {
       const payload: Types.EntryFunctionPayload = {
         function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::sell_pass`,
         type_arguments: [],
-        arguments: [opts.sellerAddress, , opts.numberOfTickets.toString()],
+        arguments: [opts.sellerAddress, opts.numberOfTickets.toString()],
       };
       const txnRequest = await this._client.generateTransaction(
         this.account.address(),
