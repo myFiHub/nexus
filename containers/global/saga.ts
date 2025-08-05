@@ -31,6 +31,7 @@ import {
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
+import { isUuid } from "app/lib/utils";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -63,8 +64,6 @@ import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
-import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
-import { isUuid } from "app/lib/utils";
 
 const availableSocialLogins = [
   "twitter",
@@ -173,6 +172,7 @@ function* getAndSetAccount() {
     yield put(globalActions.setLogingIn(true));
     const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
     const provider: IProvider | null = yield web3Auth.connect();
+
     if (provider) {
       const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
       if (
@@ -183,6 +183,20 @@ function* getAndSetAccount() {
         yield web3Auth.clearCache();
         toast.error("Only social login is supported for now");
         return;
+      } else if (!userInfo.authConnection) {
+        const accounts: string[] | undefined = yield provider?.request({
+          method: "eth_accounts",
+        });
+        if (accounts && accounts.length > 0) {
+          yield detached_afterConnectWithExternalWallet(provider);
+        } else {
+          yield web3Auth.logout();
+          yield web3Auth.clearCache();
+          yield put(globalActions.setLogingIn(false));
+
+          toast.error("Only social login is supported for now");
+          return;
+        }
       }
       yield detached_afterConnect(userInfo);
     }
@@ -338,8 +352,44 @@ function* switchAccount() {
   }
 }
 
+function* detached_afterConnectWithExternalWallet(provider: IProvider) {
+  const accounts: string[] | undefined = yield provider?.request({
+    method: "eth_accounts",
+  });
+  if (accounts && accounts.length > 0) {
+    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
+    // // Use Ethers.js to wrap the provider
+    // const ethersProvider = new ethers.BrowserProvider(provider);
+    // const correntNetwork: Network = yield ethersProvider.getNetwork();
+
+    // console.log("\x1b[32m%s\x1b[0m", "correntNetwork", correntNetwork);
+
+    // const signer: Signer = yield ethersProvider.getSigner();
+    // console.log("signer", signer);
+    // const address: string = yield signer.getAddress();
+    // console.log("address", address);
+    // const message = "Hello from Web3Auth + external wallet";
+    // const signature: string = yield signer.signMessage(message);
+    // console.log("signature", signature);
+    yield web3Auth.logout();
+    yield web3Auth.clearCache();
+    yield put(globalActions.setLogingIn(false));
+
+    toast.error("Only social login is supported for now");
+    return;
+  }
+}
+
 function* detached_afterConnect(userInfo: Partial<UserInfo>) {
   try {
+    let {
+      authConnection: loginType,
+      userId: identifierId,
+      name,
+      profileImage: image,
+      email,
+    } = userInfo;
+
     const privateKey: string | undefined = yield getPrivateKey();
     if (privateKey) {
       const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
@@ -347,13 +397,6 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       yield put(globalActions.setAptosAccount(account));
 
       const aptosAddress = account.address().hex();
-      let {
-        authConnection: loginType,
-        userId: identifierId,
-        name,
-        profileImage: image,
-        email,
-      } = userInfo;
 
       if (!identifierId) {
         console.log("Identifier ID is required");
@@ -380,6 +423,7 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       const additionalDataForLogin: AdditionalDataForLogin = {
         loginType,
       };
+
       if (name) {
         additionalDataForLogin.name = name;
       }
