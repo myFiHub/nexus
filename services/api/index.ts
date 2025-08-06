@@ -1018,7 +1018,6 @@ class PodiumApi {
   }
   async getStatistics(): Promise<{ result?: Statistics; error?: string }> {
     try {
-      console.log("getStatistics");
       const response = await this.axiosInstance.get(`/dashboard/summary`);
       return { result: response.data.data };
     } catch (error: any) {

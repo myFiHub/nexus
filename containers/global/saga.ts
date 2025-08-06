@@ -39,9 +39,9 @@ import {
   OutpostModel,
   User,
 } from "app/services/api/types";
+import { movementService } from "app/services/move/aptosMovement";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
-import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import {
   all,
@@ -146,7 +146,7 @@ function* initializeWeb3Auth(
     yield put(globalActions.setLogingIn(false));
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
+      movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
@@ -204,8 +204,8 @@ function* getAndSetAccount() {
   } catch (error) {
     yield put(globalActions.setLogingIn(false));
     yield all([
+      movementService.clearAccount(),
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
@@ -249,14 +249,8 @@ function* switchAccount() {
           if (correntAccountAddress === newAccountAddress) {
             thereWasAnError = true;
           } else {
-            const privateKeyBytes = Uint8Array.from(
-              Buffer.from(newAccountPrivateKey, "hex")
-            );
-            const newAccountAptosAccount = new AptosAccount(privateKeyBytes);
-            yield put(globalActions.setAptosAccount(newAccountAptosAccount));
-            const newAccountAptosAddress = newAccountAptosAccount
-              .address()
-              .hex();
+            movementService.setAccount(newAccountPrivateKey);
+            const newAccountAptosAddress = movementService.address;
 
             const currentAccountAddressSignedByNewAccount: string =
               yield signMessage({
@@ -315,7 +309,7 @@ function* switchAccount() {
                   signature: newAccountSignature,
                   username: newAccountAddress,
                   timestamp: timestampInUTCInSeconds,
-                  aptos_address: newAccountAptosAccount.address().hex(),
+                  aptos_address: movementService.address,
                   has_ticket: false,
                   login_type_identifier: userInfo?.authConnectionId ?? "",
                 };
@@ -392,11 +386,8 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
 
     const privateKey: string | undefined = yield getPrivateKey();
     if (privateKey) {
-      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
-      const account = new AptosAccount(privateKeyBytes);
-      yield put(globalActions.setAptosAccount(account));
-
-      const aptosAddress = account.address().hex();
+      movementService.setAccount(privateKey);
+      const aptosAddress = movementService.address;
 
       if (!identifierId) {
         console.log("Identifier ID is required");
@@ -562,7 +553,7 @@ function* logout() {
   try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
+      movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
