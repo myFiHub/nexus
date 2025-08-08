@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tsc": "tsc",
-    "postinstall": "patch-package"
+    "tsc": "tsc"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^4.0.0",
@@ -91,7 +90,6 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
-    "patch-package": "^8.0.0",
     "tailwindcss": "^4",
     "tsc": "^2.0.4",
     "tw-animate-css": "^1.3.4",
