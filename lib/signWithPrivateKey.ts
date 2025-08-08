@@ -58,7 +58,7 @@ export const signMessageUsingExternalWallet = async ({
     return;
   }
 
-  return signature.toString();
+  return signature.signature.toString();
 };
 
 export const signMessageWithTimestampUsingExternalWallet = async ({

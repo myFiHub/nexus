@@ -65,7 +65,6 @@ import {
   accountType,
   connectType,
   disconnectType,
-  externalWalletActions,
 } from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
@@ -191,19 +190,6 @@ function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
 ) {
   const { network, account } = action.payload;
-  yield put(
-    externalWalletActions.setAccount({
-      walletName: "aptos",
-      account,
-    })
-  );
-  yield put(
-    externalWalletActions.setNetwork({
-      walletName: "aptos",
-      network,
-    })
-  );
-
   if (network.chainId !== 126) {
     toast.error(
       "Please switch to the Movement Mainnet network on your wallet to login"
@@ -211,7 +197,9 @@ function* loginWithExternalWallet(
     return;
   }
   if (account) {
+    yield put(globalActions.setLogingIn(true));
     yield detached_afterConnect({}, false);
+    yield put(globalActions.setLogingIn(false));
   }
 }
 
@@ -431,6 +419,7 @@ function* detached_afterConnect(
       const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
         buyerAddress: aptosAddress,
       });
+
       yield detached_continueWithLoginRequestAndAdditionalData({
         loginRequest: {
           // this will be handled and changed in next step
@@ -520,13 +509,11 @@ function* detached_continueWithLoginRequestAndAdditionalData({
     const {
       signature: signatureExternalWallet,
       timestampInUTCInSeconds: timestampInUTCInSecondsExternalWallet,
-    }: {
-      signature: string;
-      timestampInUTCInSeconds: number;
     } = yield signMessageWithTimestampUsingExternalWallet({
       walletName: "aptos",
       message: loginRequest.username,
     });
+
     signature = signatureExternalWallet!;
     timestampInUTCInSeconds = timestampInUTCInSecondsExternalWallet!;
     movementService.connectedToExternalWallet = true;
@@ -553,6 +540,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
 
   loginRequest.signature = signature;
   loginRequest.timestamp = timestampInUTCInSeconds;
+
   const response: {
     user: User | null;
     error: string | null;
