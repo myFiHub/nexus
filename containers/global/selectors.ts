@@ -11,7 +11,6 @@ const GlobalDomains = {
   router: (state: RootState) => state.global?.router,
   web3Auth: (state: RootState) => state.global?.web3Auth,
   web3AuthUserInfo: (state: RootState) => state.global?.web3AuthUserInfo,
-  aptosAccount: (state: RootState) => state.global?.aptosAccount,
   initializingWeb3Auth: (state: RootState) =>
     state.global?.initializingWeb3Auth,
   initialized: (state: RootState) => !!state.global?.web3Auth,
@@ -42,9 +41,7 @@ export const GlobalSelectors = {
   router: GlobalDomains.router,
   web3Auth: GlobalDomains.web3Auth,
   web3AuthUserInfo: GlobalDomains.web3AuthUserInfo,
-  aptosAccount: GlobalDomains.aptosAccount,
-  aptosAccountAddress: (state: RootState) =>
-    state.global?.aptosAccount?.address().hex(),
+
   isLoggedIn: (state: RootState) => !!state.global?.podiumUserInfo,
   initializingWeb3Auth: GlobalDomains.initializingWeb3Auth,
   initialized: GlobalDomains.initialized,

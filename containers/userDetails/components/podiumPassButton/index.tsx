@@ -21,7 +21,6 @@ const Content = ({ user }: { user: User }) => {
   const dispatch = useDispatch();
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  const aptosAccount = useSelector(GlobalSelectors.aptosAccount);
   const pass = useSelector(AssetsSelectors.userPasses(user.aptos_address!));
   const sellingPass = useSelector(AssetsSelectors.sellingPass);
   const [gettingPrices, setGettingPrices] = useState(false);
