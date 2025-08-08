@@ -1,6 +1,7 @@
 import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 import { toast } from "app/lib/toast";
 import axios from "axios";
+import Decimal from "decimal.js-light";
 import podiumApi from "../api";
 import { User } from "../api/types";
 import {
@@ -27,13 +28,50 @@ const CHEER_BOO_ADDRESS = process.env.NEXT_PUBLIC_CHEER_BOO_ADDRESS || "";
 const PODIUM_PROTOCOL_NAME = "PodiumProtocol";
 const CHEER_BOO_NAME = "CheerOrBooPodium";
 
-function doubleToBigIntMoveForAptos(amount: number): bigint {
-  // Implement conversion logic as needed
-  return BigInt(Math.floor(amount * 1e8));
+// Constants for decimal precision
+const APTOS_DECIMALS = 8;
+const APTOS_DECIMAL_FACTOR = new Decimal(10).pow(APTOS_DECIMALS);
+
+/**
+ * Converts a human-readable amount to Aptos on-chain amount (with 8 decimal places)
+ * Uses Decimal.js for precise decimal arithmetic
+ */
+function doubleToBigIntMoveForAptos(amount: number | string): bigint {
+  const decimalAmount = new Decimal(amount);
+  const onChainAmount = decimalAmount.mul(APTOS_DECIMAL_FACTOR);
+  return BigInt(onChainAmount.toFixed(0));
 }
-function bigIntCoinToMoveOnAptos(amount: bigint): number {
-  // Implement conversion logic as needed
-  return Number(amount) / 1e8;
+
+/**
+ * Converts an Aptos on-chain amount (with 8 decimal places) to human-readable amount
+ * Uses Decimal.js for precise decimal arithmetic
+ */
+function bigIntCoinToMoveOnAptos(amount: bigint | string): number {
+  const decimalAmount = new Decimal(amount.toString());
+  const humanAmount = decimalAmount.div(APTOS_DECIMAL_FACTOR);
+  return humanAmount.toNumber();
+}
+
+/**
+ * Formats a bigint amount to a human-readable string with proper decimal places
+ */
+function formatAptosAmount(
+  amount: bigint | string,
+  decimals: number = 4
+): string {
+  const humanAmount = bigIntCoinToMoveOnAptos(amount);
+  return new Decimal(humanAmount).toFixed(decimals);
+}
+
+/**
+ * Safely converts a string to a Decimal, handling invalid inputs
+ */
+function safeDecimal(value: any): Decimal {
+  try {
+    return new Decimal(value || 0);
+  } catch {
+    return new Decimal(0);
+  }
 }
 
 class AptosMovement {
@@ -120,10 +158,12 @@ class AptosMovement {
       );
       const balances = response.data.data.current_fungible_asset_balances;
       if (balances && balances.length > 0) {
-        return balances.reduce(
-          (sum: bigint, b: any) => sum + BigInt(b.amount),
-          BigInt(0)
+        // Use Decimal.js for precise balance calculation
+        const totalBalance = balances.reduce(
+          (sum: Decimal, b: any) => sum.plus(safeDecimal(b.amount)),
+          new Decimal(0)
         );
+        return BigInt(totalBalance.toFixed(0));
       }
       return BigInt(0);
     } catch (e) {
@@ -154,7 +194,9 @@ class AptosMovement {
     const unParsed = response.data.data.current_fungible_asset_balances;
     const parsed: ParsedPassData[] = unParsed
       .map((item: any) => {
-        const amount = bigIntCoinToMoveOnAptos(BigInt(item.amount));
+        // Use Decimal.js for precise amount conversion
+        const rawAmount = safeDecimal(item.amount);
+        const amount = bigIntCoinToMoveOnAptos(rawAmount.toString());
         return {
           amount,
           symbol: item.metadata.symbol,
@@ -273,7 +315,14 @@ query GetNFTs($address: String!) {
         },
         { headers: { "Content-Type": "application/json" } }
       );
-      return response.data.data.current_fungible_asset_balances;
+
+      // Process balances with Decimal.js for precision
+      const balances = response.data.data.current_fungible_asset_balances;
+      return balances.map((balance: any) => ({
+        ...balance,
+        // Ensure amount is properly handled as a string for precision
+        amount: safeDecimal(balance.amount).toString(),
+      }));
     } catch (error) {
       toast.error("Error fetching token balances from indexer: " + error);
       return [];
@@ -290,6 +339,35 @@ query GetNFTs($address: String!) {
     return this.getAddressBalance(this.address);
   }
 
+  /**
+   * Get formatted balance as a string with specified decimal places
+   */
+  async getFormattedBalance(decimals: number = 4): Promise<string> {
+    const balance = await this.balance();
+    return formatAptosAmount(balance, decimals);
+  }
+
+  /**
+   * Check if account has sufficient balance for a given amount
+   */
+  async hasSufficientBalance(amount: number | string): Promise<boolean> {
+    const balance = await this.balance();
+    const requiredAmount = doubleToBigIntMoveForAptos(amount);
+    return balance >= requiredAmount;
+  }
+
+  /**
+   * Get remaining balance after deducting a given amount
+   */
+  async getRemainingBalance(amount: number | string): Promise<bigint> {
+    const balance = await this.balance();
+    const deductAmount = doubleToBigIntMoveForAptos(amount);
+    const remaining = new Decimal(balance.toString()).minus(
+      deductAmount.toString()
+    );
+    return BigInt(remaining.gte(0) ? remaining.toFixed(0) : "0");
+  }
+
   async cheerBoo(opts: {
     target: string;
     receiverAddresses: string[];
@@ -298,9 +376,12 @@ query GetNFTs($address: String!) {
     outpostId: string;
   }): Promise<[boolean | null, string | null]> {
     try {
-      const b = await this.balance();
-      if (b < doubleToBigIntMoveForAptos(opts.amount)) {
-        toast.error("Insufficient balance");
+      // Use improved balance checking with Decimal.js precision
+      if (!(await this.hasSufficientBalance(opts.amount))) {
+        const formattedBalance = await this.getFormattedBalance();
+        toast.error(
+          `Insufficient balance. Current balance: ${formattedBalance} APT`
+        );
         return [false, "Insufficient balance"];
       }
 
@@ -413,6 +494,27 @@ query GetNFTs($address: String!) {
     try {
       const isMyAccountActive = await this.isMyAccountActive();
       if (!isMyAccountActive) return [false, "Account not active"];
+
+      // Get the price for the pass
+      const passPrice = await this.getPodiumPassPrice({
+        sellerAddress: opts.sellerAddress,
+        numberOfTickets: opts.numberOfTickets,
+      });
+
+      if (passPrice === null) {
+        toast.error("Unable to get pass price");
+        return [false, "Unable to get pass price"];
+      }
+
+      // Check if user has sufficient balance for the pass
+      if (!(await this.hasSufficientBalance(passPrice))) {
+        const formattedBalance = await this.getFormattedBalance();
+        toast.error(
+          `Insufficient balance. Required: ${passPrice} APT, Current: ${formattedBalance} APT`
+        );
+        return [false, "Insufficient balance"];
+      }
+
       const referrerAddress = opts.referrer || "";
 
       // Build transaction using new SDK

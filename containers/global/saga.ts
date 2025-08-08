@@ -31,6 +31,16 @@ import {
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
+import {
+  AccountInfo,
+  AptosSignMessageOutput,
+  NetworkInfo,
+} from "@aptos-labs/wallet-adapter-react";
+import {
+  LoginMethod,
+  loginMethodSelectDialog,
+  LoginMethodSelectDialogResult,
+} from "app/components/Dialog/loginMethodSelectDialog";
 import { isUuid } from "app/lib/utils";
 import {
   AdditionalDataForLogin,
@@ -53,6 +63,15 @@ import {
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
+import { connectAsync } from "../_externalWallets";
+import {
+  externalWalletsDomains,
+  externalWalletsSelectors,
+} from "../_externalWallets/selectors";
+import {
+  ExternalWalletsState,
+  signMessageType,
+} from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
   notificationsActions,
@@ -140,7 +159,7 @@ function* initializeWeb3Auth(
     yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
     if (connected) {
-      yield getAndSetAccount();
+      yield getAndSetAccountUsingSocialLogin();
     }
   } catch (error) {
     yield put(globalActions.setLogingIn(false));
@@ -156,7 +175,58 @@ function* initializeWeb3Auth(
   }
 }
 
-function* getAndSetAccount() {
+function* login() {
+  const selectedMethod: LoginMethodSelectDialogResult =
+    yield loginMethodSelectDialog();
+  if (selectedMethod === LoginMethod.SOCIAL) {
+    yield getAndSetAccountUsingSocialLogin();
+    return;
+  }
+  if (selectedMethod === LoginMethod.NIGHTLY) {
+    const account: AccountInfo | null = yield connectAsync("Nightly");
+    if (account) {
+      const network: NetworkInfo = yield select(
+        externalWalletsSelectors.network("aptos")
+      );
+      if (network.chainId !== 126) {
+        toast.error(
+          "Please switch to the Movement Mainnet network on your wallet"
+        );
+        return;
+      } else {
+        yield put(globalActions.loginWithExternalWallet({ account, network }));
+      }
+      //log the account address
+    }
+    return;
+  }
+}
+function* loginWithExternalWallet(
+  action: ReturnType<typeof globalActions.loginWithExternalWallet>
+) {
+  const { account, network } = action.payload;
+
+  if (network.chainId !== 126) {
+    toast.error(
+      "Please switch to the Movement Mainnet network on your wallet to login"
+    );
+    return;
+  }
+
+  console.log("address", account.address.toString());
+  const address = account.address.toString();
+  const signMessageUsingExternalWallet: signMessageType = yield select(
+    externalWalletsSelectors.signMessage("aptos")
+  );
+  const signature: AptosSignMessageOutput =
+    yield signMessageUsingExternalWallet({
+      message: address,
+      nonce: "0",
+    });
+  console.log("signature", signature.signature.toString());
+}
+
+function* getAndSetAccountUsingSocialLogin() {
   try {
     const initialized: boolean = yield select(GlobalSelectors.initialized);
     if (!initialized) {
@@ -188,8 +258,6 @@ function* getAndSetAccount() {
           method: "eth_accounts",
         });
         if (accounts && accounts.length > 0) {
-          yield detached_afterConnectWithExternalWallet(provider);
-        } else {
           yield web3Auth.logout();
           yield web3Auth.clearCache();
           yield put(globalActions.setLogingIn(false));
@@ -550,11 +618,16 @@ function* detached_afterGettingPodiumUser({
 function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
+  const aptosWallet: ExternalWalletsState["wallets"]["aptos"] = yield select(
+    externalWalletsDomains.aptos
+  );
+  const disconnect = aptosWallet.disconnect;
   try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
+      disconnect(),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
     yield logoutFromOneSignal();
@@ -650,7 +723,11 @@ export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
-  yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
+  yield takeLatest(globalActions.login, login);
+  yield takeLatest(
+    globalActions.loginWithExternalWallet,
+    loginWithExternalWallet
+  );
   yield takeLatest(globalActions.switchAccount, switchAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeLatest(globalActions.joinOutpost, joinOutpost);

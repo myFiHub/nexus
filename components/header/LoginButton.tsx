@@ -47,7 +47,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
   }, []);
 
   const connect = async () => {
-    dispatch(globalActions.getAndSetWeb3AuthAccount());
+    dispatch(globalActions.login());
   };
 
   const disconnect = async () => {

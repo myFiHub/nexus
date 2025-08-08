@@ -13,6 +13,7 @@ import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
+import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -101,7 +102,11 @@ const globalSlice = createSlice({
     setWeb3Auth(state, action: PayloadAction<any>) {
       state.web3Auth = action.payload;
     },
-    getAndSetWeb3AuthAccount() {},
+    login() {},
+    loginWithExternalWallet(
+      _,
+      action: PayloadAction<{ account: AccountInfo; network: NetworkInfo }>
+    ) {},
     setWeb3AuthUserInfo(
       state,
       action: PayloadAction<Partial<UserInfo> | undefined>

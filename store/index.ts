@@ -8,6 +8,7 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 import { type AssetsState } from "app/containers/_assets/slice";
+import { ExternalWalletsState } from "app/containers/_externalWallets/slice";
 import { UsersState } from "app/containers/_users/slice";
 import { AllOutpostsState } from "app/containers/allOutposts/slice";
 import { CreateOutpostState } from "app/containers/createOutpost/slice";
@@ -109,6 +110,7 @@ export function isRegisteredSlice({ name }: { name: string }) {
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = {
   global: GlobalState;
+  externalWallets: ExternalWalletsState;
   profile: ProfileState;
   assets: AssetsState;
   userDetails: UserDetailsState;

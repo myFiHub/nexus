@@ -82,7 +82,7 @@ const Content = () => {
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
-    dispatch(globalActions.getAndSetWeb3AuthAccount());
+    dispatch(globalActions.login());
   };
 
   const handleLoginSuccess = async () => {
@@ -193,7 +193,7 @@ const Content = () => {
   return (
     <Dialog
       open={isOpen}
-      modal={false} // Always non-modal to prevent interference with Web3Auth
+      modal={true} // Always non-modal to prevent interference with Web3Auth
       onOpenChange={(open) => {
         if (!open && !logingIn) {
           // Only allow closing if Web3Auth is not active
