@@ -27,15 +27,11 @@ import {
 import {
   signMessage,
   signMessageWithTimestamp,
+  signMessageWithTimestampUsingExternalWallet,
 } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
-import {
-  AccountInfo,
-  AptosSignMessageOutput,
-  NetworkInfo,
-} from "@aptos-labs/wallet-adapter-react";
 import {
   LoginMethod,
   loginMethodSelectDialog,
@@ -63,14 +59,11 @@ import {
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
-import { connectAsync } from "../_externalWallets";
+import { externalWalletsSelectors } from "../_externalWallets/selectors";
 import {
-  externalWalletsDomains,
-  externalWalletsSelectors,
-} from "../_externalWallets/selectors";
-import {
-  ExternalWalletsState,
-  signMessageType,
+  accountType,
+  connectType,
+  disconnectType,
 } from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
@@ -183,28 +176,19 @@ function* login() {
     return;
   }
   if (selectedMethod === LoginMethod.NIGHTLY) {
-    const account: AccountInfo | null = yield connectAsync("Nightly");
-    if (account) {
-      const network: NetworkInfo = yield select(
-        externalWalletsSelectors.network("aptos")
-      );
-      if (network.chainId !== 126) {
-        toast.error(
-          "Please switch to the Movement Mainnet network on your wallet"
-        );
-        return;
-      } else {
-        yield put(globalActions.loginWithExternalWallet({ account, network }));
-      }
-      //log the account address
-    }
+    const connect: connectType = yield select(
+      externalWalletsSelectors.connect("aptos")
+    );
+    yield connect("Nightly");
+    // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
+    // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
     return;
   }
 }
 function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
 ) {
-  const { account, network } = action.payload;
+  const { network } = action.payload;
 
   if (network.chainId !== 126) {
     toast.error(
@@ -212,18 +196,7 @@ function* loginWithExternalWallet(
     );
     return;
   }
-
-  console.log("address", account.address.toString());
-  const address = account.address.toString();
-  const signMessageUsingExternalWallet: signMessageType = yield select(
-    externalWalletsSelectors.signMessage("aptos")
-  );
-  const signature: AptosSignMessageOutput =
-    yield signMessageUsingExternalWallet({
-      message: address,
-      nonce: "0",
-    });
-  console.log("signature", signature.signature.toString());
+  yield detached_afterConnect({}, false);
 }
 
 function* getAndSetAccountUsingSocialLogin() {
@@ -414,35 +387,10 @@ function* switchAccount() {
   }
 }
 
-function* detached_afterConnectWithExternalWallet(provider: IProvider) {
-  const accounts: string[] | undefined = yield provider?.request({
-    method: "eth_accounts",
-  });
-  if (accounts && accounts.length > 0) {
-    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-    // // Use Ethers.js to wrap the provider
-    // const ethersProvider = new ethers.BrowserProvider(provider);
-    // const correntNetwork: Network = yield ethersProvider.getNetwork();
-
-    // console.log("\x1b[32m%s\x1b[0m", "correntNetwork", correntNetwork);
-
-    // const signer: Signer = yield ethersProvider.getSigner();
-    // console.log("signer", signer);
-    // const address: string = yield signer.getAddress();
-    // console.log("address", address);
-    // const message = "Hello from Web3Auth + external wallet";
-    // const signature: string = yield signer.signMessage(message);
-    // console.log("signature", signature);
-    yield web3Auth.logout();
-    yield web3Auth.clearCache();
-    yield put(globalActions.setLogingIn(false));
-
-    toast.error("Only social login is supported for now");
-    return;
-  }
-}
-
-function* detached_afterConnect(userInfo: Partial<UserInfo>) {
+function* detached_afterConnect(
+  userInfo: Partial<UserInfo>,
+  isSocialLogin = true
+) {
   try {
     let {
       authConnection: loginType,
@@ -451,6 +399,36 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       profileImage: image,
       email,
     } = userInfo;
+
+    if (!isSocialLogin) {
+      const account: accountType = yield select(
+        externalWalletsSelectors.account("aptos")
+      );
+      if (!account) {
+        toast.error("Account not found");
+        return;
+      }
+      const aptosAddress = account.address.toString();
+      const identifierId = account.address.toString();
+      const loginType = "nightly";
+      const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
+        buyerAddress: aptosAddress,
+      });
+      yield detached_continueWithLoginRequestAndAdditionalData({
+        loginRequest: {
+          // this will be handled and changed in next step
+          signature: "placeholder",
+          username: aptosAddress,
+          // this will be handled and changed in next step
+          timestamp: 0,
+          aptos_address: aptosAddress,
+          has_ticket: hasCreatorPass,
+          login_type_identifier: identifierId,
+        },
+        additionalDataForLogin: { loginType },
+        isSocialLogin: false,
+      });
+    }
 
     const privateKey: string | undefined = yield getPrivateKey();
     if (privateKey) {
@@ -496,6 +474,7 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
         loginRequest,
         additionalDataForLogin,
         privateKey,
+        isSocialLogin: true,
       });
     }
   } catch (error) {
@@ -508,22 +487,51 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   additionalDataForLogin,
   retried = false,
   privateKey,
+  isSocialLogin = true,
 }: {
   loginRequest: LoginRequest;
   additionalDataForLogin: AdditionalDataForLogin;
   retried?: boolean;
-  privateKey: string;
+  privateKey?: string;
+  isSocialLogin?: boolean;
 }): any {
-  const {
-    signature,
-    timestampInUTCInSeconds,
-  }: {
-    signature: string;
-    timestampInUTCInSeconds: number;
-  } = yield signMessageWithTimestamp({
-    privateKey,
-    message: loginRequest.username,
-  });
+  let signature: string;
+  let timestampInUTCInSeconds: number;
+  if (!isSocialLogin) {
+    const {
+      signature: signatureExternalWallet,
+      timestampInUTCInSeconds: timestampInUTCInSecondsExternalWallet,
+    }: {
+      signature: string;
+      timestampInUTCInSeconds: number;
+    } = yield signMessageWithTimestampUsingExternalWallet({
+      walletName: "aptos",
+      message: loginRequest.username,
+    });
+    signature = signatureExternalWallet!;
+    timestampInUTCInSeconds = timestampInUTCInSecondsExternalWallet!;
+    movementService.connectedToExternalWallet = true;
+  } else {
+    const {
+      signature: signaturePrivateKey,
+      timestampInUTCInSeconds: timestampInUTCInSecondsPrivateKey,
+    }: {
+      signature: string;
+      timestampInUTCInSeconds: number;
+    } = yield signMessageWithTimestamp({
+      privateKey: privateKey!,
+      message: loginRequest.username,
+    });
+    signature = signaturePrivateKey!;
+    timestampInUTCInSeconds = timestampInUTCInSecondsPrivateKey!;
+    movementService.connectedToExternalWallet = false;
+  }
+  if (!signature || !timestampInUTCInSeconds) {
+    toast.error("Logging in failed, please try again");
+    yield put(globalActions.logout());
+    return;
+  }
+
   loginRequest.signature = signature;
   loginRequest.timestamp = timestampInUTCInSeconds;
   const response: {
@@ -544,6 +552,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
         additionalDataForLogin,
         privateKey,
         retried: true,
+        isSocialLogin,
       });
       return;
     } else {
@@ -618,16 +627,15 @@ function* detached_afterGettingPodiumUser({
 function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-  const aptosWallet: ExternalWalletsState["wallets"]["aptos"] = yield select(
-    externalWalletsDomains.aptos
+  const disconnect: disconnectType = yield select(
+    externalWalletsSelectors.disconnect("aptos")
   );
-  const disconnect = aptosWallet.disconnect;
   try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
-      disconnect(),
+      ...(disconnect ? [disconnect()] : []),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
     yield logoutFromOneSignal();

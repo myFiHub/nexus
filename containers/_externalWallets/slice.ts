@@ -12,11 +12,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
 
-type accountType = AccountInfo | null;
-type networkType = NetworkInfo | null;
-type connectType = (walletName: string) => void;
-type disconnectType = () => void;
-type signAndSubmitTransactionType = (
+export type accountType = AccountInfo | null;
+export type networkType = NetworkInfo | null;
+export type connectType = (walletName: string) => void;
+export type disconnectType = () => void;
+export type signAndSubmitTransactionType = (
   transaction: InputTransactionData
 ) => Promise<AptosSignAndSubmitTransactionOutput>;
 export type signMessageType = (

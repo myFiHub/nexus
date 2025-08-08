@@ -18,6 +18,8 @@ import {
   Ed25519PrivateKey,
   Network,
 } from "@aptos-labs/ts-sdk";
+import { AptosSignAndSubmitTransactionOutput } from "@aptos-labs/wallet-adapter-core";
+import { getStore } from "app/store";
 
 // Placeholder for environment/config
 const APTOS_INDEXER_URL =
@@ -79,6 +81,7 @@ class AptosMovement {
 
   private _account?: Account;
   private _client: Aptos;
+  private _connectedToExternalWallet: boolean = false;
 
   private constructor() {
     // Initialize new SDK client
@@ -96,6 +99,10 @@ class AptosMovement {
     return AptosMovement._instance;
   }
 
+  set connectedToExternalWallet(value: boolean) {
+    this._connectedToExternalWallet = value;
+  }
+
   get client() {
     return this._client;
   }
@@ -108,6 +115,7 @@ class AptosMovement {
 
   clearAccount() {
     this._account = undefined;
+    this._connectedToExternalWallet = false;
   }
 
   get account() {
@@ -395,32 +403,41 @@ query GetNFTs($address: String!) {
         percentage = 100;
       if (opts.receiverAddresses.length === 2 && !isSelfReaction)
         percentage = 100;
+      const data: any = {
+        function: `${CHEER_BOO_ADDRESS}::${CHEER_BOO_NAME}::cheer_or_boo`,
+        functionArguments: [
+          opts.target,
+          opts.receiverAddresses,
+          opts.cheer,
+          amountToSend,
+          percentage.toString(),
+          opts.outpostId,
+        ],
+      };
 
-      // Build transaction using new SDK
-      const transaction = await this._client.transaction.build.simple({
-        sender: this.account.accountAddress,
-        data: {
-          function: `${CHEER_BOO_ADDRESS}::${CHEER_BOO_NAME}::cheer_or_boo`,
-          functionArguments: [
-            opts.target,
-            opts.receiverAddresses,
-            opts.cheer,
-            amountToSend,
-            percentage.toString(),
-            opts.outpostId,
-          ],
-        },
-      });
+      let hash = "";
 
-      // Sign and submit transaction
-      const pendingTransaction = await this._client.signAndSubmitTransaction({
-        signer: this.account,
-        transaction,
-      });
+      if (this._connectedToExternalWallet) {
+        const result = await this._handleExternalWalletTransaction(data);
+        if (result) {
+          hash = result.hash;
+        }
+      } else {
+        // Build transaction using new SDK
+        const transaction = await this._client.transaction.build.simple({
+          sender: this.account.accountAddress,
+          data,
+        });
+        const pendingTransaction = await this._client.signAndSubmitTransaction({
+          signer: this.account,
+          transaction,
+        });
+        hash = pendingTransaction.hash;
+      }
 
       // Wait for transaction to be committed
       const transactionResponse = await this._client.waitForTransaction({
-        transactionHash: pendingTransaction.hash,
+        transactionHash: hash,
         options: {
           checkSuccess: true,
         },
@@ -517,28 +534,39 @@ query GetNFTs($address: String!) {
 
       const referrerAddress = opts.referrer || "";
 
-      // Build transaction using new SDK
-      const transaction = await this._client.transaction.build.simple({
-        sender: this.account.accountAddress,
-        data: {
-          function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::buy_pass`,
-          functionArguments: [
-            opts.sellerAddress,
-            (opts.numberOfTickets || 1).toString(),
-            referrerAddress,
-          ],
-        },
-      });
+      const data: any = {
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::buy_pass`,
+        functionArguments: [
+          opts.sellerAddress,
+          (opts.numberOfTickets || 1).toString(),
+          referrerAddress,
+        ],
+      };
 
-      // Sign and submit transaction
-      const pendingTransaction = await this._client.signAndSubmitTransaction({
-        signer: this.account,
-        transaction,
-      });
+      let hash = "";
+
+      if (this._connectedToExternalWallet) {
+        const result = await this._handleExternalWalletTransaction(data);
+        if (result) {
+          hash = result.hash;
+        }
+      } else {
+        // Build transaction using new SDK
+        const transaction = await this._client.transaction.build.simple({
+          sender: this.account.accountAddress,
+          data,
+        });
+
+        const pendingTransaction = await this._client.signAndSubmitTransaction({
+          signer: this.account,
+          transaction,
+        });
+        hash = pendingTransaction.hash;
+      }
 
       // Wait for transaction to be committed
       const transactionResponse = await this._client.waitForTransaction({
-        transactionHash: pendingTransaction.hash,
+        transactionHash: hash,
         options: {
           checkSuccess: true,
         },
@@ -581,27 +609,38 @@ query GetNFTs($address: String!) {
     numberOfTickets: number;
   }): Promise<[boolean | null, string | null]> {
     try {
-      // Build transaction using new SDK
-      const transaction = await this._client.transaction.build.simple({
-        sender: this.account.accountAddress,
-        data: {
-          function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::sell_pass`,
-          functionArguments: [
-            opts.sellerAddress,
-            opts.numberOfTickets.toString(),
-          ],
-        },
-      });
+      const data: any = {
+        function: `${PODIUM_PROTOCOL_ADDRESS}::${PODIUM_PROTOCOL_NAME}::sell_pass`,
+        functionArguments: [
+          opts.sellerAddress,
+          opts.numberOfTickets.toString(),
+        ],
+      };
 
-      // Sign and submit transaction
-      const pendingTransaction = await this._client.signAndSubmitTransaction({
-        signer: this.account,
-        transaction,
-      });
+      let hash = "";
+
+      if (this._connectedToExternalWallet) {
+        const result = await this._handleExternalWalletTransaction(data);
+        if (result) {
+          hash = result.hash;
+        }
+      } else {
+        // Build transaction using new SDK
+        const transaction = await this._client.transaction.build.simple({
+          sender: this.account.accountAddress,
+          data,
+        });
+
+        const pendingTransaction = await this._client.signAndSubmitTransaction({
+          signer: this.account,
+          transaction,
+        });
+        hash = pendingTransaction.hash;
+      }
 
       // Wait for transaction to be committed
       const transactionResponse = await this._client.waitForTransaction({
-        transactionHash: pendingTransaction.hash,
+        transactionHash: hash,
         options: {
           checkSuccess: true,
         },
@@ -612,6 +651,47 @@ query GetNFTs($address: String!) {
       toast.error("Error selling Pass: " + e.toString());
       return [false, e.toString().replace("AxiosError:", "")];
     }
+  }
+
+  /**
+   * Handles external wallet transaction signing and validation
+   */
+  private async _handleExternalWalletTransaction(
+    data: any
+  ): Promise<AptosSignAndSubmitTransactionOutput | undefined> {
+    const store = getStore();
+    const signAndSubmitTransaction =
+      store.getState().externalWallets.wallets.aptos.signAndSubmitTransaction;
+
+    const account = store.getState().externalWallets.wallets.aptos.account;
+    const address = account?.address.toString();
+    const network = store.getState().externalWallets.wallets.aptos.network;
+    if (!address || !network) {
+      toast.error("Connect your wallet and try again");
+      return undefined;
+    }
+    if (network.chainId !== 126) {
+      toast.error(
+        "Please switch to the Movement Mainnet network on your wallet and try again"
+      );
+      return undefined;
+    }
+    if (signAndSubmitTransaction) {
+      try {
+        const result = await signAndSubmitTransaction({
+          data,
+        });
+        return result;
+      } catch (e: any) {
+        if (e.message.includes("rejected")) {
+          toast.error("Request rejected");
+          return undefined;
+        }
+        toast.error(e.message);
+        return undefined;
+      }
+    }
+    return undefined;
   }
 }
 
