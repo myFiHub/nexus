@@ -229,39 +229,87 @@ const Content = () => {
                 <div className="flex items-center space-x-4">
                   <motion.div variants={iconVariants} className="relative">
                     <div className="group-hover:scale-110 transition-transform duration-200 flex items-center justify-center">
-                      <div className="relative w-8 h-8">
-                        {[
-                          { src: "/social_login_icons/apple.png", delay: 0 },
-                          { src: "/social_login_icons/email.png", delay: 1.2 },
-                          {
-                            src: "/social_login_icons/facebook.png",
-                            delay: 2.4,
-                          },
-                          { src: "/social_login_icons/github.png", delay: 3.6 },
-                          { src: "/social_login_icons/g_icon.png", delay: 4.8 },
-                        ].map((icon, index) => (
-                          <motion.div
-                            key={index}
-                            className="absolute inset-0"
-                            animate={{
-                              opacity: [0, 1, 0],
-                            }}
-                            transition={{
-                              duration: 6,
-                              repeat: Infinity,
-                              delay: icon.delay,
-                              ease: "easeInOut",
-                            }}
-                          >
-                            <Image
-                              src={icon.src}
-                              alt="Social login"
-                              width={32}
-                              height={32}
-                              className="w-8 h-8"
-                            />
-                          </motion.div>
-                        ))}
+                      <div className="relative w-12 h-12">
+                        {(() => {
+                          const icons = [
+                            "/social_login_icons/g_icon.png",
+                            "/social_login_icons/x_platform.png",
+                            "/social_login_icons/apple.png",
+                            "/social_login_icons/email.png",
+                            "/social_login_icons/facebook.png",
+                            "/social_login_icons/github.png",
+                          ];
+                          const loopIcons = [...icons, ...icons]; // duplicate for seamless loop
+                          const rowGapPx = 6;
+                          const iconSizePx = 16;
+                          const rowHeightPx = iconSizePx + rowGapPx; // vertical space per icon
+                          const trackHeightPx = rowHeightPx * icons.length;
+                          const durationSeconds = 10; // overall scroll duration
+
+                          return (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="relative h-6 w-6 overflow-hidden">
+                                {/* top/bottom fade masks */}
+                                <div className="pointer-events-none absolute left-0 right-0 top-0 h-2 bg-gradient-to-b from-background to-transparent" />
+                                <div className="pointer-events-none absolute left-0 right-0 bottom-0 h-2 bg-gradient-to-t from-background to-transparent" />
+
+                                <motion.div
+                                  className="flex flex-col items-center"
+                                  animate={{ y: [0, -trackHeightPx] }}
+                                  transition={{
+                                    duration: durationSeconds,
+                                    ease: "linear" as const,
+                                    repeat: Infinity,
+                                  }}
+                                >
+                                  {loopIcons.map((src, index) => (
+                                    <div
+                                      key={index}
+                                      className="flex items-center justify-center"
+                                      style={{ height: rowHeightPx }}
+                                    >
+                                      {(() => {
+                                        const needsMask =
+                                          src.includes("apple") ||
+                                          src.includes("x_platform");
+                                        if (needsMask) {
+                                          return (
+                                            <div
+                                              aria-label="Social login"
+                                              className="w-4 h-4"
+                                              style={{
+                                                backgroundColor: "#ffffff",
+                                                WebkitMaskImage: `url(${src})`,
+                                                maskImage: `url(${src})`,
+                                                WebkitMaskRepeat: "no-repeat",
+                                                maskRepeat: "no-repeat",
+                                                WebkitMaskSize: "contain",
+                                                maskSize: "contain",
+                                                WebkitMaskPosition: "center",
+                                                maskPosition: "center",
+                                                width: iconSizePx,
+                                                height: iconSizePx,
+                                              }}
+                                            />
+                                          );
+                                        }
+                                        return (
+                                          <Image
+                                            src={src}
+                                            alt="Social login"
+                                            width={iconSizePx}
+                                            height={iconSizePx}
+                                            className="w-4 h-4"
+                                          />
+                                        );
+                                      })()}
+                                    </div>
+                                  ))}
+                                </motion.div>
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     </div>
                   </motion.div>
