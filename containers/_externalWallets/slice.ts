@@ -9,12 +9,13 @@ import {
   NetworkInfo,
 } from "@aptos-labs/wallet-adapter-core";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { validWalletNames } from "app/components/Dialog/loginMethodSelectDialog";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
 
 export type accountType = AccountInfo | null;
 export type networkType = NetworkInfo | null;
-export type connectType = (walletName: string) => void;
+export type connectType = (walletName: validWalletNames) => void;
 export type disconnectType = () => void;
 export type signAndSubmitTransactionType = (
   transaction: InputTransactionData

@@ -1,13 +1,9 @@
-import { AccountInfo } from "@aptos-labs/wallet-adapter-core";
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
-import { getStore, RootState } from "app/store";
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { filter, firstValueFrom, map, Observable } from "rxjs";
 import { toast } from "sonner";
 import { globalActions } from "../global/slice";
 import { ExternalWalletsProvider } from "./connectors/nightly";
-import { externalWalletsSelectors } from "./selectors";
 import { externalWalletActions } from "./slice";
 
 /*
@@ -43,64 +39,6 @@ import { externalWalletActions } from "./slice";
 
 */
 
-// Create an observable from Redux store state changes
-function createStoreObservable<T>(
-  selector: (state: RootState) => T
-): Observable<T> {
-  return new Observable<T>((subscriber) => {
-    const store = getStore();
-    let currentValue = selector(store.getState());
-
-    // Emit initial value
-    subscriber.next(currentValue);
-
-    // Subscribe to store changes
-    const unsubscribe = store.subscribe(() => {
-      const newValue = selector(store.getState());
-      if (newValue !== currentValue) {
-        currentValue = newValue;
-        subscriber.next(newValue);
-      }
-    });
-
-    // Cleanup function
-    return () => {
-      unsubscribe();
-    };
-  });
-}
-
-// Async function to connect wallet and return account
-export const connectAsync = async (
-  walletName: string
-): Promise<AccountInfo | null> => {
-  const store = getStore();
-  const state = store.getState();
-
-  // Get connect function from store
-  const connectFn = externalWalletsSelectors.connect("aptos")(state);
-
-  // Create observables for connected state and account
-  const connected$ = createStoreObservable((state: RootState) =>
-    externalWalletsSelectors.connected("aptos")(state)
-  );
-
-  // Call connect function
-  connectFn(walletName);
-
-  // Wait for connection to be established and account to be available
-  return firstValueFrom(
-    connected$.pipe(
-      filter((connected) => connected === true),
-      map(() => {
-        const currentState = store.getState();
-        return externalWalletsSelectors.account("aptos")(currentState);
-      }),
-      filter((account) => account !== null)
-    )
-  );
-};
-
 const Container = () => {
   const triedOnce = useRef(false);
   const dispatch = useDispatch();
@@ -115,26 +53,6 @@ const Container = () => {
     disconnect,
     changeNetwork,
   } = useWallet();
-
-  useEffect(() => {
-    if (
-      account &&
-      network &&
-      network.chainId === 126 &&
-      !isLoading &&
-      !triedOnce.current
-    ) {
-      triedOnce.current = true;
-      dispatch(globalActions.loginWithExternalWallet({ account, network }));
-      setTimeout(() => {
-        triedOnce.current = false;
-      }, 1000);
-    } else if (account && network && network.chainId !== 126) {
-      toast.error(
-        "Please switch to the Movement Mainnet network on your wallet"
-      );
-    }
-  }, [account, network]);
 
   useEffect(() => {
     dispatch(
@@ -209,6 +127,26 @@ const Container = () => {
       })
     );
   }, [changeNetwork]);
+
+  useEffect(() => {
+    if (
+      account &&
+      network &&
+      network.chainId === 126 &&
+      !isLoading &&
+      !triedOnce.current
+    ) {
+      triedOnce.current = true;
+      dispatch(globalActions.loginWithExternalWallet({ account, network }));
+      setTimeout(() => {
+        triedOnce.current = false;
+      }, 1000);
+    } else if (account && network && network.chainId !== 126) {
+      toast.error(
+        "Please switch to the Movement Mainnet network on your wallet"
+      );
+    }
+  }, [account, network]);
 
   return <></>;
 };

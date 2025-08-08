@@ -7,8 +7,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./index";
 
 export enum LoginMethod {
   SOCIAL = "social",
-  NIGHTLY = "nightly",
+  NIGHTLY = "Nightly",
 }
+export type validWalletNames = LoginMethod.NIGHTLY;
 
 export type LoginMethodSelectDialogResult = LoginMethod | undefined;
 

@@ -36,8 +36,9 @@ import {
   LoginMethod,
   loginMethodSelectDialog,
   LoginMethodSelectDialogResult,
+  validWalletNames,
 } from "app/components/Dialog/loginMethodSelectDialog";
-import { isUuid } from "app/lib/utils";
+import { isDev, isUuid } from "app/lib/utils";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -64,6 +65,7 @@ import {
   accountType,
   connectType,
   disconnectType,
+  externalWalletActions,
 } from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
@@ -179,7 +181,7 @@ function* login() {
     const connect: connectType = yield select(
       externalWalletsSelectors.connect("aptos")
     );
-    yield connect("Nightly");
+    yield connect(selectedMethod);
     // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
     // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
     return;
@@ -188,7 +190,19 @@ function* login() {
 function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
 ) {
-  const { network } = action.payload;
+  const { network, account } = action.payload;
+  yield put(
+    externalWalletActions.setAccount({
+      walletName: "aptos",
+      account,
+    })
+  );
+  yield put(
+    externalWalletActions.setNetwork({
+      walletName: "aptos",
+      network,
+    })
+  );
 
   if (network.chainId !== 126) {
     toast.error(
@@ -196,7 +210,9 @@ function* loginWithExternalWallet(
     );
     return;
   }
-  yield detached_afterConnect({}, false);
+  if (account) {
+    yield detached_afterConnect({}, false);
+  }
 }
 
 function* getAndSetAccountUsingSocialLogin() {
@@ -352,6 +368,7 @@ function* switchAccount() {
                   timestamp: timestampInUTCInSeconds,
                   aptos_address: movementService.address,
                   has_ticket: false,
+                  login_type: userInfo?.authConnection ?? "",
                   login_type_identifier: userInfo?.authConnectionId ?? "",
                 };
 
@@ -410,7 +427,7 @@ function* detached_afterConnect(
       }
       const aptosAddress = account.address.toString();
       const identifierId = account.address.toString();
-      const loginType = "nightly";
+      const loginType: validWalletNames = LoginMethod.NIGHTLY;
       const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
         buyerAddress: aptosAddress,
       });
@@ -418,14 +435,15 @@ function* detached_afterConnect(
         loginRequest: {
           // this will be handled and changed in next step
           signature: "placeholder",
-          username: aptosAddress,
           // this will be handled and changed in next step
           timestamp: 0,
+          username: aptosAddress,
           aptos_address: aptosAddress,
           has_ticket: hasCreatorPass,
+          login_type: loginType.toLowerCase(),
           login_type_identifier: identifierId,
         },
-        additionalDataForLogin: { loginType },
+        additionalDataForLogin: {},
         isSocialLogin: false,
       });
     }
@@ -455,6 +473,7 @@ function* detached_afterConnect(
         timestamp: 0, //this will be handled and changed in next step
         aptos_address: aptosAddress,
         has_ticket: hasCreatorPass,
+        login_type: loginType ?? "",
         login_type_identifier: identifierId,
       };
       const additionalDataForLogin: AdditionalDataForLogin = {
@@ -627,22 +646,34 @@ function* detached_afterGettingPodiumUser({
 function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-  const disconnect: disconnectType = yield select(
-    externalWalletsSelectors.disconnect("aptos")
-  );
+
   try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
-      ...(disconnect ? [disconnect()] : []),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
     yield logoutFromOneSignal();
-    yield web3Auth?.logout();
-    yield web3Auth?.clearCache();
+    try {
+      yield web3Auth?.logout();
+    } catch (error) {}
+    try {
+      yield web3Auth?.clearCache();
+    } catch (error) {}
   } catch (error) {
     console.error(error);
+  } finally {
+    const disconnect: disconnectType = yield select(
+      externalWalletsSelectors.disconnect("aptos")
+    );
+    try {
+      disconnect?.();
+    } catch (error) {
+      if (isDev) {
+        console.error(error);
+      }
+    }
   }
   yield put(globalActions.setLogingOut(false));
 }
