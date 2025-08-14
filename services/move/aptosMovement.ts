@@ -103,6 +103,10 @@ class AptosMovement {
     this._connectedToExternalWallet = value;
   }
 
+  get connectedToExternalWallet() {
+    return this._connectedToExternalWallet;
+  }
+
   get client() {
     return this._client;
   }
@@ -124,7 +128,15 @@ class AptosMovement {
   }
 
   get address() {
-    return this.account.accountAddress.toString();
+    if (!this.connectedToExternalWallet) {
+      return this.account.accountAddress.toString();
+    }
+    const store = getStore();
+    const address = store
+      .getState()
+      .externalWallets.wallets.aptos.account?.address.toString();
+    if (!address) throw new Error("Aptos address not set!");
+    return address;
   }
 
   async isMyAccountActive() {
@@ -217,7 +229,6 @@ class AptosMovement {
       parsed.map((item: any) => podiumApi.getUserByPassSymbol(item.symbol))
     );
 
-    console.log({ results });
     const resultsToReturn: BlockchainPassData[] = [];
 
     results.forEach((result, index) => {
@@ -259,6 +270,7 @@ query GetNFTs($address: String!) {
   }
 }
   `;
+
     const address = this.address;
     const response = await axios.post(
       APTOS_INDEXER_URL,

@@ -1,9 +1,9 @@
-import gradient from "../assets/gradients/3.jpg";
+import matcap from "../assets/matcaps/3.png";
 import { InitialPositionProps } from "../types";
 import { textureLoader } from "../utils/textureLoader";
 
 const gradientTexture =
-  typeof window !== "undefined" ? textureLoader.load(gradient.src) : null;
+  typeof window !== "undefined" ? textureLoader.load(matcap.src) : null;
 
 interface SphereProps extends InitialPositionProps {
   radius?: number;

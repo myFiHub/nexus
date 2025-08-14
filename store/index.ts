@@ -75,7 +75,8 @@ function injectReducer(key: string, reducer: Reducer<any, UnknownAction>) {
 
     getStore().replaceReducer(combinedReducer);
     if (isDev) {
-      console.log("injected reducer", key);
+      // siringe emoji instead of text
+      console.log("💉 reducer", key);
     }
   }
 }
@@ -89,7 +90,7 @@ function injectSaga(key: string, saga: any) {
     injectedSagas[key] = saga;
     sagaMiddleware.run(saga);
     if (isDev) {
-      console.log("injected saga", key);
+      console.log("💉 saga", key);
     }
   }
 }

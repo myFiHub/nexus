@@ -13,7 +13,11 @@ import {
   referrerDialog,
   ReferrerDialogResult,
 } from "app/components/Dialog";
-import { CookieKeys } from "app/lib/client-cookies";
+import {
+  CookieKeys,
+  deleteClientCookie,
+  getClientCookie,
+} from "app/lib/client-cookies";
 import {
   deleteServerCookieViaAPI,
   setServerCookieViaAPI,
@@ -369,6 +373,7 @@ function* switchAccount() {
                   yield detached_afterGettingPodiumUser({
                     user: response.user,
                     token: response.token ?? "",
+                    savedName: response.user?.name ?? "",
                   });
                 } else {
                   thereWasAnError = true;
@@ -396,6 +401,26 @@ function* detached_afterConnect(
   isSocialLogin = true
 ) {
   try {
+    const token = getClientCookie(CookieKeys.token);
+    if (token && !isSocialLogin) {
+      podiumApi.setToken(token);
+      const myUser: User | undefined = yield podiumApi.getMyUserData({});
+      if (myUser) {
+        const savedName: string = yield detached_checkName({ user: myUser });
+        if (!savedName) {
+          yield put(globalActions.logout());
+          return;
+        }
+        movementService.connectedToExternalWallet = true;
+        yield detached_afterGettingPodiumUser({
+          user: myUser,
+          token,
+          savedName,
+        });
+        return;
+      }
+    }
+
     let {
       authConnection: loginType,
       userId: identifierId,
@@ -435,55 +460,55 @@ function* detached_afterConnect(
         additionalDataForLogin: {},
         isSocialLogin: false,
       });
-    }
+    } else {
+      const privateKey: string | undefined = yield getPrivateKey();
+      if (privateKey) {
+        movementService.setAccount(privateKey);
+        const aptosAddress = movementService.address;
 
-    const privateKey: string | undefined = yield getPrivateKey();
-    if (privateKey) {
-      movementService.setAccount(privateKey);
-      const aptosAddress = movementService.address;
+        if (!identifierId) {
+          console.log("Identifier ID is required");
+          return;
+        }
+        if (identifierId.includes("|")) {
+          identifierId = identifierId.split("|")[1];
+        }
+        const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
+          buyerAddress: aptosAddress,
+        });
 
-      if (!identifierId) {
-        console.log("Identifier ID is required");
-        return;
-      }
-      if (identifierId.includes("|")) {
-        identifierId = identifierId.split("|")[1];
-      }
-      const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
-        buyerAddress: aptosAddress,
-      });
+        const evmWallet = new ethers.Wallet(privateKey);
+        const evmAddress = evmWallet.address;
 
-      const evmWallet = new ethers.Wallet(privateKey);
-      const evmAddress = evmWallet.address;
+        const loginRequest: LoginRequest = {
+          signature: "placeholder", //this will be handled and changed in next step
+          username: evmAddress,
+          timestamp: 0, //this will be handled and changed in next step
+          aptos_address: aptosAddress,
+          has_ticket: hasCreatorPass,
+          login_type: loginType ?? "",
+          login_type_identifier: identifierId,
+        };
+        const additionalDataForLogin: AdditionalDataForLogin = {
+          loginType,
+        };
 
-      const loginRequest: LoginRequest = {
-        signature: "placeholder", //this will be handled and changed in next step
-        username: evmAddress,
-        timestamp: 0, //this will be handled and changed in next step
-        aptos_address: aptosAddress,
-        has_ticket: hasCreatorPass,
-        login_type: loginType ?? "",
-        login_type_identifier: identifierId,
-      };
-      const additionalDataForLogin: AdditionalDataForLogin = {
-        loginType,
-      };
-
-      if (name) {
-        additionalDataForLogin.name = name;
+        if (name) {
+          additionalDataForLogin.name = name;
+        }
+        if (image) {
+          additionalDataForLogin.image = image;
+        }
+        if (email) {
+          additionalDataForLogin.email = email;
+        }
+        yield detached_continueWithLoginRequestAndAdditionalData({
+          loginRequest,
+          additionalDataForLogin,
+          privateKey,
+          isSocialLogin: true,
+        });
       }
-      if (image) {
-        additionalDataForLogin.image = image;
-      }
-      if (email) {
-        additionalDataForLogin.email = email;
-      }
-      yield detached_continueWithLoginRequestAndAdditionalData({
-        loginRequest,
-        additionalDataForLogin,
-        privateKey,
-        isSocialLogin: true,
-      });
     }
   } catch (error) {
     yield put(globalActions.logout());
@@ -511,7 +536,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
       timestampInUTCInSeconds: timestampInUTCInSecondsExternalWallet,
     } = yield signMessageWithTimestampUsingExternalWallet({
       walletName: "aptos",
-      message: loginRequest.username,
+      message: loginRequest.aptos_address,
     });
 
     signature = signatureExternalWallet!;
@@ -547,6 +572,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
     statusCode: number | null;
     token: string | null;
   } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
     const { confirmed, enteredText }: ReferrerDialogResult =
@@ -567,56 +593,69 @@ function* detached_continueWithLoginRequestAndAdditionalData({
       yield put(globalActions.logout());
       return;
     }
-  } else if (!response.user && response.error) {
-    toast.error(response.error);
+  } else if (!response.user) {
+    toast.error(response.error ?? "Error logging in, please try again");
     yield put(globalActions.logout());
     return;
   }
-  let savedName = response.user?.name;
-  let canContinue = true;
-  if (!savedName || savedName.includes("@")) {
-    canContinue = false;
-    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
-    if (confirmed && (enteredText?.trim().length || 0) > 0) {
-      const resultsForUpdate: User | undefined =
-        yield podiumApi.updateMyUserData({ name: enteredText });
-      if (resultsForUpdate) {
-        canContinue = true;
-        savedName = enteredText;
-      }
-    }
-  }
-  if (!canContinue) {
+  const user = response.user;
+  const savedName: string = yield detached_checkName({ user });
+  if (!savedName) {
     yield put(globalActions.logout());
     return;
   }
 
-  if (response?.user) {
-    yield put(
-      globalActions.setPodiumUserInfo({
-        ...response.user,
-        name: savedName,
-      })
-    );
+  if (user) {
     yield detached_afterGettingPodiumUser({
-      user: response.user,
+      user,
       token: response.token ?? "",
+      savedName,
     });
   } else {
     yield put(globalActions.logout());
   }
 }
+
+function* detached_checkName({ user }: { user: User }) {
+  let savedName = user?.name;
+  if (!savedName || savedName.includes("@")) {
+    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
+    if (confirmed && (enteredText?.trim().length || 0) > 0) {
+      const resultsForUpdate: User | undefined =
+        yield podiumApi.updateMyUserData({ name: enteredText });
+      if (resultsForUpdate) {
+        savedName = enteredText;
+      }
+    }
+  }
+  return savedName;
+}
+
 function* detached_afterGettingPodiumUser({
   user,
   token,
+  savedName,
 }: {
   user: User;
   token: string;
+  savedName: string;
 }) {
   useMyOutpostsSlice();
   useProfileSlice();
   useAssetsSlice();
   useNotificationsSlice();
+  const remoteName: string = yield detached_checkName({ user });
+  if (!remoteName) {
+    yield put(globalActions.logout());
+    return;
+  }
+  yield put(
+    globalActions.setPodiumUserInfo({
+      ...user,
+      name: remoteName,
+    })
+  );
+
   yield put(globalActions.initOneSignal({ myId: user.uuid }));
   yield all([
     put(notificationsActions.getNotifications()),
@@ -636,16 +675,42 @@ function* logout() {
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
 
   try {
+    // remove token from cookies
+    deleteClientCookie(CookieKeys.token);
+  } catch (error) {
+    if (isDev) {
+      console.error(error);
+    }
+  }
+
+  try {
+    podiumApi.setToken(undefined);
+  } catch (error) {
+    if (isDev) {
+      console.error(error);
+    }
+  }
+
+  try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
+
     deleteServerCookieViaAPI(CookieKeys.myUserId);
-    yield logoutFromOneSignal();
+    try {
+      yield logoutFromOneSignal();
+    } catch (error) {
+      if (isDev) {
+        console.error(error);
+      }
+    }
+
     try {
       yield web3Auth?.logout();
     } catch (error) {}
+
     try {
       yield web3Auth?.clearCache();
     } catch (error) {}
