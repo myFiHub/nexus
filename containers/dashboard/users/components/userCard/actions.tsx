@@ -20,6 +20,7 @@ const Content = ({ address }: { address: string }) => {
   const loggedIn = !!myUser;
   const isBuyingPass = useSelector(AssetsSelectors.buyingPass) === address;
   const isSellingPass = useSelector(AssetsSelectors.sellingPass) === address;
+  const logingIn = useSelector(GlobalSelectors.logingIn);
   const [user, setUser] = useState<User | undefined>(undefined);
   const [isBuying, setIsBuying] = useState(false);
   const [isSelling, setIsSelling] = useState(false);
@@ -65,7 +66,7 @@ const Content = ({ address }: { address: string }) => {
       setIsSelling(false);
     }
 
-    if (!loggedIn) {
+    if (!loggedIn && !logingIn) {
       await loginPromptDialog({
         actionDescription: type === "buy" ? "buy this pass" : "sell this pass",
         additionalComponent: (
@@ -88,31 +89,46 @@ const Content = ({ address }: { address: string }) => {
   if (isMyUser) {
     return null;
   }
+
   return (
     <div
       className={`flex opacity-0 gap-1 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-opacity duration-200 ${
         isMyUser ? "hidden" : ""
       } ${loadingBuy || loadingSell ? "!opacity-100" : "opacity-0"}`}
     >
-      <Button
-        className={`min-w-10 `}
-        size="xxs"
-        type="button"
-        onClick={() => handleClick("buy")}
-        disabled={loadingBuy}
-      >
-        {loadingBuy ? <Loader className="w-4 h-4 animate-spin" /> : "Buy"}
-      </Button>
-      <Button
-        className={`min-w-10 `}
-        size="xxs"
-        type="button"
-        variant="destructive"
-        onClick={() => handleClick("sell")}
-        disabled={loadingSell}
-      >
-        {loadingSell ? <Loader className="w-4 h-4 animate-spin" /> : "Sell"}
-      </Button>
+      {logingIn ? (
+        <Button
+          className={`min-w-10 `}
+          size="xxs"
+          type="button"
+          onClick={() => {}}
+          disabled={true}
+        >
+          <Loader className="w-4 h-4 animate-spin" />
+        </Button>
+      ) : (
+        <>
+          <Button
+            className={`min-w-10 `}
+            size="xxs"
+            type="button"
+            onClick={() => handleClick("buy")}
+            disabled={loadingBuy}
+          >
+            {loadingBuy ? <Loader className="w-4 h-4 animate-spin" /> : "Buy"}
+          </Button>
+          <Button
+            className={`min-w-10 `}
+            size="xxs"
+            type="button"
+            variant="destructive"
+            onClick={() => handleClick("sell")}
+            disabled={loadingSell}
+          >
+            {loadingSell ? <Loader className="w-4 h-4 animate-spin" /> : "Sell"}
+          </Button>
+        </>
+      )}
     </div>
   );
 };
