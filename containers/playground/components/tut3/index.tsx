@@ -2,17 +2,10 @@
 import { OrbitControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { useState } from "react";
-import { Box } from "./box";
+import { Box } from "./tut3";
 
 export const Tut3 = () => {
   const [showBox, setShowBox] = useState(true);
-
-  const handleClick = () => {
-    setShowBox(false);
-    setTimeout(() => {
-      setShowBox(true);
-    }, 10);
-  };
 
   return (
     <>
@@ -39,4 +32,4 @@ export const Tut3 = () => {
 };
 
 // Export individual components for standalone use
-export { Box } from "./box";
+export { Box } from "./tut3";

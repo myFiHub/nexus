@@ -192,7 +192,7 @@ const Content = () => {
 
   return (
     <Dialog
-      open={isOpen}
+      open={isOpen && !logingIn}
       modal={true} // Always non-modal to prevent interference with Web3Auth
       onOpenChange={(open) => {
         if (!open && !logingIn) {

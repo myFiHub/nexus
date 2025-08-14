@@ -209,9 +209,7 @@
   }
 
   /* Force our login prompt dialog to have lower z-index when Web3Auth is active */
-  .login-prompt-dialog-active {
-    z-index: 10 !important;
-  }
+
 
   /* Webkit Scrollbars (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {

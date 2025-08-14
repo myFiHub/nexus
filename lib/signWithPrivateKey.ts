@@ -43,16 +43,17 @@ export const signMessageUsingExternalWallet = async ({
   if (!account) {
     toast.error("wallet is not connected");
   }
-  const signMessage =
+  const signMessageFunction =
     store.getState().externalWallets.wallets[walletName].signMessage;
-  if (!signMessage) {
+  if (!signMessageFunction) {
     toast.error("wallet is not connected");
     return;
   }
-  const signature = await signMessage({
+  const signature = await signMessageFunction({
     message,
     nonce: "0",
   });
+
   if (!signature) {
     toast.error("Error signing message");
     return;

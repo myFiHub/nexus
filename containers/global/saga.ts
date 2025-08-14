@@ -20,10 +20,7 @@ import {
 } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
-import {
-  checkPushNotificationPermission,
-  requestPushNotificationPermission,
-} from "app/lib/pushNotificationPermissions";
+import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
 import {
   signMessage,
   signMessageWithTimestamp,
@@ -107,9 +104,11 @@ function* initOneSignal(
 ) {
   const myId: string = action.payload.myId;
   try {
-    const hasPermision: boolean = yield checkPushNotificationPermission();
-    if (!hasPermision) {
+    const askedOnceForNotifs: string | null =
+      localStorage.getItem("askedOnceForNotifs");
+    if (!askedOnceForNotifs) {
       const result: boolean = yield promptNotifications();
+      localStorage.setItem("askedOnceForNotifs", "true");
       if (!result) {
         return;
       }
@@ -413,6 +412,7 @@ function* detached_afterConnect(
         toast.error("Account not found");
         return;
       }
+      const publicKey = account.publicKey.toString();
       const aptosAddress = account.address.toString();
       const identifierId = account.address.toString();
       const loginType: validWalletNames = LoginMethod.NIGHTLY;
@@ -426,7 +426,7 @@ function* detached_afterConnect(
           signature: "placeholder",
           // this will be handled and changed in next step
           timestamp: 0,
-          username: aptosAddress,
+          username: publicKey,
           aptos_address: aptosAddress,
           has_ticket: hasCreatorPass,
           login_type: loginType.toLowerCase(),
