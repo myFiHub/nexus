@@ -107,7 +107,7 @@ class PodiumApi {
           user: userData,
           error: undefined,
           statusCode: response.status,
-          token: this.token,
+          token: this.token!,
         };
       }
       return {
