@@ -1,5 +1,6 @@
 import OutpostLink from "app/components/AppLink/outpostLink";
 import { Img } from "app/components/Img";
+import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { AppLink } from "../../components/AppLink";
 import { AppPages } from "../../lib/routes";
@@ -28,7 +29,7 @@ export function TrendingSection({
           >
             <div className="relative h-48 overflow-hidden">
               <Img
-                src={outpost.image}
+                src={outpost.image || logoUrl}
                 alt={outpost.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"

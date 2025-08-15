@@ -1,4 +1,5 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import { isDev } from "app/lib/utils";
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -142,6 +143,9 @@ const Container = () => {
         triedOnce.current = false;
       }, 1000);
     } else if (account && network && network.chainId !== 126) {
+      if (isDev) {
+        console.log({ account, network });
+      }
       toast.error(
         "Please switch to the Movement Mainnet network on your wallet"
       );
