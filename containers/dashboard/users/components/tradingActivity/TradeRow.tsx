@@ -83,8 +83,10 @@ export const TradeRow = ({ trade, gridCols }: TradeRowProps) => {
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
             <Img
-              src={trade.podium_pass_owner_image || logoUrl}
-              alt={trade.podium_pass_owner_name}
+              src={trade.podium_pass_owner_image}
+              alt={
+                trade.podium_pass_owner_name ?? trade.podium_pass_owner_address
+              }
               className="w-full h-full object-cover"
               useImgTag
             />

@@ -8,6 +8,7 @@ import {
   TRADE_PAGE_SIZE,
   TRADING_VOLUME_PAGE_SIZE,
 } from "app/containers/dashboard/users/configs";
+import { CookieKeys, setClientCookie } from "app/lib/client-cookies";
 import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
@@ -48,7 +49,10 @@ import {
 class PodiumApi {
   private readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
-  private token: string | null = null;
+  private token: string | undefined = undefined;
+  setToken(token: string | undefined) {
+    this.token = token;
+  }
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -82,12 +86,28 @@ class PodiumApi {
       const response = await this.axiosInstance.post("/auth/login", request);
       if (response.status === 200) {
         this.token = response.data.data.token;
+
+        if (this.token) {
+          setClientCookie(CookieKeys.token, this.token, {
+            expires: new Date(Date.now() + 6 * 60 * 60 * 1000), // 6 hours from now
+            secure: !isDev,
+            sameSite: "strict",
+            path: "/",
+            domain: isDev
+              ? "localhost"
+              : process.env.NEXT_PUBLIC_WEBSITE_LINK_URL!.replace(
+                  "https://",
+                  ""
+                ),
+          });
+        }
+
         const userData = await this.getMyUserData(additionalData);
         return {
           user: userData,
           error: undefined,
           statusCode: response.status,
-          token: this.token,
+          token: this.token!,
         };
       }
       return {
@@ -1018,7 +1038,6 @@ class PodiumApi {
   }
   async getStatistics(): Promise<{ result?: Statistics; error?: string }> {
     try {
-      console.log("getStatistics");
       const response = await this.axiosInstance.get(`/dashboard/summary`);
       return { result: response.data.data };
     } catch (error: any) {

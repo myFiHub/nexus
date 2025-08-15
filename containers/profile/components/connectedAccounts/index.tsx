@@ -1,5 +1,6 @@
 import { Button } from "app/components/Button";
 import { confirmAddOrSwitchAccountDialog } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
+import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelectDialog";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
@@ -15,6 +16,10 @@ interface ConnectedAccountsProps {
 export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
   const dispatch = useDispatch();
   const logingIn = useSelector(GlobalSelectors.logingIn);
+  const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
+  const isExternalWallet = isExternalWalletLoginMethod(
+    podiumUserInfo?.login_type ?? ""
+  );
   const switchingAccount = useSelector(GlobalSelectors.switchingAccount);
 
   const handleAddAccount = async () => {
@@ -35,17 +40,19 @@ export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
         </h2>
         <Button
           onClick={handleAddAccount}
-          disabled={logingIn}
+          disabled={logingIn || isExternalWallet}
           size="sm"
           variant="outline"
           className="flex items-center gap-2"
         >
           {switchingAccount ? (
             <Loader className="w-4 h-4 animate-spin" />
+          ) : isExternalWallet ? (
+            <></>
           ) : (
             <Plus className="w-4 h-4 animate-pulse" />
           )}
-          Add Account
+          {!isExternalWallet ? "Add Account" : "External Wallet"}
         </Button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -25,7 +25,6 @@ const getCachedTrendingOutposts = unstable_cache(
 const getCachedStatistics = unstable_cache(
   async () => {
     const results = await podiumApi.getStatistics();
-    console.log("results", results);
     return results.result;
   },
   ["statistics"],

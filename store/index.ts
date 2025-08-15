@@ -8,6 +8,7 @@ import {
   UnknownAction,
 } from "@reduxjs/toolkit";
 import { type AssetsState } from "app/containers/_assets/slice";
+import { ExternalWalletsState } from "app/containers/_externalWallets/slice";
 import { UsersState } from "app/containers/_users/slice";
 import { AllOutpostsState } from "app/containers/allOutposts/slice";
 import { CreateOutpostState } from "app/containers/createOutpost/slice";
@@ -74,7 +75,8 @@ function injectReducer(key: string, reducer: Reducer<any, UnknownAction>) {
 
     getStore().replaceReducer(combinedReducer);
     if (isDev) {
-      console.log("injected reducer", key);
+      // siringe emoji instead of text
+      console.log("💉 reducer", key);
     }
   }
 }
@@ -88,7 +90,7 @@ function injectSaga(key: string, saga: any) {
     injectedSagas[key] = saga;
     sagaMiddleware.run(saga);
     if (isDev) {
-      console.log("injected saga", key);
+      console.log("💉 saga", key);
     }
   }
 }
@@ -109,6 +111,7 @@ export function isRegisteredSlice({ name }: { name: string }) {
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = {
   global: GlobalState;
+  externalWallets: ExternalWalletsState;
   profile: ProfileState;
   assets: AssetsState;
   userDetails: UserDetailsState;

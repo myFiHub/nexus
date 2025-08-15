@@ -270,7 +270,9 @@ const Content = () => {
       // Use provided data or fetch from API
       let ownedNumber: number | null = null;
       let price: number | null = null;
-
+      if (!myUser) {
+        return;
+      }
       // Check if we need to fetch owned number
       if (content.ownedNumber !== undefined) {
         ownedNumber = content.ownedNumber;

@@ -47,7 +47,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
   }, []);
 
   const connect = async () => {
-    dispatch(globalActions.getAndSetWeb3AuthAccount());
+    dispatch(globalActions.login());
   };
 
   const disconnect = async () => {
@@ -144,14 +144,13 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
           <Loader className="w-4 h-4 animate-spin" />
         ) : isLoggedIn && podiumUserInfo?.aptos_address ? (
           <div className="flex items-center gap-2">
-            {podiumUserInfo.image && (
-              <Img
-                src={podiumUserInfo.image}
-                alt="profile"
-                className="w-6 h-6 rounded-full"
-                useImgTag
-              />
-            )}
+            <Img
+              src={podiumUserInfo.image}
+              alt={podiumUserInfo.name ?? podiumUserInfo.aptos_address}
+              className="w-6 h-6 rounded-full"
+              useImgTag
+            />
+
             <span>{truncate(podiumUserInfo.aptos_address)}</span>
           </div>
         ) : (

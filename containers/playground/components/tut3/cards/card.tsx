@@ -1,22 +1,24 @@
 "use client";
 import { useRef } from "react";
-import { Mesh, Texture } from "three";
+import { Mesh, SRGBColorSpace } from "three";
+import matcap from "../assets/matcaps/8.png";
+import { InitialPositionProps } from "../types";
+import { textureLoader } from "../utils/textureLoader";
 import { createRoundedRectShape } from "./createShape";
 
-interface CardProps {
-  texture: Texture;
-  position?: [number, number, number];
-  rotation?: [number, number, number];
-  scale?: [number, number, number];
+interface CardProps extends InitialPositionProps {
   width?: number;
   height?: number;
   thickness?: number;
   cornerRadius?: number;
   curveSegments?: number;
 }
-
+const matcapTexture =
+  typeof window !== "undefined" ? textureLoader.load(matcap.src) : null;
+if (matcapTexture) {
+  matcapTexture.colorSpace = SRGBColorSpace;
+}
 export const Card = ({
-  texture,
   position = [0, 0, 0],
   rotation = [0, 0, 0],
   scale = [1, 1, 1],
@@ -46,7 +48,7 @@ export const Card = ({
             },
           ]}
         />
-        <meshMatcapMaterial matcap={texture} />
+        <meshMatcapMaterial matcap={matcapTexture} />
       </mesh>
     </group>
   );

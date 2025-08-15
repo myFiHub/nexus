@@ -114,7 +114,7 @@ export const ReferrerDialogProvider = () => {
                   >
                     <Input
                       type="text"
-                      placeholder="e.g., 01976487-1310-7f53-9500-9879d67d7fa9"
+                      placeholder="e.g., 01976422-1340-7f53-9500-9879d67d7fa9"
                       value={inputValue}
                       onChange={(e) => setInputValue(e.target.value)}
                       className={`transition-all duration-200 ${

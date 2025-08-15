@@ -1,5 +1,6 @@
 "use client";
 
+import makeBlockie from "ethereum-blockies-base64";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import styles from "./styles.module.css";
@@ -43,9 +44,11 @@ export const Img = ({
 
   // Memoize fallback URL to prevent regeneration on every render
   const fallbackUrl = useMemo(() => {
-    return `https://ui-avatars.com/api/?name=${encodeURIComponent(
-      alt
-    )}&size=200&background=random`;
+    const seed = alt || "placeholder";
+    return makeBlockie(seed);
+    // `https://ui-avatars.com/api/?name=${encodeURIComponent(
+    //   alt
+    // )}&size=200&background=random`;
   }, [alt]);
 
   // Determine the actual source to use

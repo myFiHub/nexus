@@ -5,6 +5,7 @@ export enum CookieKeys {
   myUserId = "my_user_id",
   viewArchivedOutposts = "view_archived_outposts",
   myMoveAddress = "my_move_address",
+  token = "token",
 }
 
 // Client-side cookie management using js-cookies package

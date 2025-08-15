@@ -176,7 +176,7 @@ function* buyPassFromUser(
 
     const [myBalance, price, referrerUser] = yield all(callArray);
     if (referrerUser) {
-      referrerAddress = referrerUser.address;
+      referrerAddress = referrerUser.aptos_address;
     }
 
     const myBalanceNumber = bigIntCoinToMoveOnAptos(myBalance);

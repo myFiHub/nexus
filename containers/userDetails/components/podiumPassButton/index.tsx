@@ -21,7 +21,6 @@ const Content = ({ user }: { user: User }) => {
   const dispatch = useDispatch();
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  const aptosAccount = useSelector(GlobalSelectors.aptosAccount);
   const pass = useSelector(AssetsSelectors.userPasses(user.aptos_address!));
   const sellingPass = useSelector(AssetsSelectors.sellingPass);
   const [gettingPrices, setGettingPrices] = useState(false);
@@ -31,11 +30,11 @@ const Content = ({ user }: { user: User }) => {
   const error = pass?.error;
 
   useEffect(() => {
-    if (pass || !aptosAccount) {
+    if (pass || !myUser) {
       return;
     }
     dispatch(assetsActions.getUserPassInfo({ address: user.aptos_address! }));
-  }, [user.aptos_address, aptosAccount]);
+  }, [user.aptos_address, myUser?.aptos_address]);
 
   if (!loggedIn || !myUser) {
     return <></>;

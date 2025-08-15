@@ -118,6 +118,16 @@ export default async function RootLayout({
           name="viewport"
           content="width=device-width, initial-scale=1, maximum-scale=5"
         />
+        {/* Prefetch social login icons for faster loading */}
+        <link rel="prefetch" href="/social_login_icons/apple.png" />
+        <link rel="prefetch" href="/social_login_icons/email.png" />
+        <link rel="prefetch" href="/social_login_icons/facebook.png" />
+        <link rel="prefetch" href="/social_login_icons/github.png" />
+        <link rel="prefetch" href="/social_login_icons/g_icon.png" />
+        <link rel="prefetch" href="/social_login_icons/linkedin.png" />
+        <link rel="prefetch" href="/social_login_icons/x_platform.png" />
+        {/* Prefetch Nightly wallet logo */}
+        <link rel="prefetch" href="/nightly_logo.webp" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -38,7 +38,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
     }
     if (!myUser) {
       toast.error("You must be logged in to check if you have a pass");
-      dispatch(globalActions.getAndSetWeb3AuthAccount());
+      dispatch(globalActions.login());
       return;
     }
     dispatch(globalActions.checkIfIHavePass({ outpost }));

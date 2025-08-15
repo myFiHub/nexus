@@ -36,19 +36,16 @@ const getTradingVolumeWithCache = unstable_cache(
 );
 
 export default async function UsersPage() {
-  const [recentlyJoinedUsers, topOwners, trades, tradingVolume] =
-    await Promise.all([
-      getRecentlyJoinedUsersWithCache(),
-      getTopOwnersWithCache(),
-      getTradesWithCache(),
-      getTradingVolumeWithCache(),
-    ]);
+  const [recentlyJoinedUsers, topOwners, trades] = await Promise.all([
+    getRecentlyJoinedUsersWithCache(),
+    getTopOwnersWithCache(),
+    getTradesWithCache(),
+  ]);
   return (
     <Users
       recentlyJoinedUsers={recentlyJoinedUsers}
       topOwners={topOwners}
       trades={trades}
-      tradingVolume={tradingVolume}
     />
   );
 }

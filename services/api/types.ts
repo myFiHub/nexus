@@ -47,6 +47,7 @@ export interface LoginRequest {
   username: string;
   aptos_address: string;
   has_ticket: boolean;
+  login_type: string;
   login_type_identifier: string;
   referrer_user_uuid?: string;
 }

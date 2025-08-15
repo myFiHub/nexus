@@ -20,7 +20,7 @@ export function UserSection({ isOpen, isMobile, items }: SidebarSectionProps) {
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
   const connect = async () => {
-    dispatch(globalActions.getAndSetWeb3AuthAccount());
+    dispatch(globalActions.login());
   };
   if (!loggedIn) {
     return isOpen ? (

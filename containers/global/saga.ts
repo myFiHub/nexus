@@ -13,25 +13,33 @@ import {
   referrerDialog,
   ReferrerDialogResult,
 } from "app/components/Dialog";
-import { CookieKeys } from "app/lib/client-cookies";
+import {
+  CookieKeys,
+  deleteClientCookie,
+  getClientCookie,
+} from "app/lib/client-cookies";
 import {
   deleteServerCookieViaAPI,
   setServerCookieViaAPI,
 } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
-import {
-  checkPushNotificationPermission,
-  requestPushNotificationPermission,
-} from "app/lib/pushNotificationPermissions";
+import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
 import {
   signMessage,
   signMessageWithTimestamp,
+  signMessageWithTimestampUsingExternalWallet,
 } from "app/lib/signWithPrivateKey";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
-import { isUuid } from "app/lib/utils";
+import {
+  LoginMethod,
+  loginMethodSelectDialog,
+  LoginMethodSelectDialogResult,
+  validWalletNames,
+} from "app/components/Dialog/loginMethodSelectDialog";
+import { isDev, isUuid } from "app/lib/utils";
 import {
   AdditionalDataForLogin,
   ConnectNewAccountRequest,
@@ -39,9 +47,9 @@ import {
   OutpostModel,
   User,
 } from "app/services/api/types";
+import { movementService } from "app/services/move/aptosMovement";
 import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
-import { AptosAccount } from "aptos";
 import { ethers } from "ethers";
 import {
   all,
@@ -53,6 +61,12 @@ import {
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
+import { externalWalletsSelectors } from "../_externalWallets/selectors";
+import {
+  accountType,
+  connectType,
+  disconnectType,
+} from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
   notificationsActions,
@@ -94,9 +108,11 @@ function* initOneSignal(
 ) {
   const myId: string = action.payload.myId;
   try {
-    const hasPermision: boolean = yield checkPushNotificationPermission();
-    if (!hasPermision) {
+    const askedOnceForNotifs: string | null =
+      localStorage.getItem("askedOnceForNotifs");
+    if (!askedOnceForNotifs) {
       const result: boolean = yield promptNotifications();
+      localStorage.setItem("askedOnceForNotifs", "true");
       if (!result) {
         return;
       }
@@ -140,13 +156,13 @@ function* initializeWeb3Auth(
     yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
     if (connected) {
-      yield getAndSetAccount();
+      yield getAndSetAccountUsingSocialLogin();
     }
   } catch (error) {
     yield put(globalActions.setLogingIn(false));
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
+      movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
@@ -156,7 +172,41 @@ function* initializeWeb3Auth(
   }
 }
 
-function* getAndSetAccount() {
+function* login() {
+  const selectedMethod: LoginMethodSelectDialogResult =
+    yield loginMethodSelectDialog();
+  if (selectedMethod === LoginMethod.SOCIAL) {
+    yield getAndSetAccountUsingSocialLogin();
+    return;
+  }
+  if (selectedMethod === LoginMethod.NIGHTLY) {
+    const connect: connectType = yield select(
+      externalWalletsSelectors.connect("aptos")
+    );
+    yield connect(selectedMethod);
+    // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
+    // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
+    return;
+  }
+}
+function* loginWithExternalWallet(
+  action: ReturnType<typeof globalActions.loginWithExternalWallet>
+) {
+  const { network, account } = action.payload;
+  if (network.chainId !== 126) {
+    toast.error(
+      "Please switch to the Movement Mainnet network on your wallet to login"
+    );
+    return;
+  }
+  if (account) {
+    yield put(globalActions.setLogingIn(true));
+    yield detached_afterConnect({}, false);
+    yield put(globalActions.setLogingIn(false));
+  }
+}
+
+function* getAndSetAccountUsingSocialLogin() {
   try {
     const initialized: boolean = yield select(GlobalSelectors.initialized);
     if (!initialized) {
@@ -188,8 +238,6 @@ function* getAndSetAccount() {
           method: "eth_accounts",
         });
         if (accounts && accounts.length > 0) {
-          yield detached_afterConnectWithExternalWallet(provider);
-        } else {
           yield web3Auth.logout();
           yield web3Auth.clearCache();
           yield put(globalActions.setLogingIn(false));
@@ -204,8 +252,8 @@ function* getAndSetAccount() {
   } catch (error) {
     yield put(globalActions.setLogingIn(false));
     yield all([
+      movementService.clearAccount(),
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
     deleteServerCookieViaAPI(CookieKeys.myUserId);
@@ -249,14 +297,8 @@ function* switchAccount() {
           if (correntAccountAddress === newAccountAddress) {
             thereWasAnError = true;
           } else {
-            const privateKeyBytes = Uint8Array.from(
-              Buffer.from(newAccountPrivateKey, "hex")
-            );
-            const newAccountAptosAccount = new AptosAccount(privateKeyBytes);
-            yield put(globalActions.setAptosAccount(newAccountAptosAccount));
-            const newAccountAptosAddress = newAccountAptosAccount
-              .address()
-              .hex();
+            movementService.setAccount(newAccountPrivateKey);
+            const newAccountAptosAddress = movementService.address;
 
             const currentAccountAddressSignedByNewAccount: string =
               yield signMessage({
@@ -315,8 +357,9 @@ function* switchAccount() {
                   signature: newAccountSignature,
                   username: newAccountAddress,
                   timestamp: timestampInUTCInSeconds,
-                  aptos_address: newAccountAptosAccount.address().hex(),
+                  aptos_address: movementService.address,
                   has_ticket: false,
+                  login_type: userInfo?.authConnection ?? "",
                   login_type_identifier: userInfo?.authConnectionId ?? "",
                 };
 
@@ -330,6 +373,7 @@ function* switchAccount() {
                   yield detached_afterGettingPodiumUser({
                     user: response.user,
                     token: response.token ?? "",
+                    savedName: response.user?.name ?? "",
                   });
                 } else {
                   thereWasAnError = true;
@@ -352,36 +396,31 @@ function* switchAccount() {
   }
 }
 
-function* detached_afterConnectWithExternalWallet(provider: IProvider) {
-  const accounts: string[] | undefined = yield provider?.request({
-    method: "eth_accounts",
-  });
-  if (accounts && accounts.length > 0) {
-    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-    // // Use Ethers.js to wrap the provider
-    // const ethersProvider = new ethers.BrowserProvider(provider);
-    // const correntNetwork: Network = yield ethersProvider.getNetwork();
-
-    // console.log("\x1b[32m%s\x1b[0m", "correntNetwork", correntNetwork);
-
-    // const signer: Signer = yield ethersProvider.getSigner();
-    // console.log("signer", signer);
-    // const address: string = yield signer.getAddress();
-    // console.log("address", address);
-    // const message = "Hello from Web3Auth + external wallet";
-    // const signature: string = yield signer.signMessage(message);
-    // console.log("signature", signature);
-    yield web3Auth.logout();
-    yield web3Auth.clearCache();
-    yield put(globalActions.setLogingIn(false));
-
-    toast.error("Only social login is supported for now");
-    return;
-  }
-}
-
-function* detached_afterConnect(userInfo: Partial<UserInfo>) {
+function* detached_afterConnect(
+  userInfo: Partial<UserInfo>,
+  isSocialLogin = true
+) {
   try {
+    const token = getClientCookie(CookieKeys.token);
+    if (token && !isSocialLogin) {
+      podiumApi.setToken(token);
+      const myUser: User | undefined = yield podiumApi.getMyUserData({});
+      if (myUser) {
+        const savedName: string = yield detached_checkName({ user: myUser });
+        if (!savedName) {
+          yield put(globalActions.logout());
+          return;
+        }
+        movementService.connectedToExternalWallet = true;
+        yield detached_afterGettingPodiumUser({
+          user: myUser,
+          token,
+          savedName,
+        });
+        return;
+      }
+    }
+
     let {
       authConnection: loginType,
       userId: identifierId,
@@ -390,54 +429,86 @@ function* detached_afterConnect(userInfo: Partial<UserInfo>) {
       email,
     } = userInfo;
 
-    const privateKey: string | undefined = yield getPrivateKey();
-    if (privateKey) {
-      const privateKeyBytes = Uint8Array.from(Buffer.from(privateKey, "hex"));
-      const account = new AptosAccount(privateKeyBytes);
-      yield put(globalActions.setAptosAccount(account));
-
-      const aptosAddress = account.address().hex();
-
-      if (!identifierId) {
-        console.log("Identifier ID is required");
+    if (!isSocialLogin) {
+      const account: accountType = yield select(
+        externalWalletsSelectors.account("aptos")
+      );
+      if (!account) {
+        toast.error("Account not found");
         return;
       }
-      if (identifierId.includes("|")) {
-        identifierId = identifierId.split("|")[1];
-      }
+      const publicKey = account.publicKey.toString();
+      const aptosAddress = account.address.toString();
+      const identifierId = account.address.toString();
+      const loginType: validWalletNames = LoginMethod.NIGHTLY;
       const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
         buyerAddress: aptosAddress,
       });
 
-      const evmWallet = new ethers.Wallet(privateKey);
-      const evmAddress = evmWallet.address;
-
-      const loginRequest: LoginRequest = {
-        signature: "placeholder", //this will be handled and changed in next step
-        username: evmAddress,
-        timestamp: 0, //this will be handled and changed in next step
-        aptos_address: aptosAddress,
-        has_ticket: hasCreatorPass,
-        login_type_identifier: identifierId,
-      };
-      const additionalDataForLogin: AdditionalDataForLogin = {
-        loginType,
-      };
-
-      if (name) {
-        additionalDataForLogin.name = name;
-      }
-      if (image) {
-        additionalDataForLogin.image = image;
-      }
-      if (email) {
-        additionalDataForLogin.email = email;
-      }
       yield detached_continueWithLoginRequestAndAdditionalData({
-        loginRequest,
-        additionalDataForLogin,
-        privateKey,
+        loginRequest: {
+          // this will be handled and changed in next step
+          signature: "placeholder",
+          // this will be handled and changed in next step
+          timestamp: 0,
+          username: publicKey,
+          aptos_address: aptosAddress,
+          has_ticket: hasCreatorPass,
+          login_type: loginType.toLowerCase(),
+          login_type_identifier: identifierId,
+        },
+        additionalDataForLogin: {},
+        isSocialLogin: false,
       });
+    } else {
+      const privateKey: string | undefined = yield getPrivateKey();
+      if (privateKey) {
+        movementService.setAccount(privateKey);
+        const aptosAddress = movementService.address;
+
+        if (!identifierId) {
+          console.log("Identifier ID is required");
+          return;
+        }
+        if (identifierId.includes("|")) {
+          identifierId = identifierId.split("|")[1];
+        }
+        const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
+          buyerAddress: aptosAddress,
+        });
+
+        const evmWallet = new ethers.Wallet(privateKey);
+        const evmAddress = evmWallet.address;
+
+        const loginRequest: LoginRequest = {
+          signature: "placeholder", //this will be handled and changed in next step
+          username: evmAddress,
+          timestamp: 0, //this will be handled and changed in next step
+          aptos_address: aptosAddress,
+          has_ticket: hasCreatorPass,
+          login_type: loginType ?? "",
+          login_type_identifier: identifierId,
+        };
+        const additionalDataForLogin: AdditionalDataForLogin = {
+          loginType,
+        };
+
+        if (name) {
+          additionalDataForLogin.name = name;
+        }
+        if (image) {
+          additionalDataForLogin.image = image;
+        }
+        if (email) {
+          additionalDataForLogin.email = email;
+        }
+        yield detached_continueWithLoginRequestAndAdditionalData({
+          loginRequest,
+          additionalDataForLogin,
+          privateKey,
+          isSocialLogin: true,
+        });
+      }
     }
   } catch (error) {
     yield put(globalActions.logout());
@@ -449,30 +520,59 @@ function* detached_continueWithLoginRequestAndAdditionalData({
   additionalDataForLogin,
   retried = false,
   privateKey,
+  isSocialLogin = true,
 }: {
   loginRequest: LoginRequest;
   additionalDataForLogin: AdditionalDataForLogin;
   retried?: boolean;
-  privateKey: string;
+  privateKey?: string;
+  isSocialLogin?: boolean;
 }): any {
-  const {
-    signature,
-    timestampInUTCInSeconds,
-  }: {
-    signature: string;
-    timestampInUTCInSeconds: number;
-  } = yield signMessageWithTimestamp({
-    privateKey,
-    message: loginRequest.username,
-  });
+  let signature: string;
+  let timestampInUTCInSeconds: number;
+  if (!isSocialLogin) {
+    const {
+      signature: signatureExternalWallet,
+      timestampInUTCInSeconds: timestampInUTCInSecondsExternalWallet,
+    } = yield signMessageWithTimestampUsingExternalWallet({
+      walletName: "aptos",
+      message: loginRequest.aptos_address,
+    });
+
+    signature = signatureExternalWallet!;
+    timestampInUTCInSeconds = timestampInUTCInSecondsExternalWallet!;
+    movementService.connectedToExternalWallet = true;
+  } else {
+    const {
+      signature: signaturePrivateKey,
+      timestampInUTCInSeconds: timestampInUTCInSecondsPrivateKey,
+    }: {
+      signature: string;
+      timestampInUTCInSeconds: number;
+    } = yield signMessageWithTimestamp({
+      privateKey: privateKey!,
+      message: loginRequest.username,
+    });
+    signature = signaturePrivateKey!;
+    timestampInUTCInSeconds = timestampInUTCInSecondsPrivateKey!;
+    movementService.connectedToExternalWallet = false;
+  }
+  if (!signature || !timestampInUTCInSeconds) {
+    toast.error("Logging in failed, please try again");
+    yield put(globalActions.logout());
+    return;
+  }
+
   loginRequest.signature = signature;
   loginRequest.timestamp = timestampInUTCInSeconds;
+
   const response: {
     user: User | null;
     error: string | null;
     statusCode: number | null;
     token: string | null;
   } = yield podiumApi.login(loginRequest, additionalDataForLogin);
+
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
     const { confirmed, enteredText }: ReferrerDialogResult =
@@ -485,6 +585,7 @@ function* detached_continueWithLoginRequestAndAdditionalData({
         additionalDataForLogin,
         privateKey,
         retried: true,
+        isSocialLogin,
       });
       return;
     } else {
@@ -492,56 +593,69 @@ function* detached_continueWithLoginRequestAndAdditionalData({
       yield put(globalActions.logout());
       return;
     }
-  } else if (!response.user && response.error) {
-    toast.error(response.error);
+  } else if (!response.user) {
+    toast.error(response.error ?? "Error logging in, please try again");
     yield put(globalActions.logout());
     return;
   }
-  let savedName = response.user?.name;
-  let canContinue = true;
-  if (!savedName || savedName.includes("@")) {
-    canContinue = false;
-    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
-    if (confirmed && (enteredText?.trim().length || 0) > 0) {
-      const resultsForUpdate: User | undefined =
-        yield podiumApi.updateMyUserData({ name: enteredText });
-      if (resultsForUpdate) {
-        canContinue = true;
-        savedName = enteredText;
-      }
-    }
-  }
-  if (!canContinue) {
+  const user = response.user;
+  const savedName: string = yield detached_checkName({ user });
+  if (!savedName) {
     yield put(globalActions.logout());
     return;
   }
 
-  if (response?.user) {
-    yield put(
-      globalActions.setPodiumUserInfo({
-        ...response.user,
-        name: savedName,
-      })
-    );
+  if (user) {
     yield detached_afterGettingPodiumUser({
-      user: response.user,
+      user,
       token: response.token ?? "",
+      savedName,
     });
   } else {
     yield put(globalActions.logout());
   }
 }
+
+function* detached_checkName({ user }: { user: User }) {
+  let savedName = user?.name;
+  if (!savedName || savedName.includes("@")) {
+    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
+    if (confirmed && (enteredText?.trim().length || 0) > 0) {
+      const resultsForUpdate: User | undefined =
+        yield podiumApi.updateMyUserData({ name: enteredText });
+      if (resultsForUpdate) {
+        savedName = enteredText;
+      }
+    }
+  }
+  return savedName;
+}
+
 function* detached_afterGettingPodiumUser({
   user,
   token,
+  savedName,
 }: {
   user: User;
   token: string;
+  savedName: string;
 }) {
   useMyOutpostsSlice();
   useProfileSlice();
   useAssetsSlice();
   useNotificationsSlice();
+  const remoteName: string = yield detached_checkName({ user });
+  if (!remoteName) {
+    yield put(globalActions.logout());
+    return;
+  }
+  yield put(
+    globalActions.setPodiumUserInfo({
+      ...user,
+      name: remoteName,
+    })
+  );
+
   yield put(globalActions.initOneSignal({ myId: user.uuid }));
   yield all([
     put(notificationsActions.getNotifications()),
@@ -559,18 +673,60 @@ function* detached_afterGettingPodiumUser({
 function* logout() {
   yield put(globalActions.setLogingOut(true));
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
+
+  try {
+    // remove token from cookies
+    deleteClientCookie(CookieKeys.token);
+  } catch (error) {
+    if (isDev) {
+      console.error(error);
+    }
+  }
+
+  try {
+    podiumApi.setToken(undefined);
+  } catch (error) {
+    if (isDev) {
+      console.error(error);
+    }
+  }
+
   try {
     yield all([
       put(globalActions.setWeb3AuthUserInfo(undefined)),
-      put(globalActions.setAptosAccount(undefined)),
+      movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
+
     deleteServerCookieViaAPI(CookieKeys.myUserId);
-    yield logoutFromOneSignal();
-    yield web3Auth?.logout();
-    yield web3Auth?.clearCache();
+    try {
+      yield logoutFromOneSignal();
+    } catch (error) {
+      if (isDev) {
+        console.error(error);
+      }
+    }
+
+    try {
+      yield web3Auth?.logout();
+    } catch (error) {}
+
+    try {
+      yield web3Auth?.clearCache();
+    } catch (error) {}
   } catch (error) {
     console.error(error);
+  } finally {
+    const disconnect: disconnectType = yield select(
+      externalWalletsSelectors.disconnect("aptos")
+    );
+    try {
+      disconnect?.();
+    } catch (error) {
+      if (isDev) {
+        console.error(error);
+      }
+    }
   }
   yield put(globalActions.setLogingOut(false));
 }
@@ -659,7 +815,11 @@ export function* globalSaga() {
   yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
-  yield takeLatest(globalActions.getAndSetWeb3AuthAccount, getAndSetAccount);
+  yield takeLatest(globalActions.login, login);
+  yield takeLatest(
+    globalActions.loginWithExternalWallet,
+    loginWithExternalWallet
+  );
   yield takeLatest(globalActions.switchAccount, switchAccount);
   yield takeLatest(globalActions.logout, logout);
   yield takeLatest(globalActions.joinOutpost, joinOutpost);

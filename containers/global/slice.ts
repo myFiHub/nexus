@@ -7,14 +7,13 @@ import {
   getClientCookie,
   setClientCookie,
 } from "app/lib/client-cookies";
+import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
 import { OutpostModel, User } from "app/services/api/types";
-import { movementService } from "app/services/move/aptosMovement";
 import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
-import { AptosAccount } from "aptos";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { parseTokenUriToImageUrl } from "app/lib/parseTokenUriToImageUrl";
+import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -25,7 +24,6 @@ export interface GlobalState {
   logingOut: boolean;
   web3Auth?: Web3Auth;
   web3AuthUserInfo?: Partial<UserInfo>;
-  aptosAccount?: AptosAccount;
   podiumUserInfo?: User;
   joiningOutpostId?: string;
   router?: AppRouterInstance;
@@ -104,19 +102,18 @@ const globalSlice = createSlice({
     setWeb3Auth(state, action: PayloadAction<any>) {
       state.web3Auth = action.payload;
     },
-    getAndSetWeb3AuthAccount() {},
+    login() {},
+    loginWithExternalWallet(
+      _,
+      action: PayloadAction<{ account: AccountInfo; network: NetworkInfo }>
+    ) {},
     setWeb3AuthUserInfo(
       state,
       action: PayloadAction<Partial<UserInfo> | undefined>
     ) {
       state.web3AuthUserInfo = action.payload;
     },
-    setAptosAccount(state, action: PayloadAction<AptosAccount | undefined>) {
-      state.aptosAccount = action.payload;
-      if (action.payload) {
-        movementService.setAccount(action.payload);
-      }
-    },
+
     logout() {},
     setPodiumUserInfo(state, action: PayloadAction<User | undefined>) {
       const { payload } = action;
