@@ -1,6 +1,6 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
-import { logoUrl, movementLogoUrl } from "app/lib/constants";
+import { movementLogoUrl } from "app/lib/constants";
 import {
   RecentlyJoinedUser,
   TopOwner,
@@ -56,7 +56,7 @@ export const UserCard = ({
         return value.toString();
     }
   };
-  const userImage = user.image || logoUrl;
+  const userImage = user.image;
   return (
     <div className="flex items-center justify-between p-4 bg-card rounded-lg border border-border hover:border-border/80 transition-colors group">
       <div className="flex items-center gap-3 flex-1 min-w-0">

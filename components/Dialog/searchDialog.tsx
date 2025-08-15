@@ -291,8 +291,8 @@ export const SearchDialogProvider = () => {
                       <div className="flex items-center gap-3">
                         <div className="relative">
                           <Img
-                            src={user.image || logoUrl}
-                            alt={user.name || "User"}
+                            src={user.image}
+                            alt={user.name || "placeholder"}
                             className="w-12 h-12 rounded-full border-2 border-gradient-to-br from-blue-500/80 to-purple-500/80 group-hover:from-blue-500 group-hover:to-purple-500 transition-all duration-300"
                             useImgTag
                           />

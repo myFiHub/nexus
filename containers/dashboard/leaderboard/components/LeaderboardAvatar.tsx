@@ -1,6 +1,5 @@
 import UserLink from "app/components/AppLink/userLink";
 import { Img } from "app/components/Img";
-import { logoUrl } from "app/lib/constants";
 import {
   MostFeeEarned,
   MostPassHeld,
@@ -19,8 +18,8 @@ export const LeaderboardAvatar = ({
     className="p-0"
   >
     <Img
-      src={user.podium_pass_owner_image || logoUrl}
-      alt={user.podium_pass_owner_name}
+      src={user.podium_pass_owner_image}
+      alt={user.podium_pass_owner_name ?? user.podium_pass_owner_address}
       useImgTag
       className="w-10 h-10 rounded-full object-cover border border-[var(--border)]"
     />
