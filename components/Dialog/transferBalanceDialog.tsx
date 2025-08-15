@@ -62,6 +62,9 @@ export const TransferBalanceDialogProvider = () => {
   const [sliderValue, setSliderValue] = useState([0]);
   const [isValid, setIsValid] = useState(false);
   const [isAddressValid, setIsAddressValid] = useState(false);
+  const [showLowBalanceWarning, setShowLowBalanceWarning] = useState(false);
+  const [pendingTransfer, setPendingTransfer] =
+    useState<TransferBalanceDialogResult | null>(null);
 
   const balance = useSelector(AssetsSelectors.balance);
   const balanceValue = parseFloat(balance?.value || "0");
@@ -73,6 +76,8 @@ export const TransferBalanceDialogProvider = () => {
       setInputValue("");
       setSliderValue([0]);
       setIsValid(false);
+      setShowLowBalanceWarning(false);
+      setPendingTransfer(null);
     };
 
     window.addEventListener("show-transfer-balance-dialog", handleShowDialog);
@@ -111,14 +116,10 @@ export const TransferBalanceDialogProvider = () => {
     const value = e.target.value;
     setInputValue(value);
 
-    if (value.trim() === "") {
-      setSliderValue([0]);
-    } else {
-      const numValue = parseFloat(value);
-      if (!isNaN(numValue) && balanceValue > 0) {
-        const percentage = (numValue / balanceValue) * 100;
-        setSliderValue([Math.min(100, Math.max(0, percentage))]);
-      }
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && balanceValue > 0) {
+      const percentage = (numValue / balanceValue) * 100;
+      setSliderValue([Math.min(100, Math.max(0, percentage))]);
     }
 
     setIsValid(validateInput(value) && isAddressValid);
@@ -154,14 +155,30 @@ export const TransferBalanceDialogProvider = () => {
 
     const amount = parseFloat(inputValue);
     const address = addressValue.trim();
+    const remainingBalance = balanceValue - amount;
+
+    // Show warning if remaining balance is less than 0.0002
+    if (remainingBalance < 0.0002) {
+      setPendingTransfer({ amount, address });
+      setShowLowBalanceWarning(true);
+      return;
+    }
+
+    // Proceed with transfer
+    completeTransfer({ amount, address });
+  };
+
+  const completeTransfer = (transferData: TransferBalanceDialogResult) => {
     setIsOpen(false);
-    resolvePromise?.({ amount, address });
+    resolvePromise?.(transferData);
     resolvePromise = null;
     setInputValue("");
     setAddressValue("");
     setSliderValue([0]);
     setIsValid(false);
     setIsAddressValid(false);
+    setShowLowBalanceWarning(false);
+    setPendingTransfer(null);
   };
 
   const handleCancel = () => {
@@ -173,9 +190,157 @@ export const TransferBalanceDialogProvider = () => {
     setSliderValue([0]);
     setIsValid(false);
     setIsAddressValid(false);
+    setShowLowBalanceWarning(false);
+    setPendingTransfer(null);
+  };
+
+  const handleLowBalanceWarningConfirm = () => {
+    if (pendingTransfer) {
+      completeTransfer(pendingTransfer);
+    }
+  };
+
+  const handleLowBalanceWarningCancel = () => {
+    setShowLowBalanceWarning(false);
+    setPendingTransfer(null);
   };
 
   const percentageIndicators = [25, 50, 75, 100];
+
+  // If showing low balance warning, render the warning dialog
+  if (showLowBalanceWarning) {
+    return (
+      <Dialog
+        open={showLowBalanceWarning}
+        onOpenChange={() => handleLowBalanceWarningCancel()}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+            >
+              <DialogTitle className="flex items-center gap-3">
+                <motion.div
+                  className="w-10 h-10 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50 flex items-center justify-center"
+                  initial={{ rotate: -180, scale: 0 }}
+                  animate={{ rotate: 0, scale: 1 }}
+                  transition={{ duration: 0.5, ease: "backOut" }}
+                >
+                  <motion.span
+                    className="text-white text-xl font-bold"
+                    animate={{
+                      scale: [1, 1.2, 1],
+                      transition: {
+                        duration: 0.6,
+                        repeat: Infinity,
+                        repeatDelay: 2,
+                      },
+                    }}
+                  >
+                    ⚠️
+                  </motion.span>
+                </motion.div>
+                <motion.span
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="text-xl font-semibold text-yellow-800 dark:text-yellow-200"
+                >
+                  Network Fee Warning
+                </motion.span>
+              </DialogTitle>
+            </motion.div>
+          </DialogHeader>
+
+          <motion.div
+            className="py-4 space-y-4"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.1 }}
+          >
+            <motion.div
+              className="bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <div className="text-sm text-yellow-800 dark:text-yellow-200 space-y-2">
+                <p className="font-medium">
+                  Warning: This transfer will leave very little balance:
+                </p>
+                <ul className="space-y-1 text-xs">
+                  <li>
+                    • Transfer amount:{" "}
+                    <span className="font-mono font-semibold">
+                      {pendingTransfer?.amount.toFixed(8)} MOVE
+                    </span>
+                  </li>
+                  <li>
+                    • Remaining balance:{" "}
+                    <span className="font-mono font-semibold text-red-600 dark:text-red-400">
+                      {(balanceValue - (pendingTransfer?.amount || 0)).toFixed(
+                        8
+                      )}{" "}
+                      MOVE
+                    </span>
+                  </li>
+                  <li>
+                    • This is below the recommended minimum of 0.0002 MOVE
+                  </li>
+                  <li>• Consider reducing the transfer amount</li>
+                </ul>
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4"
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.3 }}
+            >
+              <div className="text-sm text-blue-800 dark:text-blue-200">
+                <p className="font-medium mb-2">💡 Recommendation:</p>
+                <p className="text-xs">
+                  Keep at least 0.0002 MOVE in your wallet to maintain a valid
+                  balance and avoid potential issues with future transactions.
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+
+          <DialogFooter>
+            <motion.div
+              className="flex gap-3 w-full"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.4 }}
+            >
+              <motion.div className="flex-1">
+                <Button
+                  onClick={handleLowBalanceWarningCancel}
+                  variant="ghost"
+                  className="w-full"
+                >
+                  Cancel
+                </Button>
+              </motion.div>
+              <motion.div className="flex-1">
+                <Button
+                  onClick={handleLowBalanceWarningConfirm}
+                  variant="primary"
+                  className="w-full bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Proceed Anyway
+                </Button>
+              </motion.div>
+            </motion.div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog
@@ -412,6 +577,23 @@ export const TransferBalanceDialogProvider = () => {
             </motion.div>
           </motion.div>
 
+          {/* Network Fee Info */}
+          <motion.div
+            className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3"
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.3, delay: 1.2 }}
+          >
+            <div className="text-xs text-blue-700 dark:text-blue-300 text-center">
+              <p className="font-medium mb-1">💡 Network Fee Information</p>
+              <p>
+                Network fees will be deducted from your remaining balance.
+                Consider leaving some MOVE in your wallet for future
+                transactions.
+              </p>
+            </div>
+          </motion.div>
+
           {/* Validation Error */}
           <AnimatePresence>
             {!isValid &&
@@ -429,7 +611,7 @@ export const TransferBalanceDialogProvider = () => {
                     transition={{ duration: 0.3 }}
                   >
                     {(() => {
-                      if (addressValue.trim() !== "" && !isAddressValid) {
+                      if (!isAddressValid) {
                         return "Please enter a valid Movement address";
                       }
 
@@ -440,8 +622,6 @@ export const TransferBalanceDialogProvider = () => {
                         return `Insufficient balance. You have ${balanceValue.toFixed(
                           8
                         )} MOVE available`;
-                      } else if (!isAddressValid) {
-                        return "Please enter a valid Movement address";
                       } else {
                         return "Please enter a valid amount";
                       }

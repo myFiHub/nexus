@@ -51,8 +51,8 @@ export const UserStats = ({ user }: UserStatsProps) => {
         targetAddress: result.address,
         amount: result.amount,
       });
+      dispatch(assetsActions.getBalance());
     }
-    dispatch(assetsActions.getBalance());
 
     setTransfering(false);
   };
