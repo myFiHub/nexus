@@ -1,9 +1,4 @@
-import {
-  RecentlyJoinedUser,
-  TopOwner,
-  Trade,
-  TradingVolume,
-} from "app/services/api/types";
+import { RecentlyJoinedUser, TopOwner, Trade } from "app/services/api/types";
 import { RecentlyJoinedSection } from "./components/recentlyJoined";
 import { TopAccountsSection } from "./components/topOwners";
 import { TradingActivitySection } from "./components/tradingActivity";
@@ -13,12 +8,10 @@ export const Users = ({
   recentlyJoinedUsers,
   topOwners,
   trades,
-  tradingVolume,
 }: {
   recentlyJoinedUsers: RecentlyJoinedUser[];
   topOwners: TopOwner[];
   trades: Trade[];
-  tradingVolume: TradingVolume[];
 }) => {
   return (
     <>
