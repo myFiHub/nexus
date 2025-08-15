@@ -1,6 +1,8 @@
 "use client";
 
 import { ConfirmAddOrSwitchAccountDialogProvider } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
+import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelectDialog";
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { cn } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
@@ -19,7 +21,6 @@ import { AccountCardActionSelectDialogProvider } from "./components/SecuritySect
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/UserStats";
 import { profileActions, useProfileSlice } from "./slice";
-import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 // Reusable styled card for profile sections
 const SectionCard = ({
@@ -43,6 +44,7 @@ const Content = () => {
   useProfileSlice();
   useAssetsSlice();
   const user = useSelector(GlobalSelectors.podiumUserInfo);
+  const isExternalWallet = isExternalWalletLoginMethod(user?.login_type ?? "");
   const loading = useSelector(GlobalSelectors.logingIn);
   const dispatch = useDispatch();
   const loggedIn = !!user;
@@ -89,9 +91,13 @@ const Content = () => {
           <SectionCard>
             <SettingsSection />
           </SectionCard>
-          <SectionCard>
-            <SecuritySection />
-          </SectionCard>
+          {!isExternalWallet ? (
+            <SectionCard>
+              <SecuritySection />
+            </SectionCard>
+          ) : (
+            <></>
+          )}
         </div>
       </div>
     </>

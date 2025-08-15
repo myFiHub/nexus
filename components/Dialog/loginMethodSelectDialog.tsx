@@ -9,6 +9,11 @@ export enum LoginMethod {
   SOCIAL = "social",
   NIGHTLY = "Nightly",
 }
+
+export const isExternalWalletLoginMethod = (loginMethod: string) => {
+  return loginMethod?.toLowerCase() === LoginMethod.NIGHTLY.toLowerCase();
+};
+
 export type validWalletNames = LoginMethod.NIGHTLY;
 
 export type LoginMethodSelectDialogResult = LoginMethod | undefined;
