@@ -50,7 +50,7 @@ export const AssetsSelectors = {
     return pass?.loading ?? false;
   },
   balance: createSelector(
-    [AssetsDomains.balance, (state: RootState) => state.global.podiumUserInfo],
+    [AssetsDomains.balance, (state: RootState) => state.global?.podiumUserInfo],
     (balance, myUser) => {
       if (!myUser)
         return {
