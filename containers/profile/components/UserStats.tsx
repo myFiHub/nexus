@@ -19,7 +19,9 @@ interface UserStatsProps {
 
 export const UserStats = ({ user }: UserStatsProps) => {
   const dispatch = useDispatch();
-  const gettingBalance = useSelector(AssetsSelectors.balance).loading;
+  const balance = useSelector(AssetsSelectors.balance);
+  const gettingBalance = balance.loading;
+  const balanceValue = balance.value;
   const remainingReferrals = user?.remaining_referrals_count || 0;
   const referralsCount = user?.referrals_count || 0;
   const receivedBooCount = user?.received_boo_count || 0;
@@ -63,19 +65,23 @@ export const UserStats = ({ user }: UserStatsProps) => {
           <div className="text-sm text-foreground/80">Available Balance</div>
           <div className="flex items-center gap-2">
             <BalanceDisplay />
-            <Button
-              onClick={transferBalance}
-              variant="ghost"
-              className="ml-1 mt-2"
-              size="xxs"
-              disabled={loading}
-            >
-              {loading ? (
-                <Loader className="w-4 h-4 animate-spin" />
-              ) : (
-                <CircleArrowOutUpRight className="w-4 h-4" />
-              )}
-            </Button>
+            {balanceValue !== "0" ? (
+              <Button
+                onClick={transferBalance}
+                variant="ghost"
+                className="ml-1 mt-2"
+                size="xxs"
+                disabled={loading}
+              >
+                {loading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CircleArrowOutUpRight className="w-4 h-4" />
+                )}
+              </Button>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>
