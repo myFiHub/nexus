@@ -49,21 +49,12 @@ export const AssetsSelectors = {
     const pass = state.assets?.passes?.[id];
     return pass?.loading ?? false;
   },
-  balance: createSelector(
-    [AssetsDomains.balance, (state: RootState) => state.global?.podiumUserInfo],
-    (balance, myUser) => {
-      if (!myUser)
-        return {
-          value: "0",
-          loading: false,
-          error: undefined,
-        };
-      const tmp = { ...balance };
-      const valueStr = balance.value.toString();
-      tmp.value = valueStr.includes(".") ? valueStr : `${valueStr ?? "0"}.0`;
-      return tmp;
-    }
-  ),
+  balance: createSelector([AssetsDomains.balance], (balance) => {
+    const tmp = { ...balance };
+    const valueStr = balance.value?.toString() ?? "0";
+    tmp.value = valueStr.includes(".") ? valueStr : `${valueStr}.0`;
+    return tmp;
+  }),
   passesListBoughtByMe: createSelector(
     [AssetsDomains.passesListBoughtByMe],
     (passesListBoughtByMe) => passesListBoughtByMe.passes
