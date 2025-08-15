@@ -695,15 +695,101 @@ query GetNFTs($address: String!) {
         });
         return result;
       } catch (e: any) {
+        console.error("e", e);
         if (e.message.includes("rejected")) {
           toast.error("Request rejected");
           return undefined;
         }
-        toast.error(e.message);
+        toast.error(e.toString());
         return undefined;
       }
     }
     return undefined;
+  }
+  async sendMoveToAddress({
+    targetAddress,
+    amount,
+  }: {
+    targetAddress: string;
+    amount: number;
+  }): Promise<[boolean | null, string | null]> {
+    try {
+      // Check if account is active
+      if (!(await this.isMyAccountActive())) {
+        toast.error("Account is not active");
+        return [false, "Account is not active"];
+      }
+
+      // Check if target address is valid
+      if (!targetAddress || targetAddress.length !== 66) {
+        toast.error("Invalid target address");
+        return [false, "Invalid target address"];
+      }
+
+      // Check if amount is positive
+      if (amount <= 0) {
+        toast.error("Amount must be greater than 0");
+        return [false, "Amount must be greater than 0"];
+      }
+
+      // Check if user has sufficient balance
+      if (!(await this.hasSufficientBalance(amount))) {
+        const formattedBalance = await this.getFormattedBalance();
+        toast.error(
+          `Insufficient balance. Current balance: ${formattedBalance} MOVE`
+        );
+        return [false, "Insufficient balance"];
+      }
+
+      // Convert amount to on-chain format (8 decimal places)
+      const amountToSend = doubleToBigIntMoveForAptos(amount).toString();
+
+      // Build transaction data for native Aptos transfer
+      const data: any = {
+        function: "0x1::aptos_account::transfer",
+        // function: "0x1::coin::transfer",
+        // typeArguments: [APTOS_COIN],
+        functionArguments: [targetAddress, amountToSend],
+      };
+
+      let hash = "";
+
+      if (this._connectedToExternalWallet) {
+        const result = await this._handleExternalWalletTransaction(data);
+        if (result) {
+          hash = result.hash;
+        } else {
+          return [false, "Transaction failed"];
+        }
+      } else {
+        // Build transaction using new SDK
+        const transaction = await this._client.transaction.build.simple({
+          sender: this.account.accountAddress,
+          data,
+        });
+
+        const pendingTransaction = await this._client.signAndSubmitTransaction({
+          signer: this.account,
+          transaction,
+        });
+        hash = pendingTransaction.hash;
+      }
+
+      // Wait for transaction to be committed
+      const transactionResponse = await this._client.waitForTransaction({
+        transactionHash: hash,
+        options: {
+          checkSuccess: true,
+        },
+      });
+
+      toast.success(`Successfully sent ${amount} APT to ${targetAddress}`);
+      return [true, transactionResponse.hash];
+    } catch (e: any) {
+      const errorMessage = e.toString().replace("AxiosError:", "");
+      toast.error("Error transferring Aptos: " + errorMessage);
+      return [false, errorMessage];
+    }
   }
 }
 
