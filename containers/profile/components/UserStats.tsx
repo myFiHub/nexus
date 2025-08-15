@@ -46,7 +46,7 @@ export const UserStats = ({ user }: UserStatsProps) => {
   const transferBalance = async () => {
     setTransfering(true);
     const result = await transferBalanceDialog();
-    if (result) {
+    if (result && result.amount > 0) {
       await movementService.sendMoveToAddress({
         targetAddress: result.address,
         amount: result.amount,
