@@ -221,3 +221,10 @@ export {
   PodiumPassTradeDialogProvider,
 } from "./podiumPassTradeDialog";
 export type { PodiumPassTradeDialogResult } from "./podiumPassTradeDialog";
+
+// Export transfer balance dialog components
+export {
+  transferBalanceDialog,
+  TransferBalanceDialogProvider,
+} from "./transferBalanceDialog";
+export type { TransferBalanceDialogResult } from "./transferBalanceDialog";
