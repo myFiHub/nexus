@@ -696,8 +696,11 @@ query GetNFTs($address: String!) {
         return result;
       } catch (e: any) {
         console.error("e", e);
-        if (e.message.includes("rejected")) {
-          toast.error("Request rejected");
+        if (
+          e.message?.includes("rejected") ||
+          e.toString().includes("rejected")
+        ) {
+          toast.error("Transaction rejected");
           return undefined;
         }
         toast.error(e.toString());
@@ -767,6 +770,8 @@ query GetNFTs($address: String!) {
           sender: this.account.accountAddress,
           data,
         });
+
+        // calculate tx fee
 
         const pendingTransaction = await this._client.signAndSubmitTransaction({
           signer: this.account,

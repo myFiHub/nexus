@@ -10,6 +10,7 @@ import {
   PromptNotificationsDialogProvider,
   ReferrerDialogProvider,
   SearchDialogProvider,
+  TransferBalanceDialogProvider,
   UserSelectDialogProvider,
 } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
@@ -70,6 +71,7 @@ const Container = () => {
       <LoginPromptDialogProvider />
       <PodiumPassTradeDialogProvider />
       <LoginMethodSelectDialogProvider />
+      <TransferBalanceDialogProvider />
     </>
   );
 };

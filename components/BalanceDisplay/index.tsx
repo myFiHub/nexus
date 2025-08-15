@@ -3,6 +3,7 @@ import { cn } from "app/lib/utils";
 import { useEffect, useRef, useState } from "react";
 import CountUp from "react-countup";
 import { useSelector } from "react-redux";
+import { transferBalanceDialog } from "../Dialog/transferBalanceDialog";
 
 const BalanceDisplay = ({
   className,

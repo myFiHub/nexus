@@ -39,6 +39,7 @@ import {
   LoginMethodSelectDialogResult,
   validWalletNames,
 } from "app/components/Dialog/loginMethodSelectDialog";
+import { logoUrl } from "app/lib/constants";
 import { isDev, isUuid } from "app/lib/utils";
 import {
   AdditionalDataForLogin,
@@ -135,7 +136,11 @@ function* initializeWeb3Auth(
   const web3AuthContextConfig: Web3AuthContextConfig = {
     web3AuthOptions: {
       clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID!,
-
+      uiConfig: {
+        logoLight: logoUrl,
+        logoDark: logoUrl,
+        loginMethodsOrder: availableSocialLogins,
+      },
       web3AuthNetwork:
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
@@ -145,9 +150,7 @@ function* initializeWeb3Auth(
   };
 
   const web3auth = new Web3Auth({
-    uiConfig: {
-      loginMethodsOrder: availableSocialLogins,
-    },
+    uiConfig: web3AuthContextConfig.web3AuthOptions.uiConfig,
     clientId: web3AuthContextConfig.web3AuthOptions.clientId,
     web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
   });
