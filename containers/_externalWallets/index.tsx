@@ -1,4 +1,9 @@
 import { useWallet } from "@aptos-labs/wallet-adapter-react";
+import {
+  isNetworkValidForExternalWalletLogin,
+  validWalletNames,
+} from "app/components/Dialog/loginMethodSelectDialog";
+import { isDev } from "app/lib/utils";
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "sonner";
@@ -47,13 +52,13 @@ const Container = () => {
     isLoading,
     account,
     network,
+    wallet,
     connect,
     signAndSubmitTransaction,
     signMessage,
     disconnect,
     changeNetwork,
   } = useWallet();
-
   useEffect(() => {
     dispatch(
       externalWalletActions.setIsLoading({
@@ -127,26 +132,35 @@ const Container = () => {
       })
     );
   }, [changeNetwork]);
-
   useEffect(() => {
     if (
       account &&
       network &&
-      network.chainId === 126 &&
+      isNetworkValidForExternalWalletLogin(network) &&
       !isLoading &&
-      !triedOnce.current
+      !triedOnce.current &&
+      wallet?.name
     ) {
       triedOnce.current = true;
-      dispatch(globalActions.loginWithExternalWallet({ account, network }));
+      dispatch(
+        globalActions.loginWithExternalWallet({
+          account,
+          network,
+          selectedExternalWallet: wallet?.name as validWalletNames,
+        })
+      );
       setTimeout(() => {
         triedOnce.current = false;
       }, 1000);
     } else if (account && network && network.chainId !== 126) {
+      if (isDev) {
+        console.log({ account, network });
+      }
       toast.error(
         "Please switch to the Movement Mainnet network on your wallet"
       );
     }
-  }, [account, network]);
+  }, [account?.address.toString(), network?.chainId, wallet?.name]);
 
   return <></>;
 };

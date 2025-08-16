@@ -1,5 +1,6 @@
 "use client";
 
+import { NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -8,13 +9,26 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./index";
 export enum LoginMethod {
   SOCIAL = "social",
   NIGHTLY = "Nightly",
+  OKX = "OKX Wallet",
 }
 
-export const isExternalWalletLoginMethod = (loginMethod: string) => {
-  return loginMethod?.toLowerCase() === LoginMethod.NIGHTLY.toLowerCase();
+export const isNetworkValidForExternalWalletLogin = (network: NetworkInfo) => {
+  console.log({ network });
+  return (
+    network.chainId === 126 ||
+    network.url?.includes("fullnode/aptos/discover/rpc/v1")
+  );
 };
 
-export type validWalletNames = LoginMethod.NIGHTLY;
+export const isExternalWalletLoginMethod = (loginMethod: string) => {
+  return (
+    loginMethod?.toLowerCase() === LoginMethod.NIGHTLY.toLowerCase() ||
+    loginMethod?.toLowerCase() === LoginMethod.OKX.toLowerCase() ||
+    loginMethod?.toLowerCase() === "okx"
+  );
+};
+
+export type validWalletNames = LoginMethod.NIGHTLY | LoginMethod.OKX;
 
 export type LoginMethodSelectDialogResult = LoginMethod | undefined;
 
@@ -378,6 +392,59 @@ const Content = () => {
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
                       Connect with your Nightly wallet
+                    </p>
+                  </div>
+
+                  <motion.div
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                    initial={{ x: -10 }}
+                    whileHover={{ x: 0 }}
+                  >
+                    <div className="w-2 h-2 bg-primary rounded-full" />
+                  </motion.div>
+                </div>
+              </motion.div>
+            </motion.div>
+
+            {/* OKX Wallet Option */}
+            <motion.div
+              variants={optionVariants}
+              whileHover="hover"
+              whileTap="tap"
+              onClick={() => handleSelect(LoginMethod.OKX)}
+              className="group cursor-pointer"
+            >
+              <motion.div
+                className="relative p-6 bg-card/50 border border-border rounded-lg hover:border-primary/50 transition-colors duration-200"
+                whileHover={{
+                  backgroundColor: "hsl(var(--card) / 0.8)",
+                }}
+              >
+                <motion.div
+                  variants={glowVariants}
+                  animate="animate"
+                  className="absolute inset-0 rounded-lg pointer-events-none"
+                />
+
+                <div className="flex items-center space-x-4">
+                  <motion.div variants={iconVariants} className="relative">
+                    <div className="group-hover:scale-110 transition-transform duration-200 flex items-center justify-center">
+                      <Image
+                        src="/okx_logo.png"
+                        alt="OKX Wallet"
+                        width={32}
+                        height={32}
+                        className="w-8 h-8"
+                      />
+                    </div>
+                  </motion.div>
+
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors duration-200">
+                      OKX Wallet
+                    </h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Connect with your OKX wallet
                     </p>
                   </div>
 

@@ -1,6 +1,8 @@
 "use client";
+import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
+import { validWalletNames } from "app/components/Dialog/loginMethodSelectDialog";
 import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {
   CookieKeys,
@@ -13,7 +15,6 @@ import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
-import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -25,6 +26,8 @@ export interface GlobalState {
   web3Auth?: Web3Auth;
   web3AuthUserInfo?: Partial<UserInfo>;
   podiumUserInfo?: User;
+  connectedExternalWallet?: validWalletNames;
+  
   joiningOutpostId?: string;
   router?: AppRouterInstance;
   tick: number;
@@ -51,6 +54,7 @@ export const initialState: GlobalState = {
   tick: 0,
   numberOfOnlineUsers: {},
   objectOfOnlineUsersToGet: {},
+  connectedExternalWallet: undefined,
   wsConnectionStatus: {
     state: ConnectionState.DISCONNECTED,
     isConnecting: false,
@@ -104,9 +108,16 @@ const globalSlice = createSlice({
     },
     login() {},
     loginWithExternalWallet(
-      _,
-      action: PayloadAction<{ account: AccountInfo; network: NetworkInfo }>
-    ) {},
+      state,
+      action: PayloadAction<{
+        account: AccountInfo;
+        network: NetworkInfo;
+        selectedExternalWallet: validWalletNames;
+      }>
+    ) {
+      const { selectedExternalWallet } = action.payload;
+      state.connectedExternalWallet = selectedExternalWallet;
+    },
     setWeb3AuthUserInfo(
       state,
       action: PayloadAction<Partial<UserInfo> | undefined>

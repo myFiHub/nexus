@@ -19,6 +19,7 @@ import {
   Network,
 } from "@aptos-labs/ts-sdk";
 import { AptosSignAndSubmitTransactionOutput } from "@aptos-labs/wallet-adapter-core";
+import { isNetworkValidForExternalWalletLogin } from "app/components/Dialog/loginMethodSelectDialog";
 import { getStore } from "app/store";
 
 // Placeholder for environment/config
@@ -682,7 +683,7 @@ query GetNFTs($address: String!) {
       toast.error("Connect your wallet and try again");
       return undefined;
     }
-    if (network.chainId !== 126) {
+    if (!isNetworkValidForExternalWalletLogin(network)) {
       toast.error(
         "Please switch to the Movement Mainnet network on your wallet and try again"
       );
@@ -788,11 +789,11 @@ query GetNFTs($address: String!) {
         },
       });
 
-      toast.success(`Successfully sent ${amount} APT to ${targetAddress}`);
+      toast.success(`Successfully sent ${amount} MOVE to ${targetAddress}`);
       return [true, transactionResponse.hash];
     } catch (e: any) {
       const errorMessage = e.toString().replace("AxiosError:", "");
-      toast.error("Error transferring Aptos: " + errorMessage);
+      toast.error("Error transferring MOVE: " + errorMessage);
       return [false, errorMessage];
     }
   }
