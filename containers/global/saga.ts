@@ -34,6 +34,8 @@ import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
+  isExternalWalletLoginMethod,
+  isNetworkValidForExternalWalletLogin,
   LoginMethod,
   loginMethodSelectDialog,
   LoginMethodSelectDialogResult,
@@ -182,7 +184,7 @@ function* login() {
     yield getAndSetAccountUsingSocialLogin();
     return;
   }
-  if (selectedMethod === LoginMethod.NIGHTLY) {
+  if (selectedMethod && isExternalWalletLoginMethod(selectedMethod)) {
     const connect: connectType = yield select(
       externalWalletsSelectors.connect("aptos")
     );
@@ -196,7 +198,8 @@ function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
 ) {
   const { network, account } = action.payload;
-  if (network.chainId !== 126) {
+
+  if (!isNetworkValidForExternalWalletLogin(network)) {
     toast.error(
       "Please switch to the Movement Mainnet network on your wallet to login"
     );
@@ -443,7 +446,9 @@ function* detached_afterConnect(
       const publicKey = account.publicKey.toString();
       const aptosAddress = account.address.toString();
       const identifierId = account.address.toString();
-      const loginType: validWalletNames = LoginMethod.NIGHTLY;
+      const loginType: validWalletNames = yield select(
+        GlobalSelectors.connectedExternalWallet
+      );
       const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
         buyerAddress: aptosAddress,
       });
@@ -457,7 +462,7 @@ function* detached_afterConnect(
           username: publicKey,
           aptos_address: aptosAddress,
           has_ticket: hasCreatorPass,
-          login_type: loginType.toLowerCase(),
+          login_type: loginType.toLowerCase().split(" ")[0],
           login_type_identifier: identifierId,
         },
         additionalDataForLogin: {},
@@ -647,7 +652,9 @@ function* detached_afterGettingPodiumUser({
   useProfileSlice();
   useAssetsSlice();
   useNotificationsSlice();
-  const remoteName: string = yield detached_checkName({ user });
+  const remoteName: string = yield detached_checkName({
+    user: { ...user, name: savedName },
+  });
   if (!remoteName) {
     yield put(globalActions.logout());
     return;

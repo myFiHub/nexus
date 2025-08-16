@@ -35,6 +35,8 @@ const GlobalDomains = {
     state.global?.wsHealthChecking ?? false,
   isSidebarOpen: (state: RootState) => state.global?.isSidebarOpen ?? false,
   movePrice: (state: RootState) => state.global?.movePrice ?? 0,
+  connectedExternalWallet: (state: RootState) =>
+    state.global?.connectedExternalWallet,
 };
 
 export const GlobalSelectors = {
@@ -83,4 +85,5 @@ export const GlobalSelectors = {
         return "0";
       }
     }),
+  connectedExternalWallet: GlobalDomains.connectedExternalWallet,
 };
