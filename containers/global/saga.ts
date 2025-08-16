@@ -652,7 +652,9 @@ function* detached_afterGettingPodiumUser({
   useProfileSlice();
   useAssetsSlice();
   useNotificationsSlice();
-  const remoteName: string = yield detached_checkName({ user });
+  const remoteName: string = yield detached_checkName({
+    user: { ...user, name: savedName },
+  });
   if (!remoteName) {
     yield put(globalActions.logout());
     return;
