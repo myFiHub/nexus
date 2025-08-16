@@ -180,6 +180,9 @@ function* initializeWeb3Auth(
 function* login() {
   const selectedMethod: LoginMethodSelectDialogResult =
     yield loginMethodSelectDialog();
+  if (isDev) {
+    console.log("selectedMethod", selectedMethod);
+  }
   if (selectedMethod === LoginMethod.SOCIAL) {
     yield getAndSetAccountUsingSocialLogin();
     return;
@@ -188,7 +191,13 @@ function* login() {
     const connect: connectType = yield select(
       externalWalletsSelectors.connect("aptos")
     );
-    yield connect(selectedMethod);
+    try {
+      yield connect(selectedMethod);
+    } catch (error) {
+      if (isDev) {
+        console.log("error", error);
+      }
+    }
     // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
     // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
     return;
