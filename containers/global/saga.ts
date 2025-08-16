@@ -462,7 +462,7 @@ function* detached_afterConnect(
           username: publicKey,
           aptos_address: aptosAddress,
           has_ticket: hasCreatorPass,
-          login_type: loginType.toLowerCase(),
+          login_type: loginType.toLowerCase().split(" ")[0],
           login_type_identifier: identifierId,
         },
         additionalDataForLogin: {},

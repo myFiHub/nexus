@@ -13,16 +13,18 @@ export enum LoginMethod {
 }
 
 export const isNetworkValidForExternalWalletLogin = (network: NetworkInfo) => {
+  console.log({ network });
   return (
     network.chainId === 126 ||
-    network.url === "https://wallet.okex.org/fullnode/aptos/discover/rpc/v1"
+    network.url?.includes("fullnode/aptos/discover/rpc/v1")
   );
 };
 
 export const isExternalWalletLoginMethod = (loginMethod: string) => {
   return (
     loginMethod?.toLowerCase() === LoginMethod.NIGHTLY.toLowerCase() ||
-    loginMethod?.toLowerCase() === LoginMethod.OKX.toLowerCase()
+    loginMethod?.toLowerCase() === LoginMethod.OKX.toLowerCase() ||
+    loginMethod?.toLowerCase() === "okx"
   );
 };
 
