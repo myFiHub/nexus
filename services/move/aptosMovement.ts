@@ -789,11 +789,11 @@ query GetNFTs($address: String!) {
         },
       });
 
-      toast.success(`Successfully sent ${amount} APT to ${targetAddress}`);
+      toast.success(`Successfully sent ${amount} MOVE to ${targetAddress}`);
       return [true, transactionResponse.hash];
     } catch (e: any) {
       const errorMessage = e.toString().replace("AxiosError:", "");
-      toast.error("Error transferring Aptos: " + errorMessage);
+      toast.error("Error transferring MOVE: " + errorMessage);
       return [false, errorMessage];
     }
   }
