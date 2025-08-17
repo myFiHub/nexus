@@ -22,11 +22,16 @@ const appLinkVariants = cva(
         sm: "h-8 px-3",
         lg: "h-12 px-6",
       },
+      disabled: {
+        true: "opacity-50 pointer-events-none",
+        false: "",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
       underline: true,
+      disabled: false,
     },
   }
 );
@@ -37,14 +42,29 @@ export interface AppLinkProps
   href: string;
   ignore?: boolean;
   linkProps?: Omit<LinkProps, "href">;
+  disabled?: boolean;
 }
 
 const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
-  ({ className, variant, size, href, linkProps, underline, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      href,
+      linkProps,
+      underline,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <Link
         href={href}
-        className={cn(appLinkVariants({ variant, size, className, underline }))}
+        className={cn(
+          appLinkVariants({ variant, size, className, underline, disabled })
+        )}
         ref={ref}
         {...linkProps}
         {...props}
