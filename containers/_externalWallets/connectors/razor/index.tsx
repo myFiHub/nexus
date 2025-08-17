@@ -38,7 +38,7 @@ export const WProvider = ({ children }: { children: React.ReactNode }) => {
 
   React.useEffect(() => {
     const loadWallets = async () => {
-      if (walletExports.BitgetWallet) {
+      if (walletExports.NightlyWallet) {
         setWallets([
           walletExports.NightlyWallet,
           walletExports.RazorWallet,
