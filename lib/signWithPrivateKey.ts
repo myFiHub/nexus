@@ -1,4 +1,5 @@
 import { Ed25519PublicKey, Ed25519Signature } from "@aptos-labs/ts-sdk";
+import { UserResponseStatus } from "@aptos-labs/wallet-standard";
 import { ExternalWalletsState } from "app/containers/_externalWallets/slice";
 import { getStore } from "app/store";
 import { ethers } from "ethers";
@@ -60,7 +61,11 @@ export const signMessageUsingExternalWallet = async ({
     return;
   }
 
-  return signature.signature.toString();
+  if (signature.status === UserResponseStatus.APPROVED) {
+    return signature.args.signature.toString();
+  }
+
+  return undefined;
 };
 
 export const signMessageWithTimestampUsingExternalWallet = async ({

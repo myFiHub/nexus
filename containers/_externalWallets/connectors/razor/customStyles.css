@@ -1,0 +1,31 @@
+:root {
+    /* Convert primary accent color from oklch(0.835 0.835 280.000) to HSL */
+    --wkit-accent-hs: 280, 100%;
+    --wkit-on-accent-rgb: 255, 255, 255;
+    /* Convert background color from oklch(1 0 0) to RGB - pure white */
+    --wkit-bg-rgb: 255, 255, 255;
+    /* Convert foreground color from oklch(0.145 0 0) to RGB - very dark */
+    --wkit-on-bg-rgb: 23, 23, 23;
+    /* Use app's font system - assuming Geist Sans is primary */
+    --wkit-font-family: var(--font-geist-sans, 'Inter', sans-serif);
+    --wkit-font-family-mono: var(--font-geist-mono, 'IBM Plex Mono', monospace);
+    --wkit-font-size-large: 18px;
+    --wkit-font-size-medium: 16px;
+    --wkit-font-size-small: 14px;
+    --wkit-line-height-large: 22px;
+    --wkit-line-height-medium: 20px;
+    --wkit-line-height-small: 17px;
+    --wkit-button-width: 284px;
+    /* Use app's border radius - 0.625rem = 10px */
+    --wkit-border-radius: 10px;
+}
+
+.dark {
+    /* Keep the same accent color in dark mode */
+    --wkit-accent-hs: 280, 100%;
+    --wkit-on-accent-rgb: 255, 255, 255;
+    /* Convert dark background from oklch(0.145 0 0) to RGB */
+    --wkit-bg-rgb: 23, 23, 23;
+    /* Convert dark foreground from oklch(0.985 0 0) to RGB - near white */
+    --wkit-on-bg-rgb: 250, 250, 250;
+}

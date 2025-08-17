@@ -1,7 +1,7 @@
 "use client";
 
 import { ConfirmAddOrSwitchAccountDialogProvider } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
-import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelectDialog";
+import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { cn } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";

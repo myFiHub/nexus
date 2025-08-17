@@ -5,6 +5,9 @@
 .rti--container {
   background: red;
 }
+body {
+ pointer-events: auto !important;
+}
 :root {
   /* #d500f9 in oklch is 0.835 0.835 280.000 */
   --primary: oklch(0.835 0.835 280.000);
@@ -67,6 +70,11 @@
   --scrollbar-thumb: oklch(0.85 0 0);
   --scrollbar-thumb-hover: oklch(0.75 0 0);
   --scrollbar-corner: var(--background);
+
+
+
+
+
 }
 
 @theme inline {
