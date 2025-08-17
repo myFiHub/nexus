@@ -37,14 +37,29 @@ export interface AppLinkProps
   href: string;
   ignore?: boolean;
   linkProps?: Omit<LinkProps, "href">;
+  disabled?: boolean;
 }
 
 const AppLink = React.forwardRef<HTMLAnchorElement, AppLinkProps>(
-  ({ className, variant, size, href, linkProps, underline, ...props }, ref) => {
+  (
+    {
+      className,
+      variant,
+      size,
+      href,
+      linkProps,
+      underline,
+      disabled,
+      ...props
+    },
+    ref
+  ) => {
     return (
       <Link
         href={href}
-        className={cn(appLinkVariants({ variant, size, className, underline }))}
+        className={cn(
+          appLinkVariants({ variant, size, className, underline, disabled })
+        )}
         ref={ref}
         {...linkProps}
         {...props}

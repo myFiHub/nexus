@@ -34,13 +34,12 @@ import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 // Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
-  isExternalWalletLoginMethod,
   isNetworkValidForExternalWalletLogin,
   LoginMethod,
   loginMethodSelectDialog,
   LoginMethodSelectDialogResult,
   validWalletNames,
-} from "app/components/Dialog/loginMethodSelectDialog";
+} from "app/components/Dialog/loginMethodSelect";
 import { logoUrl } from "app/lib/constants";
 import { isDev, isUuid } from "app/lib/utils";
 import {
@@ -65,11 +64,7 @@ import {
 import { detached_checkPass } from "../_assets/saga";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { externalWalletsSelectors } from "../_externalWallets/selectors";
-import {
-  accountType,
-  connectType,
-  disconnectType,
-} from "../_externalWallets/slice";
+import { accountType, disconnectType } from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
 import {
   notificationsActions,
@@ -187,28 +182,28 @@ function* login() {
     yield getAndSetAccountUsingSocialLogin();
     return;
   }
-  if (selectedMethod && isExternalWalletLoginMethod(selectedMethod)) {
-    const connect: connectType = yield select(
-      externalWalletsSelectors.connect("aptos")
-    );
-    try {
-      yield connect(selectedMethod);
-    } catch (error) {
-      if (isDev) {
-        console.log("error", error);
-      }
-    }
-    // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
-    // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
-    return;
-  }
+  // if (selectedMethod && isExternalWalletLoginMethod(selectedMethod)) {
+  //   const connect: connectType = yield select(
+  //     externalWalletsSelectors.connect("aptos")
+  //   );
+  //   try {
+  //     yield connect(selectedMethod);
+  //   } catch (error) {
+  //     if (isDev) {
+  //       console.log("error", error);
+  //     }
+  //   }
+  //   // rest will be handled in _externalWallets index file, in a useEffect that depends on the account state and network state
+  //   // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
+  //   return;
+  // }
 }
 function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
 ) {
-  const { network, account } = action.payload;
+  const { account, chain } = action.payload;
 
-  if (!isNetworkValidForExternalWalletLogin(network)) {
+  if (!isNetworkValidForExternalWalletLogin(chain.id)) {
     toast.error(
       "Please switch to the Movement Mainnet network on your wallet to login"
     );
@@ -452,8 +447,16 @@ function* detached_afterConnect(
         toast.error("Account not found");
         return;
       }
-      const publicKey = account.publicKey.toString();
-      const aptosAddress = account.address.toString();
+
+      const publicKey = account.publicKey;
+      let publicKeyString =
+        typeof publicKey === "string"
+          ? publicKey
+          : Array.from(publicKey)
+              .map((byte) => byte.toString(16).padStart(2, "0"))
+              .join("");
+
+      const aptosAddress = account.address;
       const identifierId = account.address.toString();
       const loginType: validWalletNames = yield select(
         GlobalSelectors.connectedExternalWallet
@@ -468,7 +471,7 @@ function* detached_afterConnect(
           signature: "placeholder",
           // this will be handled and changed in next step
           timestamp: 0,
-          username: publicKey,
+          username: publicKeyString,
           aptos_address: aptosAddress,
           has_ticket: hasCreatorPass,
           login_type: loginType.toLowerCase().split(" ")[0],
@@ -557,7 +560,9 @@ function* detached_continueWithLoginRequestAndAdditionalData({
     });
 
     signature = signatureExternalWallet!;
+
     timestampInUTCInSeconds = timestampInUTCInSecondsExternalWallet!;
+
     movementService.connectedToExternalWallet = true;
   } else {
     const {
@@ -835,7 +840,8 @@ export function* globalSaga() {
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.login, login);
-  yield takeLatest(
+  yield debounce(
+    500,
     globalActions.loginWithExternalWallet,
     loginWithExternalWallet
   );

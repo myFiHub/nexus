@@ -1,6 +1,6 @@
 import { Button } from "app/components/Button";
 import { confirmAddOrSwitchAccountDialog } from "app/components/Dialog/confirmAddOrSwitchAccountDialog";
-import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelectDialog";
+import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";

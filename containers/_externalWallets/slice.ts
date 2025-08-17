@@ -1,31 +1,32 @@
 import {
-  AccountInfo,
   AptosChangeNetworkOutput,
+  AptosSignAndSubmitTransactionInput,
   AptosSignAndSubmitTransactionOutput,
   AptosSignMessageInput,
   AptosSignMessageOutput,
-  InputTransactionData,
-  Network,
-  NetworkInfo,
-} from "@aptos-labs/wallet-adapter-core";
+  UserResponse,
+  WalletAccount,
+} from "@aptos-labs/wallet-standard";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { validWalletNames } from "app/components/Dialog/loginMethodSelectDialog";
+import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
+import { Chain } from "@razorlabs/razorkit";
 
-export type accountType = AccountInfo | null;
-export type networkType = NetworkInfo | null;
+export type accountType = WalletAccount | undefined;
 export type connectType = (walletName: validWalletNames) => void;
 export type disconnectType = () => void;
 export type signAndSubmitTransactionType = (
-  transaction: InputTransactionData
-) => Promise<AptosSignAndSubmitTransactionOutput>;
+  input: AptosSignAndSubmitTransactionInput
+) => Promise<UserResponse<AptosSignAndSubmitTransactionOutput>>;
+
 export type signMessageType = (
-  message: AptosSignMessageInput
-) => Promise<AptosSignMessageOutput>;
+  input: AptosSignMessageInput
+) => Promise<UserResponse<AptosSignMessageOutput>>;
+
 export type changeNetworkType = (
-  network: Network
-) => Promise<AptosChangeNetworkOutput>;
+  input: number
+) => Promise<UserResponse<AptosChangeNetworkOutput>>;
 
 export interface ExternalWalletsState {
   wallets: {
@@ -33,8 +34,7 @@ export interface ExternalWalletsState {
       connected: boolean;
       isLoading: boolean;
       account: accountType;
-      network: networkType;
-      connect: connectType;
+      chain: Chain | undefined;
       disconnect: disconnectType;
       signAndSubmitTransaction?: signAndSubmitTransactionType;
       signMessage?: signMessageType;
@@ -48,9 +48,8 @@ const initialState: ExternalWalletsState = {
     aptos: {
       connected: false,
       isLoading: false,
-      account: null,
-      network: null,
-      connect: () => {},
+      account: undefined,
+      chain: undefined,
       disconnect: () => {},
       signAndSubmitTransaction: undefined,
       signMessage: undefined,
@@ -80,18 +79,19 @@ const externalWalletSlice = createSlice({
       }>
     ) {
       const { walletName, account } = action.payload;
-      state.wallets[walletName].account = account;
+      state.wallets[walletName].account = account as any;
     },
-    setNetwork(
+    setChain(
       state,
       action: PayloadAction<{
         walletName: keyof ExternalWalletsState["wallets"];
-        network: networkType;
+        chain: Chain | undefined;
       }>
     ) {
-      const { walletName, network } = action.payload;
-      state.wallets[walletName].network = network;
+      const { walletName, chain } = action.payload;
+      state.wallets[walletName].chain = chain;
     },
+
     setIsLoading(
       state,
       action: PayloadAction<{
@@ -102,16 +102,7 @@ const externalWalletSlice = createSlice({
       const { walletName, isLoading } = action.payload;
       state.wallets[walletName].isLoading = isLoading;
     },
-    setConnect(
-      state,
-      action: PayloadAction<{
-        walletName: keyof ExternalWalletsState["wallets"];
-        connect: connectType;
-      }>
-    ) {
-      const { walletName, connect } = action.payload;
-      state.wallets[walletName].connect = connect;
-    },
+
     setDisconnect(
       state,
       action: PayloadAction<{
