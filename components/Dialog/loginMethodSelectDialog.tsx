@@ -1,6 +1,8 @@
 "use client";
 
 import { NetworkInfo } from "@aptos-labs/wallet-adapter-react";
+import { RazorConnectButton } from "app/containers/_externalWallets/connectors/razor";
+import { useIsMobile } from "app/hooks/use-mobile";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useEffect, useState } from "react";
@@ -47,8 +49,13 @@ export const loginMethodSelectDialog =
 
 const Content = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
+    if (isMobile) {
+      resolvePromise?.(LoginMethod.SOCIAL);
+      return;
+    }
     const handleShowDialog = () => {
       setIsOpen(true);
     };
@@ -352,7 +359,7 @@ const Content = () => {
                 </div>
               </motion.div>
             </motion.div>
-
+            <RazorConnectButton />
             {/* Nightly Wallet Option */}
             <motion.div
               variants={optionVariants}

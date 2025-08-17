@@ -24,7 +24,6 @@ import { useRouter } from "next/navigation";
 import { memo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ExternalWallets } from "../_externalWallets";
-import { ExternalWalletsProvider } from "../_externalWallets/connectors/nightly";
 import { useExternalWalletSlice } from "../_externalWallets/slice";
 import { useNotificationsSlice } from "../notifications/slice";
 import { GlobalSelectors } from "./selectors";
@@ -80,9 +79,7 @@ export const GlobalContainer = memo(
   () => {
     return (
       <ReduxProvider>
-        <ExternalWalletsProvider>
-          <Container />
-        </ExternalWalletsProvider>
+        <Container />
       </ReduxProvider>
     );
   },
