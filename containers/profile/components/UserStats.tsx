@@ -1,5 +1,6 @@
 "use client";
 import { Button } from "app/components/Button";
+import { CopyButton } from "app/components/copyButton";
 import { transferBalanceDialog } from "app/components/Dialog";
 import { Loader } from "app/components/Loader";
 import { AssetsSelectors } from "app/containers/_assets/selectore";
@@ -90,6 +91,12 @@ export const UserStats = ({ user }: UserStatsProps) => {
           title="Referrals"
           value={referralsCount}
           subtitle={`Remaining: ${remainingReferrals}`}
+          action={
+            <CopyButton
+              text={user?.uuid || ""}
+              tooltipText="Copy Referral ID"
+            />
+          }
         />
         <StatCard
           title="Received Boo"

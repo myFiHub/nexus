@@ -5,10 +5,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 
 interface CopyButtonProps {
   text: string;
+  tooltipText?: string;
   className?: string;
 }
 
-export const CopyButton = ({ text, className }: CopyButtonProps) => {
+export const CopyButton = ({
+  text,
+  className,
+  tooltipText,
+}: CopyButtonProps) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -64,7 +69,9 @@ export const CopyButton = ({ text, className }: CopyButtonProps) => {
           )}
         </button>
       </TooltipTrigger>
-      <TooltipContent className="text-white">Copy</TooltipContent>
+      <TooltipContent className="text-white">
+        {tooltipText || "Copy"}
+      </TooltipContent>
     </Tooltip>
   );
 };
