@@ -22,11 +22,16 @@ const appLinkVariants = cva(
         sm: "h-8 px-3",
         lg: "h-12 px-6",
       },
+      disabled: {
+        true: "opacity-50 pointer-events-none",
+        false: "",
+      },
     },
     defaultVariants: {
       variant: "default",
       size: "default",
       underline: true,
+      disabled: false,
     },
   }
 );
