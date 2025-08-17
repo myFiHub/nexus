@@ -840,7 +840,8 @@ export function* globalSaga() {
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.login, login);
-  yield takeLatest(
+  yield debounce(
+    500,
     globalActions.loginWithExternalWallet,
     loginWithExternalWallet
   );

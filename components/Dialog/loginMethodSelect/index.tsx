@@ -50,6 +50,7 @@ export const loginMethodSelectDialog =
 const Content = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const logingIn = useSelector(GlobalSelectors.logingIn);
 
   useEffect(() => {
     if (isMobile) {
@@ -90,7 +91,7 @@ const Content = () => {
 
   return (
     <Dialog
-      open={isOpen}
+      open={isOpen && !logingIn}
       onOpenChange={(open) => {
         if (!open) {
           handleClose();

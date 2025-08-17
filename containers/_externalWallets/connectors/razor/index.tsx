@@ -1,7 +1,13 @@
 "use client";
 import "@razorlabs/razorkit/style.css";
+import AnimatedLoginOption from "app/components/Dialog/loginMethodSelect/AnimatedLoginOption";
 import dynamic from "next/dynamic";
 import React from "react";
+import {
+  imagesPathsForWallets,
+  subtitleForExternalWallet,
+  titleForExternalWallet,
+} from "./connectWithRazorButton";
 import "./customStyles.css";
 
 // Dynamic import for WalletProvider only
@@ -58,7 +64,14 @@ export const WProvider = ({ children }: { children: React.ReactNode }) => {
 
 const CButton = dynamic(() => import("./connectWithRazorButton"), {
   ssr: false,
-  loading: () => <></>,
+  loading: () => (
+    <AnimatedLoginOption
+      imagePaths={imagesPathsForWallets}
+      title={titleForExternalWallet}
+      subtitle={subtitleForExternalWallet}
+      isLoading
+    />
+  ),
 });
 
 export const RazorConnectButton = ({

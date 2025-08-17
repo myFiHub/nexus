@@ -8,6 +8,7 @@ interface AnimatedLoginOptionProps {
   title: string;
   subtitle: string;
   onClick?: () => void;
+  isLoading?: boolean;
 }
 
 const AnimatedLoginOption = ({
@@ -15,6 +16,7 @@ const AnimatedLoginOption = ({
   title,
   subtitle,
   onClick,
+  isLoading = false,
 }: AnimatedLoginOptionProps) => {
   const optionVariants = {
     hidden: { opacity: 0, y: 20 },
@@ -49,16 +51,22 @@ const AnimatedLoginOption = ({
   return (
     <motion.div
       variants={optionVariants}
-      whileHover="hover"
-      whileTap="tap"
-      onClick={onClick || undefined}
-      className="group cursor-pointer"
+      whileHover={isLoading ? undefined : "hover"}
+      whileTap={isLoading ? undefined : "tap"}
+      onClick={isLoading ? undefined : onClick || undefined}
+      className={`group ${isLoading ? "cursor-not-allowed" : "cursor-pointer"}`}
     >
       <motion.div
-        className="relative p-6 bg-card/50 border border-border rounded-lg hover:border-primary/50 transition-colors duration-200"
-        whileHover={{
-          backgroundColor: "hsl(var(--card) / 0.8)",
-        }}
+        className={`relative p-6 bg-card/50 border border-border rounded-lg transition-colors duration-200 ${
+          isLoading ? "opacity-50" : "hover:border-primary/50"
+        }`}
+        whileHover={
+          isLoading
+            ? undefined
+            : {
+                backgroundColor: "hsl(var(--card) / 0.8)",
+              }
+        }
       >
         <motion.div
           variants={glowVariants}
@@ -150,6 +158,25 @@ const AnimatedLoginOption = ({
             <div className="w-2 h-2 bg-primary rounded-full" />
           </motion.div>
         </div>
+
+        {/* Loading overlay */}
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-card/80 backdrop-blur-sm rounded-lg flex items-center justify-center"
+          >
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 1,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+              className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full"
+            />
+          </motion.div>
+        )}
       </motion.div>
     </motion.div>
   );
