@@ -2,7 +2,7 @@
 import { AccountInfo, NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
-import { validWalletNames } from "app/components/Dialog/loginMethodSelectDialog";
+import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {
   CookieKeys,
@@ -27,7 +27,7 @@ export interface GlobalState {
   web3AuthUserInfo?: Partial<UserInfo>;
   podiumUserInfo?: User;
   connectedExternalWallet?: validWalletNames;
-  
+
   joiningOutpostId?: string;
   router?: AppRouterInstance;
   tick: number;

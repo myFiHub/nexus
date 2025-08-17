@@ -19,7 +19,7 @@ import {
   Network,
 } from "@aptos-labs/ts-sdk";
 import { AptosSignAndSubmitTransactionOutput } from "@aptos-labs/wallet-adapter-core";
-import { isNetworkValidForExternalWalletLogin } from "app/components/Dialog/loginMethodSelectDialog";
+import { isNetworkValidForExternalWalletLogin } from "app/components/Dialog/loginMethodSelect";
 import { getStore } from "app/store";
 
 // Placeholder for environment/config

@@ -1,11 +1,11 @@
 import { AptosWalletAdapter } from "./connectors/aptosAdapter";
 
-import { RazorWallet } from "./connectors/razor";
+import { RazorWalletWrapper } from "./connectors/razor";
 
 export const ExternalWallets = () => {
   return (
     <>
-      <RazorWallet />
+      <RazorWalletWrapper />
       <AptosWalletAdapter />
     </>
   );

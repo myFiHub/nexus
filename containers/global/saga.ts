@@ -40,7 +40,7 @@ import {
   loginMethodSelectDialog,
   LoginMethodSelectDialogResult,
   validWalletNames,
-} from "app/components/Dialog/loginMethodSelectDialog";
+} from "app/components/Dialog/loginMethodSelect";
 import { logoUrl } from "app/lib/constants";
 import { isDev, isUuid } from "app/lib/utils";
 import {

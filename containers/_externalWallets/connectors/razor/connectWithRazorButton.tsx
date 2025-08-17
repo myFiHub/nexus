@@ -1,8 +1,14 @@
 import { BaseError, ConnectModal } from "@razorlabs/razorkit";
-import { Button } from "app/components/Button";
+import AnimatedLoginOption from "app/components/Dialog/loginMethodSelect/AnimatedLoginOption";
 import { useState } from "react";
 
-export const ConnectWithRazorButton_InternalUse = () => {
+export const ConnectWithRazorButton_InternalUse = ({
+  onConnect,
+  onModalOpenChange,
+}: {
+  onConnect: (walletName: string) => void;
+  onModalOpenChange: (open: boolean) => void;
+}) => {
   const [showModal, setShowModal] = useState(false);
   /*
       onOpenChange?: (open: boolean) => void;
@@ -12,9 +18,11 @@ export const ConnectWithRazorButton_InternalUse = () => {
   */
   const onOpenChange = (open: boolean) => {
     setShowModal(open);
+    onModalOpenChange(open);
   };
   const onConnectionSuccess = (walletName: string) => {
     console.log(`connected to: ${walletName}`);
+    onConnect(walletName);
   };
   const onConnectError = (error: BaseError) => {
     console.log({ error });
@@ -27,7 +35,17 @@ export const ConnectWithRazorButton_InternalUse = () => {
       onConnectSuccess={onConnectionSuccess}
       onConnectError={onConnectError}
     >
-      <Button>connect to external wallet</Button>
+      <AnimatedLoginOption
+        imagePaths={[
+          "/external_wallet_icons/nightly.png",
+          "/external_wallet_icons/razor.png",
+          "/external_wallet_icons/okx.svg",
+          "/external_wallet_icons/leap.svg",
+          "/external_wallet_icons/bitget.svg",
+        ]}
+        title="External Wallet"
+        subtitle="Connect with your external wallet"
+      />
     </ConnectModal>
   );
 };

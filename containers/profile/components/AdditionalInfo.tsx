@@ -1,4 +1,4 @@
-import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelectDialog";
+import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { User } from "app/services/api/types";
 import { Wallet } from "lucide-react";
 import { InfoCard } from "./InfoCard";

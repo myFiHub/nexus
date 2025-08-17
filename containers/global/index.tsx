@@ -14,7 +14,7 @@ import {
   UserSelectDialogProvider,
 } from "app/components/Dialog";
 import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
-import { LoginMethodSelectDialogProvider } from "app/components/Dialog/loginMethodSelectDialog";
+import { LoginMethodSelectDialogProvider } from "app/components/Dialog/loginMethodSelect";
 import { ReminderDialogProvider } from "app/components/Dialog/reminder";
 import { UserSelectToInviteDialogProvider } from "app/components/Dialog/userSelectToInvite";
 import { Toaster } from "app/components/toast";

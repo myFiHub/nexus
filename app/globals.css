@@ -67,6 +67,11 @@
   --scrollbar-thumb: oklch(0.85 0 0);
   --scrollbar-thumb-hover: oklch(0.75 0 0);
   --scrollbar-corner: var(--background);
+
+
+
+
+  
 }
 
 @theme inline {

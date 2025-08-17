@@ -5,7 +5,7 @@ import {
 import {
   isNetworkValidForExternalWalletLogin,
   validWalletNames,
-} from "app/components/Dialog/loginMethodSelectDialog";
+} from "app/components/Dialog/loginMethodSelect";
 import { globalActions } from "app/containers/global/slice";
 import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";

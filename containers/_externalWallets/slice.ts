@@ -9,7 +9,7 @@ import {
   NetworkInfo,
 } from "@aptos-labs/wallet-adapter-core";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { validWalletNames } from "app/components/Dialog/loginMethodSelectDialog";
+import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
 
