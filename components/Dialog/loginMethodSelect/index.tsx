@@ -50,7 +50,6 @@ export const loginMethodSelectDialog =
 const Content = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
-  const myUsername = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     if (isMobile) {
@@ -74,7 +73,6 @@ const Content = () => {
   }, []);
 
   const handleSelect = (method: LoginMethod) => {
-    setIsOpen(false);
     resolvePromise?.(method);
     resolvePromise = null;
   };
@@ -86,14 +84,13 @@ const Content = () => {
   };
 
   const handleRazorConnect = (walletName: string) => {
-    setIsOpen(false);
     resolvePromise?.(walletName as validWalletNames);
     resolvePromise = null;
   };
 
   return (
     <Dialog
-      open={isOpen && !myUsername}
+      open={isOpen}
       onOpenChange={(open) => {
         if (!open) {
           handleClose();

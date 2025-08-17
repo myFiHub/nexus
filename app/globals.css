@@ -5,6 +5,9 @@
 .rti--container {
   background: red;
 }
+body {
+ pointer-events: auto !important;
+}
 :root {
   /* #d500f9 in oklch is 0.835 0.835 280.000 */
   --primary: oklch(0.835 0.835 280.000);
@@ -71,7 +74,7 @@
 
 
 
-  
+
 }
 
 @theme inline {

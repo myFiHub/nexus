@@ -1,6 +1,8 @@
 import { BaseError, ConnectModal } from "@razorlabs/razorkit";
 import AnimatedLoginOption from "app/components/Dialog/loginMethodSelect/AnimatedLoginOption";
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useConfigureWallet } from "../aptosAdapter/useConfigureWallet";
 
 export const ConnectWithRazorButton_InternalUse = ({
@@ -12,6 +14,7 @@ export const ConnectWithRazorButton_InternalUse = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   useConfigureWallet();
+  const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   /*
       onOpenChange?: (open: boolean) => void;
     onConnectSuccess?: (walletName: string) => void;
@@ -32,7 +35,7 @@ export const ConnectWithRazorButton_InternalUse = ({
 
   return (
     <ConnectModal
-      open={showModal}
+      open={showModal && !myUser}
       onOpenChange={onOpenChange}
       onConnectSuccess={onConnectionSuccess}
       onConnectError={onConnectError}

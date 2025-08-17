@@ -1,8 +1,9 @@
+"use client";
 import { useWallet } from "@razorlabs/razorkit";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { globalActions } from "app/containers/global/slice";
 import { isDev } from "app/lib/utils";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { externalWalletActions } from "../../slice";
 
@@ -29,9 +30,9 @@ import { externalWalletActions } from "../../slice";
     signMessage(input: AptosSignMessageInput): Promise<UserResponse<AptosSignMessageOutput>>;
 
 */
+let triedOnce = false;
 
 export const useConfigureWallet = () => {
-  const triedOnce = useRef(false);
   const dispatch = useDispatch();
   const {
     connected,
@@ -126,11 +127,11 @@ export const useConfigureWallet = () => {
     );
   }, [chain]);
   useEffect(() => {
-    if (account && !isLoading && !triedOnce.current && chain) {
+    if (account && !isLoading && !triedOnce && chain) {
       if (isDev) {
         console.log({ account, chain, name });
       }
-      triedOnce.current = true;
+      triedOnce = true;
       dispatch(
         globalActions.loginWithExternalWallet({
           account,
@@ -139,7 +140,7 @@ export const useConfigureWallet = () => {
         })
       );
       setTimeout(() => {
-        triedOnce.current = false;
+        triedOnce = false;
       }, 1000);
     }
   }, [account?.address.toString()]);

@@ -4,54 +4,43 @@ import dynamic from "next/dynamic";
 import React from "react";
 import "./customStyles.css";
 
-// Dynamic imports for all exports
+// Dynamic import for WalletProvider only
 export const WalletProvider = dynamic(
-  () =>
-    import("@razorlabs/razorkit").then((mod) => ({
-      default: mod.WalletProvider,
-    })),
+  () => import("@razorlabs/razorkit").then((mod) => mod.WalletProvider),
   { ssr: false, loading: () => <></> }
 );
 
-// For wallet configurations, we'll import them lazily
-let walletConfigs: any = null;
-
-const loadWalletConfigs = async () => {
-  if (!walletConfigs) {
-    const mod = await import("@razorlabs/razorkit");
-    walletConfigs = {
-      BitgetWallet: mod.BitgetWallet,
-      LeapWallet: mod.LeapWallet,
-      NightlyWallet: mod.NightlyWallet,
-      OkxWallet: mod.OkxWallet,
-      RazorWallet: mod.RazorWallet,
-    };
+// Direct imports for other exports
+let walletExports: any = {};
+const loadWalletExports = async () => {
+  try {
+    walletExports = await import("@razorlabs/razorkit");
+  } catch (error) {
+    console.error("Failed to load wallet exports:", error);
   }
-  return walletConfigs;
 };
+loadWalletExports();
 
-export const getBitgetWallet = async () =>
-  (await loadWalletConfigs()).BitgetWallet;
-export const getLeapWallet = async () => (await loadWalletConfigs()).LeapWallet;
-export const getNightlyWallet = async () =>
-  (await loadWalletConfigs()).NightlyWallet;
-export const getOkxWallet = async () => (await loadWalletConfigs()).OkxWallet;
-export const getRazorWallet = async () =>
-  (await loadWalletConfigs()).RazorWallet;
+export const getBitgetWallet = async () => walletExports.BitgetWallet;
+export const getLeapWallet = async () => walletExports.LeapWallet;
+export const getNightlyWallet = async () => walletExports.NightlyWallet;
+export const getOkxWallet = async () => walletExports.OkxWallet;
+export const getRazorWallet = async () => walletExports.RazorWallet;
 
 export const WProvider = ({ children }: { children: React.ReactNode }) => {
   const [wallets, setWallets] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const loadWallets = async () => {
-      const configs = await loadWalletConfigs();
-      setWallets([
-        configs.NightlyWallet,
-        configs.RazorWallet,
-        configs.OkxWallet,
-        configs.LeapWallet,
-        configs.BitgetWallet,
-      ]);
+      if (walletExports.BitgetWallet) {
+        setWallets([
+          walletExports.NightlyWallet,
+          walletExports.RazorWallet,
+          walletExports.OkxWallet,
+          walletExports.LeapWallet,
+          walletExports.BitgetWallet,
+        ]);
+      }
     };
     loadWallets();
   }, []);
