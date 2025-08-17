@@ -18,12 +18,7 @@ export const externalWalletsSelectors = {
   account:
     (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
       externalWalletsDomains.wallets(state)[walletName].account,
-  network:
-    (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
-      externalWalletsDomains.wallets(state)[walletName].network,
-  connect:
-    (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
-      externalWalletsDomains.wallets(state)[walletName].connect,
+
   disconnect:
     (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
       externalWalletsDomains.wallets(state)[walletName].disconnect,

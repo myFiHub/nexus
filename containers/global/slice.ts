@@ -15,6 +15,8 @@ import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
+import { WalletAccount } from "@aptos-labs/wallet-standard";
+import { Chain } from "@razorlabs/razorkit";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
@@ -110,8 +112,8 @@ const globalSlice = createSlice({
     loginWithExternalWallet(
       state,
       action: PayloadAction<{
-        account: AccountInfo;
-        network: NetworkInfo;
+        account: WalletAccount;
+        chain: Chain;
         selectedExternalWallet: validWalletNames;
       }>
     ) {

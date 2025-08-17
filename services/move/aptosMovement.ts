@@ -19,6 +19,7 @@ import {
   Network,
 } from "@aptos-labs/ts-sdk";
 import { AptosSignAndSubmitTransactionOutput } from "@aptos-labs/wallet-adapter-core";
+import { UserResponseStatus } from "@aptos-labs/wallet-standard";
 import { isNetworkValidForExternalWalletLogin } from "app/components/Dialog/loginMethodSelect";
 import { getStore } from "app/store";
 
@@ -678,23 +679,36 @@ query GetNFTs($address: String!) {
 
     const account = store.getState().externalWallets.wallets.aptos.account;
     const address = account?.address.toString();
-    const network = store.getState().externalWallets.wallets.aptos.network;
-    if (!address || !network) {
+    const chain = store.getState().externalWallets.wallets.aptos.chain;
+
+    if (!address || !chain) {
       toast.error("Connect your wallet and try again");
       return undefined;
     }
-    if (!isNetworkValidForExternalWalletLogin(network)) {
-      toast.error(
-        "Please switch to the Movement Mainnet network on your wallet and try again"
-      );
-      return undefined;
+    if (!isNetworkValidForExternalWalletLogin(chain.id)) {
+      const changeNetwork =
+        store.getState().externalWallets.wallets.aptos.changeNetwork!;
+      const result = await changeNetwork(126);
+      if (result.status !== UserResponseStatus.APPROVED) {
+        toast.error(
+          "Please switch to the Movement Mainnet network on your wallet and try again"
+        );
+        return undefined;
+      }
     }
     if (signAndSubmitTransaction) {
       try {
         const result = await signAndSubmitTransaction({
-          data,
+          payload: {
+            function: data.function,
+            typeArguments: data.typeArguments,
+            functionArguments: data.functionArguments,
+          },
         });
-        return result;
+        if (result.status === UserResponseStatus.APPROVED) {
+          return result.args;
+        }
+        return undefined;
       } catch (e: any) {
         console.error("e", e);
         if (

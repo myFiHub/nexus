@@ -39,12 +39,7 @@ export const getOkxWallet = async () => (await loadWalletConfigs()).OkxWallet;
 export const getRazorWallet = async () =>
   (await loadWalletConfigs()).RazorWallet;
 
-const App = dynamic(() => import("./injector"), {
-  ssr: false,
-  loading: () => <></>,
-});
-
-const WProvider = ({ children }: { children: React.ReactNode }) => {
+export const WProvider = ({ children }: { children: React.ReactNode }) => {
   const [wallets, setWallets] = React.useState<any[]>([]);
 
   React.useEffect(() => {
@@ -69,14 +64,6 @@ const WProvider = ({ children }: { children: React.ReactNode }) => {
     <WalletProvider autoConnect={true} defaultWallets={wallets}>
       {children}
     </WalletProvider>
-  );
-};
-
-export const RazorWalletWrapper = () => {
-  return (
-    <WProvider>
-      <App />
-    </WProvider>
   );
 };
 

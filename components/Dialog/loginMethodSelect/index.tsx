@@ -1,10 +1,11 @@
 "use client";
 
-import { NetworkInfo } from "@aptos-labs/wallet-adapter-react";
 import { RazorConnectButton } from "app/containers/_externalWallets/connectors/razor";
+import { GlobalSelectors } from "app/containers/global/selectors";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../index";
 import AnimatedLoginOption from "./AnimatedLoginOption";
 import { containerVariants, itemVariants } from "./variants";
@@ -15,19 +16,17 @@ export enum LoginMethod {
   OKX = "OKX Wallet",
 }
 
-export const isNetworkValidForExternalWalletLogin = (network: NetworkInfo) => {
-  console.log({ network });
-  return (
-    network.chainId === 126 ||
-    network.url?.includes("fullnode/aptos/discover/rpc/v1")
-  );
+export const isNetworkValidForExternalWalletLogin = (chainId: number) => {
+  return chainId === 126;
 };
 
 export const isExternalWalletLoginMethod = (loginMethod: string) => {
   return (
-    loginMethod?.toLowerCase() === LoginMethod.NIGHTLY.toLowerCase() ||
-    loginMethod?.toLowerCase() === LoginMethod.OKX.toLowerCase() ||
-    loginMethod?.toLowerCase() === "okx"
+    loginMethod?.toLowerCase().includes("nightly") ||
+    loginMethod?.toLowerCase().includes("okx") ||
+    loginMethod?.toLowerCase().includes("razor") ||
+    loginMethod?.toLowerCase().includes("leap") ||
+    loginMethod?.toLowerCase().includes("bitget")
   );
 };
 
@@ -51,6 +50,7 @@ export const loginMethodSelectDialog =
 const Content = () => {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const myUsername = useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     if (isMobile) {
@@ -86,12 +86,14 @@ const Content = () => {
   };
 
   const handleRazorConnect = (walletName: string) => {
-    console.log({ walletName });
+    setIsOpen(false);
+    resolvePromise?.(walletName as validWalletNames);
+    resolvePromise = null;
   };
 
   return (
     <Dialog
-      open={isOpen}
+      open={isOpen && !myUsername}
       onOpenChange={(open) => {
         if (!open) {
           handleClose();
@@ -277,5 +279,9 @@ const Content = () => {
 };
 
 export const LoginMethodSelectDialogProvider = () => {
+  const myUsername = useSelector(GlobalSelectors.podiumUserInfo);
+  if (myUsername) {
+    return null;
+  }
   return <Content />;
 };

@@ -1,6 +1,7 @@
 import { BaseError, ConnectModal } from "@razorlabs/razorkit";
 import AnimatedLoginOption from "app/components/Dialog/loginMethodSelect/AnimatedLoginOption";
 import { useState } from "react";
+import { useConfigureWallet } from "../aptosAdapter/useConfigureWallet";
 
 export const ConnectWithRazorButton_InternalUse = ({
   onConnect,
@@ -10,6 +11,7 @@ export const ConnectWithRazorButton_InternalUse = ({
   onModalOpenChange: (open: boolean) => void;
 }) => {
   const [showModal, setShowModal] = useState(false);
+  useConfigureWallet();
   /*
       onOpenChange?: (open: boolean) => void;
     onConnectSuccess?: (walletName: string) => void;
