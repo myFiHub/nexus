@@ -4,6 +4,7 @@ import {
   User,
 } from "app/services/api/types";
 import { ClientRedirecter } from "./components/clientRedirecter";
+import { SocialLink } from "./components/socialLink";
 import { UserTabs } from "./components/tabs";
 import { UserProfile } from "./components/UserProfile";
 import { UserStats } from "./components/UserStats";
@@ -29,6 +30,7 @@ export const UserDetails = ({
           <div className="text-2xl font-bold">User Details</div>
         </div>
         <UserProfile user={user} />
+        <SocialLink user={user} />
         <UserStats user={user} />
         <UserTabs
           user={user}
