@@ -11,8 +11,9 @@ import { movementService } from "app/services/move/aptosMovement";
 import { CircleArrowOutUpRight } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import BalanceDisplay from "../../../components/BalanceDisplay";
-import { StatCard } from "./StatCard";
+import BalanceDisplay from "../../../../components/BalanceDisplay";
+import { StatCard } from "../StatCard";
+import { RefreshBalanceButton } from "./RefreshBalanceButton";
 
 interface UserStatsProps {
   user: User;
@@ -63,7 +64,9 @@ export const UserStats = ({ user }: UserStatsProps) => {
     <>
       <div className="mb-8">
         <div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-lg shadow-lg">
-          <div className="text-sm text-foreground/80">Available Balance</div>
+          <div className="text-sm text-foreground/80 flex items-center gap-2">
+            Available Balance <RefreshBalanceButton />
+          </div>
           <div className="flex items-center gap-2">
             <BalanceDisplay />
             {balanceValue !== "0" ? (
