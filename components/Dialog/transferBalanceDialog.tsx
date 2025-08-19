@@ -23,6 +23,7 @@
 
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { AnimatePresence, motion } from "framer-motion";
+import { RefreshCcw } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import BalanceDisplay from "../BalanceDisplay";

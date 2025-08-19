@@ -29,6 +29,7 @@ import { assetsActions, Balance, PassSeller } from "./slice";
 
 function* getBalance() {
   const correntBalance: Balance = yield select(AssetsSelectors.balance);
+
   yield put(
     assetsActions.setBalance({
       value: correntBalance.value ?? "0",
