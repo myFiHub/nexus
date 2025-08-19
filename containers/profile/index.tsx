@@ -19,7 +19,7 @@ import { ProfileHeader } from "./components/ProfileHeader";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountCardActionSelectDialogProvider } from "./components/SecuritySection/dialogs/accountCardActionSelectDialog";
 import { SettingsSection } from "./components/SettingsSection";
-import { UserStats } from "./components/UserStats";
+import { UserStats } from "./components/userStats";
 import { profileActions, useProfileSlice } from "./slice";
 
 // Reusable styled card for profile sections
