@@ -506,8 +506,9 @@ export class WebSocketService {
         this.socket.close();
         this.socket = null;
       }
+      const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-      const uri = `${this.websocketAddress}?token=${this.token}`;
+      const uri = `${this.websocketAddress}?token=${this.token}&timezone=${timeZone}`;
       this.socket = new WebSocket(uri);
 
       return new Promise<boolean>((resolve) => {

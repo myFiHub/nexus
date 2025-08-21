@@ -11,8 +11,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
-import { Chain } from "@razorlabs/razorkit";
-
+export type Chain = {
+  id: number;
+  name: string;
+  rpcUrl: string;
+  indexerUrl?: string;
+};
 export type accountType = WalletAccount | undefined;
 export type connectType = (walletName: validWalletNames) => void;
 export type disconnectType = () => void;

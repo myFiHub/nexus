@@ -1,6 +1,5 @@
 "use client";
 import { WalletAccount } from "@aptos-labs/wallet-standard";
-import { Chain } from "@razorlabs/razorkit";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UserInfo, Web3Auth } from "@web3auth/modal";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
@@ -16,6 +15,7 @@ import { ConnectionState, ConnectionStatus } from "app/services/wsClient";
 import { injectContainer } from "app/store";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { globalSaga } from "./saga";
+import { type Chain } from "../_externalWallets/slice";
 
 export interface GlobalState {
   initializingWeb3Auth: boolean;
