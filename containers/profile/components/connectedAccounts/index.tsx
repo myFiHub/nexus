@@ -30,7 +30,7 @@ export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
   };
 
   if (!accounts?.length) return null;
-
+  const disabled = logingIn || isExternalWallet;
   return (
     <div className="mb-8">
       <div className="flex items-center justify-between mb-4">
@@ -40,7 +40,7 @@ export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
         </h2>
         <Button
           onClick={handleAddAccount}
-          disabled={logingIn || isExternalWallet}
+          disabled={disabled}
           size="sm"
           variant="outline"
           className="flex items-center gap-2"
