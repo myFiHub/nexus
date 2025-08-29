@@ -175,7 +175,16 @@ const globalSlice = createSlice({
         state.objectOfOnlineUsersToGet = rest;
       }
     },
-    switchAccount() {},
+    switchAccount(
+      _,
+      __: PayloadAction<
+        | {
+            oldAccountType: "SOCIAL" | "EXTERNAL";
+            newAccountType: "SOCIAL" | "EXTERNAL";
+          }
+        | undefined
+      >
+    ) {},
     setSwitchingAccount(state, action: PayloadAction<boolean>) {
       state.switchingAccount = action.payload;
     },

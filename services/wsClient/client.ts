@@ -273,6 +273,10 @@ export class WebSocketService {
    * Uses health checking and intelligent retry logic
    */
   async asyncJoin(outpostId: string): Promise<boolean> {
+    if (!outpostId) {
+      if (isDev) console.error("[WebSocket] No outpost ID provided");
+      return false;
+    }
     if (isDev)
       console.log(`[WebSocket] Reliable join requested for: ${outpostId}`);
 

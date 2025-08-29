@@ -32,4 +32,7 @@ export const externalWalletsSelectors = {
   changeNetwork:
     (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
       externalWalletsDomains.wallets(state)[walletName].changeNetwork,
+  select:
+    (walletName: keyof ExternalWalletsState["wallets"]) => (state: RootState) =>
+      externalWalletsDomains.wallets(state)[walletName].select,
 };
