@@ -15,6 +15,7 @@ export interface OnGoingOutpostState {
   isCheeringAddress?: string;
   isBooingAddress?: string;
   isRefreshingLiveMembers: boolean;
+  isInteractionsMuted: boolean;
   amIMuted: boolean;
   leaving: boolean;
   meetApiObj?: any;
@@ -34,6 +35,10 @@ export const initialState: OnGoingOutpostState = {
   isGettingOutpost: false,
   isGettingLiveMembers: false,
   isRefreshingLiveMembers: false,
+  isInteractionsMuted:
+    typeof localStorage !== "undefined"
+      ? localStorage.getItem("isInteractionsMuted") === "true"
+      : false,
   accesses: { canEnter: false, canSpeak: false },
   liveMembers: {},
   hasAudioPermission: true,
@@ -189,6 +194,10 @@ const onGoingOutpostSlice = createSlice({
     },
     setIsRefreshingLiveMembers(state, action: PayloadAction<boolean>) {
       state.isRefreshingLiveMembers = action.payload;
+    },
+    setIsInteractionsMuted(state, action: PayloadAction<boolean>) {
+      state.isInteractionsMuted = action.payload;
+      localStorage.setItem("isInteractionsMuted", action.payload.toString());
     },
   },
 });

@@ -4,6 +4,7 @@ import {
 } from "app/components/Dialog/cheerBooAmountDialog";
 import { checkAudioPermission } from "app/lib/audioPermissions";
 import { AppPages } from "app/lib/routes";
+import { booSound, cheerSound, dislikeSound, likeSound } from "app/lib/sound";
 import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
 import podiumApi from "app/services/api";
@@ -16,6 +17,7 @@ import {
 import { movementService } from "app/services/move/aptosMovement";
 import { wsClient } from "app/services/wsClient/client";
 import {
+  IncomingMessageType,
   OutgoingMessage,
   OutgoingMessageType,
 } from "app/services/wsClient/types";
@@ -402,6 +404,26 @@ function* incomingUserReaction(
   action: ReturnType<typeof onGoingOutpostActions.incomingUserReaction>
 ) {
   const { userAddress: address, reaction } = action.payload;
+  const isInteractionsMuted: boolean = yield select(
+    onGoingOutpostSelectors.isInteractionsMuted
+  );
+  if (!isInteractionsMuted) {
+    switch (reaction) {
+      case IncomingMessageType.USER_LIKED:
+        likeSound.play();
+        break;
+      case IncomingMessageType.USER_CHEERED:
+        cheerSound.play();
+        break;
+      case IncomingMessageType.USER_BOOED:
+        booSound.play();
+        break;
+      case IncomingMessageType.USER_DISLIKED:
+        dislikeSound.play();
+        break;
+    }
+  }
+
   confettiEventBus.next({ address, type: reaction });
 }
 

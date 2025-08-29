@@ -6,53 +6,26 @@ import {
   WEB3AUTH_NETWORK,
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
-import {
-  nameDialog,
-  NameDialogResult,
-  promptNotifications,
-  referrerDialog,
-  ReferrerDialogResult,
-} from "app/components/Dialog";
-import {
-  CookieKeys,
-  deleteClientCookie,
-  getClientCookie,
-} from "app/lib/client-cookies";
-import {
-  deleteServerCookieViaAPI,
-  setServerCookieViaAPI,
-} from "app/lib/client-server-cookies";
+import { promptNotifications } from "app/components/Dialog";
+import { CookieKeys, deleteClientCookie } from "app/lib/client-cookies";
+import { deleteServerCookieViaAPI } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
 import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
-import {
-  signMessage,
-  signMessageWithTimestamp,
-  signMessageWithTimestampUsingExternalWallet,
-} from "app/lib/signWithPrivateKey";
+
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
-// Removed: import { fetchMovePrice } from "app/services/api/coingecko/priceFetch";
 import {
   isNetworkValidForExternalWalletLogin,
   LoginMethod,
   loginMethodSelectDialog,
   LoginMethodSelectDialogResult,
-  validWalletNames,
 } from "app/components/Dialog/loginMethodSelect";
 import { logoUrl } from "app/lib/constants";
-import { isDev, isUuid } from "app/lib/utils";
-import {
-  AdditionalDataForLogin,
-  ConnectNewAccountRequest,
-  LoginRequest,
-  OutpostModel,
-  User,
-} from "app/services/api/types";
+import { isDev } from "app/lib/utils";
+import { OutpostModel } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
-import { wsClient } from "app/services/wsClient/client";
 import { getStore } from "app/store";
-import { ethers } from "ethers";
 import {
   all,
   debounce,
@@ -62,44 +35,21 @@ import {
   takeLatest,
 } from "redux-saga/effects";
 import { detached_checkPass } from "../_assets/saga";
-import { assetsActions, useAssetsSlice } from "../_assets/slice";
 import { externalWalletsSelectors } from "../_externalWallets/selectors";
-import { accountType, disconnectType } from "../_externalWallets/slice";
+import { disconnectType } from "../_externalWallets/slice";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
-import {
-  notificationsActions,
-  useNotificationsSlice,
-} from "../notifications/slice";
-import { profileActions, useProfileSlice } from "../profile/slice";
+
 import { joinOutpost } from "./effects/joinOutpost";
-import { hasCreatorPodiumPass } from "./effects/podiumPassCheck";
+import { detached_afterConnect } from "./effects/login/after_connect";
 import { OutpostAccesses } from "./effects/types";
 import { GlobalSelectors } from "./selectors";
 import { globalActions } from "./slice";
 
-const availableSocialLogins = [
-  "twitter",
-  "google",
-  "apple",
-  "facebook",
-  "github",
-  "linkedin",
-  "email_passwordless",
-];
-
-const stringContainsOneOfAvailableSocialLogins = (str: string) => {
-  return availableSocialLogins.some((login) => str.includes(login));
-};
-
-export function* getPrivateKey() {
-  const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-  if (!web3Auth) return;
-  const provider = web3Auth.provider!;
-  const privateKey: unknown = yield provider.request({
-    method: "private_key",
-  });
-  return privateKey;
-}
+import { detached_connectSocialToSocial } from "./effects/add_account/social_social";
+import {
+  availableSocialLogins,
+  stringContainsOneOfAvailableSocialLogins,
+} from "./utils/social_login_types";
 
 function* initOneSignal(
   action: ReturnType<typeof globalActions.initOneSignal>
@@ -270,428 +220,17 @@ function* getAndSetAccountUsingSocialLogin() {
   }
 }
 
-function* switchAccount() {
-  yield put(globalActions.setSwitchingAccount(true));
-  try {
-    let thereWasAnError = false;
-    const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
-    const correntAccountPrivateKey: string | undefined = yield getPrivateKey();
-
-    if (!correntAccountPrivateKey) {
-      thereWasAnError = true;
-    } else {
-      yield web3Auth.logout();
-      yield web3Auth.clearCache();
-      const provider: IProvider | null = yield web3Auth.connect();
-
-      if (!provider) {
-        thereWasAnError = true;
-      } else {
-        const userInfo: Partial<UserInfo> = yield web3Auth.getUserInfo();
-        const newAccountPrivateKey: string | undefined = yield provider.request(
-          {
-            method: "private_key",
-          }
-        );
-
-        if (!newAccountPrivateKey) {
-          thereWasAnError = true;
-          return;
-        } else {
-          const correntAccountAddress = new ethers.Wallet(
-            correntAccountPrivateKey
-          ).address;
-          const newAccountAddress = new ethers.Wallet(newAccountPrivateKey)
-            .address;
-
-          if (correntAccountAddress === newAccountAddress) {
-            thereWasAnError = true;
-          } else {
-            movementService.setAccount(newAccountPrivateKey);
-            const newAccountAptosAddress = movementService.address;
-
-            const currentAccountAddressSignedByNewAccount: string =
-              yield signMessage({
-                privateKey: newAccountPrivateKey,
-                message: correntAccountAddress,
-              });
-            const newAccountAddressSignedByCurrentAccount: string =
-              yield signMessage({
-                privateKey: correntAccountPrivateKey,
-                message: newAccountAddress,
-              });
-
-            if (!userInfo.authConnection) {
-              thereWasAnError = true;
-            } else if (
-              userInfo.authConnection &&
-              !stringContainsOneOfAvailableSocialLogins(userInfo.authConnection)
-            ) {
-              thereWasAnError = true;
-              toast.error("Only social login methods are supported for now");
-            } else {
-              let identifierId = userInfo.authConnectionId ?? "";
-              if (identifierId.includes("|")) {
-                identifierId = identifierId.split("|")[1];
-              }
-
-              const request: ConnectNewAccountRequest = {
-                aptos_address: newAccountAptosAddress,
-                current_address_signature:
-                  currentAccountAddressSignedByNewAccount,
-                image: userInfo.profileImage ?? "",
-                login_type: userInfo.authConnection,
-                login_type_identifier: identifierId,
-                new_address: newAccountAddress,
-                new_address_signature: newAccountAddressSignedByCurrentAccount,
-              };
-
-              const connected: boolean = yield podiumApi.connectNewAccount(
-                request
-              );
-              if (!connected) {
-                thereWasAnError = true;
-              } else {
-                const {
-                  signature: newAccountSignature,
-                  timestampInUTCInSeconds,
-                }: {
-                  signature: string;
-                  timestampInUTCInSeconds: number;
-                } = yield signMessageWithTimestamp({
-                  privateKey: newAccountPrivateKey,
-                  message: newAccountAddress,
-                });
-
-                const loginRequest: LoginRequest = {
-                  signature: newAccountSignature,
-                  username: newAccountAddress,
-                  timestamp: timestampInUTCInSeconds,
-                  aptos_address: movementService.address,
-                  has_ticket: false,
-                  login_type: userInfo?.authConnection ?? "",
-                  login_type_identifier: userInfo?.authConnectionId ?? "",
-                };
-
-                const response: {
-                  user: User | null;
-                  error: string | null;
-                  statusCode: number | null;
-                  token: string | null;
-                } = yield podiumApi.login(loginRequest, {});
-                if (response.user) {
-                  yield detached_afterGettingPodiumUser({
-                    user: response.user,
-                    token: response.token ?? "",
-                    savedName: response.user?.name ?? "",
-                  });
-                } else {
-                  thereWasAnError = true;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    if (thereWasAnError) {
-      toast.error("there was an error, please try again");
-      yield put(globalActions.logout());
-    }
-  } catch (error) {
-    yield put(globalActions.logout());
-    toast.error("there was an error, please try again");
-  } finally {
-    yield put(globalActions.setSwitchingAccount(false));
-  }
-}
-
-function* detached_afterConnect(
-  userInfo: Partial<UserInfo>,
-  isSocialLogin = true
+function* switchAccount(
+  action: ReturnType<typeof globalActions.switchAccount>
 ) {
-  try {
-    const token = getClientCookie(CookieKeys.token);
-    if (token && !isSocialLogin) {
-      podiumApi.setToken(token);
-      const myUser: User | undefined = yield podiumApi.getMyUserData({});
-      if (myUser) {
-        const savedName: string = yield detached_checkName({ user: myUser });
-        if (!savedName) {
-          yield put(globalActions.logout());
-          return;
-        }
-        movementService.connectedToExternalWallet = true;
-        yield detached_afterGettingPodiumUser({
-          user: myUser,
-          token,
-          savedName,
-        });
-        return;
-      }
-    }
-
-    let {
-      authConnection: loginType,
-      userId: identifierId,
-      name,
-      profileImage: image,
-      email,
-    } = userInfo;
-
-    if (!isSocialLogin) {
-      const account: accountType = yield select(
-        externalWalletsSelectors.account("aptos")
-      );
-      if (!account) {
-        toast.error("Account not found");
-        return;
-      }
-
-      const publicKey = account.publicKey;
-      let publicKeyString =
-        typeof publicKey === "string"
-          ? publicKey
-          : Array.from(publicKey)
-              .map((byte) => byte.toString(16).padStart(2, "0"))
-              .join("");
-
-      const aptosAddress = account.address;
-      const identifierId = account.address.toString();
-      const loginType: validWalletNames = yield select(
-        GlobalSelectors.connectedExternalWallet
-      );
-      const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
-        buyerAddress: aptosAddress,
-      });
-
-      yield detached_continueWithLoginRequestAndAdditionalData({
-        loginRequest: {
-          // this will be handled and changed in next step
-          signature: "placeholder",
-          // this will be handled and changed in next step
-          timestamp: 0,
-          username: publicKeyString,
-          aptos_address: aptosAddress,
-          has_ticket: hasCreatorPass,
-          login_type: loginType.toLowerCase().split(" ")[0],
-          login_type_identifier: identifierId,
-        },
-        additionalDataForLogin: {},
-        isSocialLogin: false,
-      });
-    } else {
-      const privateKey: string | undefined = yield getPrivateKey();
-      if (privateKey) {
-        movementService.setAccount(privateKey);
-        const aptosAddress = movementService.address;
-
-        if (!identifierId) {
-          console.log("Identifier ID is required");
-          return;
-        }
-        if (identifierId.includes("|")) {
-          identifierId = identifierId.split("|")[1];
-        }
-        const hasCreatorPass: boolean = yield hasCreatorPodiumPass({
-          buyerAddress: aptosAddress,
-        });
-
-        const evmWallet = new ethers.Wallet(privateKey);
-        const evmAddress = evmWallet.address;
-
-        const loginRequest: LoginRequest = {
-          signature: "placeholder", //this will be handled and changed in next step
-          username: evmAddress,
-          timestamp: 0, //this will be handled and changed in next step
-          aptos_address: aptosAddress,
-          has_ticket: hasCreatorPass,
-          login_type: loginType ?? "",
-          login_type_identifier: identifierId,
-        };
-        const additionalDataForLogin: AdditionalDataForLogin = {
-          loginType,
-        };
-
-        if (name) {
-          additionalDataForLogin.name = name;
-        }
-        if (image) {
-          additionalDataForLogin.image = image;
-        }
-        if (email) {
-          additionalDataForLogin.email = email;
-        }
-        yield detached_continueWithLoginRequestAndAdditionalData({
-          loginRequest,
-          additionalDataForLogin,
-          privateKey,
-          isSocialLogin: true,
-        });
-      }
-    }
-  } catch (error) {
-    yield put(globalActions.logout());
+  yield put(globalActions.setSwitchingAccount(true));
+  const { oldAccountType, newAccountType } = action.payload ?? {
+    oldAccountType: "SOCIAL",
+    newAccountType: "SOCIAL",
+  };
+  if (oldAccountType === newAccountType && newAccountType === "SOCIAL") {
+    yield detached_connectSocialToSocial();
   }
-}
-
-function* detached_continueWithLoginRequestAndAdditionalData({
-  loginRequest,
-  additionalDataForLogin,
-  retried = false,
-  privateKey,
-  isSocialLogin = true,
-}: {
-  loginRequest: LoginRequest;
-  additionalDataForLogin: AdditionalDataForLogin;
-  retried?: boolean;
-  privateKey?: string;
-  isSocialLogin?: boolean;
-}): any {
-  let signature: string;
-  let timestampInUTCInSeconds: number;
-  if (!isSocialLogin) {
-    const {
-      signature: signatureExternalWallet,
-      timestampInUTCInSeconds: timestampInUTCInSecondsExternalWallet,
-    } = yield signMessageWithTimestampUsingExternalWallet({
-      walletName: "aptos",
-      message: loginRequest.aptos_address,
-    });
-
-    signature = signatureExternalWallet!;
-
-    timestampInUTCInSeconds = timestampInUTCInSecondsExternalWallet!;
-
-    movementService.connectedToExternalWallet = true;
-  } else {
-    const {
-      signature: signaturePrivateKey,
-      timestampInUTCInSeconds: timestampInUTCInSecondsPrivateKey,
-    }: {
-      signature: string;
-      timestampInUTCInSeconds: number;
-    } = yield signMessageWithTimestamp({
-      privateKey: privateKey!,
-      message: loginRequest.username,
-    });
-    signature = signaturePrivateKey!;
-    timestampInUTCInSeconds = timestampInUTCInSecondsPrivateKey!;
-    movementService.connectedToExternalWallet = false;
-  }
-  if (!signature || !timestampInUTCInSeconds) {
-    toast.error("Logging in failed, please try again");
-    yield put(globalActions.logout());
-    return;
-  }
-
-  loginRequest.signature = signature;
-  loginRequest.timestamp = timestampInUTCInSeconds;
-
-  const response: {
-    user: User | null;
-    error: string | null;
-    statusCode: number | null;
-    token: string | null;
-  } = yield podiumApi.login(loginRequest, additionalDataForLogin);
-
-  let referrerId = "";
-  if (response.statusCode === 428 && !retried) {
-    const { confirmed, enteredText }: ReferrerDialogResult =
-      yield referrerDialog();
-    if (confirmed && enteredText && isUuid(enteredText)) {
-      referrerId = enteredText;
-      loginRequest.referrer_user_uuid = referrerId;
-      yield detached_continueWithLoginRequestAndAdditionalData({
-        loginRequest,
-        additionalDataForLogin,
-        privateKey,
-        retried: true,
-        isSocialLogin,
-      });
-      return;
-    } else {
-      toast.error("you need to be referred by a user to join");
-      yield put(globalActions.logout());
-      return;
-    }
-  } else if (!response.user) {
-    toast.error(response.error ?? "Error logging in, please try again");
-    yield put(globalActions.logout());
-    return;
-  }
-  const user = response.user;
-  const savedName: string = yield detached_checkName({ user });
-  if (!savedName) {
-    yield put(globalActions.logout());
-    return;
-  }
-
-  if (user) {
-    yield detached_afterGettingPodiumUser({
-      user,
-      token: response.token ?? "",
-      savedName,
-    });
-  } else {
-    yield put(globalActions.logout());
-  }
-}
-
-function* detached_checkName({ user }: { user: User }) {
-  let savedName = user?.name;
-  if (!savedName || savedName.includes("@")) {
-    const { confirmed, enteredText }: NameDialogResult = yield nameDialog();
-    if (confirmed && (enteredText?.trim().length || 0) > 0) {
-      const resultsForUpdate: User | undefined =
-        yield podiumApi.updateMyUserData({ name: enteredText });
-      if (resultsForUpdate) {
-        savedName = enteredText;
-      }
-    }
-  }
-  return savedName;
-}
-
-function* detached_afterGettingPodiumUser({
-  user,
-  token,
-  savedName,
-}: {
-  user: User;
-  token: string;
-  savedName: string;
-}) {
-  useMyOutpostsSlice();
-  useProfileSlice();
-  useAssetsSlice();
-  useNotificationsSlice();
-  const remoteName: string = yield detached_checkName({
-    user: { ...user, name: savedName },
-  });
-  if (!remoteName) {
-    yield put(globalActions.logout());
-    return;
-  }
-  yield put(
-    globalActions.setPodiumUserInfo({
-      ...user,
-      name: remoteName,
-    })
-  );
-
-  yield put(globalActions.initOneSignal({ myId: user.uuid }));
-  yield all([
-    put(notificationsActions.getNotifications()),
-    put(assetsActions.getMyBlockchainPasses()),
-    put(assetsActions.getBalance()),
-    put(myOutpostsActions.getOutposts()),
-    put(profileActions.fetchNfts({ silent: true })),
-    put(assetsActions.getPassesBoughtByMe({ page: 0 })),
-    setServerCookieViaAPI(CookieKeys.myUserId, user.uuid),
-    setServerCookieViaAPI(CookieKeys.myMoveAddress, user.aptos_address!),
-    wsClient.connect(token, process.env.NEXT_PUBLIC_WEBSOCKET_ADDRESS!),
-  ]);
 }
 
 function* logout() {

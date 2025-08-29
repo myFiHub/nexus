@@ -11,10 +11,15 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { injectContainer } from "app/store";
 import { externalWalletSaga } from "./saga";
-import { Chain } from "@razorlabs/razorkit";
-
+export type Chain = {
+  id: number;
+  name: string;
+  rpcUrl: string;
+  indexerUrl?: string;
+};
 export type accountType = WalletAccount | undefined;
 export type connectType = (walletName: validWalletNames) => void;
+export type selectType = (walletName: validWalletNames) => void;
 export type disconnectType = () => void;
 export type signAndSubmitTransactionType = (
   input: AptosSignAndSubmitTransactionInput
@@ -32,6 +37,7 @@ export interface ExternalWalletsState {
   wallets: {
     ["aptos"]: {
       connected: boolean;
+      select: selectType;
       isLoading: boolean;
       account: accountType;
       chain: Chain | undefined;
@@ -47,6 +53,7 @@ const initialState: ExternalWalletsState = {
   wallets: {
     aptos: {
       connected: false,
+      select: () => {},
       isLoading: false,
       account: undefined,
       chain: undefined,
@@ -143,6 +150,16 @@ const externalWalletSlice = createSlice({
     ) {
       const { walletName, changeNetwork } = action.payload;
       state.wallets[walletName].changeNetwork = changeNetwork;
+    },
+    setSelect(
+      state,
+      action: PayloadAction<{
+        walletName: keyof ExternalWalletsState["wallets"];
+        select: selectType;
+      }>
+    ) {
+      const { walletName, select } = action.payload;
+      state.wallets[walletName].select = select;
     },
   },
 });

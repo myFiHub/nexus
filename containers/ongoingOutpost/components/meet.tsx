@@ -9,6 +9,7 @@ import { logoUrl } from "../../../lib/constants";
 import { LeaveOutpostWarningDialogProvider } from "../dialogs/leaveOutpostWarning";
 import { onGoingOutpostSelectors } from "../selectors";
 import { onGoingOutpostActions } from "../slice";
+import { RejoinAttempt } from "../utils/rejoinAttempt";
 import { AccessDenied } from "./AccessDenied";
 import { JoiningStatus } from "./JoiningStatus";
 import LeavingAnimation from "./LeavingAnimation";
@@ -62,6 +63,7 @@ export const Meet = memo(
         <div
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >
+          <RejoinAttempt />
           <MeetEventListeners />
           <OngoingOutpostMembers />
 
@@ -107,7 +109,7 @@ export const Meet = memo(
                 },
               }),
               toolbarButtons: [
-                ...(accesses?.canSpeak ? ["microphone"] : []),
+                // ...(accesses?.canSpeak ? ["microphone"] : []),
                 "closedcaptions",
                 "desktop",
                 "chat",

@@ -44,6 +44,7 @@ export const useConfigureWallet = () => {
     disconnect,
     changeNetwork,
     name,
+    select,
   } = useWallet();
 
   if (isDev) {
@@ -155,5 +156,6 @@ export const useConfigureWallet = () => {
     signMessage,
     disconnect,
     changeNetwork,
+    select,
   };
 };

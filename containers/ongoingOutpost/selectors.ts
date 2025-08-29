@@ -28,6 +28,8 @@ export const onGoingOutpostDomains = {
     state.onGoingOutpost?.isRefreshingLiveMembers,
   talkingUsersAddress: (state: RootState) =>
     state.onGoingOutpost?.talkingUsersAddress,
+  isInteractionsMuted: (state: RootState) =>
+    state.onGoingOutpost?.isInteractionsMuted,
 };
 
 export const onGoingOutpostSelectors = {
@@ -125,4 +127,5 @@ export const onGoingOutpostSelectors = {
   ),
   leaving: onGoingOutpostDomains.leaving,
   isRefreshingLiveMembers: onGoingOutpostDomains.isRefreshingLiveMembers,
+  isInteractionsMuted: onGoingOutpostDomains.isInteractionsMuted,
 };

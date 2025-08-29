@@ -7,6 +7,7 @@ import { onGoingOutpostSelectors } from "../../selectors";
 import { BackupFetcher } from "./backupFetcher";
 import { MembersHeader } from "./header";
 import { MembersList } from "./list";
+import { MuteUnmuteInteractionSounds } from "./muteUnmuteInteractionSounds";
 
 export const OngoingOutpostMembers = memo(
   () => {
@@ -30,6 +31,7 @@ export const OngoingOutpostMembers = memo(
             {/* Drag Handle */}
             <div className="drag-handle absolute top-0 left-0 w-full h-6 bg-muted/80 hover:bg-muted border border-border rounded cursor-move flex items-center justify-center group z-10">
               <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              <MuteUnmuteInteractionSounds />
             </div>
 
             <div className="p-4">

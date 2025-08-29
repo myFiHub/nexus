@@ -1,9 +1,16 @@
-import { BaseError, ConnectModal } from "@razorlabs/razorkit";
 import AnimatedLoginOption from "app/components/Dialog/loginMethodSelect/AnimatedLoginOption";
 import { GlobalSelectors } from "app/containers/global/selectors";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useConfigureWallet } from "../aptosAdapter/useConfigureWallet";
+
+const ConnectModalLazyLoad = dynamic(
+  () => import("@razorlabs/razorkit").then((mod) => mod.ConnectModal),
+  {
+    ssr: false,
+  }
+);
 
 export const imagesPathsForWallets = [
   "/external_wallet_icons/nightly.png",
@@ -40,12 +47,12 @@ export const ConnectWithRazorButton_InternalUse = ({
     console.log(`connected to: ${walletName}`);
     onConnect(walletName);
   };
-  const onConnectError = (error: BaseError) => {
+  const onConnectError = (error: any) => {
     console.log({ error });
   };
 
   return (
-    <ConnectModal
+    <ConnectModalLazyLoad
       open={showModal && !myUser && !logingIn}
       onOpenChange={onOpenChange}
       onConnectSuccess={onConnectionSuccess}
@@ -56,7 +63,7 @@ export const ConnectWithRazorButton_InternalUse = ({
         title={titleForExternalWallet}
         subtitle={subtitleForExternalWallet}
       />
-    </ConnectModal>
+    </ConnectModalLazyLoad>
   );
 };
 
