@@ -56,6 +56,12 @@ export const Meet = memo(
 
     const showIframeClassName = joined ? "opacity-100" : "opacity-0";
 
+    let hostUrl =
+      outpost.outpost_host_url ?? process.env.NEXT_PUBLIC_OUTPOST_SERVER!;
+    if (hostUrl.includes("http://") || hostUrl.includes("https://")) {
+      hostUrl = hostUrl.split("://")[1];
+    }
+
     return (
       <div className="space-y-4 relative">
         <LeaveOutpostWarningDialogProvider />
@@ -68,7 +74,7 @@ export const Meet = memo(
           <OngoingOutpostMembers />
 
           <JitsiMeeting
-            domain={process.env.NEXT_PUBLIC_OUTPOST_SERVER}
+            domain={hostUrl}
             roomName={outpost.uuid}
             userInfo={{
               displayName: myUser.name?.includes("@")
