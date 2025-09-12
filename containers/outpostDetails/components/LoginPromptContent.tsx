@@ -132,7 +132,7 @@ export const LoginPromptContent = ({ outpost }: LoginPromptContentProps) => {
     >
       {/* Hero Section */}
       <motion.div
-        className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-4 text-white shadow-lg"
+        className="relative overflow-hidden rounded-xl bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 p-4 text-white shadow-lg max-w-[355px]"
         variants={cardVariants}
       >
         <div className="absolute inset-0 bg-black/10" />

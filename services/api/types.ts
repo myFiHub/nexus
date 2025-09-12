@@ -253,6 +253,7 @@ export interface OutpostModel {
   creator_user_uuid: string;
   creator_user_image: string;
   enter_type: string;
+  outpost_host_url?: string;
   has_adult_content: boolean;
   image: string;
   invites?: InviteModel[];
