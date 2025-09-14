@@ -1057,6 +1057,23 @@ class PodiumApi {
       return false;
     }
   }
+  async rateOutpost({
+    outpostId,
+    rating,
+  }: {
+    outpostId: string;
+    rating: number;
+  }): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.post(`/outposts/rate`, {
+        uuid: outpostId,
+        rating,
+      });
+      return response.status === 200;
+    } catch {
+      return false;
+    }
+  }
 }
 
 // Create a single instance with the base URL

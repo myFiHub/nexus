@@ -1,3 +1,4 @@
+import { OutpostRatingDialogProvider } from "app/components/Dialog/outpostRatingDialog";
 import { OutpostModel } from "../../../services/api/types";
 import { StateInitializer } from "../stateInitializer";
 import { CreatorCard } from "./CreatorCard";
@@ -20,6 +21,7 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
   return (
     <>
       <StateInitializer outpost={outpost} />
+      <OutpostRatingDialogProvider />
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header Image with Overlay */}
