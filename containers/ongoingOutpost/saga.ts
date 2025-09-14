@@ -36,6 +36,10 @@ import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
 import { onGoingOutpostDomains, onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions } from "./slice";
+import {
+  outpostRatingDialog,
+  OutpostRatingDialogResult,
+} from "app/components/Dialog/outpostRatingDialog";
 
 // Add type definition for cheerBoo parameters
 
@@ -86,6 +90,10 @@ function* leaveOutpost(
   router.replace(AppPages.outpostDetails(outpost.uuid));
   yield delay(5000);
   yield put(onGoingOutpostActions.setLeaving(false));
+  const rating: OutpostRatingDialogResult = yield outpostRatingDialog();
+  if (rating !== undefined) {
+    yield podiumApi.rateOutpost({ outpostId: outpost.uuid, rating });
+  }
 }
 
 function* like(action: ReturnType<typeof onGoingOutpostActions.like>) {

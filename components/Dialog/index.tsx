@@ -228,3 +228,10 @@ export {
   TransferBalanceDialogProvider,
 } from "./transferBalanceDialog";
 export type { TransferBalanceDialogResult } from "./transferBalanceDialog";
+
+// Export outpost rating dialog components
+export {
+  outpostRatingDialog,
+  OutpostRatingDialogProvider,
+} from "./outpostRatingDialog";
+export type { OutpostRatingDialogResult } from "./outpostRatingDialog";
