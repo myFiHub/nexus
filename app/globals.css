@@ -332,7 +332,7 @@ body {
 /* Sidebar content pushing */
 main {
   margin-left: var(--sidebar-width);
-  transition: margin-left 300ms ease-in-out;
+  transition: margin-left 300ms ease-in-out, width 300ms ease-in-out;
   /* Center content within the remaining space */
   width: calc(100vw - var(--sidebar-width));
   display: flex;

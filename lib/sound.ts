@@ -1,19 +1,23 @@
 "use client";
 export class Sound {
-  private ctx: AudioContext = new AudioContext();
+  private ctx: AudioContext | null = null;
   private buffer: AudioBuffer | null = null;
 
   constructor(url: string) {
-    // @ts-expect-error the browser context will not be available in the server side
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-    fetch(url)
-      .then((r) => r.arrayBuffer())
-      .then((b) => this.ctx.decodeAudioData(b))
-      .then((decoded) => (this.buffer = decoded));
+    // Initialize AudioContext only in browser environment
+    if (typeof window !== "undefined") {
+      const AudioContextClass =
+        window.AudioContext || (window as any).webkitAudioContext;
+      this.ctx = new AudioContextClass();
+      fetch(url)
+        .then((r) => r.arrayBuffer())
+        .then((b) => this.ctx!.decodeAudioData(b))
+        .then((decoded) => (this.buffer = decoded));
+    }
   }
 
   play() {
-    if (!this.buffer) return;
+    if (!this.buffer || !this.ctx) return;
     const src = this.ctx.createBufferSource();
     src.buffer = this.buffer;
     src.connect(this.ctx.destination);
