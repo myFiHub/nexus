@@ -4,6 +4,7 @@ import { onGoingOutpostSelectors } from "../../../selectors";
 
 export const IsTalkingIndicator = ({ address }: { address: string }) => {
   const isTalking = useSelector(onGoingOutpostSelectors.isTalking(address));
+
   if (!isTalking) return null;
 
   return (
