@@ -86,7 +86,6 @@ export const Meet = memo(
               apiLogLevel: ["error"],
               startWithAudioMuted: true,
               startWithVideoMuted: true,
-              startScreenSharing: true,
               enableEmailInStats: false,
               enableWelcomePage: false,
               subject: outpost.name,
