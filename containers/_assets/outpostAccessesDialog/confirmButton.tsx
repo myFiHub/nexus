@@ -32,7 +32,7 @@ export const ConfirmButton = ({
     buttonState.disabled = false;
   }
   if (!canEnter) {
-    buttonState.label = "Buy one of the passes";
+    buttonState.label = "Buy 1 Pass";
     buttonState.disabled = true;
   }
 
