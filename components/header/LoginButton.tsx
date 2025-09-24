@@ -3,6 +3,7 @@
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { useIsMobile } from "app/hooks/use-mobile";
 import { cn, truncate } from "app/lib/utils";
 import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
@@ -42,6 +43,7 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const logingOut = useSelector(GlobalSelectors.logingOut);
   const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
+  const isMobile = useIsMobile();
   // Ensure loading is always a boolean to prevent hydration mismatch
   const loading = Boolean(logingIn || logingOut || initializingWeb3Auth);
 
@@ -50,7 +52,11 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
   }, []);
 
   const connect = async () => {
-    dispatch(globalActions.login());
+    if (isMobile) {
+      dispatch(globalActions.socialLogin());
+    } else {
+      dispatch(globalActions.login());
+    }
   };
 
   const disconnect = async () => {

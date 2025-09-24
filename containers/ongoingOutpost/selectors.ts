@@ -69,11 +69,11 @@ export const onGoingOutpostSelectors = {
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {
       return liveMembers[id];
     }),
-  isTalking: (id: string) =>
+  isTalking: (address: string) =>
     createSelector(
       [onGoingOutpostDomains.talkingUsersAddress],
       (talkingUsersAddress) =>
-        talkingUsersAddress.length && talkingUsersAddress.includes(id)
+        talkingUsersAddress.length && talkingUsersAddress.includes(address)
     ),
   remainingTime: (id?: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {

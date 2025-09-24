@@ -108,6 +108,7 @@ const globalSlice = createSlice({
       state.web3Auth = action.payload;
     },
     login() {},
+    socialLogin() {},
     loginWithExternalWallet(
       state,
       action: PayloadAction<{
