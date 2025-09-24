@@ -13,8 +13,6 @@ import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
 import { requestPushNotificationPermission } from "app/lib/pushNotificationPermissions";
 
-import { toast } from "app/lib/toast";
-import podiumApi from "app/services/api";
 import {
   isNetworkValidForExternalWalletLogin,
   LoginMethod,
@@ -22,7 +20,9 @@ import {
   LoginMethodSelectDialogResult,
 } from "app/components/Dialog/loginMethodSelect";
 import { logoUrl } from "app/lib/constants";
+import { toast } from "app/lib/toast";
 import { isDev } from "app/lib/utils";
+import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { getStore } from "app/store";
@@ -147,6 +147,9 @@ function* login() {
   //   // if the account is not null, and the network is not null, and the network.chainId is 126, then we can login with the external wallet using loginWithExternalWallet
   //   return;
   // }
+}
+function* socialLogin() {
+  yield getAndSetAccountUsingSocialLogin();
 }
 function* loginWithExternalWallet(
   action: ReturnType<typeof globalActions.loginWithExternalWallet>
@@ -379,6 +382,7 @@ export function* globalSaga() {
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.login, login);
+  yield takeLatest(globalActions.socialLogin, socialLogin);
   yield debounce(
     500,
     globalActions.loginWithExternalWallet,
