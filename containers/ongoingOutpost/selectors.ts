@@ -1,7 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
-import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
 import { initialState } from "./slice";
+import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
 
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
@@ -84,6 +84,9 @@ export const onGoingOutpostSelectors = {
       }
       const member = liveMembers[id];
       if (!member) return 0;
+      if (member.remaining_time < 0) {
+        return 0;
+      }
       // remaining time is in seconds, so formatted remaining time in hours, minutes and seconds
       const hours = Math.floor(member.remaining_time / 3600);
       const minutes = Math.floor((member.remaining_time % 3600) / 60);
