@@ -3,6 +3,7 @@
 import OutpostLink from "app/components/AppLink/outpostLink";
 import UserLink from "app/components/AppLink/userLink";
 import { Button } from "app/components/Button";
+import { Img } from "app/components/Img";
 import {
   Popover,
   PopoverContent,
@@ -10,7 +11,6 @@ import {
 } from "app/components/Popover";
 import { motion } from "framer-motion";
 import { Bell, Check, Trash2, X } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
@@ -102,11 +102,12 @@ const NotificationItem = ({ notification }: NotificationItemProps) => {
         className="p-0 m-0"
       >
         {
-          <Image
+          <Img
             src={content.image ?? ""}
             alt={notification.follow_metadata?.follower_name ?? ""}
             width={32}
             height={32}
+            useImgTag
             className="w-8 h-8 rounded-full object-cover flex-shrink-0"
           />
         }
