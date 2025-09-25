@@ -1,6 +1,7 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
+import { initialState } from "./slice";
 
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
@@ -29,7 +30,8 @@ export const onGoingOutpostDomains = {
   talkingUsersAddress: (state: RootState) =>
     state.onGoingOutpost?.talkingUsersAddress,
   isInteractionsMuted: (state: RootState) =>
-    state.onGoingOutpost?.isInteractionsMuted,
+    state.onGoingOutpost?.isInteractionsMuted ??
+    initialState.isInteractionsMuted,
 };
 
 export const onGoingOutpostSelectors = {
