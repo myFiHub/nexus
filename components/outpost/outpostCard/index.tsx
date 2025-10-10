@@ -17,7 +17,6 @@ export function OutpostCard({ outpost }: OutpostCardProps) {
         {/* Image section */}
         <div className="relative">
           <ImageSection outpost={outpost} />
-
           {/* Floating status indicators */}
           <div className="absolute -bottom-4 left-4 right-4 z-1">
             <div className="bg-background/98 backdrop-blur-sm rounded-lg border border-border/80 shadow-lg p-3">
