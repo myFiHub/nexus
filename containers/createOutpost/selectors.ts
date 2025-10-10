@@ -1,6 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { BuyableTicketTypes } from "app/components/outpost/types";
-import { TicketToEnter, TicketToSpeak } from "app/services/api/types";
 import { RootState } from "app/store";
 
 export const createOutpostDomains = {
@@ -93,24 +91,10 @@ export const createOutpostSelectors = {
       luma_guests: lumaGuests,
       luma_hosts: lumaHosts,
       tickets_to_speak: Object.values(passSellersRequiredToSpeak || {}).map(
-        (user) => {
-          const ticket: TicketToSpeak = {
-            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
-            address: user.address,
-            user_uuid: user.uuid,
-          };
-          return ticket;
-        }
+        (user) => user.address
       ),
       tickets_to_enter: Object.values(passSellersRequiredToEnter || {}).map(
-        (user) => {
-          const ticket: TicketToEnter = {
-            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
-            address: user.address,
-            user_uuid: user.uuid,
-          };
-          return ticket;
-        }
+        (user) => user.address
       ),
     })
   ),

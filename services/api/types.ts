@@ -118,8 +118,8 @@ export interface CreateOutpostRequest {
   enter_type: string;
   speak_type: string;
   has_adult_content: boolean;
-  tickets_to_enter: TicketToEnter[];
-  tickets_to_speak: TicketToSpeak[];
+  tickets_to_enter: string[];
+  tickets_to_speak: string[];
   is_recordable: boolean;
   tags: string[];
   reminder_offset_minutes?: number;
