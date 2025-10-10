@@ -279,8 +279,10 @@ function* createOutpost(
     );
     router.push(AppPages.outpostDetails(outpost.uuid));
     yield delay(2000);
-    yield put(createOutpostActions.setIsSubmitting(false));
-    yield put(createOutpostActions.reset());
+    yield all([
+      put(createOutpostActions.setIsSubmitting(false)),
+      put(createOutpostActions.reset()),
+    ]);
   } catch (error) {
     console.log({ error });
   } finally {
