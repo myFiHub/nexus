@@ -62,8 +62,6 @@ export const Meet = memo(
       hostUrl = hostUrl.split("://")[1];
     }
 
-    console.log({ hostUrl });
-
     return (
       <div className="space-y-4 relative">
         <LeaveOutpostWarningDialogProvider />
