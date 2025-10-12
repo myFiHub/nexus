@@ -8,7 +8,7 @@ import {
   TRADE_PAGE_SIZE,
   TRADING_VOLUME_PAGE_SIZE,
 } from "app/containers/dashboard/users/configs";
-import { CookieKeys, setClientCookie } from "app/lib/client-cookies";
+import { CookieKeys, setClientCookie, getClientCookie } from "app/lib/client-cookies";
 import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
@@ -62,6 +62,14 @@ class PodiumApi {
         "Content-Type": "application/json",
       },
     });
+
+    // Initialize token from cookies on startup
+    if (typeof window !== "undefined") {
+      const token = getClientCookie(CookieKeys.token);
+      if (token) {
+        this.token = token;
+      }
+    }
 
     // Add request interceptor for authentication
     this.axiosInstance.interceptors.request.use((config) => {
@@ -705,8 +713,23 @@ class PodiumApi {
       });
       return response.data.data;
     } catch (error: any) {
-      if (error.response.status === 422) {
-        if (isDev) console.log("422 error", error);
+      if (error.response?.status === 401) {
+        console.error("Authentication failed - token may be invalid or expired");
+        console.error("Token present:", !!this.token);
+        return undefined;
+      }
+      if (error.response?.status === 422) {
+        const errorMessage = error.response?.data?.message;
+        if (isDev) {
+          console.log("422 error:", errorMessage);
+          console.log("Full error:", error);
+        }
+        
+        if (errorMessage === "outpost is not live") {
+          console.warn("Outpost session is not active");
+        } else if (errorMessage === "user is not in the session") {
+          console.warn("User is not connected to the outpost session");
+        }
         return false;
       }
       console.error("Get latest live data error:", error);
