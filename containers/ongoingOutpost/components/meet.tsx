@@ -54,13 +54,15 @@ export const Meet = memo(
       dispatch(onGoingOutpostActions.setMeetApiObj(apiObj));
     };
 
-    const showIframeClassName = joined ? "opacity-100" : "opacity-0";
+    const showIframeClassName = joined ? "opacity-100" : "opacity-100";
 
     let hostUrl =
       outpost.outpost_host_url ?? process.env.NEXT_PUBLIC_OUTPOST_SERVER!;
     if (hostUrl.includes("http://") || hostUrl.includes("https://")) {
       hostUrl = hostUrl.split("://")[1];
     }
+
+    console.log({ hostUrl });
 
     return (
       <div className="space-y-4 relative">
@@ -87,7 +89,37 @@ export const Meet = memo(
               startWithAudioMuted: true,
               startWithVideoMuted: true,
               enableEmailInStats: false,
-              enableWelcomePage: false,
+              welcomePage: {
+                // Whether to disable welcome page. In case it's disabled a random room
+                // will be joined when no room is specified.
+                disabled: true,
+              },
+              disabledSounds: [
+                "PARTICIPANT_JOINED_SOUND",
+                "PARTICIPANT_LEFT_SOUND",
+              ],
+              securityUi: {
+                // Hides the lobby button. Replaces `hideLobbyButton`.
+                hideLobbyButton: true,
+                // Hides the possibility to set and enter a lobby password.
+                disableLobbyPassword: true,
+              },
+              prejoinConfig: {
+                // When 'true', it shows an intermediate page before joining, where the user can configure their devices.
+                // This replaces `prejoinPageEnabled`. Defaults to true.
+                enabled: false,
+                // Hides the participant name editing field in the prejoin screen.
+                // If requireDisplayName is also set as true, a name should still be provided through
+                // either the jwt or the userInfo from the iframe api init object in order for this to have an effect.
+                // hideDisplayName: false,
+                // List of buttons to hide from the extra join options dropdown.
+                // hideExtraJoinButtons: ['no-audio', 'by-phone'],
+                // Configuration for pre-call test
+                // By setting preCallTestEnabled, you enable the pre-call test in the prejoin page.
+                // ICE server credentials need to be provided over the preCallTestICEUrl
+                // preCallTestEnabled: false,
+                // preCallTestICEUrl: ''
+              },
               subject: outpost.name,
               localSubject: outpost.name,
               autoJoin: true,
