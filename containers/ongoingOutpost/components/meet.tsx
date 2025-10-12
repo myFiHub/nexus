@@ -54,7 +54,7 @@ export const Meet = memo(
       dispatch(onGoingOutpostActions.setMeetApiObj(apiObj));
     };
 
-    const showIframeClassName = joined ? "opacity-100" : "opacity-100";
+    const showIframeClassName = joined ? "opacity-100" : "opacity-0";
 
     let hostUrl =
       outpost.outpost_host_url ?? process.env.NEXT_PUBLIC_OUTPOST_SERVER!;
