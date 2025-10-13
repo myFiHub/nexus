@@ -23,6 +23,7 @@ export const createOutpostDomains = {
   enabledLuma: (store: RootState) => store.createOutpost.enabledLuma,
   lumaGuests: (store: RootState) => store.createOutpost.lumaGuests,
   lumaHosts: (store: RootState) => store.createOutpost.lumaHosts,
+  cohostUsers: (store: RootState) => store.createOutpost?.cohostUsers || [],
 };
 export const createOutpostSelectors = {
   image: createOutpostDomains.image,
@@ -45,6 +46,7 @@ export const createOutpostSelectors = {
   enabledLuma: createOutpostDomains.enabledLuma,
   lumaGuests: createOutpostDomains.lumaGuests,
   lumaHosts: createOutpostDomains.lumaHosts,
+  cohostUsers: createOutpostDomains.cohostUsers,
   allFields: createSelector(
     [
       createOutpostDomains.name,
@@ -61,6 +63,7 @@ export const createOutpostSelectors = {
       createOutpostDomains.enabledLuma,
       createOutpostDomains.lumaGuests,
       createOutpostDomains.lumaHosts,
+      createOutpostDomains.cohostUsers,
     ],
     (
       name,
@@ -76,7 +79,8 @@ export const createOutpostSelectors = {
       passSellersRequiredToEnter,
       enabledLuma,
       lumaGuests,
-      lumaHosts
+      lumaHosts,
+      cohostUsers
     ) => ({
       name,
       subject,
@@ -96,6 +100,7 @@ export const createOutpostSelectors = {
       tickets_to_enter: Object.values(passSellersRequiredToEnter || {}).map(
         (user) => user.address
       ),
+      cohost_user_uuids: cohostUsers?.map((user) => user.uuid),
     })
   ),
 };

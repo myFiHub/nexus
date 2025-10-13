@@ -77,6 +77,7 @@ function* getOutpostAccesses({
   const myUser = store.getState().global.podiumUserInfo!;
   ///////////////////////////////////////////////////
   const iAmOutpostCreator = outpost.creator_user_uuid == myUser.uuid;
+
   if (iAmOutpostCreator) {
     return {
       canEnter: true,
@@ -116,6 +117,17 @@ function* getOutpostAccesses({
     }
   }
   //////////////////////////////////////////////////
+
+  //check if user is cohost
+  const iAmCohost = outpost.cohost_user_uuids?.some(
+    (uuid) => uuid === myUser.uuid
+  );
+  if (iAmCohost) {
+    return {
+      canEnter: true,
+      canSpeak: true,
+    };
+  }
 
   ////////////////////////////////////////////////////
   const lumaAccessResponse: OutpostAccesses | undefined =

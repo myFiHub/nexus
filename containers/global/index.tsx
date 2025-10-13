@@ -19,6 +19,7 @@ import { ReminderDialogProvider } from "app/components/Dialog/reminder";
 import { UserSelectToInviteDialogProvider } from "app/components/Dialog/userSelectToInvite";
 import { Toaster } from "app/components/toast";
 import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
+import { CohostsDialogProvider } from "app/containers/createOutpost/components/cohosts/dialog";
 import { ReduxProvider } from "app/store/Provider";
 import { useRouter } from "next/navigation";
 import { memo, useEffect } from "react";

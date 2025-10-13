@@ -202,12 +202,14 @@ function* createOutpost(
     ) {
       params.tickets_to_enter = [];
     }
+
     if (
       !params.tickets_to_speak ||
       params.speak_type !== BuyableTicketTypes.onlyPodiumPassHolders
     ) {
       params.tickets_to_speak = [];
     }
+
     const validated: boolean = yield validateFields(params);
     if (!validated) {
       yield put(createOutpostActions.setIsSubmitting(false));

@@ -108,6 +108,7 @@ export interface LiveMember {
   is_recording: boolean;
   joined_at: number;
   primary_aptos_address?: string;
+  is_cohost?: boolean;
 }
 
 export interface CreateOutpostRequest {
@@ -120,6 +121,7 @@ export interface CreateOutpostRequest {
   has_adult_content: boolean;
   tickets_to_enter: string[];
   tickets_to_speak: string[];
+  cohost_user_uuids?: string[];
   is_recordable: boolean;
   tags: string[];
   reminder_offset_minutes?: number;
@@ -272,6 +274,7 @@ export interface OutpostModel {
   online_users_count?: number;
   i_am_member: boolean;
   reminder_offset_minutes?: number;
+  cohost_user_uuids?: string[];
 }
 
 export interface TagModel {
