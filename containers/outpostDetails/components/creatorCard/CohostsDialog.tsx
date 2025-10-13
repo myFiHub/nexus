@@ -1,6 +1,7 @@
 "use client";
 
 import UserLink from "app/components/AppLink/userLink";
+import { Button } from "app/components/Button";
 import {
   Dialog,
   DialogContent,
@@ -12,12 +13,18 @@ import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
 import { motion } from "framer-motion";
-import { Users as UsersIcon } from "lucide-react";
+import { Pencil, Users as UsersIcon } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
+import {
+  cohostsEditDialog,
+  CohostsEditDialogProvider,
+} from "./CohostsEditDialog";
 
 interface CohostsViewDialogProps {
   title?: ReactNode;
   cohostUuids: string[];
+  iAmCreator: boolean;
+  outpostUuid: string;
 }
 
 export type CohostsViewDialogResult = {
@@ -29,6 +36,8 @@ let resolvePromise: ((value: CohostsViewDialogResult) => void) | null = null;
 export const cohostsViewDialog = ({
   title = "Cohosts",
   cohostUuids,
+  iAmCreator,
+  outpostUuid,
 }: CohostsViewDialogProps): Promise<CohostsViewDialogResult> => {
   return new Promise((resolve) => {
     resolvePromise = resolve;
@@ -37,6 +46,8 @@ export const cohostsViewDialog = ({
       detail: {
         title,
         cohostUuids,
+        iAmCreator,
+        outpostUuid,
       },
     });
     window.dispatchEvent(event);
@@ -101,11 +112,13 @@ export const CohostsViewDialogProvider = () => {
   const [dialogContent, setDialogContent] =
     useState<CohostsViewDialogProps | null>(null);
   const [cohosts, setCohosts] = useState<(User | null)[]>([]);
+  const [iAmCreator, setIAmCreator] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const handleShowDialog = (event: CustomEvent<CohostsViewDialogProps>) => {
       setDialogContent(event.detail);
+      setIAmCreator(event.detail.iAmCreator);
       setIsOpen(true);
 
       // Initialize placeholders
@@ -164,45 +177,78 @@ export const CohostsViewDialogProvider = () => {
 
   const cohostCount = cohosts.length;
 
-  return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) {
-          handleClose();
-        }
-      }}
-    >
-      <DialogContent className="w-full max-w-2xl max-h-[620px] flex flex-col">
-        <DialogHeader className="pr-10">
-          <DialogTitle>
-            <div className="flex items-center justify-between">
-              <span>{dialogContent?.title}</span>
-              <span className="text-sm font-normal text-muted-foreground">
-                {cohostCount} cohost{cohostCount !== 1 ? "s" : ""}
-              </span>
-            </div>
-          </DialogTitle>
-        </DialogHeader>
+  const handleEdit = async () => {
+    const loadedCohosts = cohosts.filter((c) => c !== null) as User[];
+    if (!dialogContent?.outpostUuid) return;
 
-        {/* Cohosts List */}
-        <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-          {cohosts.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <UsersIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No cohosts found</p>
-            </div>
-          ) : (
-            cohosts.map((cohost, index) =>
-              cohost ? (
-                <CohostCard key={cohost.uuid} user={cohost} />
-              ) : (
-                <CohostPlaceholder key={`placeholder-${index}`} />
+    const result = await cohostsEditDialog({
+      title: "Edit Cohosts",
+      initialCohosts: loadedCohosts,
+      outpostUuid: dialogContent.outpostUuid,
+    });
+
+    if (result.confirmed && result.cohosts) {
+      // Update the local state with the new cohosts
+      setCohosts(result.cohosts);
+      // Optionally trigger a page refresh or revalidation here
+    }
+  };
+
+  return (
+    <>
+      <CohostsEditDialogProvider />
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleClose();
+          }
+        }}
+      >
+        <DialogContent className="w-full max-w-2xl max-h-[620px] flex flex-col">
+          <DialogHeader className="pr-10">
+            <DialogTitle>
+              <div className="flex items-center justify-between">
+                <span>{dialogContent?.title}</span>
+                <div className="flex items-center gap-2">
+                  {iAmCreator && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleEdit}
+                      className="h-7 text-xs gap-1"
+                    >
+                      <Pencil className="w-3 h-3" />
+                      Edit
+                    </Button>
+                  )}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    {cohostCount} cohost{cohostCount !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          {/* Cohosts List */}
+          <div className="flex-1 overflow-y-auto space-y-3 pr-2">
+            {cohosts.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <UsersIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No cohosts found</p>
+              </div>
+            ) : (
+              cohosts.map((cohost, index) =>
+                cohost ? (
+                  <CohostCard key={cohost.uuid} user={cohost} />
+                ) : (
+                  <CohostPlaceholder key={`placeholder-${index}`} />
+                )
               )
-            )
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };

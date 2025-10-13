@@ -30,7 +30,7 @@ export function CreatorCard({ outpost }: CreatorCardProps) {
                 {outpost.creator_user_name}
               </UserLink>
             </div>
-            <Cohosts cohosts={outpost.cohost_user_uuids} />
+            <Cohosts outpost={outpost} />
             <div className="flex items-center gap-2 text-muted-foreground">
               <Users className="w-4 h-4" />
               <span>

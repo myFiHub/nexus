@@ -135,6 +135,7 @@ export interface UpdateOutpostRequest {
   scheduled_for?: number;
   image?: string;
   uuid: string;
+  cohost_user_uuids?: string[];
 }
 
 // Follow related types

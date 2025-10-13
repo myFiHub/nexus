@@ -8,7 +8,11 @@ import {
   TRADE_PAGE_SIZE,
   TRADING_VOLUME_PAGE_SIZE,
 } from "app/containers/dashboard/users/configs";
-import { CookieKeys, setClientCookie, getClientCookie } from "app/lib/client-cookies";
+import {
+  CookieKeys,
+  getClientCookie,
+  setClientCookie,
+} from "app/lib/client-cookies";
 import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
@@ -250,6 +254,8 @@ class PodiumApi {
       );
       return response.status === 200;
     } catch (error) {
+      if (isDev) console.log("error", error);
+      console.error("Update outpost error:", error);
       return false;
     }
   }
@@ -714,7 +720,9 @@ class PodiumApi {
       return response.data.data;
     } catch (error: any) {
       if (error.response?.status === 401) {
-        console.error("Authentication failed - token may be invalid or expired");
+        console.error(
+          "Authentication failed - token may be invalid or expired"
+        );
         console.error("Token present:", !!this.token);
         return undefined;
       }
@@ -724,7 +732,7 @@ class PodiumApi {
           console.log("422 error:", errorMessage);
           console.log("Full error:", error);
         }
-        
+
         if (errorMessage === "outpost is not live") {
           console.warn("Outpost session is not active");
         } else if (errorMessage === "user is not in the session") {
