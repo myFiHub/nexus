@@ -234,7 +234,7 @@ export const CohostsDialogProvider = () => {
 
         {/* Search Results */}
         <div className="flex-1 overflow-y-auto space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground sticky top-0 bg-background py-2">
+          <h3 className="text-sm font-medium text-muted-foreground sticky top-0 bg-background py-2 z-2">
             {usersCount > 0
               ? `Search Results (${usersCount})`
               : "Search Results"}

@@ -38,6 +38,7 @@ const Content = ({ outpost }: CohostsProps) => {
       title: "Cohosts",
       cohostUuids: cohostsArray,
       iAmCreator,
+      myUserUuid: myUser?.uuid,
       outpostUuid: outpost.uuid,
     });
   };

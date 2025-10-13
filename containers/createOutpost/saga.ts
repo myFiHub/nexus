@@ -19,6 +19,7 @@ import {
   OutpostModel,
   SetOrRemoveReminderRequest,
   UpdateOutpostRequest,
+  User,
 } from "app/services/api/types";
 import { outpostImageService } from "app/services/imageUpload";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
@@ -208,6 +209,13 @@ function* createOutpost(
       params.speak_type !== BuyableTicketTypes.onlyPodiumPassHolders
     ) {
       params.tickets_to_speak = [];
+    }
+    const myUser: User = yield select(GlobalSelectors.podiumUserInfo);
+
+    if (params.cohost_user_uuids) {
+      params.cohost_user_uuids = params.cohost_user_uuids.filter(
+        (uuid) => uuid !== myUser.uuid
+      );
     }
 
     const validated: boolean = yield validateFields(params);

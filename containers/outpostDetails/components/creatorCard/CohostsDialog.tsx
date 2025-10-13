@@ -25,6 +25,7 @@ interface CohostsViewDialogProps {
   cohostUuids: string[];
   iAmCreator: boolean;
   outpostUuid: string;
+  myUserUuid?: string;
 }
 
 export type CohostsViewDialogResult = {
@@ -38,6 +39,7 @@ export const cohostsViewDialog = ({
   cohostUuids,
   iAmCreator,
   outpostUuid,
+  myUserUuid,
 }: CohostsViewDialogProps): Promise<CohostsViewDialogResult> => {
   return new Promise((resolve) => {
     resolvePromise = resolve;
@@ -48,6 +50,7 @@ export const cohostsViewDialog = ({
         cohostUuids,
         iAmCreator,
         outpostUuid,
+        myUserUuid,
       },
     });
     window.dispatchEvent(event);
@@ -72,40 +75,42 @@ const CohostPlaceholder = () => (
 );
 
 // Cohost card component
-const CohostCard = ({ user }: { user: User }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ type: "spring", stiffness: 300, damping: 25 }}
-    className="group relative p-3 rounded-xl border border-border bg-gradient-to-br from-card to-card/50 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-300"
-  >
-    <div className="flex items-center gap-2.5">
-      <UserLink id={user.uuid} underline={false}>
-        <div className="relative">
-          <Img
-            src={user.image}
-            alt={user.name || "placeholder"}
-            className="w-12 h-12 rounded-full border-2 border-primary/60 group-hover:border-primary transition-all duration-300"
-            useImgTag
-          />
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        </div>
-      </UserLink>
-      <div className="flex-1 min-w-0">
+const CohostCard = ({ user }: { user: User }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      className="group relative p-3 rounded-xl border border-border bg-gradient-to-br from-card to-card/50 hover:border-primary/50 hover:shadow-md hover:shadow-primary/5 transition-all duration-300"
+    >
+      <div className="flex items-center gap-2.5">
         <UserLink id={user.uuid} underline={false}>
-          <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
-            {user.name || "Anonymous User"}
-          </h4>
+          <div className="relative">
+            <Img
+              src={user.image}
+              alt={user.name || "placeholder"}
+              className="w-12 h-12 rounded-full border-2 border-primary/60 group-hover:border-primary transition-all duration-300 "
+              useImgTag
+            />
+            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          </div>
         </UserLink>
-        {user.uuid && (
-          <p className="text-[11px] text-muted-foreground/80 font-mono mt-0.5 leading-tight">
-            {truncate(user.uuid)}
-          </p>
-        )}
+        <div className="flex-1 min-w-0">
+          <UserLink id={user.uuid} underline={false}>
+            <h4 className="font-semibold text-foreground group-hover:text-primary transition-colors leading-tight">
+              {user.name || "Anonymous User"}
+            </h4>
+          </UserLink>
+          {user.uuid && (
+            <p className="text-[11px] text-muted-foreground/80 font-mono mt-0.5 leading-tight">
+              {truncate(user.uuid)}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
-  </motion.div>
-);
+    </motion.div>
+  );
+};
 
 export const CohostsViewDialogProvider = () => {
   const [isOpen, setIsOpen] = useState(false);
