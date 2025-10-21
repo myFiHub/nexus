@@ -2,6 +2,7 @@
 
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { useIsMobile } from "app/hooks/use-mobile";
 import { isDev } from "app/lib/utils";
 import { motion } from "framer-motion";
 import { Lock, LogIn, Shield, Zap } from "lucide-react";
@@ -49,6 +50,7 @@ export const loginPromptDialog = ({
 
 const Content = () => {
   const dispatch = useDispatch();
+  const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [dialogContent, setDialogContent] =
@@ -82,7 +84,11 @@ const Content = () => {
 
   const handleLogin = async () => {
     setIsLoggingIn(true);
-    dispatch(globalActions.login());
+    if (isMobile) {
+      dispatch(globalActions.socialLogin());
+    } else {
+      dispatch(globalActions.login());
+    }
   };
 
   const handleLoginSuccess = async () => {
