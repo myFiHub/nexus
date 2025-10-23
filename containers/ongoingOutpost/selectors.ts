@@ -32,6 +32,8 @@ export const onGoingOutpostDomains = {
   isInteractionsMuted: (state: RootState) =>
     state.onGoingOutpost?.isInteractionsMuted ??
     initialState.isInteractionsMuted,
+  membersSearchValue: (state: RootState) =>
+    state.onGoingOutpost?.membersSearchValue,
 };
 
 export const onGoingOutpostSelectors = {
@@ -42,6 +44,7 @@ export const onGoingOutpostSelectors = {
   isGettingLiveMembers: onGoingOutpostDomains.isGettingLiveMembers,
   accesses: onGoingOutpostDomains.accesses,
   members: onGoingOutpostDomains.members,
+  membersSearchValue: onGoingOutpostDomains.membersSearchValue,
   myUserInOutpostMembers: createSelector(
     [onGoingOutpostDomains.members, onGoingOutpostDomains.podiumUserInfo],
     (members, myUser) => {

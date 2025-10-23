@@ -25,6 +25,7 @@ export interface OnGoingOutpostState {
     [address: string]: LiveMember;
   };
   joined: boolean;
+  membersSearchValue?: string;
   liveMembers: {
     [address: string]: LiveMember;
   };
@@ -59,6 +60,9 @@ const onGoingOutpostSlice = createSlice({
     },
     isGettingOutpost(state, action: PayloadAction<boolean>) {
       state.isGettingOutpost = action.payload;
+    },
+    setMembersSearchValue(state, action: PayloadAction<string | undefined>) {
+      state.membersSearchValue = action.payload;
     },
     setOutpost(state, action: PayloadAction<OutpostModel | undefined>) {
       state.outpost = action.payload;

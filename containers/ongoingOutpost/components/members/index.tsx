@@ -8,6 +8,7 @@ import { BackupFetcher } from "./backupFetcher";
 import { MembersHeader } from "./header";
 import { MembersList } from "./list";
 import { MuteUnmuteInteractionSounds } from "./muteUnmuteInteractionSounds";
+import { MembersSearchBar } from "./searchBar";
 
 export const OngoingOutpostMembers = memo(
   () => {
@@ -35,15 +36,18 @@ export const OngoingOutpostMembers = memo(
             </div>
 
             <div className="p-4">
-              <div className="flex items-center justify-between gap-2 mb-3">
-                <MembersHeader />
-                {outpost && (
-                  <InviteUsersButton
-                    outpost={outpost}
-                    withWrapper={false}
-                    buttonSize="xxs"
-                  />
-                )}
+              <div className="flex-col gap-1">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <MembersHeader />
+                  {outpost && (
+                    <InviteUsersButton
+                      outpost={outpost}
+                      withWrapper={false}
+                      buttonSize="xxs"
+                    />
+                  )}
+                </div>
+                <MembersSearchBar />
               </div>
               <div className="overflow-y-auto max-h-[calc(100%-60px)]">
                 <MembersList />
