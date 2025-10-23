@@ -1,7 +1,7 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { useIsMobile } from "app/hooks/use-mobile";
-import { truncate } from "app/lib/utils";
+import { isDev, truncate } from "app/lib/utils";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -60,6 +60,9 @@ export const Meet = memo(
       outpost.outpost_host_url ?? process.env.NEXT_PUBLIC_OUTPOST_SERVER!;
     if (hostUrl.includes("http://") || hostUrl.includes("https://")) {
       hostUrl = hostUrl.split("://")[1];
+    }
+    if (isDev) {
+      hostUrl = "meet.avaxcoolyeti.com";
     }
 
     return (
