@@ -1,3 +1,14 @@
+diff --git a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.d.ts b/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.d.ts
+index d8943fb..66997f6 100644
+--- a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.d.ts
++++ b/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.d.ts
+@@ -16,5 +16,5 @@ import { IJitsiMeetingProps } from '../types';
+     />
+   ```
+  */
+-declare const JitsiMeeting: ({ domain, roomName, configOverwrite, interfaceConfigOverwrite, jwt, invitees, devices, userInfo, release, lang, spinner: Spinner, onApiReady, onReadyToClose, getIFrameRef }: IJitsiMeetingProps) => ReactElement;
++declare const JitsiMeeting: ({ domain, roomName, configOverwrite, interfaceConfigOverwrite, jwt, invitees, devices, userInfo, release, lang, spinner: Spinner, onApiReady, onReadyToClose, getIFrameRef, creatorUuid, cohostUuids }: IJitsiMeetingProps) => ReactElement;
+ export default JitsiMeeting;
 diff --git a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js b/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js
 index ef82014..c57b1ce 100644
 --- a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js
@@ -32,3 +43,14 @@ index ef82014..c57b1ce 100644
      ]);
      useEffect(() => {
          if (apiLoaded && !apiRef.current) {
+diff --git a/node_modules/@jitsi/react-sdk/lib/types/IJitsiMeetingProps.d.ts b/node_modules/@jitsi/react-sdk/lib/types/IJitsiMeetingProps.d.ts
+index 7daa994..f02873c 100644
+--- a/node_modules/@jitsi/react-sdk/lib/types/IJitsiMeetingProps.d.ts
++++ b/node_modules/@jitsi/react-sdk/lib/types/IJitsiMeetingProps.d.ts
+@@ -7,4 +7,6 @@ export default interface IJitsiMeetingProps extends IMeetingProps {
+      * The domain used to build the conference URL.
+      */
+     domain?: string;
++    creatorUuid?: string;
++    cohostUuids?: string[];
+ }
