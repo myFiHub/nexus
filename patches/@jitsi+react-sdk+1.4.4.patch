@@ -1,0 +1,34 @@
+diff --git a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js b/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js
+index ef82014..c57b1ce 100644
+--- a/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js
++++ b/node_modules/@jitsi/react-sdk/lib/components/JitsiMeeting.js
+@@ -19,7 +19,8 @@ import { generateComponentId, getAppId } from '../utils';
+     />
+   ```
+  */
+-const JitsiMeeting = ({ domain = DEFAULT_DOMAIN, roomName, configOverwrite, interfaceConfigOverwrite, jwt, invitees, devices, userInfo, release, lang, spinner: Spinner, onApiReady, onReadyToClose, getIFrameRef }) => {
++const JitsiMeeting = ({ domain = DEFAULT_DOMAIN, roomName, configOverwrite, interfaceConfigOverwrite, jwt, invitees, devices, userInfo, release, lang, spinner: Spinner, onApiReady, onReadyToClose, getIFrameRef,  creatorUuid,
++    cohostUuids, }) => {
+     const [loading, setLoading] = useState(true);
+     const [apiLoaded, setApiLoaded] = useState(false);
+     const externalApi = useRef();
+@@ -45,6 +46,8 @@ const JitsiMeeting = ({ domain = DEFAULT_DOMAIN, roomName, configOverwrite, inte
+             userInfo,
+             release,
+             lang,
++            creatorUuid,
++            cohostUuids,
+             parentNode: meetingRef.current
+         });
+         setLoading(false);
+@@ -72,7 +75,9 @@ const JitsiMeeting = ({ domain = DEFAULT_DOMAIN, roomName, configOverwrite, inte
+         devices,
+         userInfo,
+         release,
+-        lang
++        lang,
++        creatorUuid,
++        cohostUuids,
+     ]);
+     useEffect(() => {
+         if (apiLoaded && !apiRef.current) {

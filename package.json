@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "tsc": "tsc"
+    "tsc": "tsc",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@aptos-labs/ts-sdk": "^4.0.0",
