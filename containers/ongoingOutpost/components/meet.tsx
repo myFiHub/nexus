@@ -52,6 +52,15 @@ export const Meet = memo(
     const handleApiReady = (apiObj: any) => {
       // set apiObj to redux to be read and listened to in Listener component
       dispatch(onGoingOutpostActions.setMeetApiObj(apiObj));
+      const creatorUuid = outpost.creator_user_uuid;
+      const cohostsUuids = outpost.cohost_user_uuids;
+      const IAmCohostOrCreator =
+        creatorUuid === myUser?.uuid || cohostsUuids?.includes(myUser?.uuid);
+      if (IAmCohostOrCreator) {
+        apiObj.executeCommand("setMyRole", "moderator");
+      } else {
+        apiObj.executeCommand("setMyRole", "participant");
+      }
     };
 
     const showIframeClassName = joined ? "opacity-100" : "opacity-0";
@@ -85,6 +94,10 @@ export const Meet = memo(
                 : myUser.name ?? truncate(myUser.uuid),
               email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
+            // @ts-ignore
+            creatorUuid={outpost.creator_user_uuid}
+            // @ts-ignore
+            cohostUuids={outpost.cohost_user_uuids ?? []}
             configOverwrite={{
               apiLogLevel: ["error"],
               startWithAudioMuted: true,
