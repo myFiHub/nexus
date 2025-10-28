@@ -1,7 +1,7 @@
 import { JitsiMeeting } from "@jitsi/react-sdk";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { useIsMobile } from "app/hooks/use-mobile";
-import { truncate } from "app/lib/utils";
+import { isDev, truncate } from "app/lib/utils";
 import { transformIdToEmailLike } from "app/lib/uuidToEmail";
 import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,6 +61,9 @@ export const Meet = memo(
     if (hostUrl.includes("http://") || hostUrl.includes("https://")) {
       hostUrl = hostUrl.split("://")[1];
     }
+    if (isDev) {
+      hostUrl = "meet.avaxcoolyeti.com";
+    }
 
     return (
       <div className="space-y-4 relative">
@@ -87,7 +90,37 @@ export const Meet = memo(
               startWithAudioMuted: true,
               startWithVideoMuted: true,
               enableEmailInStats: false,
-              enableWelcomePage: false,
+              welcomePage: {
+                // Whether to disable welcome page. In case it's disabled a random room
+                // will be joined when no room is specified.
+                disabled: true,
+              },
+              disabledSounds: [
+                "PARTICIPANT_JOINED_SOUND",
+                "PARTICIPANT_LEFT_SOUND",
+              ],
+              securityUi: {
+                // Hides the lobby button. Replaces `hideLobbyButton`.
+                hideLobbyButton: true,
+                // Hides the possibility to set and enter a lobby password.
+                disableLobbyPassword: true,
+              },
+              prejoinConfig: {
+                // When 'true', it shows an intermediate page before joining, where the user can configure their devices.
+                // This replaces `prejoinPageEnabled`. Defaults to true.
+                enabled: false,
+                // Hides the participant name editing field in the prejoin screen.
+                // If requireDisplayName is also set as true, a name should still be provided through
+                // either the jwt or the userInfo from the iframe api init object in order for this to have an effect.
+                // hideDisplayName: false,
+                // List of buttons to hide from the extra join options dropdown.
+                // hideExtraJoinButtons: ['no-audio', 'by-phone'],
+                // Configuration for pre-call test
+                // By setting preCallTestEnabled, you enable the pre-call test in the prejoin page.
+                // ICE server credentials need to be provided over the preCallTestICEUrl
+                // preCallTestEnabled: false,
+                // preCallTestICEUrl: ''
+              },
               subject: outpost.name,
               localSubject: outpost.name,
               autoJoin: true,

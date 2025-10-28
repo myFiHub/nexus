@@ -19,10 +19,11 @@ import {
   OutpostModel,
   SetOrRemoveReminderRequest,
   UpdateOutpostRequest,
+  User,
 } from "app/services/api/types";
 import { outpostImageService } from "app/services/imageUpload";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
-import { all, put, select, takeLatest } from "redux-saga/effects";
+import { all, delay, put, select, takeLatest } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
 import { GlobalSelectors } from "../global/selectors";
 import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
@@ -202,12 +203,21 @@ function* createOutpost(
     ) {
       params.tickets_to_enter = [];
     }
+
     if (
       !params.tickets_to_speak ||
       params.speak_type !== BuyableTicketTypes.onlyPodiumPassHolders
     ) {
       params.tickets_to_speak = [];
     }
+    const myUser: User = yield select(GlobalSelectors.podiumUserInfo);
+
+    if (params.cohost_user_uuids) {
+      params.cohost_user_uuids = params.cohost_user_uuids.filter(
+        (uuid) => uuid !== myUser.uuid
+      );
+    }
+
     const validated: boolean = yield validateFields(params);
     if (!validated) {
       yield put(createOutpostActions.setIsSubmitting(false));
@@ -261,8 +271,6 @@ function* createOutpost(
       }
     }
 
-    yield put(createOutpostActions.setIsSubmitting(false));
-    yield put(createOutpostActions.reset());
     const router: AppRouterInstance = yield select(GlobalSelectors.router);
 
     // Use client-side revalidation service instead of server actions
@@ -276,7 +284,15 @@ function* createOutpost(
     } catch (error) {
       console.error("Failed to revalidate pages:", error);
     }
+    toast.success(
+      "Outpost created successfully, redirecting to outpost details..."
+    );
     router.push(AppPages.outpostDetails(outpost.uuid));
+    yield delay(2000);
+    yield all([
+      put(createOutpostActions.setIsSubmitting(false)),
+      put(createOutpostActions.reset()),
+    ]);
   } catch (error) {
     console.log({ error });
   } finally {

@@ -2,6 +2,7 @@
 
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
+import { useIsMobile } from "app/hooks/use-mobile";
 import { isDev } from "app/lib/utils";
 import { motion } from "framer-motion";
 import { Lock, LogIn, Shield, Zap } from "lucide-react";
@@ -49,8 +50,8 @@ export const loginPromptDialog = ({
 
 const Content = () => {
   const dispatch = useDispatch();
+  const isMobile = useIsMobile();
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [dialogContent, setDialogContent] =
     useState<LoginPromptDialogProps | null>(null);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
@@ -81,12 +82,14 @@ const Content = () => {
   }, [isLoggedIn, isOpen]);
 
   const handleLogin = async () => {
-    setIsLoggingIn(true);
-    dispatch(globalActions.login());
+    if (isMobile) {
+      dispatch(globalActions.socialLogin());
+    } else {
+      dispatch(globalActions.login());
+    }
   };
 
   const handleLoginSuccess = async () => {
-    setIsLoggingIn(false);
     setIsOpen(false);
 
     if (dialogContent?.action) {
@@ -111,7 +114,6 @@ const Content = () => {
 
   const handleCancel = () => {
     setIsOpen(false);
-    setIsLoggingIn(false); // Reset the logging in state
     resolvePromise?.({ loggedIn: false });
     resolvePromise = null;
   };
@@ -307,7 +309,7 @@ const Content = () => {
               >
                 <Button
                   onClick={handleLogin}
-                  disabled={isLoggingIn || logingIn}
+                  disabled={logingIn}
                   className="w-full bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-primary-foreground font-semibold relative overflow-hidden text-sm sm:text-base py-2 sm:py-2.5"
                 >
                   <motion.div

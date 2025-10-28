@@ -1,7 +1,7 @@
 import { OutpostRatingDialogProvider } from "app/components/Dialog/outpostRatingDialog";
 import { OutpostModel } from "../../../services/api/types";
 import { StateInitializer } from "../stateInitializer";
-import { CreatorCard } from "./CreatorCard";
+import { CreatorCard } from "./creatorCard";
 import { EventDetails } from "./EventDetails";
 import { OutpostDetailsHeader } from "./header";
 import { InviteUsersButton } from "./InviteUsersButton";

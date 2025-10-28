@@ -12,6 +12,7 @@ import { SubjectField } from "./components/SubjectField";
 import { TagsField } from "./components/TagsField";
 import { useCreateOutpostSlice } from "./slice";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
+import { Cohosts } from "./components/cohosts";
 
 const Content = () => {
   useCreateOutpostSlice();
@@ -56,6 +57,7 @@ const Content = () => {
                 <TagsField />
                 <EnterTypeField />
                 <SpeakField />
+                <Cohosts />
                 <ScheduledField />
                 <AdultsField />
                 <RecordableField />

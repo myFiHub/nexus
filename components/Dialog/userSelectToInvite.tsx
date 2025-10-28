@@ -486,7 +486,7 @@ export const UserSelectToInviteDialogProvider = () => {
                       className="text-xs px-2 py-1 h-7"
                       disabled={!!existingInvite || isMember}
                     >
-                      Only Invite
+                      Invite Muted
                     </Button>
                     {canInviteToSpeakForCurrentUser && (
                       <Button

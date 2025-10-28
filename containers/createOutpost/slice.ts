@@ -3,10 +3,10 @@ import {
   FreeOutpostEnterTypes,
   FreeOutpostSpeakerTypes,
 } from "app/components/outpost/types";
+import { AddGuestModel, AddHostModel } from "app/services/api/luma";
 import { User } from "app/services/api/types";
 import { injectContainer } from "app/store";
 import { createOutpostSaga } from "./saga";
-import { AddGuestModel, AddHostModel } from "app/services/api/luma";
 
 export interface CreateOutpostState {
   name: string;
@@ -35,6 +35,7 @@ export interface CreateOutpostState {
     subject?: string;
     tags?: string;
   };
+  cohostUsers?: User[];
 }
 
 const initialState: CreateOutpostState = {
@@ -55,6 +56,7 @@ const initialState: CreateOutpostState = {
   selectedImage: undefined,
   isCreating: false,
   error: undefined,
+  cohostUsers: [],
 };
 
 const createOutpostSlice = createSlice({
@@ -205,6 +207,26 @@ const createOutpostSlice = createSlice({
     },
     setLumaHosts(state, action: PayloadAction<AddHostModel[]>) {
       state.lumaHosts = action.payload;
+    },
+    toggleCohostUser: (state, action: PayloadAction<User>) => {
+      if (!state.cohostUsers) {
+        state.cohostUsers = [];
+      }
+
+      const isSelected = state.cohostUsers.some(
+        (user) => user.uuid === action.payload.uuid
+      );
+
+      if (isSelected) {
+        state.cohostUsers = state.cohostUsers.filter(
+          (user) => user.uuid !== action.payload.uuid
+        );
+      } else {
+        state.cohostUsers.push(action.payload);
+      }
+    },
+    setCohostUserUuids: (state, action: PayloadAction<User[]>) => {
+      state.cohostUsers = action.payload;
     },
   },
 });

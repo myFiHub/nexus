@@ -1,5 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
+import { initialState } from "./slice";
 import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
 
 export const onGoingOutpostDomains = {
@@ -29,7 +30,10 @@ export const onGoingOutpostDomains = {
   talkingUsersAddress: (state: RootState) =>
     state.onGoingOutpost?.talkingUsersAddress,
   isInteractionsMuted: (state: RootState) =>
-    state.onGoingOutpost?.isInteractionsMuted,
+    state.onGoingOutpost?.isInteractionsMuted ??
+    initialState.isInteractionsMuted,
+  membersSearchValue: (state: RootState) =>
+    state.onGoingOutpost?.membersSearchValue,
 };
 
 export const onGoingOutpostSelectors = {
@@ -40,6 +44,7 @@ export const onGoingOutpostSelectors = {
   isGettingLiveMembers: onGoingOutpostDomains.isGettingLiveMembers,
   accesses: onGoingOutpostDomains.accesses,
   members: onGoingOutpostDomains.members,
+  membersSearchValue: onGoingOutpostDomains.membersSearchValue,
   myUserInOutpostMembers: createSelector(
     [onGoingOutpostDomains.members, onGoingOutpostDomains.podiumUserInfo],
     (members, myUser) => {
@@ -70,11 +75,13 @@ export const onGoingOutpostSelectors = {
       return liveMembers[id];
     }),
   isTalking: (address: string) =>
-    createSelector(
-      [onGoingOutpostDomains.talkingUsersAddress],
-      (talkingUsersAddress) =>
-        talkingUsersAddress.length && talkingUsersAddress.includes(address)
-    ),
+    createSelector([onGoingOutpostDomains.members], (members) => {
+      if (!address) return false;
+      if (!members) return false;
+      const member = members[address];
+      if (!member) return false;
+      return member.is_present && member.is_speaking;
+    }),
   remainingTime: (id?: string) =>
     createSelector([onGoingOutpostDomains.members], (liveMembers) => {
       if (!id) {
@@ -82,6 +89,8 @@ export const onGoingOutpostSelectors = {
       }
       const member = liveMembers[id];
       if (!member) return 0;
+      if (member?.remaining_time < 0) return 0;
+
       // remaining time is in seconds, so formatted remaining time in hours, minutes and seconds
       const hours = Math.floor(member.remaining_time / 3600);
       const minutes = Math.floor((member.remaining_time % 3600) / 60);
@@ -97,6 +106,7 @@ export const onGoingOutpostSelectors = {
       }
       const member = liveMembers[id];
       if (!member) return 0;
+      if (member.remaining_time < 0) return 0;
       return member.remaining_time;
     }),
   isCheeringAddress: onGoingOutpostDomains.isCheeringAddress,

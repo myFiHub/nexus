@@ -1,6 +1,4 @@
 import { createSelector } from "@reduxjs/toolkit";
-import { BuyableTicketTypes } from "app/components/outpost/types";
-import { TicketToEnter, TicketToSpeak } from "app/services/api/types";
 import { RootState } from "app/store";
 
 export const createOutpostDomains = {
@@ -25,6 +23,7 @@ export const createOutpostDomains = {
   enabledLuma: (store: RootState) => store.createOutpost.enabledLuma,
   lumaGuests: (store: RootState) => store.createOutpost.lumaGuests,
   lumaHosts: (store: RootState) => store.createOutpost.lumaHosts,
+  cohostUsers: (store: RootState) => store.createOutpost?.cohostUsers || [],
 };
 export const createOutpostSelectors = {
   image: createOutpostDomains.image,
@@ -47,6 +46,7 @@ export const createOutpostSelectors = {
   enabledLuma: createOutpostDomains.enabledLuma,
   lumaGuests: createOutpostDomains.lumaGuests,
   lumaHosts: createOutpostDomains.lumaHosts,
+  cohostUsers: createOutpostDomains.cohostUsers,
   allFields: createSelector(
     [
       createOutpostDomains.name,
@@ -63,6 +63,7 @@ export const createOutpostSelectors = {
       createOutpostDomains.enabledLuma,
       createOutpostDomains.lumaGuests,
       createOutpostDomains.lumaHosts,
+      createOutpostDomains.cohostUsers,
     ],
     (
       name,
@@ -78,7 +79,8 @@ export const createOutpostSelectors = {
       passSellersRequiredToEnter,
       enabledLuma,
       lumaGuests,
-      lumaHosts
+      lumaHosts,
+      cohostUsers
     ) => ({
       name,
       subject,
@@ -93,25 +95,12 @@ export const createOutpostSelectors = {
       luma_guests: lumaGuests,
       luma_hosts: lumaHosts,
       tickets_to_speak: Object.values(passSellersRequiredToSpeak || {}).map(
-        (user) => {
-          const ticket: TicketToSpeak = {
-            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
-            address: user.address,
-            user_uuid: user.uuid,
-          };
-          return ticket;
-        }
+        (user) => user.address
       ),
       tickets_to_enter: Object.values(passSellersRequiredToEnter || {}).map(
-        (user) => {
-          const ticket: TicketToEnter = {
-            access_type: BuyableTicketTypes.onlyPodiumPassHolders,
-            address: user.address,
-            user_uuid: user.uuid,
-          };
-          return ticket;
-        }
+        (user) => user.address
       ),
+      cohost_user_uuids: cohostUsers?.map((user) => user.uuid),
     })
   ),
 };

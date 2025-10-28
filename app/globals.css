@@ -396,3 +396,6 @@ main > * {
 .w3a--flex.w3a--w-full.w3a--flex-col.w3a--items-start.w3a--justify-start.w3a--gap-y-2 .w3a--group.w3a--relative.w3a--overflow-hidden.w3a--rounded-full:first-of-type {
   display: none !important;
 }
+.w3a-parent-container .w3a--my-2{
+  display: none !important;
+}
