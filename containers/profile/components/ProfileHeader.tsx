@@ -2,13 +2,15 @@ import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
 import { truncate } from "app/lib/utils";
 import { User } from "app/services/api/types";
+import { ProfileTutorialIds } from "../tutorial/ProfileTutorial";
 
 interface ProfileHeaderProps {
   user: User;
+  id?: string;
 }
 
-export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
-  <div className="flex items-center space-x-6 mb-8">
+export const ProfileHeader = ({ user, id }: ProfileHeaderProps) => (
+  <div id={id} className="flex items-center space-x-6 mb-8">
     <div className="relative w-32 h-32 flex-shrink-0">
       {/* Backdrop effect - blurred larger version positioned outside */}
       <div className="absolute inset-0 scale-125 opacity-50 blur-md rounded-full overflow-hidden">
@@ -42,7 +44,10 @@ export const ProfileHeader = ({ user }: ProfileHeaderProps) => (
         </div>
       )}
       {user?.aptos_address && (
-        <div className="flex gap-2 items-center content-center">
+        <div
+          className="flex gap-2 items-center content-center"
+          id={ProfileTutorialIds.yourWalletAddress}
+        >
           <p className="text-muted-foreground mt-1 truncate">
             {truncate(user.aptos_address, 30)}
           </p>

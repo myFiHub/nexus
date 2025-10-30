@@ -7,12 +7,12 @@ import { DeleteAccountDialogProvider } from "./dialogs/deleteAccountDialog";
 import { ExportPrivateKeyDialogProvider } from "./dialogs/exportPrivateKeyDialog";
 import { ExportPrivateKeyButton } from "./ExportPrivateKeyButton";
 
-export const SecuritySection = () => {
+export const SecuritySection = ({ id }: { id?: string }) => {
   return (
     <>
       <ExportPrivateKeyDialogProvider />
       <DeleteAccountDialogProvider />
-      <div className="mb-8">
+      <div id={id} className="mb-8">
         <h3 className="text-lg font-semibold text-foreground mb-4">Security</h3>
         <div className="space-y-4">
           <motion.div

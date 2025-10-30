@@ -12,14 +12,16 @@ import { CircleArrowOutUpRight } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import BalanceDisplay from "../../../../components/BalanceDisplay";
+import { ProfileTutorialIds } from "../../tutorial/ProfileTutorial";
 import { StatCard } from "../StatCard";
 import { RefreshBalanceButton } from "./RefreshBalanceButton";
 
 interface UserStatsProps {
   user: User;
+  id?: string;
 }
 
-export const UserStats = ({ user }: UserStatsProps) => {
+export const UserStats = ({ user, id }: UserStatsProps) => {
   const dispatch = useDispatch();
   const balance = useSelector(AssetsSelectors.balance);
   const gettingBalance = balance.loading;
@@ -61,7 +63,7 @@ export const UserStats = ({ user }: UserStatsProps) => {
   const loading = transfering || gettingBalance;
 
   return (
-    <>
+    <div id={id}>
       <div className="mb-8">
         <div className="bg-gradient-to-r from-primary to-secondary p-6 rounded-lg shadow-lg">
           <div className="text-sm text-foreground/80 flex items-center gap-2">
@@ -76,6 +78,7 @@ export const UserStats = ({ user }: UserStatsProps) => {
                 className="ml-1 mt-2"
                 size="xxs"
                 disabled={loading}
+                id={ProfileTutorialIds.exportBalance}
               >
                 {loading ? (
                   <Loader className="w-4 h-4 animate-spin" />
@@ -141,6 +144,6 @@ export const UserStats = ({ user }: UserStatsProps) => {
           }
         />
       </div>
-    </>
+    </div>
   );
 };

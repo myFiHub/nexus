@@ -33,7 +33,7 @@ const headerVariants = {
   },
 };
 
-export const NFTSSection = () => {
+export const NFTSSection = ({ id }: { id?: string }) => {
   // Configuration
   const NFT_DISPLAY_LIMIT =
     typeof window !== "undefined" ? (window.innerWidth > 768 ? 6 : 3) : 3;
@@ -62,6 +62,7 @@ export const NFTSSection = () => {
 
   return (
     <motion.div
+      id={id}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
