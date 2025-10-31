@@ -5,7 +5,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useDispatch, useSelector } from "react-redux";
 
-export const SettingsSection = () => {
+export const SettingsSection = ({ id }: { id?: string }) => {
   const dispatch = useDispatch();
   const viewArchivedOutposts = useSelector(
     GlobalSelectors.viewArchivedOutposts
@@ -16,7 +16,7 @@ export const SettingsSection = () => {
   };
 
   return (
-    <div className="mb-8">
+    <div id={id} className="mb-8">
       <h3 className="text-lg font-semibold text-foreground mb-4">Settings</h3>
       <div className="bg-muted p-4 rounded-lg">
         <div className="flex items-center justify-between">

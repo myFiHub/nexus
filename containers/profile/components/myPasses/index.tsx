@@ -14,8 +14,8 @@ import { AssetsSelectors } from "../../../_assets/selectore";
 import { ProfileSectionTitle } from "../ProfileSectionTitle";
 import { EmptyState } from "./EmptyState";
 
-const SectionWrapper = ({ children }: { children: React.ReactNode }) => (
-  <div>
+const SectionWrapper = ({ children, id }: { children: React.ReactNode; id?: string }) => (
+  <div id={id}>
     <ProfileSectionTitle>My Passes</ProfileSectionTitle>
     {children}
   </div>
@@ -136,7 +136,7 @@ const PassCard = ({ pass }: { pass: BlockchainPassData }) => {
   );
 };
 
-export const MyPasses = () => {
+export const MyPasses = ({ id }: { id?: string }) => {
   const passes = useSelector(AssetsSelectors.myBlockchainPassesPasses);
 
   const loading = useSelector(AssetsSelectors.myBlockchainPassesLoading);
@@ -159,7 +159,7 @@ export const MyPasses = () => {
 
   if (loading) {
     return (
-      <SectionWrapper>
+      <SectionWrapper id={id}>
         <div className="flex items-center justify-center p-4">
           <Loader className="w-6 h-6 animate-spin" />
         </div>
@@ -169,7 +169,7 @@ export const MyPasses = () => {
 
   if (error) {
     return (
-      <SectionWrapper>
+      <SectionWrapper id={id}>
         <div className="text-red-500 p-4 text-center">{error}</div>
       </SectionWrapper>
     );
@@ -177,14 +177,14 @@ export const MyPasses = () => {
 
   if (!passes || passes.length === 0) {
     return (
-      <SectionWrapper>
+      <SectionWrapper id={id}>
         <EmptyState />
       </SectionWrapper>
     );
   }
 
   return (
-    <SectionWrapper>
+    <SectionWrapper id={id}>
       <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {displayedPasses?.map((pass, index) => (

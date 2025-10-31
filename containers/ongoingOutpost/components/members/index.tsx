@@ -11,7 +11,7 @@ import { MuteUnmuteInteractionSounds } from "./muteUnmuteInteractionSounds";
 import { MembersSearchBar } from "./searchBar";
 
 export const OngoingOutpostMembers = memo(
-  () => {
+  ({ id }: { id?: string }) => {
     const outpost = useSelector(onGoingOutpostSelectors.outpost);
     const nodeRef = useRef(null);
 
@@ -26,9 +26,12 @@ export const OngoingOutpostMembers = memo(
           bounds="parent"
         >
           <div
+            id={id}
             ref={nodeRef}
             className="absolute top-0 pt-4 right-0 bg-card/95 backdrop-blur-sm border border-border rounded-lg shadow-lg max-w-[360px] w-[360px] max-h-[calc(100%-32px)] overflow-hidden z-1"
           >
+            {/* Anchor for reactions tutorial */}
+            <div id="ongoing-reactions-anchor" className="absolute -bottom-4 left-1/2 w-4 h-4 pointer-events-none" />
             {/* Drag Handle */}
             <div className="drag-handle absolute top-0 left-0 w-full h-6 bg-muted/80 hover:bg-muted border border-border rounded cursor-move flex items-center justify-center group z-10">
               <GripVertical className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />

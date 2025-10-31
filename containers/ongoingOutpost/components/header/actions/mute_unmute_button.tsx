@@ -8,7 +8,7 @@ import { Mic, MicOff } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 
-export const MuteUnmuteButton = () => {
+export const MuteUnmuteButton = ({ id }: { id?: string }) => {
   const amIMuted = useSelector(onGoingOutpostSelectors.amIMuted);
   const joined = useSelector(onGoingOutpostSelectors.joined);
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
@@ -45,6 +45,7 @@ export const MuteUnmuteButton = () => {
 
   return (
     <Button
+      id={id}
       onClick={handleMuteUnmute}
       disabled={!inListOfMember}
       variant={amIMuted ? "destructive" : "primary"}

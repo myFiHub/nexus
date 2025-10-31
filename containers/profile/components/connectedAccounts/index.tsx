@@ -11,9 +11,10 @@ import { ConnectedAccountCard } from "./ConnectedAccountCard";
 
 interface ConnectedAccountsProps {
   accounts: ConnectedAccount[];
+  id?: string;
 }
 
-export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
+export const ConnectedAccounts = ({ accounts, id }: ConnectedAccountsProps) => {
   const dispatch = useDispatch();
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
@@ -32,7 +33,7 @@ export const ConnectedAccounts = ({ accounts }: ConnectedAccountsProps) => {
   if (!accounts?.length) return null;
   const disabled = logingIn || isExternalWallet;
   return (
-    <div className="mb-8">
+    <div id={id} className="mb-8">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
           <Users className="w-5 h-5 text-primary" />

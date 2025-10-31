@@ -5,13 +5,14 @@ import { InfoCard } from "./InfoCard";
 
 interface AdditionalInfoProps {
   user: User;
+  id?: string;
 }
 
-export const AdditionalInfo = ({ user }: AdditionalInfoProps) => {
+export const AdditionalInfo = ({ user, id }: AdditionalInfoProps) => {
   const myLoginType = user.login_type;
   const isExternalWallet = isExternalWalletLoginMethod(myLoginType ?? "");
   return (
-    <div className="mb-8">
+    <div id={id} className="mb-8">
       <h2 className="text-xl font-semibold text-foreground flex items-center gap-2">
         <Wallet className="w-5 h-5 text-primary" />
         Wallet Info

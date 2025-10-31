@@ -2,7 +2,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
 
-export const MyTimer = () => {
+export const MyTimer = ({ id }: { id?: string }) => {
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const myRemainingTime = useSelector(
     onGoingOutpostSelectors.remainingTime(myUser?.address)
@@ -32,7 +32,7 @@ export const MyTimer = () => {
   const isLessThanOneMinute = timeInSeconds > 0 && timeInSeconds < 60;
 
   return (
-    <div className={`px-4 py-3 ${isLessThanOneMinute ? "animate-pulse" : ""}`}>
+    <div id={id} className={`px-4 py-3 ${isLessThanOneMinute ? "animate-pulse" : ""}`}>
       <div className="text-center">
         <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider mb-1">
           {!iAmCreator ? "Remaining Time" : ""}

@@ -21,6 +21,10 @@ import { AccountCardActionSelectDialogProvider } from "./components/SecuritySect
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/userStats";
 import { profileActions, useProfileSlice } from "./slice";
+import {
+  ProfileTutorial,
+  ProfileTutorialIds,
+} from "./tutorial/ProfileTutorial";
 
 // Reusable styled card for profile sections
 const SectionCard = ({
@@ -72,28 +76,35 @@ const Content = () => {
       <AccountCardActionSelectDialogProvider />
       <div className="max-w-4xl mx-auto p-6">
         <div className="bg-card rounded-lg shadow-md p-6">
-          <ProfileHeader user={user} />
-          <SectionCard>
-            <UserStats user={user} />
+          <ProfileTutorial />
+          <ProfileHeader id={ProfileTutorialIds.header} user={user} />
+          <SectionCard className="">
+            <UserStats id={ProfileTutorialIds.stats} user={user} />
           </SectionCard>
-          <SectionCard>
-            <ConnectedAccounts accounts={user.accounts} />
+          <SectionCard className="">
+            <ConnectedAccounts
+              id={ProfileTutorialIds.accounts}
+              accounts={user.accounts}
+            />
           </SectionCard>
-          <SectionCard>
-            <AdditionalInfo user={user} />
+          <SectionCard className="">
+            <AdditionalInfo
+              id={ProfileTutorialIds.additionalInfo}
+              user={user}
+            />
           </SectionCard>
-          <SectionCard>
-            <MyPasses />
+          <SectionCard className="">
+            <MyPasses id={ProfileTutorialIds.passes} />
           </SectionCard>
-          <SectionCard>
-            <NFTSSection />
+          <SectionCard className="">
+            <NFTSSection id={ProfileTutorialIds.nfts} />
           </SectionCard>
-          <SectionCard>
-            <SettingsSection />
+          <SectionCard className="">
+            <SettingsSection id={ProfileTutorialIds.settings} />
           </SectionCard>
           {!isExternalWallet ? (
             <SectionCard>
-              <SecuritySection />
+              <SecuritySection id={ProfileTutorialIds.security} />
             </SectionCard>
           ) : (
             <></>
