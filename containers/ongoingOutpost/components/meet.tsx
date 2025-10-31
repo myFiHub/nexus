@@ -88,8 +88,8 @@ export const Meet = memo(
                 : myUser.name ?? truncate(myUser.uuid),
               email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
-            creatorUuid={`"${creatorUuid}"`}
-            cohostUuids={cohostsUuids}
+            // creatorUuid={`"${creatorUuid}"`}
+            // cohostUuids={cohostsUuids}
             configOverwrite={{
               cohostsUuids,
               apiLogLevel: ["error"],
