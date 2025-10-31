@@ -1,0 +1,38 @@
+diff --git a/node_modules/react-joyride/dist/index.mjs b/node_modules/react-joyride/dist/index.mjs
+index b5925d5..3d7195d 100644
+--- a/node_modules/react-joyride/dist/index.mjs
++++ b/node_modules/react-joyride/dist/index.mjs
+@@ -1,6 +1,7 @@
+ var __defProp = Object.defineProperty;
+ var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+ var __publicField = (obj, key, value) => __defNormalProp(obj, typeof key !== "symbol" ? key + "" : key, value);
++import { createRoot } from 'react-dom/client';
+ 
+ // src/literals/index.ts
+ var ACTIONS = {
+@@ -1222,9 +1223,11 @@ var JoyridePortal = class extends React3.Component {
+     if (!canUseDOM() || !this.node) {
+       return;
+     }
+-    if (!isReact16) {
+-      ReactDOM.unmountComponentAtNode(this.node);
+-    }
++  try {
++    ReactDOM?.unmountComponentAtNode(this.node);
++  } catch (error) {
++    
++  }
+     if (this.node.parentNode === document.body) {
+       document.body.removeChild(this.node);
+       this.node = null;
+@@ -1236,7 +1239,9 @@ var JoyridePortal = class extends React3.Component {
+     }
+     const { children } = this.props;
+     if (this.node) {
+-      ReactDOM.unstable_renderSubtreeIntoContainer(this, children, this.node);
++      // ReactDOM.unstable_renderSubtreeIntoContainer(this, children, this.node);
++      const root = createRoot(this.node);
++root.render(children);
+     }
+   }
+   renderReact16() {
