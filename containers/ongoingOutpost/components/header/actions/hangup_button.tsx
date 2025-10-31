@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../../selectors";
 
-export const HangupButton = () => {
+export const HangupButton = ({ id }: { id?: string }) => {
   const apiObj = useSelector(onGoingOutpostSelectors.meetApiObj);
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
   const onlineMembersCount = useSelector(onGoingOutpostSelectors.membersCount);
@@ -29,6 +29,7 @@ export const HangupButton = () => {
 
   return (
     <Button
+      id={id}
       onClick={handleHangup}
       variant="destructive"
       className="px-4 py-2 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl min-w-[108px]"

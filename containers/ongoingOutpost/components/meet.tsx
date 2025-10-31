@@ -72,11 +72,12 @@ export const Meet = memo(
         <LeaveOutpostWarningDialogProvider />
         {!joined && <JoiningStatus />}
         <div
+          id="ongoing-jitsi-container"
           className={`w-full h-[600px] relative rounded-xl overflow-hidden ${showIframeClassName}`}
         >
           <RejoinAttempt />
           <MeetEventListeners />
-          <OngoingOutpostMembers />
+          <OngoingOutpostMembers id="ongoing-members" />
 
           <JitsiMeeting
             domain={hostUrl}
@@ -87,8 +88,8 @@ export const Meet = memo(
                 : myUser.name ?? truncate(myUser.uuid),
               email: transformIdToEmailLike(myUser.uuid) ?? "",
             }}
-            creatorUuid={`"${creatorUuid}"`}
-            cohostUuids={cohostsUuids}
+            // creatorUuid={`"${creatorUuid}"`}
+            // cohostUuids={cohostsUuids}
             configOverwrite={{
               cohostsUuids,
               apiLogLevel: ["error"],

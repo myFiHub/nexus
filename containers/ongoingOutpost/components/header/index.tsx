@@ -1,6 +1,7 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../selectors";
+import { OngoingTutorialIds } from "../../tutorial/constants";
 import { Controlls } from "./actions";
 import { MuteUnmuteButton } from "./actions/mute_unmute_button";
 import { MyTimer } from "./myTimer";
@@ -29,10 +30,10 @@ export const OutpostHeader = () => {
           <div className="flex justify-center lg:col-span-1">
             <div className="flex items-stretch bg-muted/50 backdrop-blur-sm border border-border rounded-xl shadow-lg overflow-hidden">
               <div className="flex-1">
-                <MyTimer />
+                <MyTimer id={OngoingTutorialIds.remainingTime} />
               </div>
               <div className="border-l border-border flex-1">
-                <MuteUnmuteButton />
+                <MuteUnmuteButton id={OngoingTutorialIds.muteButton} />
               </div>
             </div>
           </div>

@@ -7,6 +7,8 @@ import Joyride, { CallBackProps, STATUS } from "react-joyride";
 import { useSelector } from "react-redux";
 
 import type { Step } from "react-joyride";
+import { buildJoyrideStyles } from "../../tutorial/joyrideStyles";
+import { useJoyrideTheme } from "../../tutorial/useJoyrideTheme";
 
 export const PROFILE_TUTORIAL_LOCAL_STORAGE_KEY = "profile_tutorial_shown";
 
@@ -31,15 +33,7 @@ export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
   const user = useSelector(GlobalSelectors.podiumUserInfo);
   const isExternalWallet = isExternalWalletLoginMethod(user?.login_type ?? "");
   const [run, setRun] = useState(false);
-  const [theme, setTheme] = useState({
-    primary: "#7c3aed",
-    foreground: "#0f172a",
-    foregroundMuted: "#6b7280",
-    card: "#ffffff",
-    border: "#e5e7eb",
-    radius: "10px",
-    overlay: "rgba(0,0,0,0.4)",
-  });
+  const theme = useJoyrideTheme();
 
   const steps: Step[] = [
     {
@@ -105,32 +99,7 @@ export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
     }
   }, [enabled]);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const root = document.documentElement;
-      const css = getComputedStyle(root);
-      const isDark = root.classList.contains("dark");
-      const primary = css.getPropertyValue("--primary").trim() || theme.primary;
-      const foreground =
-        css.getPropertyValue("--foreground").trim() || theme.foreground;
-      const muted =
-        css.getPropertyValue("--muted-foreground").trim() ||
-        theme.foregroundMuted;
-      const card = css.getPropertyValue("--card").trim() || theme.card;
-      const border = css.getPropertyValue("--border").trim() || theme.border;
-      const radius = css.getPropertyValue("--radius").trim() || theme.radius;
-      setTheme({
-        primary,
-        foreground,
-        foregroundMuted: muted,
-        card,
-        border,
-        radius,
-        overlay: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.4)",
-      });
-    } catch {}
-  }, []);
+  // theme resolved via useJoyrideTheme
 
   const handleCallback = (data: CallBackProps) => {
     const { status } = data;
@@ -157,57 +126,7 @@ export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
       showProgress
       showSkipButton
       disableOverlayClose
-      styles={{
-        options: {
-          zIndex: 10000,
-          primaryColor: theme.primary,
-          textColor: theme.foreground,
-          arrowColor: theme.card,
-          backgroundColor: theme.card,
-        },
-        overlay: {
-          backgroundColor: theme.overlay,
-        },
-        tooltip: {
-          backgroundColor: theme.card,
-          color: theme.foreground,
-          borderRadius: theme.radius,
-          border: `1px solid ${theme.border}`,
-          boxShadow:
-            "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
-        },
-        tooltipContainer: {
-          textAlign: "left",
-          fontFamily: "var(--font-geist-sans, ui-sans-serif, system-ui)",
-        },
-        tooltipTitle: {
-          margin: 0,
-          color: theme.foreground,
-        },
-        tooltipContent: {
-          color: theme.foreground,
-        },
-        buttonNext: {
-          backgroundColor: theme.primary,
-          color: "var(--primary-foreground, #fff)",
-          borderRadius: theme.radius,
-          padding: "0.5rem 0.75rem",
-          boxShadow: "none",
-        },
-        buttonBack: {
-          color: theme.foregroundMuted,
-          marginRight: 8,
-        },
-        buttonClose: {
-          color: theme.foregroundMuted,
-        },
-        beacon: {
-          boxShadow: `0 0 0 2px ${theme.primary}40`,
-        },
-        spotlight: {
-          borderRadius: theme.radius,
-        },
-      }}
+      styles={buildJoyrideStyles(theme)}
     />
   );
 };

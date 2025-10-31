@@ -1,4 +1,5 @@
 import { Loader } from "app/components/Loader";
+import { OngoingTutorialIds } from "app/containers/ongoingOutpost/tutorial/constants";
 import { useSelector } from "react-redux";
 import { onGoingOutpostSelectors } from "../../../selectors";
 import { HangupButton } from "./hangup_button";
@@ -10,7 +11,7 @@ export const Controlls = () => {
   }
   return (
     <div className="flex gap-3 min-w-[120px]">
-      <HangupButton />
+      <HangupButton id={OngoingTutorialIds.leaveButton} />
     </div>
   );
 };
