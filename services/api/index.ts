@@ -449,8 +449,15 @@ class PodiumApi {
     page_size?: number
   ): Promise<FollowerModel[]> {
     try {
+      let id = uuid;
+      if (id.length === 66) {
+        const user = await this.getUserByAptosAddress(uuid);
+        if (user) {
+          id = user.uuid;
+        }
+      }
       const response = await this.axiosInstance.get(`/users/followers`, {
-        params: { uuid, page, page_size },
+        params: { uuid: id, page, page_size },
       });
       return response.data.data;
     } catch {
