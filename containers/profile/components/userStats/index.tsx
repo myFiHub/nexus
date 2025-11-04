@@ -3,11 +3,6 @@ import { Button } from "app/components/Button";
 import { CopyButton } from "app/components/copyButton";
 import { transferBalanceDialog } from "app/components/Dialog";
 import { Loader } from "app/components/Loader";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "app/components/Tooltip";
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { assetsActions } from "app/containers/_assets/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
@@ -77,27 +72,20 @@ export const UserStats = ({ user, id }: UserStatsProps) => {
           <div className="flex items-center gap-2">
             <BalanceDisplay />
             {balanceValue !== "0" ? (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    onClick={transferBalance}
-                    variant="ghost"
-                    className="ml-1 mt-2"
-                    size="xxs"
-                    disabled={loading}
-                    id={ProfileTutorialIds.exportBalance}
-                  >
-                    {loading ? (
-                      <Loader className="w-4 h-4 animate-spin" />
-                    ) : (
-                      <CircleArrowOutUpRight className="w-4 h-4" />
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent className="text-white">
-                  Transfer Balance
-                </TooltipContent>
-              </Tooltip>
+              <Button
+                onClick={transferBalance}
+                variant="ghost"
+                className="ml-1 mt-2"
+                size="xxs"
+                disabled={loading}
+                id={ProfileTutorialIds.exportBalance}
+              >
+                {loading ? (
+                  <Loader className="w-4 h-4 animate-spin" />
+                ) : (
+                  <CircleArrowOutUpRight className="w-4 h-4" />
+                )}
+              </Button>
             ) : (
               <></>
             )}

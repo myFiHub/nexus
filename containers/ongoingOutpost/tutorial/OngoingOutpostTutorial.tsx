@@ -3,10 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import Joyride, { CallBackProps, STATUS, Step } from "react-joyride";
 import { useSelector } from "react-redux";
-import { onGoingOutpostSelectors } from "../selectors";
-import { OngoingTutorialIds, ONGOING_TUTORIAL_LS_KEY } from "./constants";
-import { useJoyrideTheme } from "../../tutorial/useJoyrideTheme";
 import { buildJoyrideStyles } from "../../tutorial/joyrideStyles";
+import { useJoyrideTheme } from "../../tutorial/useJoyrideTheme";
+import { onGoingOutpostSelectors } from "../selectors";
+import { ONGOING_TUTORIAL_LS_KEY, OngoingTutorialIds } from "./constants";
 
 export const OngoingOutpostTutorial = () => {
   const joined = useSelector(onGoingOutpostSelectors.joined);

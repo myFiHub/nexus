@@ -7,14 +7,17 @@ import {
 import { FeaturesSection } from "./FeaturesSection";
 import { HeroSection } from "./HeroSection";
 import { HowItWorksSection } from "./HowItWorksSection";
+import { LiveOutpostsBanner } from "./LiveOutpostsBanner";
 import { TrendingSection } from "./TrendingSection";
 
 export const HomeContainer = ({
   trendingOutposts,
+  liveNowOutposts,
   statistics,
   recentUsers,
 }: {
   trendingOutposts: OutpostModel[];
+  liveNowOutposts: OutpostModel[];
   statistics?: Statistics;
   recentUsers: RecentlyJoinedUser[];
 }) => {
@@ -22,7 +25,12 @@ export const HomeContainer = ({
     <div className="flex flex-col items-center w-full min-h-screen">
       <RouteLoaderCleaner />
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="pt-24 pb-16">
+        {liveNowOutposts.length > 0 && (
+          <div className="pt-24 pb-8">
+            <LiveOutpostsBanner liveOutposts={liveNowOutposts} />
+          </div>
+        )}
+        <div className={liveNowOutposts.length > 0 ? "pb-16" : "pt-24 pb-16"}>
           <HeroSection statistics={statistics} recentUsers={recentUsers} />
         </div>
         <div className="py-20">

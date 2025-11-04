@@ -9,7 +9,7 @@ export { generateMetadata };
 // Cache the trending outposts data with ISR
 const getCachedTrendingOutposts = unstable_cache(
   async () => {
-    const results = await podiumApi.getOutposts(0, 3);
+    const results = await podiumApi.getOutposts(0, 20);
     if (results instanceof Error) {
       return [];
     }
@@ -52,7 +52,10 @@ export default async function Home() {
 
   return (
     <HomeContainer
-      trendingOutposts={outposts}
+      liveNowOutposts={outposts.filter(
+        (outpost) => (outpost.online_users_count || 0) > 0
+      )}
+      trendingOutposts={outposts.splice(0, 3)}
       statistics={statistics}
       recentUsers={recentUsers}
     />
