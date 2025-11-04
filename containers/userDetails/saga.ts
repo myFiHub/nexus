@@ -5,7 +5,15 @@ import { userDetailsActions } from "./slice";
 function* getTabsData(
   action: ReturnType<typeof userDetailsActions.getTabsData>
 ): Generator<any, void, any> {
-  const { id } = action.payload;
+  let { id } = action.payload;
+
+  if (id.length === 66) {
+    const user = yield podiumApi.getUserByAptosAddress(id);
+    if (user) {
+      id = user.uuid;
+    }
+  }
+
   const [passBuyers, followers, followings] = yield all([
     podiumApi.podiumPassBuyers(id),
     podiumApi.getFollowersOfUser(id),

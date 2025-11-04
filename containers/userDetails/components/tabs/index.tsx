@@ -25,6 +25,7 @@ interface UserTabsProps {
 }
 
 const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
+  const isExternalUser = !user.uuid;
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg mb-2 hover:bg-accent/5 transition-colors">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -39,12 +40,15 @@ const UserCard = ({ user }: { user: FollowerModel | PodiumPassBuyerModel }) => {
         <div className="min-w-0 flex-1">
           <p className="font-medium truncate">{user.name}</p>
           <p className="text-sm text-muted-foreground truncate">
-            id: {truncate(user.uuid, 10)}
+            {!isExternalUser
+              ? `id: ${truncate(user.uuid, 10)}`
+              : "External User"}
           </p>
         </div>
       </div>
       <div className="flex items-center gap-2 ml-4 flex-shrink-0">
         <UserLink
+          disabled={isExternalUser}
           id={user.uuid}
           className="text-sm text-primary hover:text-primary/80 transition-colors whitespace-nowrap"
         >

@@ -189,6 +189,12 @@ class PodiumApi {
 
   async getUserData(id: string): Promise<User | undefined> {
     try {
+      if (id.length === 66) {
+        const user = await this.getUserByAptosAddress(id);
+        if (user) {
+          return user;
+        }
+      }
       const response = await this.axiosInstance.get(
         `/users/detail?uuid=${id.replaceAll("/", "")}`
       );
@@ -457,9 +463,16 @@ class PodiumApi {
     page?: number,
     page_size?: number
   ): Promise<FollowerModel[]> {
+    let id = uuid;
     try {
+      if (id.length === 66) {
+        const user = await this.getUserByAptosAddress(uuid);
+        if (user) {
+          id = user.uuid;
+        }
+      }
       const response = await this.axiosInstance.get(`/users/followings`, {
-        params: { uuid, page, page_size },
+        params: { uuid: id, page, page_size },
       });
       return response.data.data;
     } catch (error) {
@@ -850,10 +863,17 @@ class PodiumApi {
     page = 0,
     page_size = 50
   ): Promise<PodiumPassBuyerModel[]> {
+    let id = uuid;
+    if (id.length === 66) {
+      const user = await this.getUserByAptosAddress(uuid);
+      if (user) {
+        id = user.uuid;
+      }
+    }
     try {
       const response = await this.axiosInstance.get(
         `/podium-passes/recent-holders`,
-        { params: { uuid, page, page_size } }
+        { params: { uuid: id, page, page_size } }
       );
       return response.data.data;
     } catch (error) {
@@ -908,7 +928,9 @@ class PodiumApi {
       const response = await this.axiosInstance.get(`/dashboard/top-owners`, {
         params: { page, page_size },
       });
-      return response.data.data;
+
+      const owners = response.data.data;
+      return owners;
     } catch (error) {
       if (isDev) console.log("error", error);
       return [];
