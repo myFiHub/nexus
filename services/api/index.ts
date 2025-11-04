@@ -187,31 +187,6 @@ class PodiumApi {
     }
   }
 
-  async getUserData(id: string): Promise<User | undefined> {
-    try {
-      if (id.length === 66) {
-        const user = await this.getUserByAptosAddress(id);
-        if (user) {
-          return user;
-        }
-      }
-      const response = await this.axiosInstance.get(
-        `/users/detail?uuid=${id.replaceAll("/", "")}`
-      );
-      return response.data.data;
-    } catch (error) {
-      if (isDev) console.log("error", error);
-      try {
-        const user = await this.getUserByAptosAddress(id);
-        if (user) {
-          return user;
-        }
-      } catch (error) {
-        return undefined;
-      }
-    }
-  }
-
   async searchUserByName(
     name: string,
     page?: number,
@@ -379,18 +354,33 @@ class PodiumApi {
     }
   }
 
-  // --- User/Account ---
-  async getUserByAptosAddress(address: string): Promise<User | undefined> {
+  async getUserByUuidOrAptosAddress(
+    idOrAddress: string
+  ): Promise<User | undefined> {
+    if (idOrAddress === "index.iife.min.js.map") {
+      return undefined;
+    }
+    if (idOrAddress.length === 66) {
+      try {
+        const response = await this.axiosInstance.get(
+          `/users/detail/by-aptos-address`,
+          { params: { aptos_address: idOrAddress } }
+        );
+        const user = response.data.data;
+        return user;
+      } catch (error) {
+        if (isDev) console.log(`error: ${idOrAddress}`, error);
+        console.error(`error: getUserByAptosAddress: ${idOrAddress}`, error);
+        return undefined;
+      }
+    }
     try {
       const response = await this.axiosInstance.get(
-        `/users/detail/by-aptos-address`,
-        { params: { aptos_address: address } }
+        `/users/detail?uuid=${idOrAddress.replaceAll("/", "")}`
       );
       return response.data.data;
     } catch (error) {
       if (isDev) console.log("error", error);
-      console.error("Get user by Aptos address error:", error);
-      return undefined;
     }
   }
 
@@ -410,7 +400,7 @@ class PodiumApi {
 
   async getUsersByIds(ids: string[]): Promise<User[]> {
     try {
-      const promises = ids.map((id) => this.getUserData(id));
+      const promises = ids.map((id) => this.getUserByUuidOrAptosAddress(id));
       const users = await Promise.all(promises);
       return users.filter(Boolean) as User[];
     } catch {
@@ -421,7 +411,7 @@ class PodiumApi {
   async getUserByAptosAddresses(addresses: string[]): Promise<User[]> {
     try {
       const promises = addresses.map((address) =>
-        this.getUserByAptosAddress(address)
+        this.getUserByUuidOrAptosAddress(address)
       );
       const users = await Promise.all(promises);
       return users.filter(Boolean) as User[];
@@ -451,7 +441,7 @@ class PodiumApi {
     try {
       let id = uuid;
       if (id.length === 66) {
-        const user = await this.getUserByAptosAddress(uuid);
+        const user = await this.getUserByUuidOrAptosAddress(uuid);
         if (user) {
           id = user.uuid;
         }
@@ -472,8 +462,11 @@ class PodiumApi {
   ): Promise<FollowerModel[]> {
     let id = uuid;
     try {
+      if (id === "index.iife.min.js.map") {
+        return [];
+      }
       if (id.length === 66) {
-        const user = await this.getUserByAptosAddress(uuid);
+        const user = await this.getUserByUuidOrAptosAddress(uuid);
         if (user) {
           id = user.uuid;
         }
@@ -871,8 +864,11 @@ class PodiumApi {
     page_size = 50
   ): Promise<PodiumPassBuyerModel[]> {
     let id = uuid;
+    if (id === "index.iife.min.js.map") {
+      return [];
+    }
     if (id.length === 66) {
-      const user = await this.getUserByAptosAddress(uuid);
+      const user = await this.getUserByUuidOrAptosAddress(uuid);
       if (user) {
         id = user.uuid;
       }

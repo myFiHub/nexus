@@ -153,9 +153,10 @@ export const CohostsViewDialogProvider = () => {
 
     try {
       // Fetch all cohosts in parallel
-      const cohostPromises = uuids.map((uuid) => podiumApi.getUserData(uuid));
+      const cohostPromises = uuids.map((uuid) =>
+        podiumApi.getUserByUuidOrAptosAddress(uuid)
+      );
       const results = await Promise.allSettled(cohostPromises);
-
       // Map results, replacing each placeholder with actual data or keeping null on error
       const fetchedCohosts = results.map((result) => {
         if (result.status === "fulfilled" && result.value) {

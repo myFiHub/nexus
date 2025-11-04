@@ -8,7 +8,7 @@ function* getTabsData(
   let { id } = action.payload;
 
   if (id.length === 66) {
-    const user = yield podiumApi.getUserByAptosAddress(id);
+    const user = yield podiumApi.getUserByUuidOrAptosAddress(id);
     if (user) {
       id = user.uuid;
     }

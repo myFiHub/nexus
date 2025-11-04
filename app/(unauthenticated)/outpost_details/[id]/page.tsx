@@ -1,10 +1,10 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
 import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
 import { generateEventStructuredData, generateMetadata } from "./_metadata";
-import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 interface PageProps {
   params: Promise<{ id: string }>;

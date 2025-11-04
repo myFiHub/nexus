@@ -53,7 +53,7 @@ const Content = ({ address }: { address: string }) => {
       if (type === "sell") {
         setIsSelling(true);
       }
-      userResult = await podiumApi.getUserByAptosAddress(address);
+      userResult = await podiumApi.getUserByUuidOrAptosAddress(address);
       setUser(userResult);
     }
     if (!userResult) {
