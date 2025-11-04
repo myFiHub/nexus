@@ -10,5 +10,5 @@ export async function revalidateOutpostDetails(outpostId: string) {
   if (!outpostId) {
     throw new Error("Outpost ID is required");
   }
-  revalidateTag(`outpost-details-${outpostId}`);
+  revalidateTag(`outpost-details-${outpostId}`, "hours");
 }

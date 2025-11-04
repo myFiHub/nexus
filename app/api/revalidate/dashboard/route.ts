@@ -8,9 +8,9 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     // Revalidate all dashboard-related cache tags
-    revalidateTag(UserTags.RecentlyJoined);
-    revalidateTag(UserTags.TopOwners);
-    revalidateTag(TradesTags.Trades);
+    revalidateTag(UserTags.RecentlyJoined, "hours");
+    revalidateTag(UserTags.TopOwners, "hours");
+    revalidateTag(TradesTags.Trades, "hours");
 
     return NextResponse.json(
       {

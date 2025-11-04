@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     // Revalidate the top owners cache tag
-    revalidateTag("top-owners");
+    revalidateTag("top-owners", "hours");
 
     return NextResponse.json(
       {

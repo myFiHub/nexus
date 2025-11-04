@@ -33,7 +33,7 @@ export async function POST(
     }
 
     // Always revalidate the outpost details cache tag
-    revalidateTag(`outpost-details-${id}`);
+    revalidateTag(`outpost-details-${id}`, "hours");
 
     // Only revalidate path if not cache-only
     if (!options.cacheOnly) {

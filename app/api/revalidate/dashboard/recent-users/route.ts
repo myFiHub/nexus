@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     // Revalidate the recently joined users cache tag
-    revalidateTag(UserTags.RecentlyJoined);
+    revalidateTag(UserTags.RecentlyJoined, "hours");
 
     return NextResponse.json(
       {

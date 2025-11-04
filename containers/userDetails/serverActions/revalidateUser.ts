@@ -28,28 +28,28 @@ export async function revalidateUserData(
 
   // If 'all' is true, revalidate all user-related cache tags
   if (options.all) {
-    revalidateTag(`user-data-${userId}`);
-    revalidateTag(`user-pass-buyers-${userId}`);
-    revalidateTag(`user-followers-${userId}`);
-    revalidateTag(`user-followings-${userId}`);
+    revalidateTag(`user-data-${userId}`, "hours");
+    revalidateTag(`user-pass-buyers-${userId}`, "hours");
+    revalidateTag(`user-followers-${userId}`, "hours");
+    revalidateTag(`user-followings-${userId}`, "hours");
     return;
   }
 
   // Revalidate specific cache tags based on options
   if (options.userData) {
-    revalidateTag(`user-data-${userId}`);
+    revalidateTag(`user-data-${userId}`, "hours");
   }
 
   if (options.passBuyers) {
-    revalidateTag(`user-pass-buyers-${userId}`);
+    revalidateTag(`user-pass-buyers-${userId}`, "hours");
   }
 
   if (options.followers) {
-    revalidateTag(`user-followers-${userId}`);
+    revalidateTag(`user-followers-${userId}`, "hours");
   }
 
   if (options.followings) {
-    revalidateTag(`user-followings-${userId}`);
+    revalidateTag(`user-followings-${userId}`, "hours");
   }
 }
 
@@ -61,7 +61,7 @@ export async function revalidateUserBasicData(userId: string) {
   if (!userId) {
     throw new Error("User ID is required");
   }
-  revalidateTag(`user-data-${userId}`);
+  revalidateTag(`user-data-${userId}`, "hours");
 }
 
 /**
@@ -72,7 +72,7 @@ export async function revalidateUserFollowers(userId: string) {
   if (!userId) {
     throw new Error("User ID is required");
   }
-  revalidateTag(`user-followers-${userId}`);
+  revalidateTag(`user-followers-${userId}`, "hours");
 }
 
 /**
@@ -83,7 +83,7 @@ export async function revalidateUserFollowings(userId: string) {
   if (!userId) {
     throw new Error("User ID is required");
   }
-  revalidateTag(`user-followings-${userId}`);
+  revalidateTag(`user-followings-${userId}`, "hours");
 }
 
 /**
@@ -94,5 +94,5 @@ export async function revalidateUserPassBuyers(userId: string) {
   if (!userId) {
     throw new Error("User ID is required");
   }
-  revalidateTag(`user-pass-buyers-${userId}`);
+  revalidateTag(`user-pass-buyers-${userId}`, "hours");
 }

@@ -41,23 +41,23 @@ export async function POST(
     // Only revalidate cache tags if explicitly requested
     if (options.all) {
       // Revalidate all user-related cache tags
-      revalidateTag(`user-data-${id}`);
-      revalidateTag(`user-pass-buyers-${id}`);
-      revalidateTag(`user-followers-${id}`);
-      revalidateTag(`user-followings-${id}`);
+      revalidateTag(`user-data-${id}`, "hours");
+      revalidateTag(`user-pass-buyers-${id}`, "hours");
+      revalidateTag(`user-followers-${id}`, "hours");
+      revalidateTag(`user-followings-${id}`, "hours");
     } else {
       // Revalidate specific cache tags based on options
       if (options.userData) {
-        revalidateTag(`user-data-${id}`);
+        revalidateTag(`user-data-${id}`, "hours");
       }
       if (options.passBuyers) {
-        revalidateTag(`user-pass-buyers-${id}`);
+        revalidateTag(`user-pass-buyers-${id}`, "hours");
       }
       if (options.followers) {
-        revalidateTag(`user-followers-${id}`);
+        revalidateTag(`user-followers-${id}`, "hours");
       }
       if (options.followings) {
-        revalidateTag(`user-followings-${id}`);
+        revalidateTag(`user-followings-${id}`, "hours");
       }
     }
 
