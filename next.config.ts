@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Exclude problematic packages from server-side bundling
+  // This prevents Next.js from trying to bundle pino and its dependencies
+  serverExternalPackages: ["pino", "pino-pretty", "thread-stream"],
+  // Turbopack configuration (Next.js 16 uses Turbopack by default)
+  turbopack: {
+    // Empty config to silence the warning
+    // serverExternalPackages should handle excluding pino
+  },
   images: {
     remotePatterns: [
       {
