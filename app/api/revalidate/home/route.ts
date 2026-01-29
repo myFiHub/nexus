@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   try {
     // Revalidate the home page outposts cache tag
-    revalidateTag("home-outposts");
+    revalidateTag("home-outposts", "hours");
 
     return NextResponse.json(
       {
