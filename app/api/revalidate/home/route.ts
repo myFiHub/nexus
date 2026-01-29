@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   try {
-    // Revalidate the trending outposts cache tag
-    revalidateTag("trending-outposts", "hours");
+    // Revalidate the home page outposts cache tag
+    revalidateTag("home-outposts");
 
     return NextResponse.json(
       {
         success: true,
-        message: "Home page trending outposts cache has been revalidated",
-        revalidatedTag: "trending-outposts",
+        message: "Home page outposts cache has been revalidated",
+        revalidatedTag: "home-outposts",
       },
       { status: 200 }
     );

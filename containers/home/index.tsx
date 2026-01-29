@@ -4,40 +4,37 @@ import {
   RecentlyJoinedUser,
   Statistics,
 } from "app/services/api/types";
+import { EventsStrip } from "./EventsStrip";
 import { FeaturesSection } from "./FeaturesSection";
 import { HeroSection } from "./HeroSection";
 import { HowItWorksSection } from "./HowItWorksSection";
-import { LiveOutpostsBanner } from "./LiveOutpostsBanner";
-import { TrendingSection } from "./TrendingSection";
 
 export const HomeContainer = ({
-  trendingOutposts,
-  liveNowOutposts,
+  featuredEvents,
   statistics,
   recentUsers,
 }: {
-  trendingOutposts: OutpostModel[];
-  liveNowOutposts: OutpostModel[];
+  featuredEvents: OutpostModel[];
   statistics?: Statistics;
   recentUsers: RecentlyJoinedUser[];
 }) => {
+  const hasEventsStrip = featuredEvents.length > 0;
+
   return (
     <div className="flex flex-col items-center w-full min-h-screen">
       <RouteLoaderCleaner />
       <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        {liveNowOutposts.length > 0 && (
-          <div className="pt-24 pb-8">
-            <LiveOutpostsBanner liveOutposts={liveNowOutposts} />
+        {/* Events strip: first content below header, visible without scrolling */}
+        {hasEventsStrip && (
+          <div className="pt-16 pb-4">
+            <EventsStrip featuredEvents={featuredEvents} />
           </div>
         )}
-        <div className={liveNowOutposts.length > 0 ? "pb-16" : "pt-24 pb-16"}>
+        <div className={hasEventsStrip ? "pb-10" : "pt-24 pb-16"}>
           <HeroSection statistics={statistics} recentUsers={recentUsers} />
         </div>
         <div className="py-20">
           <FeaturesSection />
-        </div>
-        <div className="py-20">
-          <TrendingSection trendingOutposts={trendingOutposts} />
         </div>
         <div className="py-20">
           <HowItWorksSection />

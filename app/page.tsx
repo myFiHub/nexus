@@ -1,3 +1,4 @@
+import { sortFeaturedOutposts } from "app/lib/outposts";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { HomeContainer } from "../containers/home";
@@ -6,8 +7,8 @@ import { generateMetadata } from "./_metadata";
 // Export the metadata function
 export { generateMetadata };
 
-// Cache the trending outposts data with ISR
-const getCachedTrendingOutposts = unstable_cache(
+// Cache outposts for home page (ISR); used to derive featured events.
+const getCachedOutposts = unstable_cache(
   async () => {
     const results = await podiumApi.getOutposts(0, 20);
     if (results instanceof Error) {
@@ -15,10 +16,10 @@ const getCachedTrendingOutposts = unstable_cache(
     }
     return results;
   },
-  ["trending-outposts"],
+  ["home-outposts"],
   {
     revalidate: 60, // Revalidate every 60 seconds
-    tags: ["trending-outposts"],
+    tags: ["home-outposts"],
   }
 );
 
@@ -45,17 +46,16 @@ const getCachedRecentUsers = unstable_cache(
 
 export default async function Home() {
   const [outposts, statistics, recentUsers] = await Promise.all([
-    getCachedTrendingOutposts(),
+    getCachedOutposts(),
     getCachedStatistics(),
     getCachedRecentUsers(),
   ]);
 
+  const featuredEvents = sortFeaturedOutposts(outposts);
+
   return (
     <HomeContainer
-      liveNowOutposts={outposts.filter(
-        (outpost) => (outpost.online_users_count || 0) > 0
-      )}
-      trendingOutposts={outposts.splice(0, 3)}
+      featuredEvents={featuredEvents}
       statistics={statistics}
       recentUsers={recentUsers}
     />

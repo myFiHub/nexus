@@ -4,6 +4,11 @@ import dynamic from "next/dynamic";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useConfigureWallet } from "../aptosAdapter/useConfigureWallet";
+import {
+  imagesPathsForWallets,
+  subtitleForExternalWallet,
+  titleForExternalWallet,
+} from "./connectWithRazorButtonConstants";
 
 const ConnectModalLazyLoad = dynamic(
   () => import("@razorlabs/razorkit").then((mod) => mod.ConnectModal),
@@ -12,15 +17,7 @@ const ConnectModalLazyLoad = dynamic(
   }
 );
 
-export const imagesPathsForWallets = [
-  "/external_wallet_icons/nightly.png",
-  "/external_wallet_icons/razor.png",
-  "/external_wallet_icons/okx.svg",
-  "/external_wallet_icons/leap.svg",
-  "/external_wallet_icons/bitget.svg",
-];
-export const titleForExternalWallet = "External Wallet";
-export const subtitleForExternalWallet = "Connect with your external wallet";
+export { imagesPathsForWallets, subtitleForExternalWallet, titleForExternalWallet };
 
 export const ConnectWithRazorButton_InternalUse = ({
   onConnect,
