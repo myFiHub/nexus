@@ -3,14 +3,15 @@ import React from "react";
 interface FeatureCardProps {
   title: string;
   children: React.ReactNode;
-  icon?: string;
+  /** Accessible icon (Lucide or custom SVG); use sr-only label on icon if decorative */
+  icon?: React.ReactNode;
 }
 
 export function FeatureCard({ title, children, icon }: FeatureCardProps) {
   return (
     <div className="bg-[var(--card)] dark:bg-[var(--secondary)] rounded-2xl shadow-lg p-8 border border-[var(--border)] hover:border-[var(--primary)] transition-all duration-200 group relative overflow-hidden">
-      {icon && (
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--primary)] to-purple-600 mb-6 flex items-center justify-center text-white font-bold text-lg shadow-lg">
+      {icon != null && (
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--primary)] to-purple-600 mb-6 flex items-center justify-center text-white shadow-lg [&>svg]:w-6 [&>svg]:h-6">
           {icon}
         </div>
       )}
