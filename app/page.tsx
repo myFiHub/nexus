@@ -1,3 +1,4 @@
+import { getCachedDiscovery } from "app/lib/discovery";
 import { sortFeaturedOutposts } from "app/lib/outposts";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
@@ -42,20 +43,6 @@ const getCachedRecentUsers = unstable_cache(
   },
   ["recent-users"],
   { revalidate: 60, tags: ["recent-users"] }
-);
-
-const getCachedDiscovery = unstable_cache(
-  async () => {
-    const [live, trending24h, trending7d, tags] = await Promise.all([
-      podiumApi.getLiveOutposts(12),
-      podiumApi.getTrendingOutposts("24h", 12),
-      podiumApi.getTrendingOutposts("7d", 12),
-      podiumApi.getPopularTags(16),
-    ]);
-    return { live, trending: { "24h": trending24h, "7d": trending7d }, tags };
-  },
-  ["home-discovery"],
-  { revalidate: 60, tags: ["home-outposts"] }
 );
 
 export default async function Home() {

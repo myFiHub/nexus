@@ -1,5 +1,6 @@
 import { LoadingOutposts } from "app/components/outpost/LoadingOutposts";
 import { AllOutpostsContainer } from "app/containers/allOutposts";
+import { getCachedDiscovery } from "app/lib/discovery";
 import { PAGE_SIZE } from "app/lib/constants";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
@@ -52,10 +53,19 @@ export default async function AllOutpostsPage() {
 }
 
 const InitialOutpostsList = async () => {
-  const outposts = await getCachedOutposts();
+  const [outposts, discovery] = await Promise.all([
+    getCachedOutposts(),
+    getCachedDiscovery(),
+  ]);
 
   if (outposts instanceof Error || !outposts.length) {
-    return <ErrorState />;
+    return (
+      <AllOutpostsContainer
+        initialOutposts={[]}
+        discovery={discovery}
+        listError={<ErrorState />}
+      />
+    );
   }
 
   // Generate structured data for better SEO
@@ -69,7 +79,7 @@ const InitialOutpostsList = async () => {
           __html: JSON.stringify(structuredData),
         }}
       />
-      <AllOutpostsContainer initialOutposts={outposts} />
+      <AllOutpostsContainer initialOutposts={outposts} discovery={discovery} />
     </>
   );
 };

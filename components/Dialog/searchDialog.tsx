@@ -30,6 +30,7 @@ import {
   Users,
   X,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { AppLink } from "../AppLink";
 import { Img } from "../Img";
@@ -85,6 +86,7 @@ export const searchDialog = ({
 };
 
 export const SearchDialogProvider = () => {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
@@ -234,6 +236,14 @@ export const SearchDialogProvider = () => {
               placeholder="Search for users, outposts, or tags..."
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && searchValue.trim().length >= 2) {
+                  router.push(
+                    `${AppPages.search}?q=${encodeURIComponent(searchValue.trim())}`
+                  );
+                  handleClose();
+                }
+              }}
               className="pl-10 pr-10"
             />
             {isSearching && (
@@ -248,6 +258,16 @@ export const SearchDialogProvider = () => {
               </button>
             )}
           </div>
+          {searchValue.trim().length >= 2 && (
+            <AppLink
+              href={`${AppPages.search}?q=${encodeURIComponent(searchValue.trim())}`}
+              onClick={handleClose}
+              underline={false}
+              className="mt-2 h-auto px-0 py-0 text-sm font-semibold text-primary hover:opacity-80"
+            >
+              See all results for “{searchValue.trim()}” →
+            </AppLink>
+          )}
         </div>
 
         {/* Tabs */}

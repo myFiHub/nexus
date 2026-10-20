@@ -97,16 +97,22 @@ const Trending = ({
   );
 };
 
-export const PopularTags = ({ tags }: { tags: PopularTag[] }) => {
+export const PopularTags = ({
+  tags,
+  title = "Browse by topic",
+}: {
+  tags: PopularTag[];
+  title?: string;
+}) => {
   if (tags.length === 0) return null;
   return (
     <section>
-      <SectionHeader title="Browse by topic" />
+      <SectionHeader title={title} />
       <div className="flex flex-wrap gap-2">
         {tags.map((tag, i) => (
           <Link
             key={tag.id}
-            href={AppPages.tag(tag.id)}
+            href={`${AppPages.tag(tag.id)}?name=${encodeURIComponent(tag.name)}`}
             className="animate-entrance press inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/70 px-3 py-1.5 text-sm font-medium text-foreground backdrop-blur hover:border-primary/60 hover:text-primary"
             style={{ "--i": Math.min(i, 6) } as React.CSSProperties}
           >
