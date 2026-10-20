@@ -7,7 +7,7 @@ import {
 } from "@web3auth/modal";
 import { Web3AuthContextConfig } from "@web3auth/modal/react";
 import { promptNotifications } from "app/components/Dialog";
-import { CookieKeys, deleteClientCookie } from "app/lib/client-cookies";
+import { CookieKeys } from "app/lib/client-cookies";
 import { deleteServerCookieViaAPI } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
@@ -115,7 +115,7 @@ function* initializeWeb3Auth(
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
     toast.error("Failed to initialize the app");
   } finally {
     yield put(globalActions.setInitializingWeb3Auth(false));
@@ -219,9 +219,14 @@ function* getAndSetAccountUsingSocialLogin() {
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
   }
 }
+
+const clearSessionCookies = () => {
+  deleteServerCookieViaAPI(CookieKeys.myUserId).catch(() => {});
+  deleteServerCookieViaAPI(CookieKeys.myMoveAddress).catch(() => {});
+};
 
 function* switchAccount(
   action: ReturnType<typeof globalActions.switchAccount>
@@ -241,16 +246,7 @@ function* logout() {
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
 
   try {
-    // remove token from cookies
-    deleteClientCookie(CookieKeys.token);
-  } catch (error) {
-    if (isDev) {
-      console.error(error);
-    }
-  }
-
-  try {
-    podiumApi.setToken(undefined);
+    podiumApi.clearToken();
   } catch (error) {
     if (isDev) {
       console.error(error);
@@ -264,7 +260,7 @@ function* logout() {
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
 
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
     try {
       yield logoutFromOneSignal();
     } catch (error) {

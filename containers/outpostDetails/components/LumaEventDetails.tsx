@@ -1,5 +1,5 @@
 import { Img } from "../../../components/Img";
-import { lumaApiDirect } from "../../../services/api/luma";
+import { getLumaEvent } from "../../../services/api/luma/server";
 
 interface LumaEventDetailsProps {
   eventId: string;
@@ -7,7 +7,7 @@ interface LumaEventDetailsProps {
 
 export async function LumaEventDetails({ eventId }: LumaEventDetailsProps) {
   try {
-    const eventData = await lumaApiDirect.getEvent(eventId);
+    const eventData = await getLumaEvent(eventId);
 
     if (!eventData) {
       return (
@@ -128,9 +128,6 @@ export async function LumaEventDetails({ eventId }: LumaEventDetailsProps) {
                     <div>
                       <p className="text-sm font-medium text-gray-900 dark:text-white">
                         {host.name}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {host.email}
                       </p>
                     </div>
                   </div>

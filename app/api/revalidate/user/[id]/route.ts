@@ -1,4 +1,5 @@
 import { revalidatePath, revalidateTag } from "next/cache";
+import { isUserKey, rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
 interface RevalidateOptions {
@@ -13,11 +14,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
     const { id } = await params;
 
     // Validate the ID parameter
-    if (!id || typeof id !== "string") {
+    if (!id || typeof id !== "string" || !isUserKey(id)) {
       return NextResponse.json(
         { error: "Invalid user ID provided" },
         { status: 400 }
@@ -25,11 +28,13 @@ export async function POST(
     }
 
     // Parse request body to check for specific revalidation options
-    let options: RevalidateOptions = { all: false };
+    const options: RevalidateOptions = { all: false };
     try {
       const body = await request.json();
       if (body && typeof body === "object") {
-        options = { ...options, ...body };
+        for (const key of ["all", "userData", "passBuyers", "followers", "followings"] as const) {
+          if (typeof body[key] === "boolean") options[key] = body[key];
+        }
       }
     } catch {
       // If no body or invalid JSON, use default options (no revalidation)
@@ -95,12 +100,4 @@ export async function POST(
       { status: 500 }
     );
   }
-}
-
-// Also support GET requests for easier testing
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  return POST(request, { params });
 }

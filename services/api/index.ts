@@ -10,6 +10,7 @@ import {
 } from "app/containers/dashboard/users/configs";
 import {
   CookieKeys,
+  deleteClientCookie,
   getClientCookie,
   setClientCookie,
 } from "app/lib/client-cookies";
@@ -62,12 +63,31 @@ import {
   User,
 } from "./types";
 
+const tokenCookieAttributes = () => ({
+  secure: !isDev,
+  sameSite: "strict" as const,
+  path: "/",
+  domain: isDev
+    ? "localhost"
+    : process.env.NEXT_PUBLIC_WEBSITE_LINK_URL!.replace("https://", ""),
+});
+
 class PodiumApi {
   private readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private token: string | undefined = undefined;
+  /** Called once when an authenticated request comes back 401. */
+  onUnauthorized: (() => void) | undefined = undefined;
+
   setToken(token: string | undefined) {
     this.token = token;
+  }
+
+  /** Forgets the token in memory and in the cookie, including legacy host-only copies. */
+  clearToken() {
+    this.token = undefined;
+    deleteClientCookie(CookieKeys.token, tokenCookieAttributes());
+    deleteClientCookie(CookieKeys.token, { path: "/" });
   }
 
   constructor(baseUrl: string) {
@@ -94,6 +114,20 @@ class PodiumApi {
       }
       return config;
     });
+
+    this.axiosInstance.interceptors.response.use(undefined, (error) => {
+      const sentToken = error?.config?.headers?.Authorization;
+      if (
+        typeof window !== "undefined" &&
+        error?.response?.status === 401 &&
+        sentToken &&
+        sentToken === `Bearer ${this.token}`
+      ) {
+        this.clearToken();
+        this.onUnauthorized?.();
+      }
+      return Promise.reject(error);
+    });
   }
 
   // Auth methods
@@ -113,16 +147,8 @@ class PodiumApi {
 
         if (this.token) {
           setClientCookie(CookieKeys.token, this.token, {
+            ...tokenCookieAttributes(),
             expires: new Date(Date.now() + 6 * 60 * 60 * 1000), // 6 hours from now
-            secure: !isDev,
-            sameSite: "strict",
-            path: "/",
-            domain: isDev
-              ? "localhost"
-              : process.env.NEXT_PUBLIC_WEBSITE_LINK_URL!.replace(
-                  "https://",
-                  ""
-                ),
           });
         }
 

@@ -67,45 +67,23 @@ export interface AddHostModel {
   name?: string;
 }
 
-// Constants
-export const LUMA_BASE_URL = ApiEndpoints.luma; // Proxy URL for client-side
-export const LUMA_DIRECT_URL = "https://api.lu.ma"; // Direct URL for server-side
-
-// Default headers
-const getDefaultHeaders = (useProxy: boolean = true) => {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  // Add API key directly for server-side calls
-  if (!useProxy) {
-    const apiKey = process.env.NEXT_PUBLIC_LUMA_API_KEY;
-    if (apiKey) {
-      headers["x-luma-api-key"] = apiKey;
-    }
-  }
-
-  return headers;
-};
+// Browser calls go through the allowlisted /api/luma proxy, which adds the key server-side.
+export const LUMA_BASE_URL = ApiEndpoints.luma;
 
 export class LumaApi {
   private static instance: LumaApi | undefined = undefined;
   private axiosInstance: AxiosInstance;
-  private useProxy: boolean;
 
-  private constructor(useProxy: boolean = true) {
-    this.useProxy = useProxy;
-    const baseURL = useProxy ? LUMA_BASE_URL : LUMA_DIRECT_URL;
-
+  private constructor() {
     this.axiosInstance = axios.create({
-      baseURL,
-      headers: getDefaultHeaders(useProxy),
+      baseURL: LUMA_BASE_URL,
+      headers: { "Content-Type": "application/json" },
     });
   }
 
-  public static getInstance(useProxy: boolean = true): LumaApi {
-    if (!LumaApi.instance || LumaApi.instance.useProxy !== useProxy) {
-      LumaApi.instance = new LumaApi(useProxy);
+  public static getInstance(): LumaApi {
+    if (!LumaApi.instance) {
+      LumaApi.instance = new LumaApi();
     }
     return LumaApi.instance;
   }
@@ -162,24 +140,6 @@ export class LumaApi {
     } catch (error) {
       console.error("Error getting event:", error);
       return undefined;
-    }
-  }
-
-  /**
-   * Get all guests for an event
-   */
-  async getGuests(eventId: string): Promise<GuestModel[]> {
-    const response = await this.axiosInstance.get(
-      `/public/v1/event/get-guests?event_api_id=${eventId}`
-    );
-
-    if (response.status === 200) {
-      const jsonBody = response.data;
-      const array = jsonBody.entries as any[];
-      const guests = array.map((e) => e as GuestModel);
-      return guests;
-    } else {
-      return [];
     }
   }
 
@@ -248,8 +208,4 @@ export class LumaApi {
   }
 }
 
-// Default export for client-side usage (with proxy)
-export const lumaApi = LumaApi.getInstance(true);
-
-// Export for server-side usage (direct API calls)
-export const lumaApiDirect = LumaApi.getInstance(false);
+export const lumaApi = LumaApi.getInstance();
