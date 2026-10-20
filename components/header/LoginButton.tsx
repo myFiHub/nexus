@@ -1,17 +1,15 @@
 "use client";
 
-import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
+import { CookieKeys, getClientCookie } from "app/lib/client-cookies";
 import { cn, truncate } from "app/lib/utils";
-import { motion } from "framer-motion";
-import { ChevronDown, Crown, Loader2, LogOut, User } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, Crown, Loader2, LogIn, LogOut, User } from "lucide-react";
+import { useSyncExternalStore } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
 import BalanceDisplay from "../BalanceDisplay";
-import { Button } from "../Button";
 import { logoutDialog } from "../Dialog";
 import { Img } from "../Img";
 import { Popover, PopoverContent, PopoverTrigger } from "../Popover";
@@ -19,43 +17,38 @@ import { Popover, PopoverContent, PopoverTrigger } from "../Popover";
 interface LoginButtonProps {
   size?: "sm" | "lg";
   className?: string;
+  /** Kept for call-site compatibility; the header uses the default style. */
   fancy?: boolean;
 }
 
-export const LoginButton = ({ size, className, fancy }: LoginButtonProps) => {
-  return (
-    <>
-      <Content size={size} className={className} fancy={fancy} />
-    </>
-  );
-};
+const noopSubscribe = () => () => {};
 
-const Content = ({ size, className, fancy }: LoginButtonProps) => {
+/** A saved session cookie means the pending state is a session restore, not a fresh login. */
+const useHasSavedSession = () =>
+  useSyncExternalStore(
+    noopSubscribe,
+    () => !!getClientCookie(CookieKeys.myUserId),
+    () => false
+  );
+
+const chipBase =
+  "press inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold transition-[box-shadow,filter,background-color] duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed";
+
+export const LoginButton = ({ size, className }: LoginButtonProps) => {
   const dispatch = useDispatch();
-  const [isMounted, setIsMounted] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const podiumUserInfo = useSelector(GlobalSelectors.podiumUserInfo);
-  const initializingWeb3Auth = useSelector(
-    GlobalSelectors.initializingWeb3Auth
-  );
+  const initializingWeb3Auth = useSelector(GlobalSelectors.initializingWeb3Auth);
   const logingIn = useSelector(GlobalSelectors.logingIn);
   const logingOut = useSelector(GlobalSelectors.logingOut);
   const isPrimary = useSelector(GlobalSelectors.isPrimaryAccount);
   const isMobile = useIsMobile();
-  // Ensure loading is always a boolean to prevent hydration mismatch
+  const hasSavedSession = useHasSavedSession();
   const loading = Boolean(logingIn || logingOut || initializingWeb3Auth);
+  const height = size === "sm" ? "h-8" : "h-10";
 
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-
-  const connect = async () => {
-    if (isMobile) {
-      dispatch(globalActions.socialLogin());
-    } else {
-      dispatch(globalActions.login());
-    }
+  const connect = () => {
+    dispatch(isMobile ? globalActions.socialLogin() : globalActions.login());
   };
 
   const disconnect = async () => {
@@ -65,564 +58,119 @@ const Content = ({ size, className, fancy }: LoginButtonProps) => {
     }
   };
 
-  const minWidth = size === "sm" ? "min-w-[100px]" : "min-w-[162px]";
-
-  // Don't render until mounted to prevent hydration mismatch
-  if (!isMounted) {
+  if (isLoggedIn && podiumUserInfo?.aptos_address) {
     return (
-      <Button disabled={true} size={size} className={cn(className, minWidth)}>
-        <Loader2 className="w-4 h-4 animate-spin" />
-      </Button>
+      <div className="relative">
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              disabled={loading}
+              aria-label="Account menu"
+              className={cn(
+                chipBase,
+                height,
+                "group glass-card !rounded-full pl-1 pr-3 text-foreground hover:bg-surface-raised",
+                className
+              )}
+            >
+              <span className="rounded-full bg-grad-aurora p-[2px]">
+                <span className="block h-7 w-7 overflow-hidden rounded-full bg-surface">
+                  {loading ? (
+                    <Loader2 className="m-1.5 h-4 w-4 animate-spin text-primary" />
+                  ) : (
+                    <Img
+                      src={podiumUserInfo.image || ""}
+                      alt={podiumUserInfo.name ?? podiumUserInfo.aptos_address}
+                      className="h-full w-full object-cover"
+                      useImgTag
+                    />
+                  )}
+                </span>
+              </span>
+              <span className="hidden flex-col items-start leading-tight sm:flex">
+                <span className="max-w-[120px] truncate text-xs font-semibold">
+                  {podiumUserInfo.name || truncate(podiumUserInfo.aptos_address)}
+                </span>
+                <BalanceDisplay className="text-[10px] font-medium text-muted-foreground" />
+              </span>
+              <ChevronDown className="h-4 w-4 text-text-faint transition-transform group-data-[state=open]:rotate-180" />
+            </button>
+          </PopoverTrigger>
+
+          <PopoverContent className="w-60 rounded-[18px] p-1.5" align="end" sideOffset={8}>
+            <div className="border-b border-border px-3 pb-2 pt-1.5">
+              <p className="truncate text-sm font-semibold text-foreground">
+                {podiumUserInfo.name || "User"}
+              </p>
+              <p className="text-xs text-muted-foreground">{podiumUserInfo.login_type}</p>
+              <p className="text-xs text-text-faint tabular-nums">
+                {truncate(podiumUserInfo.aptos_address, 20)}
+              </p>
+            </div>
+            <AppLink
+              href="/profile"
+              underline={false}
+              className="mt-1 flex h-auto w-full items-center justify-start gap-3 rounded-[12px] px-3 py-2 text-sm text-foreground hover:bg-accent"
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </AppLink>
+            <button
+              type="button"
+              onClick={disconnect}
+              className="flex w-full cursor-pointer items-center gap-3 rounded-[12px] px-3 py-2 text-sm text-[var(--p-danger)] hover:bg-[color-mix(in_oklab,var(--p-danger)_12%,transparent)]"
+            >
+              <LogOut className="h-4 w-4" />
+              Log out
+            </button>
+          </PopoverContent>
+        </Popover>
+
+        {!loading && (
+          <span className="pointer-events-none absolute -right-1 -top-1">
+            {isPrimary ? (
+              <Crown
+                className="h-4 w-4 text-[var(--p-warning)]"
+                fill="currentColor"
+                aria-label="Primary account"
+              />
+            ) : (
+              <span className="rounded bg-[var(--p-danger)] px-1 text-[8px] font-bold text-white">
+                Not primary
+              </span>
+            )}
+          </span>
+        )}
+      </div>
     );
   }
 
-  const loginButtonContent = (
-    <Button
-      disabled={loading}
-      size={size}
-      className={cn(
-        className,
-        minWidth,
-        !loading && "relative overflow-hidden"
-      )}
-      onClick={connect}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {fancy && !loading && (
-        <>
-          {/* Rotating light shadow */}
-          <motion.div
-            className="absolute inset-0 opacity-30"
-            style={{
-              background:
-                "conic-gradient(from 0deg, transparent 70%, rgba(255, 255, 255, 0.3), transparent 130%)",
-              borderRadius: "inherit",
-            }}
-            animate={{ rotate: 360 }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-
-          {/* Hover shine effect */}
-          <motion.div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.4) 50%, transparent 75%)",
-              borderRadius: "inherit",
-            }}
-            initial={{ x: "-100%" }}
-            animate={isHovered ? { x: "100%" } : { x: "-100%" }}
-            transition={{
-              duration: 0.6,
-              ease: "easeInOut",
-            }}
-          />
-        </>
-      )}
-
-      {/* Non-fancy button hover shine effect */}
-      {!fancy && !loading && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          style={{ borderRadius: "inherit" }}
-        >
-          <motion.div
-            className="absolute inset-0"
-            style={{
-              background:
-                "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.2) 50%, transparent 75%)",
-            }}
-            initial={{ x: "-100%" }}
-            animate={isHovered ? { x: "100%" } : { x: "-100%" }}
-            transition={{
-              duration: 0.6,
-              ease: "easeInOut",
-            }}
-          />
-        </motion.div>
-      )}
-
-      <span className="relative z-10">
-        {loading ? <Loader className="w-4 h-4 animate-spin" /> : "Login"}
-      </span>
-    </Button>
-  );
-
-  const connectedUserButton = (
-    <PopoverTrigger asChild>
-      <Button
-        disabled={loading}
-        size={size}
-        className={cn(
-          className,
-          minWidth,
-          !loading && "relative overflow-hidden group"
-        )}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        {fancy && !loading && (
-          <>
-            {/* Rotating light shadow */}
-            <motion.div
-              className="absolute inset-0 opacity-30"
-              style={{
-                background:
-                  "conic-gradient(from 0deg, transparent 70%, rgba(255, 255, 255, 0.3), transparent 130%)",
-                borderRadius: "inherit",
-              }}
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-
-            {/* Hover shine effect */}
-            <motion.div
-              className="absolute inset-0 pointer-events-none"
-              style={{
-                background:
-                  "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.4) 50%, transparent 75%)",
-                borderRadius: "inherit",
-              }}
-              initial={{ x: "-100%" }}
-              animate={isHovered ? { x: "100%" } : { x: "-100%" }}
-              transition={{
-                duration: 0.6,
-                ease: "easeInOut",
-              }}
-            />
-          </>
-        )}
-
-        {/* Non-fancy button hover shine effect */}
-        {!fancy && !loading && (
-          <motion.div
-            className="absolute inset-0 pointer-events-none overflow-hidden"
-            style={{ borderRadius: "inherit" }}
-          >
-            <motion.div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.2) 50%, transparent 75%)",
-              }}
-              initial={{ x: "-100%" }}
-              animate={isHovered ? { x: "100%" } : { x: "-100%" }}
-              transition={{
-                duration: 0.6,
-                ease: "easeInOut",
-              }}
-            />
-          </motion.div>
-        )}
-
-        <span className="relative z-10">
-          {loading ? (
-            <Loader className="w-4 h-4 animate-spin" />
-          ) : (
-            <div className="flex  gap-1 flex-col relative">
-              <div className="flex items-center gap-2">
-                <Img
-                  src={podiumUserInfo?.image || ""}
-                  alt={
-                    podiumUserInfo?.name ?? podiumUserInfo?.aptos_address ?? ""
-                  }
-                  className="w-6 h-6 rounded-full"
-                  useImgTag
-                />
-                <span>{truncate(podiumUserInfo?.aptos_address || "")}</span>
-                <ChevronDown className="w-4 h-4 transition-transform group-data-[state=open]:rotate-180" />
-              </div>
-              <div className="text-xs text-white absolute -bottom-[8px] left-8 h-4">
-                <BalanceDisplay className="text-[8px]" />
-              </div>
-            </div>
-          )}
-        </span>
-      </Button>
-    </PopoverTrigger>
-  );
+  const restoring = loading;
+  const label = loading && (hasSavedSession || logingIn) ? "Signing in" : "Log in";
 
   return (
-    <div className="relative">
-      {isLoggedIn && podiumUserInfo?.aptos_address ? (
-        <Popover>
-          {fancy && !loading ? (
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ type: "spring", stiffness: 400, damping: 17 }}
-              className="relative"
-            >
-              {/* Subtle shadow with animated offset - light source orbiting above button */}
-              <motion.div
-                animate={{
-                  boxShadow: [
-                    "3px -3px 12px 2px rgba(59, 130, 246, 0.25), 6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-                    "3px 3px 12px 2px rgba(59, 130, 246, 0.25), 6px 6px 24px 4px rgba(147, 51, 234, 0.15)",
-                    "-3px 3px 12px 2px rgba(59, 130, 246, 0.25), -6px 6px 24px 4px rgba(147, 51, 234, 0.15)",
-                    "-3px -3px 12px 2px rgba(59, 130, 246, 0.25), -6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-                    "3px -3px 12px 2px rgba(59, 130, 246, 0.25), 6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-                  ],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "linear",
-                }}
-                className="absolute inset-0 rounded-xl -z-10"
-              />
-
-              {/* Connected user button with dropdown */}
-              {connectedUserButton}
-
-              {/* Individual orbiting sparkles */}
-              {/* Sparkle 1 */}
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [0.3, 0.8, 0.3],
-                  opacity: [0.1, 0.6, 0.1],
-                }}
-                transition={{
-                  rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                  opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                }}
-                className="absolute top-1/2 left-1/2 pointer-events-none"
-                style={{
-                  transformOrigin: "0 -28px",
-                }}
-              >
-                <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-              </motion.div>
-
-              {/* Sparkle 2 */}
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [0.3, 0.8, 0.3],
-                  opacity: [0.1, 0.6, 0.1],
-                }}
-                transition={{
-                  rotate: {
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: 2,
-                  },
-                  scale: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 0.5,
-                  },
-                  opacity: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 0.5,
-                  },
-                }}
-                className="absolute top-1/2 left-1/2 pointer-events-none"
-                style={{
-                  transformOrigin: "28px 0",
-                }}
-              >
-                <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-              </motion.div>
-
-              {/* Sparkle 3 */}
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [0.3, 0.8, 0.3],
-                  opacity: [0.1, 0.6, 0.1],
-                }}
-                transition={{
-                  rotate: {
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: 4,
-                  },
-                  scale: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1,
-                  },
-                  opacity: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1,
-                  },
-                }}
-                className="absolute top-1/2 left-1/2 pointer-events-none"
-                style={{
-                  transformOrigin: "0 28px",
-                }}
-              >
-                <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-              </motion.div>
-
-              {/* Sparkle 4 */}
-              <motion.div
-                animate={{
-                  rotate: [0, 360],
-                  scale: [0.3, 0.8, 0.3],
-                  opacity: [0.1, 0.6, 0.1],
-                }}
-                transition={{
-                  rotate: {
-                    duration: 8,
-                    repeat: Infinity,
-                    ease: "linear",
-                    delay: 6,
-                  },
-                  scale: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.5,
-                  },
-                  opacity: {
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: 1.5,
-                  },
-                }}
-                className="absolute top-1/2 left-1/2 pointer-events-none"
-                style={{
-                  transformOrigin: "-28px 0",
-                }}
-              >
-                <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-              </motion.div>
-            </motion.div>
-          ) : (
-            connectedUserButton
-          )}
-
-          <PopoverContent
-            className="w-56 p-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-slate-700/50 shadow-2xl"
-            align="end"
-            sideOffset={8}
-          >
-            <div className="p-2 space-y-1">
-              <div className="px-3 py-2 border-b border-slate-700/50">
-                <p className="text-sm font-medium text-slate-200">
-                  {podiumUserInfo?.name || "User"}
-                </p>
-                <p className="text-xs text-slate-400 mb-1">
-                  {podiumUserInfo?.login_type}
-                </p>
-                <p className="text-xs text-slate-400">
-                  {truncate(podiumUserInfo?.aptos_address || "", 20)}
-                </p>
-              </div>
-
-              <AppLink
-                href="/profile"
-                underline={false}
-                className="flex items-center gap-3 w-full px-3 py-2 text-sm text-slate-200 hover:bg-slate-700/50 rounded-md transition-colors justify-start"
-              >
-                <User className="w-4 h-4" />
-                Profile
-              </AppLink>
-
-              <button
-                onClick={disconnect}
-                className="flex items-center gap-3 w-full px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 rounded-md transition-colors cursor-pointer"
-              >
-                <LogOut className="w-4 h-4" />
-                Logout
-              </button>
-            </div>
-          </PopoverContent>
-        </Popover>
-      ) : /* Login button for non-authenticated users */
-      fancy && !loading ? (
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-          className="relative"
-        >
-          {/* Subtle shadow with animated offset - light source orbiting above button */}
-          <motion.div
-            animate={{
-              boxShadow: [
-                "3px -3px 12px 2px rgba(59, 130, 246, 0.25), 6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-                "3px 3px 12px 2px rgba(59, 130, 246, 0.25), 6px 6px 24px 4px rgba(147, 51, 234, 0.15)",
-                "-3px 3px 12px 2px rgba(59, 130, 246, 0.25), -6px 6px 24px 4px rgba(147, 51, 234, 0.15)",
-                "-3px -3px 12px 2px rgba(59, 130, 246, 0.25), -6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-                "3px -3px 12px 2px rgba(59, 130, 246, 0.25), 6px -6px 24px 4px rgba(147, 51, 234, 0.15)",
-              ],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-            className="absolute inset-0 rounded-xl -z-10"
-          />
-
-          {/* Static button - no rotation! */}
-          {loginButtonContent}
-
-          {/* Individual orbiting sparkles */}
-          {/* Sparkle 1 */}
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [0.3, 0.8, 0.3],
-              opacity: [0.1, 0.6, 0.1],
-            }}
-            transition={{
-              rotate: { duration: 8, repeat: Infinity, ease: "linear" },
-              scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-              opacity: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-            }}
-            className="absolute top-1/2 left-1/2 pointer-events-none"
-            style={{
-              transformOrigin: "0 -28px",
-            }}
-          >
-            <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-          </motion.div>
-
-          {/* Sparkle 2 */}
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [0.3, 0.8, 0.3],
-              opacity: [0.1, 0.6, 0.1],
-            }}
-            transition={{
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-                delay: 2,
-              },
-              scale: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5,
-              },
-              opacity: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 0.5,
-              },
-            }}
-            className="absolute top-1/2 left-1/2 pointer-events-none"
-            style={{
-              transformOrigin: "28px 0",
-            }}
-          >
-            <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-          </motion.div>
-
-          {/* Sparkle 3 */}
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [0.3, 0.8, 0.3],
-              opacity: [0.1, 0.6, 0.1],
-            }}
-            transition={{
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-                delay: 4,
-              },
-              scale: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1,
-              },
-              opacity: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1,
-              },
-            }}
-            className="absolute top-1/2 left-1/2 pointer-events-none"
-            style={{
-              transformOrigin: "0 28px",
-            }}
-          >
-            <div className="w-0.5 h-0.5 bg-blue-300/80 rounded-full" />
-          </motion.div>
-
-          {/* Sparkle 4 */}
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [0.3, 0.8, 0.3],
-              opacity: [0.1, 0.6, 0.1],
-            }}
-            transition={{
-              rotate: {
-                duration: 8,
-                repeat: Infinity,
-                ease: "linear",
-                delay: 6,
-              },
-              scale: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1.5,
-              },
-              opacity: {
-                duration: 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: 1.5,
-              },
-            }}
-            className="absolute top-1/2 left-1/2 pointer-events-none"
-            style={{
-              transformOrigin: "-28px 0",
-            }}
-          >
-            <div className="w-0.5 h-0.5 bg-purple-300/80 rounded-full" />
-          </motion.div>
-        </motion.div>
+    <button
+      type="button"
+      onClick={connect}
+      disabled={restoring}
+      aria-busy={restoring}
+      className={cn(
+        chipBase,
+        height,
+        "px-4",
+        restoring
+          ? "glass-card !rounded-full text-muted-foreground"
+          : "btn-aurora !rounded-full hover:shadow-[0_8px_28px_-8px_color-mix(in_oklab,var(--p-accent)_70%,transparent)]",
+        className
+      )}
+    >
+      {restoring ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
       ) : (
-        loginButtonContent
+        <LogIn className="h-4 w-4" />
       )}
-
-      {/* Primary account indicator */}
-      {isLoggedIn && !loading && (
-        <div className="absolute -top-1 -right-1">
-          {isPrimary ? (
-            <Crown className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-          ) : (
-            <div className="bg-red-500 text-white text-[6px] px-0.5 py-0.5 rounded text-center min-w-[55px]">
-              Not Primary
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      {label}
+    </button>
   );
 };
