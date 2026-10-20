@@ -2,7 +2,7 @@
 
 import { Img } from "app/components/Img";
 import { usersSelectors } from "app/containers/_users/selectors";
-import { usersActions, useUsersSlice } from "app/containers/_users/slice";
+import { usersActions, injectUsersSlice } from "app/containers/_users/slice";
 import { useClock } from "app/lib/clock";
 import { logoUrl } from "app/lib/constants";
 import { agoLabel } from "app/lib/format";
@@ -28,7 +28,7 @@ const Ago = ({ seconds }: { seconds: number }) => {
 };
 
 const FollowBack = ({ uuid }: { uuid: string }) => {
-  useUsersSlice();
+  injectUsersSlice();
   const dispatch = useDispatch();
   const followed = useSelector(usersSelectors.isFollowedFromCache(uuid));
   if (followed) {

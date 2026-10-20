@@ -2,7 +2,7 @@
 
 import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Joyride, { CallBackProps, STATUS } from "react-joyride";
 import { useSelector } from "react-redux";
 
@@ -11,6 +11,15 @@ import { buildJoyrideStyles } from "../../tutorial/joyrideStyles";
 import { useJoyrideTheme } from "../../tutorial/useJoyrideTheme";
 
 export const PROFILE_TUTORIAL_LOCAL_STORAGE_KEY = "profile_tutorial_shown";
+
+const noopSubscribe = () => () => {};
+const readTutorialShown = () => {
+  try {
+    return window.localStorage.getItem(PROFILE_TUTORIAL_LOCAL_STORAGE_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
 
 export const ProfileTutorialIds = {
   header: "profile-header",
@@ -32,7 +41,9 @@ type ProfileTutorialProps = {
 export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
   const user = useSelector(GlobalSelectors.podiumUserInfo);
   const isExternalWallet = isExternalWalletLoginMethod(user?.login_type ?? "");
-  const [run, setRun] = useState(false);
+  const shownBefore = useSyncExternalStore(noopSubscribe, readTutorialShown, () => true);
+  const [dismissed, setDismissed] = useState(false);
+  const run = enabled && !shownBefore && !dismissed;
   const theme = useJoyrideTheme();
 
   const steps: Step[] = [
@@ -85,20 +96,6 @@ export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
       : []),
   ];
 
-  useEffect(() => {
-    if (!enabled) return;
-    try {
-      const hasShown =
-        typeof window !== "undefined" &&
-        window.localStorage.getItem(PROFILE_TUTORIAL_LOCAL_STORAGE_KEY) === "1";
-      if (!hasShown) {
-        setRun(true);
-      }
-    } catch {
-      setRun(true);
-    }
-  }, [enabled]);
-
   // theme resolved via useJoyrideTheme
 
   const handleCallback = (data: CallBackProps) => {
@@ -109,11 +106,9 @@ export const ProfileTutorial = ({ enabled = true }: ProfileTutorialProps) => {
       status === STATUS.PAUSED;
     if (finished) {
       try {
-        if (typeof window !== "undefined") {
-          window.localStorage.setItem(PROFILE_TUTORIAL_LOCAL_STORAGE_KEY, "1");
-        }
+        window.localStorage.setItem(PROFILE_TUTORIAL_LOCAL_STORAGE_KEY, "1");
       } catch {}
-      setRun(false);
+      setDismissed(true);
     }
   };
 

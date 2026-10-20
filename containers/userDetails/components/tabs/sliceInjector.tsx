@@ -1,8 +1,8 @@
 "use client";
-import { useUserDetailsSlice } from "../../slice";
-import { useUsersSlice } from "app/containers/_users/slice";
+import { injectUserDetailsSlice } from "../../slice";
+import { injectUsersSlice } from "app/containers/_users/slice";
 export const UserDetailsSliceInjector = () => {
-  useUserDetailsSlice();
-  useUsersSlice();
+  injectUserDetailsSlice();
+  injectUsersSlice();
   return <></>;
 };

@@ -8,7 +8,7 @@ import { User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { assetsActions, useAssetsSlice } from "../../../_assets/slice";
+import { assetsActions, injectAssetsSlice } from "../../../_assets/slice";
 import { GlobalSelectors } from "../../../global/selectors";
 import { ButtonContent } from "./ButtonContent";
 import { PulsingShadow } from "./PulsingShadow";
@@ -16,7 +16,7 @@ import { ShimmerEffect } from "./ShimmerEffect";
 import { Sparkles } from "./Sparkles";
 
 const Content = ({ user }: { user: User }) => {
-  useAssetsSlice();
+  injectAssetsSlice();
   const dispatch = useDispatch();
   const loggedIn = useSelector(GlobalSelectors.isLoggedIn);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
@@ -59,7 +59,7 @@ const Content = ({ user }: { user: User }) => {
           })
         );
       }
-      let [price, sellPrice] = await Promise.all(callArray);
+      const [price, sellPrice] = await Promise.all(callArray);
       const sellPriceInMove = sellPrice
         ? bigIntCoinToMoveOnAptos(sellPrice)
         : 0;

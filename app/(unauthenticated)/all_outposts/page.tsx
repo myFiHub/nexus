@@ -25,31 +25,24 @@ const getCachedOutposts = unstable_cache(
   }
 );
 
-export default async function AllOutpostsPage() {
-  try {
-    return (
-      <Suspense
-        fallback={
-          <div className="container mx-auto px-4 py-8">
-            <h1 className="text-4xl font-bold mb-8 text-center">
-              All Outposts
-            </h1>
-            <LoadingOutposts
-              count={9}
-              loadingText="Loading outposts..."
-              showLoadingIndicator={true}
-              loadingIndicatorPosition="bottom"
-            />
-          </div>
-        }
-      >
-        <InitialOutpostsList />
-      </Suspense>
-    );
-  } catch (error) {
-    console.error("Error loading outposts:", error);
-    return <ErrorState />;
-  }
+export default function AllOutpostsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="container mx-auto px-4 py-8">
+          <h1 className="text-4xl font-bold mb-8 text-center">All Outposts</h1>
+          <LoadingOutposts
+            count={9}
+            loadingText="Loading outposts..."
+            showLoadingIndicator={true}
+            loadingIndicatorPosition="bottom"
+          />
+        </div>
+      }
+    >
+      <InitialOutpostsList />
+    </Suspense>
+  );
 }
 
 const InitialOutpostsList = async () => {

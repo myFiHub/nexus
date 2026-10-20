@@ -33,7 +33,7 @@ export const {
   actions: outpostDetailsActions,
 } = outpostDetailsSlice;
 
-export const useOutpostDetailsSlice = () => {
+export const injectOutpostDetailsSlice = () => {
   injectContainer({
     name: outpostDetailsSlice.name,
     reducer: outpostDetailsSlice.reducer,

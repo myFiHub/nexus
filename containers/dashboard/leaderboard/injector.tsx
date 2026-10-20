@@ -4,11 +4,11 @@ import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboar
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { leaderboardActions, useLeaderboardSlice } from "./slice";
+import { leaderboardActions, injectLeaderboardSlice } from "./slice";
 
 const Content = () => {
   const dispatch = useDispatch();
-  useLeaderboardSlice();
+  injectLeaderboardSlice();
 
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
 

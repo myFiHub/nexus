@@ -170,7 +170,7 @@ export const {
   actions: externalWalletActions,
 } = externalWalletSlice;
 
-export const useExternalWalletSlice = () => {
+export const injectExternalWalletSlice = () => {
   // Lazy import to avoid circular dependency
   injectContainer({
     name: externalWalletSlice.name,

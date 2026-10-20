@@ -3,7 +3,7 @@ import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
-import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { injectOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
@@ -27,7 +27,7 @@ const JoinButtonContent = ({
   fromCard,
   joinComponent,
 }: JoinButtonProps) => {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   // const logingIn = useSelector(GlobalSelectors.logingIn);

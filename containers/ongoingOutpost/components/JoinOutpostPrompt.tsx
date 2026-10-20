@@ -4,7 +4,7 @@ import { LoginButton } from "app/components/header/LoginButton";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
-import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { injectOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
@@ -18,7 +18,7 @@ interface JoinOutpostPromptProps {
 }
 
 const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const scheduledFor = outpost?.scheduled_for ?? 0;
   const displayText = useClock((now) =>
     now === null

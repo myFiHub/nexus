@@ -242,7 +242,7 @@ export const {
   actions: createOutpostActions,
 } = createOutpostSlice;
 
-export const useCreateOutpostSlice = () => {
+export const injectCreateOutpostSlice = () => {
   injectContainer({
     name: createOutpostSlice.name,
     reducer: createOutpostSlice.reducer,

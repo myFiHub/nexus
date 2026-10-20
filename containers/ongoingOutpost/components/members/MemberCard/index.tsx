@@ -16,8 +16,8 @@ interface MemberCardProps {
 
 export const MemberCard = ({ address }: MemberCardProps) => {
   const member = useSelector(onGoingOutpostSelectors.member(address));
-  if (!member) return null;
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+  if (!member) return null;
   const isCurrentUser = address === myUser?.address;
 
   return (

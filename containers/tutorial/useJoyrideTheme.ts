@@ -1,7 +1,8 @@
 "use client";
 
 import { useTheme } from "app/lib/useTheme";
-import { useEffect, useState } from "react";
+import { useHydrated } from "app/hooks/use-hydrated";
+import { useMemo } from "react";
 
 export type JoyrideTheme = {
   primary: string;
@@ -23,38 +24,32 @@ const defaultTheme: JoyrideTheme = {
   overlay: "rgba(0,0,0,0.4)",
 };
 
-export function useJoyrideTheme(): JoyrideTheme {
-  const [theme, setTheme] = useState<JoyrideTheme>(defaultTheme);
-  const themeId = useTheme();
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const root = document.documentElement;
-      const css = getComputedStyle(root);
-      const isDark = root.classList.contains("dark");
-      const primary = css.getPropertyValue("--primary").trim() || theme.primary;
-      const foreground =
-        css.getPropertyValue("--foreground").trim() || theme.foreground;
-      const muted =
-        css.getPropertyValue("--muted-foreground").trim() ||
-        theme.foregroundMuted;
-      const card = css.getPropertyValue("--card").trim() || theme.card;
-      const border = css.getPropertyValue("--border").trim() || theme.border;
-      const radius = css.getPropertyValue("--radius").trim() || theme.radius;
-      setTheme({
-        primary,
-        foreground,
-        foregroundMuted: muted,
-        card,
-        border,
-        radius,
-        overlay: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.4)",
-      });
-    } catch {}
-  }, [themeId]);
-
-  return theme;
+function readJoyrideTheme(): JoyrideTheme {
+  try {
+    const root = document.documentElement;
+    const css = getComputedStyle(root);
+    const read = (name: string, fallback: string) =>
+      css.getPropertyValue(name).trim() || fallback;
+    return {
+      primary: read("--primary", defaultTheme.primary),
+      foreground: read("--foreground", defaultTheme.foreground),
+      foregroundMuted: read("--muted-foreground", defaultTheme.foregroundMuted),
+      card: read("--card", defaultTheme.card),
+      border: read("--border", defaultTheme.border),
+      radius: read("--radius", defaultTheme.radius),
+      overlay: root.classList.contains("dark") ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.4)",
+    };
+  } catch {
+    return defaultTheme;
+  }
 }
 
-
+/** Joyride colors read from the active theme's CSS variables. */
+export function useJoyrideTheme(): JoyrideTheme {
+  const themeId = useTheme();
+  const hydrated = useHydrated();
+  return useMemo(
+    () => (hydrated && themeId ? readJoyrideTheme() : defaultTheme),
+    [hydrated, themeId]
+  );
+}

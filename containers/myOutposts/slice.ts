@@ -76,7 +76,7 @@ export const {
   actions: myOutpostsActions,
 } = myOutpostsSlice;
 
-export const useMyOutpostsSlice = () => {
+export const injectMyOutpostsSlice = () => {
   injectContainer({
     name: myOutpostsSlice.name,
     reducer: myOutpostsSlice.reducer,

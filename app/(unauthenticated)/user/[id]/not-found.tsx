@@ -1,17 +1,18 @@
-import Link from "next/link";
+import { AppLink } from "app/components/AppLink";
+import { primaryActionClass, StatusPage } from "app/components/aurora/StatusPage";
+import { UserX } from "lucide-react";
 
-export default function NotFound() {
+export default function UserNotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">User Not Found</h2>
-        <p className="text-gray-600 mb-4">
-          The user you are looking for does not exist or has been removed.
-        </p>
-        <Link href="/" className="text-blue-500 hover:text-blue-600 underline">
-          Return Home
-        </Link>
-      </div>
-    </div>
+    <StatusPage
+      icon={<UserX className="h-6 w-6" />}
+      tone="magenta"
+      title="User not found"
+      message="The person you are looking for does not exist or has removed their account."
+    >
+      <AppLink href="/" className={primaryActionClass}>
+        Go home
+      </AppLink>
+    </StatusPage>
   );
 }

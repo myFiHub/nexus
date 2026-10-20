@@ -6,10 +6,10 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useExternalWalletSlice } from "../_externalWallets/slice";
-import { useNotificationsSlice } from "../notifications/slice";
+import { injectExternalWalletSlice } from "../_externalWallets/slice";
+import { injectNotificationsSlice } from "../notifications/slice";
 import { GlobalSelectors } from "./selectors";
-import { globalActions, useGlobalSlice } from "./slice";
+import { globalActions, injectGlobalSlice } from "./slice";
 
 const GlobalUi = dynamic(() => import("./GlobalUi"), { ssr: false });
 
@@ -17,9 +17,9 @@ const Container = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const initialized = useSelector(GlobalSelectors.initialized);
-  useGlobalSlice();
-  useNotificationsSlice();
-  useExternalWalletSlice();
+  injectGlobalSlice();
+  injectNotificationsSlice();
+  injectExternalWalletSlice();
 
   useEffect(() => {
     dispatch(globalActions.getMovePrice());

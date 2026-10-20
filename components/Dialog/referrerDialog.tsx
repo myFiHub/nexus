@@ -35,7 +35,6 @@ const UUID_REGEX =
 export const ReferrerDialogProvider = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
     const handleShowDialog = () => {
@@ -48,9 +47,7 @@ export const ReferrerDialogProvider = () => {
     };
   }, []);
 
-  useEffect(() => {
-    setIsValid(UUID_REGEX.test(inputValue.trim()));
-  }, [inputValue]);
+  const isValid = UUID_REGEX.test(inputValue.trim());
 
   const handleConfirm = () => {
     if (!isValid) return;

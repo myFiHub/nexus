@@ -3,10 +3,10 @@ import {
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
 import { detached_checkPass } from "app/containers/_assets/saga";
-import { useAssetsSlice } from "app/containers/_assets/slice";
+import { injectAssetsSlice } from "app/containers/_assets/slice";
 import {
   onGoingOutpostActions,
-  useOnGoingOutpostSlice,
+  injectOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
 import { banNotice, isBanActive } from "app/lib/outpostBans";
 import { toast } from "app/lib/toast";
@@ -33,7 +33,7 @@ const FreeOutpostAccessTypes = {
 export function* joinOutpost(
   action: ReturnType<typeof globalActions.joinOutpost>
 ) {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const joiningId: string | undefined = yield select(
     GlobalSelectors.joiningOutpostId
   );
@@ -151,7 +151,7 @@ function* getOutpostAccesses({
   ////////////////////////////////////////////////////
 
   if (accessIsBuyableByTicket(outpost) || speakIsBuyableByTicket(outpost)) {
-    useAssetsSlice();
+    injectAssetsSlice();
     const accesses: OutpostAccesses | undefined = yield detached_checkPass({
       outpost,
     });
@@ -222,7 +222,7 @@ function* openOutpost({
   outpost: OutpostModel;
   accesses: OutpostAccesses;
 }) {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const outpost = { ...receivedOutpost };
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);

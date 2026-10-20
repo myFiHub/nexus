@@ -54,8 +54,8 @@ export const NFTEmptyState = () => {
             variants={sparkleVariants}
             className="absolute"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${(i * 37 + 11) % 100}%`,
+              top: `${(i * 53 + 17) % 100}%`,
               animationDelay: `${i * 0.5}s`,
             }}
           >

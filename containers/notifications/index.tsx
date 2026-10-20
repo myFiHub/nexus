@@ -14,10 +14,10 @@ import { GlobalSelectors } from "../global/selectors";
 import { notificationsEventBus } from "./eventBus";
 import { NotificationItem } from "./NotificationItem";
 import { notificationsSelectors } from "./selectors";
-import { notificationsActions, useNotificationsSlice } from "./slice";
+import { notificationsActions, injectNotificationsSlice } from "./slice";
 
 const NotificationsContent = ({ onNavigate }: { onNavigate?: () => void }) => {
-  useNotificationsSlice();
+  injectNotificationsSlice();
   const dispatch = useDispatch();
   const notifications = useSelector(notificationsSelectors.notifications);
   const isLoading = useSelector(notificationsSelectors.isLoadingNotifications);

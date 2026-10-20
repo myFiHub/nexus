@@ -64,3 +64,5 @@ export const OngoingOutpostMembers = memo(
 
   () => true
 );
+
+OngoingOutpostMembers.displayName = "OngoingOutpostMembers";

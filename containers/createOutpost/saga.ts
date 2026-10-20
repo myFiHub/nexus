@@ -26,7 +26,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { all, delay, put, select, takeLatest } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
 import { GlobalSelectors } from "../global/selectors";
-import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
+import { myOutpostsActions, injectMyOutpostsSlice } from "../myOutposts/slice";
 import { createOutpostSelectors } from "./selectors";
 import { createOutpostActions } from "./slice";
 function* validateFields(
@@ -277,7 +277,7 @@ function* createOutpost(
         outpostId: outpost.uuid,
         allOutposts: true,
       });
-      useMyOutpostsSlice();
+      injectMyOutpostsSlice();
       yield put(myOutpostsActions.getOutposts());
     } catch (error) {
       console.error("Failed to revalidate pages:", error);

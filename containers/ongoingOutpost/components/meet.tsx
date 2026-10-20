@@ -196,3 +196,5 @@ export const Meet = memo(
   },
   () => true
 );
+
+Meet.displayName = "Meet";

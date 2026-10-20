@@ -5,28 +5,28 @@ import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { cn } from "app/lib/utils";
 import { motion, useAnimation } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useHydrated } from "app/hooks/use-hydrated";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { SidebarContent } from "./SidebarContent";
 import { TriggerButton } from "./TriggerButton";
 
+const MOBILE_MENU_CLICKED_KEY = "mobile-menu-clicked";
+const noopSubscribe = () => () => {};
+
 const Content = () => {
   const dispatch = useDispatch();
   const isMobile = useIsMobile();
-  const [hasBeenClicked, setHasBeenClicked] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
+  const clickedBefore = useSyncExternalStore(
+    noopSubscribe,
+    () => localStorage.getItem(MOBILE_MENU_CLICKED_KEY) === "true",
+    () => false
+  );
+  const [clickedNow, setClickedNow] = useState(false);
+  const hasBeenClicked = clickedBefore || clickedNow;
+  const isVisible = useHydrated();
   const triggerControls = useAnimation();
   const isOpen = useSelector(GlobalSelectors.isSidebarOpen);
-  // Check localStorage for previous mobile menu interaction
-  useEffect(() => {
-    if (isMobile && typeof window !== "undefined") {
-      const mobileMenuClicked = localStorage.getItem("mobile-menu-clicked");
-      if (mobileMenuClicked === "true") {
-        setHasBeenClicked(true);
-      }
-    }
-  }, [isMobile]);
-
   // Update CSS custom property for content pushing
   useEffect(() => {
     const root = document.documentElement;
@@ -35,7 +35,6 @@ const Content = () => {
     } else {
       root.style.setProperty("--sidebar-width", isOpen ? "260px" : "70px");
     }
-    setIsVisible(true);
   }, [isOpen, isMobile]);
 
   // Trigger button pulse animation
@@ -58,10 +57,8 @@ const Content = () => {
     dispatch(globalActions.setIsSidebarOpen(!isOpen));
     // Mark as clicked on first mobile interaction and save to localStorage
     if (isMobile && !hasBeenClicked) {
-      setHasBeenClicked(true);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("mobile-menu-clicked", "true");
-      }
+      setClickedNow(true);
+      localStorage.setItem(MOBILE_MENU_CLICKED_KEY, "true");
     }
   };
   if (!isVisible) return null;

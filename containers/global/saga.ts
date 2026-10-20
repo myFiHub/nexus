@@ -31,7 +31,7 @@ import {
 import { detached_checkPass } from "../_assets/saga";
 import { externalWalletsSelectors } from "../_externalWallets/selectors";
 import { disconnectType } from "../_externalWallets/slice";
-import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
+import { myOutpostsActions, injectMyOutpostsSlice } from "../myOutposts/slice";
 
 import { joinOutpost } from "./effects/joinOutpost";
 import { detached_afterConnect } from "./effects/login/after_connect";
@@ -309,7 +309,7 @@ function* checkIfIHavePass(
 function* setViewArchivedOutposts(
   action: ReturnType<typeof globalActions.setViewArchivedOutposts>
 ) {
-  useMyOutpostsSlice();
+  injectMyOutpostsSlice();
   yield put(myOutpostsActions.getOutposts());
 }
 

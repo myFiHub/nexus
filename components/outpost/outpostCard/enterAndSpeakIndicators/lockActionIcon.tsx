@@ -5,7 +5,7 @@ import { globalActions } from "app/containers/global/slice";
 import { toast } from "app/lib/toast";
 import { OutpostModel } from "app/services/api/types";
 import { Lock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useHydrated } from "app/hooks/use-hydrated";
 import { useDispatch, useSelector } from "react-redux";
 import { BuyableTicketTypes } from "../../types";
 
@@ -16,12 +16,9 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
     GlobalSelectors.checkingOutpostForPass
   );
   const loggingIn = useSelector(GlobalSelectors.logingIn);
-  const [isClient, setIsClient] = useState(false);
+  const isClient = useHydrated();
 
   // Ensure consistent rendering between server and client
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const loading = checkingOutpostForPass?.uuid === outpost.uuid;
   const buyable =

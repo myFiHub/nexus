@@ -158,7 +158,7 @@ export const {
   actions: notificationsActions,
 } = notificationsSlice;
 
-export const useNotificationsSlice = () => {
+export const injectNotificationsSlice = () => {
   injectContainer({
     name: notificationsSlice.name,
     reducer: notificationsSlice.reducer,

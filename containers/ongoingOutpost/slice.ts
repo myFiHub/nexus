@@ -212,7 +212,7 @@ export const {
   actions: onGoingOutpostActions,
 } = onGoingOutpostSlice;
 
-export const useOnGoingOutpostSlice = () => {
+export const injectOnGoingOutpostSlice = () => {
   injectContainer({
     name: onGoingOutpostSlice.name,
     reducer: onGoingOutpostSlice.reducer,

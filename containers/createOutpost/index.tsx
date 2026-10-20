@@ -10,12 +10,12 @@ import { ScheduledField } from "./components/scheduleField";
 import { SpeakField } from "./components/speakTypeField";
 import { SubjectField } from "./components/SubjectField";
 import { TagsField } from "./components/TagsField";
-import { useCreateOutpostSlice } from "./slice";
+import { injectCreateOutpostSlice } from "./slice";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { Cohosts } from "./components/cohosts";
 
 const Content = () => {
-  useCreateOutpostSlice();
+  injectCreateOutpostSlice();
   return (
     <div className="min-h-screen   from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 px-4 pt-20 !w-full">
       <RouteLoaderCleaner />

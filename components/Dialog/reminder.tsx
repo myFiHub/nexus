@@ -1,5 +1,6 @@
 "use client";
 
+import { useNow } from "app/lib/clock";
 import { ReactNode, useEffect, useState } from "react";
 import { Button, ButtonProps } from "../Button";
 import {
@@ -55,6 +56,7 @@ export const reminderDialog = ({
 };
 
 export const ReminderDialogProvider = () => {
+  const now = useNow(30_000);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedReminder, setSelectedReminder] = useState<number | null>(null);
   const [dialogContent, setDialogContent] =
@@ -97,8 +99,7 @@ export const ReminderDialogProvider = () => {
   };
 
   const getReminderOptions = (scheduledFor: number) => {
-    const now = Date.now();
-    const timeUntilEvent = scheduledFor - now;
+    const timeUntilEvent = scheduledFor - (now ?? 0);
     const options = [];
 
     // Only show options that are in the future

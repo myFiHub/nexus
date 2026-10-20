@@ -113,13 +113,10 @@ function injectReducer(key: string, reducer: Reducer<any, UnknownAction>) {
   }
 
   injectedReducers[key] = reducer;
-  const combinedReducer = combineReducers<RootState>(
-    // @ts-ignore
-    {
-      ...rootReducer,
-      ...injectedReducers,
-    }
-  ) as Reducer<RootState, UnknownAction>;
+  const combinedReducer = combineReducers({
+    ...rootReducer,
+    ...injectedReducers,
+  }) as unknown as Reducer<RootState, UnknownAction>;
 
   getStore().replaceReducer(combinedReducer);
   if (isDev) {

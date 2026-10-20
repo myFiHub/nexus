@@ -213,7 +213,7 @@ export const {
   actions: globalActions,
 } = globalSlice;
 
-export const useGlobalSlice = () => {
+export const injectGlobalSlice = () => {
   injectContainer({
     name: globalSlice.name,
     reducer: globalSlice.reducer,

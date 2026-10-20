@@ -5,15 +5,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import {
   onGoingOutpostActions,
-  useOnGoingOutpostSlice,
+  injectOnGoingOutpostSlice,
 } from "../ongoingOutpost/slice";
-import { outpostDetailsActions, useOutpostDetailsSlice } from "./slice";
+import { outpostDetailsActions, injectOutpostDetailsSlice } from "./slice";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
-  useOutpostDetailsSlice();
-  useOnGoingOutpostSlice();
+  injectOutpostDetailsSlice();
+  injectOnGoingOutpostSlice();
   useEffect(() => {
     dispatch(outpostDetailsActions.setOutpost(outpost));
     dispatch(onGoingOutpostActions.setOutpost(outpost));

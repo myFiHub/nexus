@@ -1,13 +1,13 @@
-import { assetsActions, useAssetsSlice } from "app/containers/_assets/slice";
+import { assetsActions, injectAssetsSlice } from "app/containers/_assets/slice";
 import {
   myOutpostsActions,
-  useMyOutpostsSlice,
+  injectMyOutpostsSlice,
 } from "app/containers/myOutposts/slice";
 import {
   notificationsActions,
-  useNotificationsSlice,
+  injectNotificationsSlice,
 } from "app/containers/notifications/slice";
-import { profileActions, useProfileSlice } from "app/containers/profile/slice";
+import { profileActions, injectProfileSlice } from "app/containers/profile/slice";
 import { User } from "app/services/api/types";
 import { detached_checkName } from "./check_name";
 import { globalActions } from "../../slice";
@@ -25,10 +25,10 @@ export function* detached_afterGettingPodiumUser({
   token: string;
   savedName: string;
 }) {
-  useMyOutpostsSlice();
-  useProfileSlice();
-  useAssetsSlice();
-  useNotificationsSlice();
+  injectMyOutpostsSlice();
+  injectProfileSlice();
+  injectAssetsSlice();
+  injectNotificationsSlice();
   const remoteName: string = yield detached_checkName({
     user: { ...user, name: savedName },
   });

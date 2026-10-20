@@ -1,6 +1,6 @@
 "use client";
 import { Loader } from "app/components/Loader";
-import { usersActions, useUsersSlice } from "app/containers/_users/slice";
+import { usersActions, injectUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
@@ -31,7 +31,7 @@ const Content = ({
   noScale?: boolean;
   followsYou?: boolean;
 }) => {
-  useUsersSlice();
+  injectUsersSlice();
   const dispatch = useDispatch();
   const isFollowedFromCache = useSelector(
     usersSelectors.isFollowedFromCache(id)
@@ -44,16 +44,13 @@ const Content = ({
   const [followed, setFollowed] = useState(initial);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isMyUser = myUser?.uuid === id;
-  const isLoading = loading || gettingUserData;
+  const isLoading = loading || (gettingUserData && !existsOnCache);
   const [isVisible, setIsVisible] = useState(false);
   const isVisibleRef = useRef(false);
   const componentRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Check if component is visible
   useEffect(() => {
-    if (existsOnCache) {
-      setGettingUserData(false);
-    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);

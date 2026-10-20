@@ -6,14 +6,14 @@ import { LoadingOutposts } from "../../components/outpost/LoadingOutposts";
 import { OutpostsList } from "../../components/outpost/OutpostsList";
 import { OutpostModel } from "../../services/api/types";
 import { allOutpostsSelectors } from "./selectors";
-import { allOutpostsActions, useAllOutpostsSlice } from "./slice";
+import { allOutpostsActions, injectAllOutpostsSlice } from "./slice";
 
 interface ClientOutpostsListProps {
   initialOutposts: OutpostModel[];
 }
 
 const Content = ({ initialOutposts }: ClientOutpostsListProps) => {
-  useAllOutpostsSlice();
+  injectAllOutpostsSlice();
   const dispatch = useDispatch();
   const observerRef = useRef<IntersectionObserver | null>(null);
 
