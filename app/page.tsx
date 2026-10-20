@@ -44,11 +44,26 @@ const getCachedRecentUsers = unstable_cache(
   { revalidate: 60, tags: ["recent-users"] }
 );
 
+const getCachedDiscovery = unstable_cache(
+  async () => {
+    const [live, trending24h, trending7d, tags] = await Promise.all([
+      podiumApi.getLiveOutposts(12),
+      podiumApi.getTrendingOutposts("24h", 12),
+      podiumApi.getTrendingOutposts("7d", 12),
+      podiumApi.getPopularTags(16),
+    ]);
+    return { live, trending: { "24h": trending24h, "7d": trending7d }, tags };
+  },
+  ["home-discovery"],
+  { revalidate: 60, tags: ["home-outposts"] }
+);
+
 export default async function Home() {
-  const [outposts, statistics, recentUsers] = await Promise.all([
+  const [outposts, statistics, recentUsers, discovery] = await Promise.all([
     getCachedOutposts(),
     getCachedStatistics(),
     getCachedRecentUsers(),
+    getCachedDiscovery(),
   ]);
 
   const featuredEvents = sortFeaturedOutposts(outposts);
@@ -58,6 +73,9 @@ export default async function Home() {
       featuredEvents={featuredEvents}
       statistics={statistics}
       recentUsers={recentUsers}
+      live={discovery.live}
+      trending={discovery.trending}
+      tags={discovery.tags}
     />
   );
 }

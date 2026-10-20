@@ -16,12 +16,9 @@ export function HeroSection({
   const totalUsers = statistics?.users_count ?? 1000;
 
   return (
-    <div className="flex flex-col items-center text-center w-full">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 via-transparent to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20 -z-10" />
-
+    <div className="animate-entrance flex flex-col items-center text-center w-full">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 bg-gradient-to-r from-[var(--primary)] via-purple-600 to-blue-600 bg-clip-text text-transparent leading-tight">
+        <h1 className="text-grad text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-[1.05]">
           Join Live Conversations. Empower Creators.
         </h1>
 
@@ -39,14 +36,14 @@ export function HeroSection({
             {recentUsers.slice(0, 5).map((i, index) => (
               <div
                 key={index}
-                className="w-9 h-9 rounded-full border-2 border-white dark:border-black shadow-lg bg-gradient-to-r from-purple-400 to-blue-400 overflow-hidden"
+                className="w-9 h-9 rounded-full border-2 border-[var(--p-bg)] shadow-lg bg-surface-raised overflow-hidden"
                 style={{
                   transform: `rotate(${[-8, -4, 0, 4, 8][index] || 0}deg)`,
                 }}
                 tabIndex={0}
                 aria-label={i.name}
               >
-                <div className="w-full h-full rounded-full border-2 border-purple-200 dark:border-blue-900 box-content">
+                <div className="w-full h-full rounded-full box-content">
                   <Img
                     src={i.image ?? logoUrl}
                     alt={i.name}
@@ -57,7 +54,7 @@ export function HeroSection({
               </div>
             ))}
             {recentUsers.length > 5 && (
-              <div className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-white dark:border-black bg-gradient-to-r from-purple-200 to-blue-200 text-purple-700 font-bold text-xs shadow-lg">
+              <div className="w-9 h-9 flex items-center justify-center rounded-full border-2 border-[var(--p-bg)] bg-surface-raised text-text-muted font-bold text-xs shadow-lg">
                 +{recentUsers.length - 5}
               </div>
             )}
@@ -72,7 +69,7 @@ export function HeroSection({
               href={AppPages.allOutposts}
               variant="default"
               size="default"
-              className="bg-gradient-to-r from-[var(--primary)] to-purple-600 text-white px-8 py-4 rounded-full text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+              className="btn-aurora text-[var(--p-on-accent)] h-auto px-8 py-4 rounded-full text-lg hover:no-underline"
             >
               Explore Live Rooms
             </AppLink>
@@ -80,14 +77,14 @@ export function HeroSection({
               href={AppPages.createOutpost}
               variant="outline"
               size="default"
-              className="border-2 border-[var(--primary)] text-[var(--primary)] px-8 py-4 rounded-full text-lg font-bold hover:bg-[var(--primary)] hover:text-white transition-all duration-200 hover:scale-105 backdrop-blur-sm"
+              className="press h-auto border border-border-strong bg-surface/60 text-foreground px-8 py-4 rounded-full text-lg font-bold hover:border-primary hover:text-primary hover:bg-surface backdrop-blur hover:no-underline"
             >
               Start Your Room
             </AppLink>
           </div>
           <AppLink
             href={`${AppPages.users}/${UserTags.TopOwners}`}
-            className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:text-purple-600 text-lg group transition-colors duration-200 mb-12"
+            className="inline-flex items-center gap-2 text-[var(--primary)] font-semibold hover:opacity-80 text-lg group transition-colors duration-200 mb-12"
           >
             <span>Discover creators</span>
             <span className="group-hover:translate-x-1 transition-transform duration-200">
