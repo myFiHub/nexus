@@ -166,7 +166,7 @@ export const {
   actions: leaderboardActions,
 } = leaderboardSlice;
 
-export const useLeaderboardSlice = () => {
+export const injectLeaderboardSlice = () => {
   injectContainer({
     name: leaderboardSlice.name,
     reducer: leaderboardSlice.reducer,

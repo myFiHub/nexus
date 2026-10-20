@@ -40,7 +40,7 @@ export const {
   actions: usersActions,
 } = usersSlice;
 
-export const useUsersSlice = () => {
+export const injectUsersSlice = () => {
   injectContainer({
     name: usersSlice.name,
     reducer: usersSlice.reducer,

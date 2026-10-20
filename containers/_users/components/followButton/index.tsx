@@ -1,10 +1,9 @@
 "use client";
 import { Loader } from "app/components/Loader";
-import { usersActions, useUsersSlice } from "app/containers/_users/slice";
+import { usersActions, injectUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,6 +20,7 @@ const Content = ({
   className,
   noRouterRefresh,
   noScale,
+  followsYou,
 }: {
   id: string;
   address: string;
@@ -29,8 +29,9 @@ const Content = ({
   className?: string;
   noRouterRefresh?: boolean;
   noScale?: boolean;
+  followsYou?: boolean;
 }) => {
-  useUsersSlice();
+  injectUsersSlice();
   const dispatch = useDispatch();
   const isFollowedFromCache = useSelector(
     usersSelectors.isFollowedFromCache(id)
@@ -43,16 +44,13 @@ const Content = ({
   const [followed, setFollowed] = useState(initial);
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const isMyUser = myUser?.uuid === id;
-  const isLoading = loading || gettingUserData;
+  const isLoading = loading || (gettingUserData && !existsOnCache);
   const [isVisible, setIsVisible] = useState(false);
   const isVisibleRef = useRef(false);
   const componentRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   // Check if component is visible
   useEffect(() => {
-    if (existsOnCache) {
-      setGettingUserData(false);
-    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         setIsVisible(entry.isIntersecting);
@@ -181,6 +179,8 @@ const Content = ({
               </div>
             ) : followed ? (
               "Unfollow"
+            ) : followsYou ? (
+              "Follow back"
             ) : (
               "Follow"
             )}
@@ -198,6 +198,7 @@ export const FollowButton = ({
   className,
   noRouterRefresh,
   noScale,
+  followsYou,
 }: {
   id: string;
   followed: boolean;
@@ -206,9 +207,10 @@ export const FollowButton = ({
   className?: string;
   noRouterRefresh?: boolean;
   noScale?: boolean;
+  followsYou?: boolean;
 }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content
         id={id}
         followed={followed}
@@ -217,7 +219,8 @@ export const FollowButton = ({
         className={className}
         noRouterRefresh={noRouterRefresh}
         noScale={noScale}
+        followsYou={followsYou}
       />
-    </ReduxProvider>
+    </>
   );
 };

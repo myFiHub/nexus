@@ -2,6 +2,7 @@ import { AppLink } from "app/components/AppLink";
 import { FreeOutpostEnterTypes } from "app/components/outpost/types";
 import { generateOutpostShareUrl } from "app/lib/utils";
 import { OutpostModel } from "../../../services/api/types";
+import { HostTools } from "./HostTools";
 import { InviteUsersButton } from "./InviteUsersButton";
 import { JoinButton } from "./JoinButton";
 import { MembersList } from "./members";
@@ -24,6 +25,8 @@ export function Sidebar({ outpost }: SidebarProps) {
       <div className="hidden lg:block">
         <InviteUsersButton outpost={outpost} className="w-full" />
       </div>
+
+      <HostTools outpost={outpost} />
 
       {/* Members List */}
       <MembersList outpost={outpost} />

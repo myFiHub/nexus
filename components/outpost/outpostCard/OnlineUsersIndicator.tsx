@@ -3,7 +3,6 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -137,8 +136,8 @@ export const OnlineUsersIndicator = ({
   outpost,
 }: OnlineUsersIndicatorProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

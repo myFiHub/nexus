@@ -1,7 +1,7 @@
 "use client";
-import { useDashboardUsersSlice } from "../slice";
+import { injectDashboardUsersSlice } from "../slice";
 
 export const InjectUsersPage = () => {
-  useDashboardUsersSlice();
+  injectDashboardUsersSlice();
   return <></>;
 };

@@ -39,10 +39,11 @@ const formatCountdown = (seconds: number) => {
 export function getTimerInfo(
   endsAt: number,
   notPassedText: string = "Starts in",
-  passedText: string = "Join Now"
+  passedText: string = "Join Now",
+  nowMs: number = Date.now()
 ) {
   const eventTime = new Date(endsAt);
-  const now = new Date();
+  const now = new Date(nowMs);
   const isPassed = now >= eventTime;
 
   // Calculate seconds remaining until event starts (negative if event has passed)

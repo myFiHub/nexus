@@ -25,6 +25,7 @@ interface ConfirmDialogProps {
   cancelOpts?: {
     text?: string;
     variant?: ButtonProps["variant"];
+    hidden?: boolean;
   };
 }
 
@@ -127,12 +128,14 @@ export const ConfirmDialogProvider = () => {
           </div>
         )}
         <DialogFooter>
-          <Button
-            onClick={handleCancel}
-            variant={cancelOpts?.variant || "ghost"}
-          >
-            {cancelOpts?.text || "Cancel"}
-          </Button>
+          {!cancelOpts?.hidden && (
+            <Button
+              onClick={handleCancel}
+              variant={cancelOpts?.variant || "ghost"}
+            >
+              {cancelOpts?.text || "Cancel"}
+            </Button>
+          )}
           <Button
             onClick={handleConfirm}
             variant={confirmOpts?.variant || "primary"}

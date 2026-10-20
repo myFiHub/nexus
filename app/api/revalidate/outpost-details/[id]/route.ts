@@ -1,5 +1,6 @@
 import { AppPages } from "app/lib/routes";
 import { revalidatePath, revalidateTag } from "next/cache";
+import { isUuid, rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
 interface RevalidateOptions {
@@ -10,11 +11,13 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
     const { id } = await params;
 
     // Validate the ID parameter
-    if (!id || typeof id !== "string") {
+    if (!id || typeof id !== "string" || !isUuid(id)) {
       return NextResponse.json(
         { error: "Invalid outpost ID provided" },
         { status: 400 }
@@ -25,15 +28,15 @@ export async function POST(
     let options: RevalidateOptions = {};
     try {
       const body = await request.json();
-      if (body && typeof body === "object") {
-        options = { ...options, ...body };
+      if (body && typeof body?.cacheOnly === "boolean") {
+        options = { cacheOnly: body.cacheOnly };
       }
     } catch {
       // If no body or invalid JSON, use default options
     }
 
     // Always revalidate the outpost details cache tag
-    revalidateTag(`outpost-details-${id}`);
+    revalidateTag(`outpost-details-${id}`, "hours");
 
     // Only revalidate path if not cache-only
     if (!options.cacheOnly) {
@@ -60,12 +63,4 @@ export async function POST(
       { status: 500 }
     );
   }
-}
-
-// Also support GET requests for easier testing
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  return POST(request, { params });
 }

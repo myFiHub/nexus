@@ -1,7 +1,7 @@
 "use client";
 import { WalletAccount } from "@aptos-labs/wallet-standard";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserInfo, Web3Auth } from "@web3auth/modal";
+import type { UserInfo, Web3Auth } from "@web3auth/modal";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {
@@ -31,7 +31,6 @@ export interface GlobalState {
 
   joiningOutpostId?: string;
   router?: AppRouterInstance;
-  tick: number;
   wsConnectionStatus: ConnectionStatus;
   checkingOutpostForPass?: OutpostModel;
   viewArchivedOutposts?: boolean;
@@ -52,7 +51,6 @@ export const initialState: GlobalState = {
       ? window.innerWidth > MOBILE_BREAKPOINT
       : false,
   logingOut: false,
-  tick: 0,
   numberOfOnlineUsers: {},
   objectOfOnlineUsersToGet: {},
   connectedExternalWallet: undefined,
@@ -78,12 +76,8 @@ const globalSlice = createSlice({
     },
     initializeWeb3Auth() {},
     initOneSignal(_, __: PayloadAction<{ myId: string }>) {},
-    startTicker() {},
     setIsSidebarOpen(state, action: PayloadAction<boolean>) {
       state.isSidebarOpen = action.payload;
-    },
-    increaseTick_(state) {
-      state.tick++;
     },
     setViewArchivedOutposts(state, action: PayloadAction<boolean>) {
       state.viewArchivedOutposts = action.payload;
@@ -219,7 +213,7 @@ export const {
   actions: globalActions,
 } = globalSlice;
 
-export const useGlobalSlice = () => {
+export const injectGlobalSlice = () => {
   injectContainer({
     name: globalSlice.name,
     reducer: globalSlice.reducer,

@@ -1,5 +1,4 @@
 "use client";
-import { ReduxProvider } from "app/store/Provider";
 import { Calendar } from "lucide-react";
 import { useSelector } from "react-redux";
 import { outpostDetailsSelectors } from "../../selectors";
@@ -37,8 +36,8 @@ const Content = () => {
 
 export const ScheduledDateSection = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

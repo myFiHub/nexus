@@ -9,26 +9,25 @@ import {
 import { GlobalSelectors } from "app/containers/global/selectors";
 import {
   myOutpostsActions,
-  useMyOutpostsSlice,
+  injectMyOutpostsSlice,
 } from "app/containers/myOutposts/slice";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { revalidateService } from "app/services/revalidate";
-import { ReduxProvider } from "app/store/Provider";
 import { ArchiveRestore, ArchiveX } from "lucide-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Content = ({ outpost }: { outpost: OutpostModel }) => {
   const dispatch = useDispatch();
-  useMyOutpostsSlice();
+  injectMyOutpostsSlice();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const showArchivedOutposts = useSelector(
     GlobalSelectors.viewArchivedOutposts
   );
   const amICreator = myUser?.uuid === outpost.creator_user_uuid;
-  const archiveRef = useRef(outpost.is_archived);
+  const [isArchivedState, setIsArchived] = useState(!!outpost.is_archived);
   const [isLoading, setIsLoading] = useState(false);
 
   if (!amICreator || !myUser) {
@@ -37,7 +36,7 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
   const handleArchive = async () => {
     setIsLoading(true);
-    const shouldArchive = !archiveRef.current;
+    const shouldArchive = !isArchivedState;
     const result = await podiumApi.toggleOutpostArchive(
       outpost.uuid,
       shouldArchive
@@ -54,11 +53,10 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
       revalidateService.revalidateMultiple({
         outpostId: outpost.uuid,
       });
-      archiveRef.current = shouldArchive;
+      setIsArchived(shouldArchive);
     }
     setIsLoading(false);
   };
-  const isArchivedState = archiveRef.current;
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -87,8 +85,8 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
 export const ArchiveButton = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

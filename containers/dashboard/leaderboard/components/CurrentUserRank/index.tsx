@@ -2,7 +2,6 @@
 import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { RefreshCw } from "lucide-react";
 import { useState } from "react";
@@ -117,8 +116,8 @@ const Content = ({ filter }: { filter: LeaderboardTags }) => {
 
 export const CurrentUserRank = ({ filter }: { filter: LeaderboardTags }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content filter={filter} />
-    </ReduxProvider>
+    </>
   );
 };

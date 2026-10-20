@@ -172,7 +172,7 @@ function* buyPassFromUser(
     ];
 
     if (myReferrer) {
-      callArray.push(podiumApi.getUserData(myReferrer));
+      callArray.push(podiumApi.getUserByUuidOrAptosAddress(myReferrer));
     }
 
     const [myBalance, price, referrerUser] = yield all(callArray);
@@ -416,7 +416,9 @@ export function* detached_getAccesses({
     ];
 
     // Fetch user data for all IDs
-    const userDataPromises = allUserIds.map((id) => podiumApi.getUserData(id));
+    const userDataPromises = allUserIds.map((id) =>
+      podiumApi.getUserByUuidOrAptosAddress(id)
+    );
 
     const userDataResults: User[] = yield all(userDataPromises);
     // Create a map for quick lookup

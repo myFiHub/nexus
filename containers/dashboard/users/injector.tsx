@@ -1,10 +1,10 @@
 "use client";
 
-import { useAssetsSlice } from "app/containers/_assets/slice";
-import { useDashboardUsersSlice } from "./slice";
+import { injectAssetsSlice } from "app/containers/_assets/slice";
+import { injectDashboardUsersSlice } from "./slice";
 
 export const DashboardUsersInjector = () => {
-  useDashboardUsersSlice();
-  useAssetsSlice();
+  injectDashboardUsersSlice();
+  injectAssetsSlice();
   return null;
 };

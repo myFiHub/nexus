@@ -1,6 +1,6 @@
 import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { cn } from "app/lib/utils";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import CountUp from "react-countup";
 import { useSelector } from "react-redux";
 
@@ -28,15 +28,10 @@ const BalanceDisplay = ({
     }
   }
 
-  const [prevValue, setPrevValue] = useState(value);
-  const isInitialLoad = useRef(true);
-
-  useEffect(() => {
-    if (prevValue !== value) {
-      setPrevValue(value);
-      isInitialLoad.current = false;
-    }
-  }, [value, prevValue]);
+  const [values, setValues] = useState({ current: value, previous: value });
+  if (values.current !== value) {
+    setValues({ current: value, previous: values.current });
+  }
 
   return isLoading ? (
     <div
@@ -51,11 +46,11 @@ const BalanceDisplay = ({
     >
       <CountUp
         end={value ?? 0}
-        start={isInitialLoad.current ? value : undefined}
+        start={values.previous}
         duration={1}
         separator=","
         decimals={decimals}
-        key={prevValue}
+        key={value}
       />{" "}
       MOVE
     </div>

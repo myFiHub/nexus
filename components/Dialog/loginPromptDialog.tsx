@@ -75,12 +75,6 @@ const Content = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (isLoggedIn && isOpen) {
-      handleLoginSuccess();
-    }
-  }, [isLoggedIn, isOpen]);
-
   const handleLogin = async () => {
     if (isMobile) {
       dispatch(globalActions.socialLogin());
@@ -89,28 +83,27 @@ const Content = () => {
     }
   };
 
-  const handleLoginSuccess = async () => {
-    setIsOpen(false);
-
-    if (dialogContent?.action) {
-      try {
-        if (isDev) {
-          console.log(
-            "running action . . .~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
-          );
+  const handleLoginSuccess = () =>
+    Promise.resolve()
+      .then(() => dialogContent?.action?.())
+      .then(
+        () => true,
+        (error) => {
+          console.error("Action failed after login:", error);
+          return false;
         }
-        await dialogContent.action();
-        resolvePromise?.({ loggedIn: true });
-      } catch (error) {
-        console.error("Action failed after login:", error);
-        resolvePromise?.({ loggedIn: false });
-      }
-    } else {
-      resolvePromise?.({ loggedIn: true });
-    }
+      )
+      .then((loggedIn) => {
+        resolvePromise?.({ loggedIn });
+        resolvePromise = null;
+        setIsOpen(false);
+      });
 
-    resolvePromise = null;
-  };
+  useEffect(() => {
+    if (isLoggedIn && isOpen) {
+      handleLoginSuccess();
+    }
+  }, [isLoggedIn, isOpen]);
 
   const handleCancel = () => {
     setIsOpen(false);
@@ -194,7 +187,7 @@ const Content = () => {
 
   return (
     <Dialog
-      open={isOpen && !logingIn}
+      open={isOpen && !logingIn && !isLoggedIn}
       modal={true} // Always non-modal to prevent interference with Web3Auth
       onOpenChange={(open) => {
         if (!open && !logingIn) {

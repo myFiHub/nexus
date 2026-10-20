@@ -1,7 +1,7 @@
 "use client";
 import { cn } from "app/lib/utils";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { loadingRouteEventBus } from "../eventBus";
 
 export const RoutingLoadingComponent = ({
@@ -20,24 +20,19 @@ export const RoutingLoadingComponent = ({
   return <Loader2 className={cn(" animate-spin text-purple-400", className)} />;
 };
 
-const useLoadingRouteEventBus = ({ id }: { id: string }) => {
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const initialValue = loadingRouteEventBus.getValue();
-    if (initialValue === id) {
-      setLoading(true);
-    }
-    const subscription = loadingRouteEventBus.subscribe((message) => {
-      if (message === id) {
-        setLoading(true);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  return loading;
+const subscribeToRouteLoading = (onChange: () => void) => {
+  const subscription = loadingRouteEventBus.subscribe(onChange);
+  return () => subscription.unsubscribe();
 };
+
+const subscribe = (onChange: () => void) => {
+  const subscription = loadingRouteEventBus.subscribe(onChange);
+  return () => subscription.unsubscribe();
+};
+
+const useLoadingRouteEventBus = ({ id }: { id: string }) =>
+  useSyncExternalStore(
+    subscribe,
+    () => loadingRouteEventBus.getValue() === id,
+    () => false
+  );

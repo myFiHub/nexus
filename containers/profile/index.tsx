@@ -4,10 +4,9 @@ import { ConfirmAddOrSwitchAccountDialogProvider } from "app/components/Dialog/c
 import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { cn } from "app/lib/utils";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { assetsActions, useAssetsSlice } from "../_assets/slice";
+import { assetsActions, injectAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { AdditionalInfo } from "./components/AdditionalInfo";
 import { ConnectedAccounts } from "./components/connectedAccounts";
@@ -18,9 +17,10 @@ import { NFTSSection } from "./components/nfts";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountCardActionSelectDialogProvider } from "./components/SecuritySection/dialogs/accountCardActionSelectDialog";
+import { SocialSection } from "./components/SocialSection";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/userStats";
-import { profileActions, useProfileSlice } from "./slice";
+import { profileActions, injectProfileSlice } from "./slice";
 import {
   ProfileTutorial,
   ProfileTutorialIds,
@@ -45,8 +45,8 @@ const SectionCard = ({
 );
 
 const Content = () => {
-  useProfileSlice();
-  useAssetsSlice();
+  injectProfileSlice();
+  injectAssetsSlice();
   const user = useSelector(GlobalSelectors.podiumUserInfo);
   const isExternalWallet = isExternalWalletLoginMethod(user?.login_type ?? "");
   const loading = useSelector(GlobalSelectors.logingIn);
@@ -100,6 +100,9 @@ const Content = () => {
             <NFTSSection id={ProfileTutorialIds.nfts} />
           </SectionCard>
           <SectionCard className="">
+            <SocialSection user={user} />
+          </SectionCard>
+          <SectionCard className="">
             <SettingsSection id={ProfileTutorialIds.settings} />
           </SectionCard>
           {!isExternalWallet ? (
@@ -117,9 +120,9 @@ const Content = () => {
 
 export const Profile = () => {
   return (
-    <ReduxProvider>
+    <>
       <RouteLoaderCleaner />
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

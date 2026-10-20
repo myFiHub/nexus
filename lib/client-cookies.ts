@@ -23,7 +23,10 @@ export const setClientCookie = (
   Cookies.set(key, value, options);
 };
 
-export const deleteClientCookie = (key: CookieKeys): void => {
+export const deleteClientCookie = (
+  key: CookieKeys,
+  options?: Cookies.CookieAttributes
+): void => {
   if (typeof window === "undefined") return;
-  Cookies.remove(key);
+  Cookies.remove(key, options);
 };

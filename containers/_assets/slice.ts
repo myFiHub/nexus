@@ -228,7 +228,7 @@ export const {
   actions: assetsActions,
 } = assetsSlice;
 
-export const useAssetsSlice = () => {
+export const injectAssetsSlice = () => {
   injectContainer({
     name: assetsSlice.name,
     reducer: assetsSlice.reducer,

@@ -1,3 +1,4 @@
+import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { UserDetails } from "app/containers/userDetails";
 import { CookieKeys } from "app/lib/client-cookies";
 import { AppPages } from "app/lib/routes";
@@ -6,7 +7,6 @@ import { unstable_cache } from "next/cache";
 import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { generateMetadata, generateStructuredData } from "./_metadata";
-import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -14,9 +14,13 @@ interface Props {
 
 // Cached API functions
 const getUserDataCached = (id: string) =>
-  unstable_cache(() => podiumApi.getUserData(id), [`user-data-${id}`], {
-    tags: [`user-data-${id}`],
-  });
+  unstable_cache(
+    () => podiumApi.getUserByUuidOrAptosAddress(id),
+    [`user-data-${id}`],
+    {
+      tags: [`user-data-${id}`],
+    }
+  );
 
 const getPodiumPassBuyersCached = (id: string) =>
   unstable_cache(

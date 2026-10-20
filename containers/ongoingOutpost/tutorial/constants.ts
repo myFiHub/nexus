@@ -8,14 +8,3 @@ export const OngoingTutorialIds = {
   leaveButton: "ongoing-leave-button",
   jitsiContainer: "ongoing-jitsi-container",
 } as const;
-
-export enum STATUS {
-  IDLE = "idle",
-  READY = "ready",
-  WAITING = "waiting",
-  RUNNING = "running",
-  PAUSED = "paused",
-  SKIPPED = "skipped",
-  FINISHED = "finished",
-  ERROR = "error",
-}

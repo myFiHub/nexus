@@ -26,7 +26,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 import { all, delay, put, select, takeLatest } from "redux-saga/effects";
 import { revalidateService } from "../../services/revalidate";
 import { GlobalSelectors } from "../global/selectors";
-import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
+import { myOutpostsActions, injectMyOutpostsSlice } from "../myOutposts/slice";
 import { createOutpostSelectors } from "./selectors";
 import { createOutpostActions } from "./slice";
 function* validateFields(
@@ -253,14 +253,12 @@ function* createOutpost(
     }
 
     if (params.scheduled_for) {
-      console.log("calling setReminder");
       yield detached_setReminder({
         outpost,
         scheduledFor: params.scheduled_for,
       });
     }
     if (enabled_luma && luma_guests && luma_hosts && luma_hosts.length > 0) {
-      console.log("calling createLumaEvent");
       const lumaEventCreated: boolean = yield detached_createLumaEvent({
         guests: luma_guests || [],
         hosts: luma_hosts || [],
@@ -279,7 +277,7 @@ function* createOutpost(
         outpostId: outpost.uuid,
         allOutposts: true,
       });
-      useMyOutpostsSlice();
+      injectMyOutpostsSlice();
       yield put(myOutpostsActions.getOutposts());
     } catch (error) {
       console.error("Failed to revalidate pages:", error);
@@ -294,7 +292,7 @@ function* createOutpost(
       put(createOutpostActions.reset()),
     ]);
   } catch (error) {
-    console.log({ error });
+    console.error("Failed to create outpost", error);
   } finally {
     yield put(createOutpostActions.setIsSubmitting(false));
   }

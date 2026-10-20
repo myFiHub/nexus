@@ -14,7 +14,7 @@ export const RecordableField = () => {
     <div className="flex items-center justify-between w-full ">
       <div className="cursor-pointer" onClick={() => handleChange(!recordable)}>
         <div className="font-medium text-base">Recordable</div>
-        <div className="text-[#b0b8c1] text-xs">
+        <div className="text-text-muted text-xs">
           Outpost sessions can be recorded by you
         </div>
       </div>

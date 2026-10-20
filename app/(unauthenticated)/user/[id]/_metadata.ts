@@ -103,7 +103,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const user = await podiumApi.getUserData(id);
+  const user = await podiumApi.getUserByUuidOrAptosAddress(id);
 
   if (!user) {
     return {

@@ -1,8 +1,6 @@
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "app/store";
 import { initialState } from "./slice";
-import { shouldWaitForCreator } from "./utils/shouldWaitForCreator";
-
 export const onGoingOutpostDomains = {
   root: (state: RootState) => state,
   outpost: (state: RootState) => state.onGoingOutpost?.outpost,
@@ -23,7 +21,6 @@ export const onGoingOutpostDomains = {
   podiumUserInfo: (state: RootState) => state.global.podiumUserInfo,
   creatorJoined: (state: RootState) =>
     state.onGoingOutpost?.outpost?.creator_joined,
-  tick: (state: RootState) => state.global?.tick ?? 0,
   leaving: (state: RootState) => state.onGoingOutpost?.leaving,
   isRefreshingLiveMembers: (state: RootState) =>
     state.onGoingOutpost?.isRefreshingLiveMembers,
@@ -125,17 +122,6 @@ export const onGoingOutpostSelectors = {
     ),
   isRecording: onGoingOutpostDomains.isRecording,
   creatorJoined: onGoingOutpostDomains.creatorJoined,
-  shouldWaitForCreator: createSelector(
-    [onGoingOutpostDomains.outpost, onGoingOutpostDomains.tick],
-    (outpost, tick) => {
-      if (tick < 0) {
-        return false;
-      }
-      if (!outpost) return false;
-      const shouldWait = shouldWaitForCreator({ outpost });
-      return shouldWait;
-    }
-  ),
   leaving: onGoingOutpostDomains.leaving,
   isRefreshingLiveMembers: onGoingOutpostDomains.isRefreshingLiveMembers,
   isInteractionsMuted: onGoingOutpostDomains.isInteractionsMuted,

@@ -22,15 +22,20 @@ import {
   OutgoingMessageType,
 } from "app/services/wsClient/types";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { Action } from "@reduxjs/toolkit";
 import {
   all,
+  call,
   debounce,
   delay,
+  fork,
   put,
+  race,
   select,
+  take,
   takeLatest,
 } from "redux-saga/effects";
-import { assetsActions, useAssetsSlice } from "../_assets/slice";
+import { assetsActions, injectAssetsSlice } from "../_assets/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { globalActions } from "../global/slice";
 import { confettiEventBus } from "./eventBusses/confetti";
@@ -316,7 +321,7 @@ function* cheerBoo(action: ReturnType<typeof onGoingOutpostActions.cheerBoo>) {
     }
   } catch (error) {
   } finally {
-    useAssetsSlice();
+    injectAssetsSlice();
     yield put(assetsActions.getBalance());
     if (cheer) {
       yield put(
@@ -384,7 +389,7 @@ function* detatched_getLiveMembers(forceJoin?: boolean) {
   return members;
 }
 
-function* clockTicked() {
+function* decreaseSpeakersTalkTime(elapsedSeconds: number) {
   const liveMembers: { [address: string]: LiveMember } = yield select(
     onGoingOutpostDomains.members
   );
@@ -401,10 +406,40 @@ function* clockTicked() {
       yield put(
         onGoingOutpostActions.updateRemainingTime({
           userAddress: member.address,
-          remainingTime: member.remaining_time - 1,
+          remainingTime: Math.max(0, remainingTime - elapsedSeconds),
         })
       );
     }
+  }
+}
+
+// Background tabs throttle timers, so each tick subtracts the whole seconds
+// that actually elapsed instead of assuming exactly one.
+function* talkTimeCountdown() {
+  let lastTick = Date.now();
+  while (true) {
+    yield delay(1000 - (Date.now() % 1000));
+    const elapsedSeconds = Math.floor((Date.now() - lastTick) / 1000);
+    if (elapsedSeconds < 1) continue;
+    lastTick += elapsedSeconds * 1000;
+    yield call(decreaseSpeakersTalkTime, elapsedSeconds);
+  }
+}
+
+const isJoinedAction = (action: Action) =>
+  onGoingOutpostActions.setJoined.match(action) && action.payload === true;
+
+const isLeftOrClearedAction = (action: Action) =>
+  (onGoingOutpostActions.setJoined.match(action) && action.payload === false) ||
+  (onGoingOutpostActions.setOutpost.match(action) && !action.payload);
+
+function* watchTalkTimeCountdown() {
+  while (true) {
+    yield take(isJoinedAction);
+    yield race({
+      countdown: call(talkTimeCountdown),
+      stopped: take(isLeftOrClearedAction),
+    });
   }
 }
 
@@ -523,5 +558,5 @@ export function* onGoingOutpostSaga() {
     onGoingOutpostActions.incomingUserReaction,
     incomingUserReaction
   );
-  yield takeLatest(globalActions.increaseTick_, clockTicked);
+  yield fork(watchTalkTimeCountdown);
 }

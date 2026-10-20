@@ -1,66 +1,47 @@
 import { CookieKeys } from "app/lib/client-cookies";
-import {
-  deleteServerCookie,
-  getServerCookie,
-  setServerCookie,
-} from "app/lib/server-cookies";
+import { deleteServerCookie, setServerCookie } from "app/lib/server-cookies";
+import { isUserKey, isUuid, rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const key = searchParams.get("key") as CookieKeys;
+/** Only the session hints the server reads for redirects; never the auth token. */
+const WRITABLE: Partial<Record<CookieKeys, (value: string) => boolean>> = {
+  [CookieKeys.myUserId]: isUuid,
+  [CookieKeys.myMoveAddress]: isUserKey,
+};
 
-  if (!key) {
-    return NextResponse.json({ error: "Key is required" }, { status: 400 });
-  }
-
-  try {
-    const value = await getServerCookie(key);
-    return NextResponse.json({ value });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to get cookie" },
-      { status: 500 }
-    );
-  }
-}
+const writableKey = (key: unknown): key is CookieKeys =>
+  typeof key === "string" && key in WRITABLE;
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
-    const { key, value, options } = await request.json();
-
-    if (!key || !value) {
-      return NextResponse.json(
-        { error: "Key and value are required" },
-        { status: 400 }
-      );
+    const { key, value } = await request.json();
+    if (!writableKey(key) || typeof value !== "string" || !WRITABLE[key]!(value)) {
+      return NextResponse.json({ error: "Invalid cookie" }, { status: 400 });
     }
-
-    await setServerCookie(key as CookieKeys, value, options);
+    await setServerCookie(key, value, {
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to set cookie" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Failed to set cookie" }, { status: 500 });
   }
 }
 
 export async function DELETE(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const key = searchParams.get("key") as CookieKeys;
-
-  if (!key) {
-    return NextResponse.json({ error: "Key is required" }, { status: 400 });
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
+  const key = new URL(request.url).searchParams.get("key");
+  if (!writableKey(key)) {
+    return NextResponse.json({ error: "Invalid cookie" }, { status: 400 });
   }
-
   try {
     await deleteServerCookie(key);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Failed to delete cookie" },
-      { status: 500 }
-    );
+  } catch {
+    return NextResponse.json({ error: "Failed to delete cookie" }, { status: 500 });
   }
 }

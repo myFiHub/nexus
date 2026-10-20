@@ -4,14 +4,13 @@ import { LoginButton } from "app/components/header/LoginButton";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
-import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { injectOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { ConnectionState } from "app/services/wsClient";
-import { ReduxProvider } from "app/store/Provider";
 import { Lock, Play, Users } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useClock } from "app/lib/clock";
 import { useDispatch, useSelector } from "react-redux";
 
 interface JoinOutpostPromptProps {
@@ -19,14 +18,14 @@ interface JoinOutpostPromptProps {
 }
 
 const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useOnGoingOutpostSlice();
-  useSelector(GlobalSelectors.tick);
+  injectOnGoingOutpostSlice();
+  const scheduledFor = outpost?.scheduled_for ?? 0;
+  const displayText = useClock((now) =>
+    now === null
+      ? null
+      : getTimerInfo(scheduledFor, undefined, undefined, now).displayText
+  );
+  const isPassed = useClock((now) => now !== null && now >= scheduledFor);
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   const logingIn = useSelector(GlobalSelectors.logingIn);
@@ -44,7 +43,7 @@ const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
   if (!outpost) return null;
 
   // Show loading state until client-side hydration is complete
-  if (!isClient) {
+  if (displayText === null) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] p-8">
         <div className="animate-pulse text-muted-foreground">Loading...</div>
@@ -54,8 +53,6 @@ const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
 
   // Client-side only logic
   const joining = joiningId === outpost.uuid;
-  const timerInfo = getTimerInfo(outpost.scheduled_for);
-  const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
   if (!myUser && !logingIn) {
@@ -157,8 +154,8 @@ const JoinOutpostPromptContent = ({ outpost }: JoinOutpostPromptProps) => {
 
 export const JoinOutpostPrompt = ({ outpost }: JoinOutpostPromptProps) => {
   return (
-    <ReduxProvider>
+    <>
       <JoinOutpostPromptContent outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

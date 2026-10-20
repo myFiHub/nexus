@@ -30,17 +30,21 @@ export const TagsInput: React.FC<TagsInputProps> = ({
       <style>{`
         .rti--container {
           background-color: transparent !important;
-          border-color: #94a3b8 !important; /* Tailwind slate-400 */
-          border-radius: 0.375rem !important; /* Tailwind rounded-md */
+          border-color: var(--border) !important;
+          border-radius: var(--radius-md) !important;
          }
+        .rti--input {
+          background: transparent !important;
+          color: var(--foreground) !important;
+        }
         .rti--tag {
-          background-color: #dbeafe !important; /* Tailwind blue-100 */
-          color: #1d4ed8 !important; /* Tailwind blue-700 */
-          border-radius: 0.375rem !important;
-          padding: 0.15rem 0.25rem !important;
+          background-color: color-mix(in oklab, var(--p-accent) 16%, transparent) !important;
+          color: var(--p-accent) !important;
+          border-radius: 9999px !important;
+          padding: 0.15rem 0.5rem !important;
         }
         .rti--tag button {
-          color: #ef4444 !important; /* Tailwind red-500 */
+          color: var(--p-danger) !important;
         }
       `}</style>
     </>

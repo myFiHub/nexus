@@ -2,7 +2,6 @@
 
 import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import { Loader } from "app/components/Loader";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { leaderboardSelectors } from "../selectors";
@@ -71,9 +70,9 @@ const Content = ({ type }: { type: LeaderboardTags }) => {
 
 const ListEndObserver = ({ type }: { type: LeaderboardTags }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content type={type} />
-    </ReduxProvider>
+    </>
   );
 };
 

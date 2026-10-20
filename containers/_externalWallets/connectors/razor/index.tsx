@@ -7,7 +7,7 @@ import {
   imagesPathsForWallets,
   subtitleForExternalWallet,
   titleForExternalWallet,
-} from "./connectWithRazorButton";
+} from "./connectWithRazorButtonConstants";
 import "./customStyles.css";
 
 // Dynamic import for WalletProvider only
@@ -16,16 +16,19 @@ export const WalletProvider = dynamic(
   { ssr: false, loading: () => <></> }
 );
 
-// Direct imports for other exports
+// Load razorkit only on the client to avoid "window is not defined" during SSR.
 let walletExports: any = {};
 const loadWalletExports = async () => {
+  if (typeof window === "undefined") return;
   try {
     walletExports = await import("@razorlabs/razorkit");
   } catch (error) {
     console.error("Failed to load wallet exports:", error);
   }
 };
-loadWalletExports();
+if (typeof window !== "undefined") {
+  loadWalletExports();
+}
 
 export const getBitgetWallet = async () => walletExports.BitgetWallet;
 export const getLeapWallet = async () => walletExports.LeapWallet;

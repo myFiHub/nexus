@@ -3,14 +3,17 @@ import {
   UserTags,
 } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { revalidateTag } from "next/cache";
+import { rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
     // Revalidate all dashboard-related cache tags
-    revalidateTag(UserTags.RecentlyJoined);
-    revalidateTag(UserTags.TopOwners);
-    revalidateTag(TradesTags.Trades);
+    revalidateTag(UserTags.RecentlyJoined, "hours");
+    revalidateTag(UserTags.TopOwners, "hours");
+    revalidateTag(TradesTags.Trades, "hours");
 
     return NextResponse.json(
       {
@@ -31,9 +34,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Also support GET requests for easier testing
-export async function GET(request: NextRequest) {
-  return POST(request);
 }

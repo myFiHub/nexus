@@ -27,7 +27,7 @@ import { truncate } from "app/lib/utils";
 import podiumApi from "app/services/api";
 import { InviteModel, OutpostModel, User } from "app/services/api/types";
 import { Search, X } from "lucide-react";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Button } from "../Button";
 import { Input } from "../Input";
@@ -81,6 +81,20 @@ export const userSelectToInviteDialog = ({
   });
 };
 
+
+/** Selections for existing invitees in `results` that have not been seeded since the dialog opened. */
+const takeExistingInvites = (
+  results: Record<string, User>,
+  invites: InviteModel[] | undefined,
+  seeded: Set<string>
+): InvitedUser[] =>
+  (invites ?? []).flatMap((invite) => {
+    const user = results[invite.invitee_uuid];
+    if (!user || seeded.has(user.uuid)) return [];
+    seeded.add(user.uuid);
+    return [{ user, invited: !invite.can_speak, invitedToSpeak: invite.can_speak }];
+  });
+
 export const UserSelectToInviteDialogProvider = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
@@ -92,12 +106,15 @@ export const UserSelectToInviteDialogProvider = () => {
   const outpost = dialogContent?.outpost;
   const members = outpost?.members ?? [];
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
+  const outpostInvites = dialogContent?.outpostInvites;
+  const seededInvitees = useRef(new Set<string>());
 
   useEffect(() => {
     const handleShowDialog = (
       event: CustomEvent<UserSelectToInviteDialogProps>
     ) => {
       setDialogContent(event.detail);
+      seededInvitees.current = new Set();
       setInvitedUsers([]);
       setIsOpen(true);
     };
@@ -133,6 +150,12 @@ export const UserSelectToInviteDialogProvider = () => {
           )
         );
         setSearchResults(filteredResults);
+        const seeded = takeExistingInvites(
+          filteredResults,
+          outpostInvites,
+          seededInvitees.current
+        );
+        if (seeded.length) setInvitedUsers((prev) => [...prev, ...seeded]);
       } catch (error) {
         console.error("Error searching users:", error);
         setSearchResults({});
@@ -143,7 +166,7 @@ export const UserSelectToInviteDialogProvider = () => {
 
     const timeoutId = setTimeout(searchUsers, 500);
     return () => clearTimeout(timeoutId);
-  }, [searchValue, myUser?.uuid, dialogContent?.creatorUuid]);
+  }, [searchValue, myUser?.uuid, dialogContent?.creatorUuid, outpostInvites]);
 
   const handleInviteOption = (
     user: User,
@@ -288,30 +311,6 @@ export const UserSelectToInviteDialogProvider = () => {
       (invite) => invite.invitee_uuid === user.uuid
     );
   };
-
-  // Initialize invited users from existing invites when dialog opens
-  useEffect(() => {
-    if (isOpen && dialogContent?.outpostInvites) {
-      const initialInvitedUsers: InvitedUser[] = [];
-
-      // Add existing invites to the initial state
-      dialogContent.outpostInvites.forEach((invite) => {
-        // Find the user data for this invite
-        const user = Object.values(searchResults).find(
-          (u) => u.uuid === invite.invitee_uuid
-        );
-        if (user) {
-          initialInvitedUsers.push({
-            user,
-            invited: !invite.can_speak, // If can_speak is false, they were invited to listen
-            invitedToSpeak: invite.can_speak, // If can_speak is true, they were invited to speak
-          });
-        }
-      });
-
-      setInvitedUsers(initialInvitedUsers);
-    }
-  }, [isOpen, dialogContent?.outpostInvites, searchResults]);
 
   // Check if there are any changes in invitations
   const hasChanges = () => {

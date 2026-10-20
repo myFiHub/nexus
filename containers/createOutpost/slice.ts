@@ -18,6 +18,7 @@ export interface CreateOutpostState {
   scheduledFor: number;
   adults: boolean;
   recordable: boolean;
+  musicMode: boolean;
   selectedImage?: File;
   isCreating: boolean;
   enabledLuma: boolean;
@@ -48,6 +49,7 @@ const initialState: CreateOutpostState = {
   scheduledFor: 0,
   adults: false,
   recordable: false,
+  musicMode: false,
   enabledLuma: false,
   passSellersRequiredToSpeak: {},
   passSellersRequiredToEnter: {},
@@ -116,6 +118,9 @@ const createOutpostSlice = createSlice({
     },
     setRecordable: (state, action: PayloadAction<boolean>) => {
       state.recordable = action.payload;
+    },
+    setMusicMode: (state, action: PayloadAction<boolean>) => {
+      state.musicMode = action.payload;
     },
     setSelectedImage: (state, action: PayloadAction<File>) => {
       state.selectedImage = action.payload;
@@ -237,7 +242,7 @@ export const {
   actions: createOutpostActions,
 } = createOutpostSlice;
 
-export const useCreateOutpostSlice = () => {
+export const injectCreateOutpostSlice = () => {
   injectContainer({
     name: createOutpostSlice.name,
     reducer: createOutpostSlice.reducer,

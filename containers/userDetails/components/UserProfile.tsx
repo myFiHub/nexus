@@ -1,53 +1,63 @@
 import { CopyButton } from "app/components/copyButton";
 import { Img } from "app/components/Img";
+import { logoUrl } from "app/lib/constants";
 import { truncate } from "app/lib/utils";
-import { User } from "app/services/api/types";
-import { FollowButton } from "../../_users/components/followButton";
+import { FollowerModel, User } from "app/services/api/types";
 import { PodiumPassButton } from "./podiumPassButton/index";
+import { FollowsYouPill, MutualFollowers, ProfileActions } from "./social";
 
 interface UserProfileProps {
   user: User;
+  followers: FollowerModel[];
+  followings: FollowerModel[];
 }
 
-export const UserProfile = ({ user }: UserProfileProps) => {
+export const UserProfile = ({ user, followers, followings }: UserProfileProps) => {
+  const followersCount = user.followers_count ?? followers.length;
+  const followingsCount = user.followings_count ?? followings.length;
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-4">
-      {user.image && (
-        <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0">
-          <div className="relative z-10 w-full h-full rounded-full overflow-hidden">
-            <Img
-              src={user.image}
-              alt={user.name || "User"}
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-              useImgTag
-            />
+    <section className="glass-card animate-entrance p-5 sm:p-6">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+        <div className="flex min-w-0 flex-1 items-center gap-4">
+          <span className="shrink-0 rounded-full bg-grad-primary p-[2px]">
+            <span className="block h-16 w-16 overflow-hidden rounded-full bg-surface sm:h-20 sm:w-20">
+              <Img
+                src={user.image || logoUrl}
+                alt={user.name || "User"}
+                width={80}
+                height={80}
+                className="h-full w-full object-cover"
+                useImgTag
+              />
+            </span>
+          </span>
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="truncate text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                {user.name || "Anonymous"}
+              </h1>
+              <FollowsYouPill followings={followings} />
+            </div>
+            {user.aptos_address && (
+              <div className="flex items-center text-sm text-text-muted">
+                <span className="tabular-nums">{truncate(user.aptos_address, 20)}</span>
+                <CopyButton text={user.aptos_address} />
+              </div>
+            )}
+            <p className="mt-1 text-sm text-text-muted">
+              <span className="font-semibold text-foreground tabular-nums">{followersCount}</span>{" "}
+              followers ·{" "}
+              <span className="font-semibold text-foreground tabular-nums">{followingsCount}</span>{" "}
+              following
+            </p>
           </div>
         </div>
-      )}
-      <div className="text-center sm:text-left">
-        <h1 className="text-xl sm:text-2xl font-bold">
-          {user.name || "Anonymous User"}
-        </h1>
-        {user.aptos_address && (
-          <div className="flex items-center">
-            <p className="text-gray-400 text-sm sm:text-base">
-              {truncate(user.aptos_address, 20)}
-            </p>
-            <CopyButton text={user.aptos_address} />
-          </div>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <PodiumPassButton user={user} />
+          <ProfileActions user={user} followings={followings} />
+        </div>
       </div>
-      <PodiumPassButton user={user} />
-      <FollowButton
-        className="min-w-24"
-        id={user.uuid}
-        noScale
-        size="md"
-        followed={!!user.followed_by_me}
-        address={user.address}
-      />
-    </div>
+      <MutualFollowers userId={user.uuid} />
+    </section>
   );
 };

@@ -1,8 +1,8 @@
-import { IProvider, UserInfo, Web3Auth } from "@web3auth/modal";
+import type { IProvider, UserInfo, Web3Auth } from "@web3auth/modal";
 import { put, select } from "redux-saga/effects";
 import { GlobalSelectors } from "../../selectors";
 import { getPrivateKey } from "../socialPrivateKey";
-import { ethers } from "ethers";
+import { Wallet } from "ethers";
 import { movementService } from "app/services/move/aptosMovement";
 import {
   signMessage,
@@ -45,10 +45,10 @@ export function* detached_connectSocialToSocial() {
           thereWasAnError = true;
           return;
         } else {
-          const correntAccountAddress = new ethers.Wallet(
+          const correntAccountAddress = new Wallet(
             correntAccountPrivateKey
           ).address;
-          const newAccountAddress = new ethers.Wallet(newAccountPrivateKey)
+          const newAccountAddress = new Wallet(newAccountPrivateKey)
             .address;
 
           if (correntAccountAddress === newAccountAddress) {

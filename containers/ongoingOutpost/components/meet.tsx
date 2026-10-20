@@ -37,7 +37,6 @@ export const Meet = memo(
     const iAmCreator = outpost?.creator_user_uuid === myUser?.uuid;
 
     if (!outpost || !myUser) {
-      console.log("No outpost data available");
       return null;
     }
 
@@ -197,3 +196,5 @@ export const Meet = memo(
   },
   () => true
 );
+
+Meet.displayName = "Meet";

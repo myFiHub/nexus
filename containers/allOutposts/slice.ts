@@ -70,7 +70,7 @@ export const {
   actions: allOutpostsActions,
 } = allOutpostsSlice;
 
-export const useAllOutpostsSlice = () => {
+export const injectAllOutpostsSlice = () => {
   injectContainer({
     name: allOutpostsSlice.name,
     reducer: allOutpostsSlice.reducer,

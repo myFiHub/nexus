@@ -6,6 +6,7 @@ import {
 import { ClientRedirecter } from "./components/clientRedirecter";
 import { SocialLink } from "./components/socialLink";
 import { UserTabs } from "./components/tabs";
+import { LiveNowCard } from "./components/social";
 import { UserProfile } from "./components/UserProfile";
 import { UserStats } from "./components/UserStats";
 
@@ -25,11 +26,9 @@ export const UserDetails = ({
   return (
     <>
       <ClientRedirecter id={user.uuid} />
-      <div className="p-4 sm:p-6">
-        <div className="flex justify-between items-center">
-          <div className="text-2xl font-bold">User Details</div>
-        </div>
-        <UserProfile user={user} />
+      <div className="mx-auto w-full max-w-5xl p-4 sm:p-6">
+        <UserProfile user={user} followers={followers} followings={followings} />
+        <LiveNowCard userId={user.uuid} />
         <SocialLink user={user} />
         <UserStats user={user} />
         <UserTabs

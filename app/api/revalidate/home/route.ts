@@ -1,16 +1,19 @@
 import { revalidateTag } from "next/cache";
+import { rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
-    // Revalidate the trending outposts cache tag
-    revalidateTag("trending-outposts");
+    // Revalidate the home page outposts cache tag
+    revalidateTag("home-outposts", "hours");
 
     return NextResponse.json(
       {
         success: true,
-        message: "Home page trending outposts cache has been revalidated",
-        revalidatedTag: "trending-outposts",
+        message: "Home page outposts cache has been revalidated",
+        revalidatedTag: "home-outposts",
       },
       { status: 200 }
     );
@@ -21,9 +24,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Also support GET requests for easier testing
-export async function GET(request: NextRequest) {
-  return POST(request);
 }

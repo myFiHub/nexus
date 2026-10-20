@@ -1,4 +1,3 @@
-import { ReduxProvider } from "app/store/Provider";
 
 const Content = () => {
   return <div>AddNewAccount</div>;
@@ -6,8 +5,8 @@ const Content = () => {
 
 export const AddNewAccount = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

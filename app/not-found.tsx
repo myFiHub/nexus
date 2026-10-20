@@ -1,31 +1,25 @@
 import { AppLink } from "app/components/AppLink";
+import {
+  primaryActionClass,
+  secondaryActionClass,
+  StatusPage,
+} from "app/components/aurora/StatusPage";
 import { AppPages } from "app/lib/routes";
+import { Compass } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="container mx-auto px-4 py-16">
-      <div className="max-w-2xl mx-auto text-center">
-        <h1 className="text-4xl font-bold text-[var(--primary)] mb-4">
-          Page Not Found
-        </h1>
-        <p className="text-xl text-[var(--muted-foreground)] mb-8">
-          The page you are looking for does not exist or has been moved.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <AppLink
-            href="/"
-            className="inline-flex items-center justify-center px-6 py-3 bg-[var(--primary)] text-white rounded-full hover:bg-[var(--primary-hover)] transition-colors"
-          >
-            Go Home
-          </AppLink>
-          <AppLink
-            href={AppPages.allOutposts}
-            className="inline-flex items-center justify-center px-6 py-3 border border-[var(--primary)] text-[var(--primary)] rounded-full hover:bg-[var(--primary)] hover:text-white transition-colors"
-          >
-            Browse Outposts
-          </AppLink>
-        </div>
-      </div>
-    </div>
+    <StatusPage
+      icon={<Compass className="h-6 w-6" />}
+      title="Page not found"
+      message="The page you are looking for does not exist or has been moved."
+    >
+      <AppLink href="/" className={primaryActionClass}>
+        Go home
+      </AppLink>
+      <AppLink href={AppPages.allOutposts} className={secondaryActionClass}>
+        Browse outposts
+      </AppLink>
+    </StatusPage>
   );
 }

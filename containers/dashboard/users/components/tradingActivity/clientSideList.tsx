@@ -1,6 +1,5 @@
 "use client";
 
-import { ReduxProvider } from "app/store/Provider";
 import { useSelector } from "react-redux";
 import { dashboardUsersSelectors } from "../../selectors";
 import { TradeRow } from "./TradeRow";
@@ -21,9 +20,9 @@ const Content = () => {
 
 const ClientSideList = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };
 

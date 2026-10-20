@@ -6,6 +6,7 @@ import { EventDetails } from "./EventDetails";
 import { OutpostDetailsHeader } from "./header";
 import { InviteUsersButton } from "./InviteUsersButton";
 import { JoinButton } from "./JoinButton";
+import { MyBanBanner } from "./MyBanBanner";
 import { Sidebar } from "./Sidebar";
 import { Tags } from "./Tags";
 
@@ -26,6 +27,7 @@ export function OutpostDetails({ outpost, lumaSlot }: OutpostDetailsProps) {
         <div className="max-w-4xl mx-auto">
           {/* Header Image with Overlay */}
           <OutpostDetailsHeader outpost={outpost} />
+          <MyBanBanner />
 
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">

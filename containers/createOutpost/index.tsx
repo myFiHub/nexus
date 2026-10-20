@@ -1,21 +1,21 @@
 "use client";
-import { ReduxProvider } from "app/store/Provider";
 import { AdultsField } from "./components/AdultsField";
 import CreateButton from "./components/CreateButton";
 import { EnterTypeField } from "./components/enterTypeField";
 import ImageSelector from "./components/ImageSelector";
 import { NameField } from "./components/nameField";
+import { MusicModeField } from "./components/MusicModeField";
 import { RecordableField } from "./components/RecordableField";
 import { ScheduledField } from "./components/scheduleField";
 import { SpeakField } from "./components/speakTypeField";
 import { SubjectField } from "./components/SubjectField";
 import { TagsField } from "./components/TagsField";
-import { useCreateOutpostSlice } from "./slice";
+import { injectCreateOutpostSlice } from "./slice";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { Cohosts } from "./components/cohosts";
 
 const Content = () => {
-  useCreateOutpostSlice();
+  injectCreateOutpostSlice();
   return (
     <div className="min-h-screen   from-slate-100 via-white to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-12 px-4 pt-20 !w-full">
       <RouteLoaderCleaner />
@@ -61,6 +61,7 @@ const Content = () => {
                 <ScheduledField />
                 <AdultsField />
                 <RecordableField />
+                <MusicModeField />
               </div>
 
               <div className="mt-8 pt-6 border-t border-white/10">
@@ -80,8 +81,8 @@ const Content = () => {
 
 export const CreateOutpost = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };
