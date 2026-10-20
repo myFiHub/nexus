@@ -39,14 +39,14 @@ export function EventsList({ featuredEvents }: EventsListProps) {
     <section
       className="w-full relative"
       role="region"
-      aria-label="Live and upcoming rooms"
+      aria-label="Live and upcoming outposts"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 blur-3xl -z-10 pointer-events-none" />
 
       <div className="relative">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base md:text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-            Live & Upcoming Rooms
+            Live & Upcoming Outposts
           </h2>
           <div
             className="flex gap-1.5"
@@ -97,7 +97,7 @@ export function EventsList({ featuredEvents }: EventsListProps) {
 
         {filtered.length === 0 && (
           <p className="text-center py-4 text-sm text-[var(--muted-foreground)]">
-            No {filter === "live" ? "live" : filter === "upcoming" ? "upcoming" : ""} rooms right now. Check back later.
+            No {filter === "live" ? "live" : filter === "upcoming" ? "upcoming" : ""} outposts right now. Check back later.
           </p>
         )}
       </div>

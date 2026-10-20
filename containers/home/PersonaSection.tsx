@@ -15,7 +15,7 @@ export function PersonaSection() {
         Built for Hosts and Listeners
       </h2>
       <p className="text-center text-lg text-[var(--muted-foreground)] max-w-2xl mx-auto mb-16">
-        Rooms (Outposts) are live audio spaces. Whether you host or join, Podium
+        Outposts are live audio spaces. Whether you host or join, Podium
         is built for you.
       </p>
 
@@ -34,7 +34,7 @@ export function PersonaSection() {
             </h3>
           </div>
           <ul className="space-y-3 text-[var(--muted-foreground)] mb-6 list-disc list-inside text-base leading-relaxed">
-            <li>Host live Rooms and build your community</li>
+            <li>Host live Outposts and build your community</li>
             <li>Monetize with passes and direct support</li>
             <li>Schedule events and invite your audience</li>
           </ul>
@@ -44,7 +44,7 @@ export function PersonaSection() {
             size="default"
             className="inline-flex items-center gap-2 rounded-full font-semibold"
           >
-            Start Your Room
+            Start Your Outpost
           </AppLink>
         </div>
 
@@ -62,7 +62,7 @@ export function PersonaSection() {
             </h3>
           </div>
           <ul className="space-y-3 text-[var(--muted-foreground)] mb-6 list-disc list-inside text-base leading-relaxed">
-            <li>Join live Rooms on topics you care about</li>
+            <li>Join live Outposts on topics you care about</li>
             <li>Discover creators and set reminders for upcoming events</li>
             <li>Participate, react, and support creators</li>
           </ul>
@@ -72,7 +72,7 @@ export function PersonaSection() {
             size="default"
             className="inline-flex items-center gap-2 rounded-full font-semibold border-2"
           >
-            Explore Live Rooms
+            Explore Live Outposts
           </AppLink>
         </div>
       </div>

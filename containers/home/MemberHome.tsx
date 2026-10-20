@@ -297,7 +297,7 @@ const MemberFeed = ({ userId, name }: { userId?: string; name?: string }) => {
       items.push({
         outpost,
         online,
-        line: outpost.creator_user_uuid === userId ? "Your room is live" : "One of your outposts",
+        line: outpost.creator_user_uuid === userId ? "Your outpost is live" : "One of your outposts",
         people: [],
       });
     }

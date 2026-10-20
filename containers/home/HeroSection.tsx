@@ -25,7 +25,7 @@ export function HeroSection({
         <p className="text-xl md:text-2xl text-[var(--muted-foreground)] mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
           Podium is where audiences and creators meet in{" "}
           <span className="font-semibold text-foreground">
-            Rooms (Outposts)
+            Outposts
           </span>{" "}
           — live audio spaces built around the topics you care about.
         </p>
@@ -71,7 +71,7 @@ export function HeroSection({
               size="default"
               className="btn-aurora text-[var(--p-on-accent)] h-auto px-8 py-4 rounded-full text-lg hover:no-underline"
             >
-              Explore Live Rooms
+              Explore Live Outposts
             </AppLink>
             <AppLink
               href={AppPages.createOutpost}
@@ -79,7 +79,7 @@ export function HeroSection({
               size="default"
               className="press h-auto border border-border-strong bg-surface/60 text-foreground px-8 py-4 rounded-full text-lg font-bold hover:border-primary hover:text-primary hover:bg-surface backdrop-blur hover:no-underline"
             >
-              Start Your Room
+              Start Your Outpost
             </AppLink>
           </div>
           <AppLink

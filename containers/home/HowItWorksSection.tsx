@@ -16,7 +16,7 @@ const steps = [
   },
   {
     number: 2,
-    title: "Discover rooms",
+    title: "Discover outposts",
     description: "Find live discussions on topics you love.",
     icon: Search,
   },

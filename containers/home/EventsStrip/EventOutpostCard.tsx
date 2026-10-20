@@ -56,7 +56,7 @@ export function EventOutpostCard({
     e.stopPropagation();
     e.preventDefault();
     loginPromptDialog({
-      actionDescription: "set a reminder for this room",
+      actionDescription: "set a reminder for this outpost",
       action: async () => {
         const res = await reminderDialog({
           title: "Set Reminder",
@@ -230,7 +230,7 @@ export function EventOutpostCard({
                   type="button"
                   onClick={handleRemindMe}
                   className="inline-flex items-center gap-1.5 px-2 py-1.5 rounded-lg bg-purple-500/80 hover:bg-purple-500 text-white text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
-                  aria-label="Set reminder for this room"
+                  aria-label="Set reminder for this outpost"
                 >
                   <Bell className="w-3.5 h-3.5" aria-hidden />
                   Remind me

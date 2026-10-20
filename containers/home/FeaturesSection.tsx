@@ -18,7 +18,7 @@ export function FeaturesSection() {
     {
       title: "Community Owned",
       description:
-        "Join Rooms where creators and fans build value together. Some rooms are pass-gated for exclusive access.",
+        "Join Outposts where creators and fans build value together. Some outposts are pass-gated for exclusive access.",
       icon: <Users className="w-6 h-6" aria-hidden />,
     },
   ];
@@ -30,7 +30,7 @@ export function FeaturesSection() {
           Why Podium?
         </h2>
         <p className="text-lg text-[var(--muted-foreground)] max-w-2xl mx-auto leading-relaxed">
-          Live Rooms, direct support, and community ownership
+          Live Outposts, direct support, and community ownership
         </p>
       </div>
 

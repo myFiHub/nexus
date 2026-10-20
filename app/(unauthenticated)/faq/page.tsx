@@ -12,12 +12,12 @@ export default function FAQPage() {
       <div className="space-y-8 text-[var(--muted-foreground)]">
         <section>
           <h2 className="text-lg font-semibold text-foreground mb-2">
-            What is a Room (Outpost)?
+            What is an Outpost?
           </h2>
           <p>
-            A Room (we also call it an Outpost) is a live audio space where
+            An Outpost is a live audio space where
             creators host conversations and listeners can join, react, and
-            support. You can discover live and upcoming rooms on the home page.
+            support. You can discover live and upcoming outposts on the home page.
           </p>
         </section>
         <section>
@@ -26,8 +26,8 @@ export default function FAQPage() {
           </h2>
           <p>
             No. You can sign in with social login (e.g. Google, email) and join
-            public rooms without a wallet. Connecting a wallet and owning Passes
-            are optional—for pass-gated rooms and rewards.
+            public outposts without a wallet. Connecting a wallet and owning Passes
+            are optional—for pass-gated outposts and rewards.
           </p>
         </section>
         <section>
@@ -36,7 +36,7 @@ export default function FAQPage() {
           </h2>
           <p>
             A Pass is a creator&apos;s membership token. Owning one grants
-            access to their pass-gated rooms and perks. Some rooms are
+            access to their pass-gated outposts and perks. Some outposts are
             public; others require a Pass to enter or speak.
           </p>
         </section>
@@ -45,9 +45,9 @@ export default function FAQPage() {
             How do reminders work?
           </h2>
           <p>
-            For upcoming rooms, you can click &quot;Remind me&quot; and choose
+            For upcoming outposts, you can click &quot;Remind me&quot; and choose
             when to be notified (e.g. 15 minutes before or when it starts). We
-            send you a notification so you don&apos;t miss the room.
+            send you a notification so you don&apos;t miss the outpost.
           </p>
         </section>
       </div>

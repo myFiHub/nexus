@@ -40,7 +40,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           <span className="font-medium text-foreground">Audio Data:</span>{" "}
-          When you participate in audio rooms or discussions on the App, we may
+          When you participate in outposts or discussions on the App, we may
           collect audio recordings of your voice.
         </li>
       </ul>

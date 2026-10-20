@@ -22,7 +22,7 @@ export function TrustFooter() {
             Trust &amp; Safety
           </h2>
           <p className="text-sm text-[var(--muted-foreground)] mb-4 leading-relaxed">
-            Some rooms are pass-gated: you need a creator&apos;s Pass to enter
+            Some outposts are pass-gated: you need a creator&apos;s Pass to enter
             or speak. Passes unlock access and perks. You do not need crypto to
             use Podium; wallet and passes are optional.
           </p>
@@ -37,8 +37,8 @@ export function TrustFooter() {
             <div>
               <dt className="font-medium text-foreground">Do I need crypto?</dt>
               <dd>
-                No. You can sign in with social login and join public rooms
-                without a wallet. Passes and wallet are optional for gated rooms
+                No. You can sign in with social login and join public outposts
+                without a wallet. Passes and wallet are optional for gated outposts
                 and rewards.
               </dd>
             </div>
@@ -46,7 +46,7 @@ export function TrustFooter() {
               <dt className="font-medium text-foreground">What is a Pass?</dt>
               <dd>
                 A Pass is a creator&apos;s membership token. Owning one grants
-                access to their pass-gated rooms and perks.{" "}
+                access to their pass-gated outposts and perks.{" "}
                 <AppLink href={FAQ_PATH} className="text-[var(--primary)] hover:underline">
                   FAQ
                 </AppLink>
@@ -55,8 +55,8 @@ export function TrustFooter() {
             <div>
               <dt className="font-medium text-foreground">How do reminders work?</dt>
               <dd>
-                For upcoming rooms, you can set a reminder. We notify you before
-                the room starts (e.g. 15 minutes or when it starts). Manage
+                For upcoming outposts, you can set a reminder. We notify you before
+                the outpost starts (e.g. 15 minutes or when it starts). Manage
                 reminders in your account.
               </dd>
             </div>
