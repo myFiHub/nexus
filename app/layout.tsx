@@ -3,6 +3,7 @@ import Header from "app/components/header";
 import { GlobalContainer } from "app/containers/global";
 import { ReduxProvider } from "app/store/Provider";
 import { AuthFlag } from "app/components/listeners/AuthFlag";
+import { ReferralCapture } from "app/components/listeners/ReferralCapture";
 import { bootScript } from "app/lib/bootScript";
 import { DEFAULT_THEME } from "app/lib/theme";
 import type { Metadata, Viewport } from "next";
@@ -131,6 +132,7 @@ export default function RootLayout({
         <ReduxProvider>
           <GlobalContainer />
           <AuthFlag />
+          <ReferralCapture />
           <Header />
           <Sidebar />
           <main className="pt-16">{children}</main>

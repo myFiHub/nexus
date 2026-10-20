@@ -25,6 +25,7 @@ import {
   referrerDialog,
   ReferrerDialogResult,
 } from "app/components/Dialog/referrerDialog";
+import { clearStoredReferrer, getStoredReferrer } from "app/lib/referral";
 import { isUuid } from "app/lib/utils";
 import { detached_checkName } from "./check_name";
 import { detached_afterGettingPodiumUser } from "./afterGettingPodiumUser";
@@ -220,10 +221,16 @@ function* detached_continueWithLoginRequestAndAdditionalData({
 
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
-    const { confirmed, enteredText }: ReferrerDialogResult =
-      yield referrerDialog();
-    if (confirmed && enteredText && isUuid(enteredText)) {
-      referrerId = enteredText;
+    let referrer = getStoredReferrer();
+    if (referrer) {
+      clearStoredReferrer();
+    } else {
+      const { confirmed, enteredText }: ReferrerDialogResult =
+        yield referrerDialog();
+      referrer = confirmed && enteredText && isUuid(enteredText) ? enteredText : null;
+    }
+    if (referrer) {
+      referrerId = referrer;
       loginRequest.referrer_user_uuid = referrerId;
       yield detached_continueWithLoginRequestAndAdditionalData({
         loginRequest,

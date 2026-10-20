@@ -20,6 +20,7 @@ const Content = ({
   className,
   noRouterRefresh,
   noScale,
+  followsYou,
 }: {
   id: string;
   address: string;
@@ -28,6 +29,7 @@ const Content = ({
   className?: string;
   noRouterRefresh?: boolean;
   noScale?: boolean;
+  followsYou?: boolean;
 }) => {
   useUsersSlice();
   const dispatch = useDispatch();
@@ -180,6 +182,8 @@ const Content = ({
               </div>
             ) : followed ? (
               "Unfollow"
+            ) : followsYou ? (
+              "Follow back"
             ) : (
               "Follow"
             )}
@@ -197,6 +201,7 @@ export const FollowButton = ({
   className,
   noRouterRefresh,
   noScale,
+  followsYou,
 }: {
   id: string;
   followed: boolean;
@@ -205,6 +210,7 @@ export const FollowButton = ({
   className?: string;
   noRouterRefresh?: boolean;
   noScale?: boolean;
+  followsYou?: boolean;
 }) => {
   return (
     <>
@@ -216,6 +222,7 @@ export const FollowButton = ({
         className={className}
         noRouterRefresh={noRouterRefresh}
         noScale={noScale}
+        followsYou={followsYou}
       />
     </>
   );

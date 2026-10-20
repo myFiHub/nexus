@@ -14,6 +14,7 @@ export const createOutpostDomains = {
   scheduledFor: (store: RootState) => store.createOutpost.scheduledFor,
   adults: (store: RootState) => store.createOutpost.adults,
   recordable: (store: RootState) => store.createOutpost.recordable,
+  musicMode: (store: RootState) => store.createOutpost.musicMode,
   reminderOffsetMinutes: (store: RootState) =>
     store.createOutpost.reminder_offset_minutes,
   passSellersRequiredToSpeak: (store: RootState) =>
@@ -38,6 +39,7 @@ export const createOutpostSelectors = {
   scheduledFor: createOutpostDomains.scheduledFor,
   adults: createOutpostDomains.adults,
   recordable: createOutpostDomains.recordable,
+  musicMode: createOutpostDomains.musicMode,
   reminderOffsetMinutes: createOutpostDomains.reminderOffsetMinutes,
   fieldError: (field: "name" | "subject" | "tags") =>
     createSelector([createOutpostDomains.error], (error) => error?.[field]),
@@ -64,6 +66,7 @@ export const createOutpostSelectors = {
       createOutpostDomains.lumaGuests,
       createOutpostDomains.lumaHosts,
       createOutpostDomains.cohostUsers,
+      createOutpostDomains.musicMode,
     ],
     (
       name,
@@ -80,7 +83,8 @@ export const createOutpostSelectors = {
       enabledLuma,
       lumaGuests,
       lumaHosts,
-      cohostUsers
+      cohostUsers,
+      musicMode
     ) => ({
       name,
       subject,
@@ -90,6 +94,7 @@ export const createOutpostSelectors = {
       speak_type: allowedToSpeak,
       has_adult_content: adults,
       is_recordable: recordable,
+      is_music_mode: musicMode,
       tags,
       enabled_luma: enabledLuma,
       luma_guests: lumaGuests,

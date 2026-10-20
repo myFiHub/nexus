@@ -17,12 +17,17 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
   useEffect(() => {
     dispatch(outpostDetailsActions.setOutpost(outpost));
     dispatch(onGoingOutpostActions.setOutpost(outpost));
-    dispatch(outpostDetailsActions.getOutpost(outpost.uuid));
 
     // return () => {
     //   dispatch(outpostDetailsActions.setOutpost(undefined));
     // };
   }, [outpost.uuid]);
+
+  const myUuid = myUser?.uuid;
+  // The response carries viewer-specific fields (my_ban, i_am_member), so refetch when the viewer changes.
+  useEffect(() => {
+    dispatch(outpostDetailsActions.getOutpost(outpost.uuid));
+  }, [myUuid, outpost.uuid, dispatch]);
 
   return <></>;
 };

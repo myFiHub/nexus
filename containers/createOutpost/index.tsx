@@ -4,6 +4,7 @@ import CreateButton from "./components/CreateButton";
 import { EnterTypeField } from "./components/enterTypeField";
 import ImageSelector from "./components/ImageSelector";
 import { NameField } from "./components/nameField";
+import { MusicModeField } from "./components/MusicModeField";
 import { RecordableField } from "./components/RecordableField";
 import { ScheduledField } from "./components/scheduleField";
 import { SpeakField } from "./components/speakTypeField";
@@ -60,6 +61,7 @@ const Content = () => {
                 <ScheduledField />
                 <AdultsField />
                 <RecordableField />
+                <MusicModeField />
               </div>
 
               <div className="mt-8 pt-6 border-t border-white/10">

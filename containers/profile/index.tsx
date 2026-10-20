@@ -17,6 +17,7 @@ import { NFTSSection } from "./components/nfts";
 import { ProfileHeader } from "./components/ProfileHeader";
 import { SecuritySection } from "./components/SecuritySection";
 import { AccountCardActionSelectDialogProvider } from "./components/SecuritySection/dialogs/accountCardActionSelectDialog";
+import { SocialSection } from "./components/SocialSection";
 import { SettingsSection } from "./components/SettingsSection";
 import { UserStats } from "./components/userStats";
 import { profileActions, useProfileSlice } from "./slice";
@@ -97,6 +98,9 @@ const Content = () => {
           </SectionCard>
           <SectionCard className="">
             <NFTSSection id={ProfileTutorialIds.nfts} />
+          </SectionCard>
+          <SectionCard className="">
+            <SocialSection user={user} />
           </SectionCard>
           <SectionCard className="">
             <SettingsSection id={ProfileTutorialIds.settings} />

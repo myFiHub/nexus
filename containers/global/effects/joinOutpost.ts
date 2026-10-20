@@ -8,6 +8,7 @@ import {
   onGoingOutpostActions,
   useOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
+import { banNotice, isBanActive } from "app/lib/outpostBans";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel, User } from "app/services/api/types";
@@ -47,6 +48,18 @@ export function* joinOutpost(
     );
     if (!outpost) {
       toast.error("Outpost not found");
+      return;
+    }
+
+    const now = Date.now();
+    if (outpost.my_ban && isBanActive(outpost.my_ban, now)) {
+      const notice = banNotice(outpost.my_ban, now, outpost.name);
+      yield confirmDialog({
+        title: notice.title,
+        content: notice.message,
+        confirmOpts: { text: "OK" },
+        cancelOpts: { hidden: true },
+      });
       return;
     }
 

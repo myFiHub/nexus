@@ -9,6 +9,7 @@ import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient";
 import { useClock } from "app/lib/clock";
+import { isBanActive } from "app/lib/outpostBans";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
@@ -40,6 +41,8 @@ const JoinButtonContent = ({
       : getTimerInfo(scheduledFor, undefined, undefined, now).displayText
   );
   const isPassed = useClock((now) => now !== null && now >= scheduledFor);
+  const myBan = outpost?.my_ban;
+  const banned = useClock((now) => now !== null && isBanActive(myBan, now), 30_000);
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -82,6 +85,16 @@ const JoinButtonContent = ({
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
   const disabled = (iAmCreator ? loading : !isPassed || loading) || joining;
+
+  if (banned && myBan) {
+    return (
+      <Button className="w-full" disabled>
+        <span className="font-medium">
+          {myBan.kind === "kick" && myBan.expires_at != null ? "Removed by a host" : "Blocked by a host"}
+        </span>
+      </Button>
+    );
+  }
 
   return (
     <Button className="w-full" onClick={join} disabled={disabled}>
