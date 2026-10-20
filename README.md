@@ -1,389 +1,186 @@
-# Nexus
+# Podium Nexus
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+The web app for [Podium](https://podiumnexus.com): discover, schedule and join **outposts** (live audio spaces), follow creators, trade Passes and track how your outposts perform.
 
-## Overview
-
-Nexus is a modern web application built with Next.js, Redux Toolkit, Redux-Saga, and a modular architecture. It integrates with Web3, Firebase, OneSignal, and custom APIs to provide a real-time, interactive platform for managing and participating in "Outposts"—virtual spaces for collaboration, discussion, and events.
+Built with Next.js 16 (App Router, Turbopack), React 19, Redux Toolkit + redux-saga, Tailwind CSS v4, Web3Auth and the Movement (Aptos) chain. It talks to the same Podium backend as the mobile app.
 
 ---
 
-## Table of Contents
+## Contents
 
-- [Badges](#badges)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Architecture](#architecture)
-- [Feature Overview](#feature-overview)
-- [Environment Variables](#environment-variables)
-- [State Management](#state-management)
-- [Side Effects & Sagas](#side-effects--sagas)
-- [Slices & Dynamic Injection](#slices--dynamic-injection)
-- [Selectors](#selectors)
-- [API Reference](#api-reference)
-- [Scripts & Development](#scripts--development)
-- [Testing](#testing)
-- [Deployment & Production](#deployment--production)
-- [Troubleshooting & FAQ](#troubleshooting--faq)
-- [Contribution Guidelines](#contribution-guidelines)
-- [Credits & Acknowledgements](#credits--acknowledgements)
-- [License](#license)
+- [Quick start](#quick-start)
+- [Running against production](#running-against-production)
+- [Environment variables](#environment-variables)
+- [Scripts](#scripts)
+- [Project layout](#project-layout)
+- [How it works](#how-it-works)
+- [Design system (Aurora)](#design-system-aurora)
+- [Security model](#security-model)
+- [Conventions](#conventions)
+- [Troubleshooting](#troubleshooting)
 
 ---
 
-## Badges
+## Quick start
 
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![License](https://img.shields.io/badge/license-MIT-blue)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
-
----
-
-## Quick Start
-
-1. **Clone the repo:**
-   ```sh
-   git clone https://github.com/your-org/nexus.git
-   cd nexus
-   ```
-2. **Copy and configure environment variables:**
-   ```sh
-   cp env.production.template .env.local
-   # Edit .env.local with your values
-   ```
-3. **Install dependencies:**
-   ```sh
-   npm install
-   ```
-4. **Run the development server:**
-   ```sh
-   npm run dev
-   ```
-5. **Visit:** [http://localhost:3000](http://localhost:3000)
-
----
-
-## Project Structure
-
-- `app/` — Next.js app directory, including authenticated/unauthenticated routes and API endpoints.
-- `components/` — Reusable UI components (buttons, dialogs, lists, etc.).
-- `containers/` — Feature modules, each with its own state slice, saga, selectors, and components.
-- `services/` — API clients, WebSocket logic, image upload, and utility services.
-- `store/` — Redux store setup, root reducer, root saga, and provider.
-- `public/` — Static assets.
-- `lib/` — Utility functions and helpers.
-
----
-
-## Architecture
-
-### High-Level Overview
-
-```mermaid
-flowchart TD
-  A[User] -->|Web| B[Next.js Frontend]
-  B -->|Redux| C[Redux Store]
-  C -->|Saga| D[Side Effects]
-  D -->|API| E[Podium API]
-  D -->|WebSocket| F[WebSocket Server]
-  D -->|Web3| G[Web3Auth/Aptos]
-  D -->|Push| H[OneSignal]
-  D -->|Firebase| I[Firebase]
-```
-
-### State/Data Flow
-
-```mermaid
-sequenceDiagram
-  participant UI
-  participant Redux
-  participant Saga
-  participant API
-  UI->>Redux: Dispatch Action
-  Redux->>Saga: Listen for Action
-  Saga->>API: Call API/Service
-  API-->>Saga: Response
-  Saga->>Redux: Dispatch Result
-  Redux->>UI: Update State
-```
-
----
-
-## Feature Overview
-
-| Feature         | Location                   | Description                         |
-| --------------- | -------------------------- | ----------------------------------- |
-| Outposts        | `containers/outpost*`      | Virtual rooms for events/discussion |
-| Notifications   | `containers/notifications` | Real-time and push notifications    |
-| Blockchain Pass | `containers/_assets`       | Passes, trading, and balance        |
-| User Profiles   | `containers/profile`       | User info, NFTs, account actions    |
-| Dashboard       | `containers/dashboard`     | Leaderboards, user stats, tokens    |
-| My Outposts     | `containers/myOutposts`    | User's created/joined outposts      |
-| All Outposts    | `containers/allOutposts`   | Public outpost listing              |
-
----
-
-## Environment Variables
-
-Configuration is managed via environment variables. Copy `env.production.template` to `.env.production` and fill in your values.
-
-### Firebase
-
-- `NEXT_PUBLIC_FIREBASE_API_KEY` — Firebase API key
-- `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` — Firebase Auth domain
-- `NEXT_PUBLIC_FIREBASE_PROJECT_ID` — Firebase project ID
-- `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET` — Firebase storage bucket
-- `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID` — Firebase messaging sender ID
-- `NEXT_PUBLIC_FIREBASE_APP_ID` — Firebase app ID
-
-### OneSignal
-
-- `NEXT_PUBLIC_ONESIGNAL_APP_ID` — OneSignal app ID for push notifications
-
-### Website
-
-- `NEXT_PUBLIC_WEBSITE_LINK_URL` — Public website URL
-
-### Podium API
-
-- `NEXT_PUBLIC_PODIUM_API_URL` — Base URL for Podium API
-
-### WebSocket
-
-- `NEXT_PUBLIC_WEBSOCKET_ADDRESS` — WebSocket server address for real-time features
-
-### Outpost Server
-
-- `NEXT_PUBLIC_OUTPOST_SERVER` — Outpost server address
-
-### Luma API
-
-- `NEXT_PUBLIC_LUMA_API_KEY` — Luma API key for event integration
-
-### Web3Auth
-
-- `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID` — Web3Auth client ID for authentication
-
-### Aptos/Movement
-
-- `NEXT_PUBLIC_MOVEMENT_RPC_URL` — Movement/Aptos RPC endpoint
-- `NEXT_PUBLIC_PODIUM_PROTOCOL_ADDRESS` — Podium protocol contract address
-- `NEXT_PUBLIC_CHEER_BOO_ADDRESS` — Cheer/Boo contract address
-- `NEXT_PUBLIC_FIHUB_ADDRESS` — FIHUB contract address
-- `NEXT_PUBLIC_FIHUB_ADDRESS_APTOS` — FIHUB Aptos contract address
-
----
-
-## State Management
-
-Nexus uses [Redux Toolkit](https://redux-toolkit.js.org/) for state management, with a modular, feature-based approach:
-
-- Each feature (e.g., outposts, users, notifications) has its own slice in `containers/<feature>/slice.ts`.
-- Slices are dynamically injected into the store using the `injectContainer` pattern, allowing for code splitting and on-demand loading.
-- The main store is configured in `store/index.ts` and uses `configureStore` from Redux Toolkit.
-- The store supports dynamic reducer and saga injection for modularity and scalability.
-
-### Store Setup
-
-- `store/index.ts` — Main store logic, dynamic injection, and type definitions.
-- `store/rootReducer.ts` — Combines all static reducers.
-- `store/rootSaga.ts` — Combines all static sagas.
-- `store/Provider.tsx` — React provider for the Redux store.
-
----
-
-## Side Effects & Sagas
-
-Asynchronous logic and side effects are handled with [redux-saga](https://redux-saga.js.org/):
-
-- Each feature has its own saga in `containers/<feature>/saga.ts`.
-- Sagas handle API calls, WebSocket events, authentication, notifications, and more.
-- The root saga (`store/rootSaga.ts`) combines all feature sagas.
-- Sagas are dynamically injected alongside reducers for each feature.
-
-### Example Saga Features
-
-- **Authentication & Web3**: Handles Web3Auth, account switching, and login flows.
-- **Outposts**: Manages creation, joining, reminders, and live data for outposts.
-- **Notifications**: Fetches, marks as read, and deletes notifications.
-- **Assets**: Handles blockchain passes, balance, and pass trading.
-- **Profile**: Manages user profile, NFTs, and account actions.
-
----
-
-## Slices & Dynamic Injection
-
-Slices are created using Redux Toolkit's `createSlice` and injected at runtime:
-
-- Each slice exports a `use<Feature>Slice` hook that injects its reducer and saga.
-- Example:
-  ```ts
-  export const useUsersSlice = () => {
-    injectContainer({
-      name: usersSlice.name,
-      reducer: usersSlice.reducer,
-      saga: usersSaga,
-    });
-  };
-  ```
-- This enables code splitting and only loads state logic when needed.
-
----
-
-## Selectors
-
-Selectors are used to efficiently access and compute derived state:
-
-- Defined in each feature's `selectors.ts` or `selectore.ts` file.
-- Use `createSelector` for memoization and performance.
-- Example: `AssetsSelectors.userPasses(id)` returns pass info for a user.
-
----
-
-## API Reference
-
-> **Note:** Most API calls are proxied through the Podium API and custom endpoints in `app/api/`.
-
-### Example Endpoints
-
-- `GET /api/revalidate/all-outposts` — Revalidates all outposts cache
-- `GET /api/revalidate/dashboard/recent-users` — Revalidates recent users
-- `GET /api/revalidate/user/[id]` — Revalidates a specific user
-- `POST /api/search` — Search functionality
-- `GET /api/cookies` — Cookie management
-
-For more, see the `app/api/` directory and [Podium API documentation](https://your-podium-api-url.com/api/v1/docs).
-
----
-
-## Scripts & Development
-
-### Scripts (from `package.json`):
-
-- `dev` — Start development server with Turbopack
-- `build` — Build the app for production
-- `start` — Start the production server
-- `lint` — Run ESLint
-- `tsc` — Run TypeScript compiler
-- `postinstall` — Run patch-package after install
-
-### Install & Run
+Requirements: **Node 22+** and **Yarn 1.x** (the repo ships a `yarn.lock`; don't mix in npm).
 
 ```sh
-npm install
-npm run dev
+git clone https://github.com/myFiHub/nexus.git
+cd nexus
+yarn install            # also applies patches/ via patch-package
+cp env.production.template .env.local
+# fill in .env.local (see below)
+yarn dev                # http://localhost:3000
+```
+
+`yarn dev` runs in development mode, which uses the **Web3Auth Sapphire devnet** network. Pair it with a development backend and a devnet Web3Auth client ID.
+
+---
+
+## Running against production
+
+To test locally against the live Podium backend, run a production build. Production mode switches Web3Auth to **Sapphire mainnet**, so you sign in with the same wallet and account as on the live site.
+
+1. Put production values in `.env.production.local`. It overrides `.env.production` and is only read by `next build` / `next start`.
+   The values that differ between environments are:
+   - `NEXT_PUBLIC_PODIUM_API_URL` (backend base URL, including `/api/v1`)
+   - `NEXT_PUBLIC_WEBSOCKET_ADDRESS`
+   - `NEXT_PUBLIC_ONESIGNAL_APP_ID`
+   - `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID`
+
+   The mobile app's `podium/env/production.env` (`PODIM_BACKEND_BASE_URL`, `WEBSOCKET_ADDRESS`, `ONESIGNAL_API_KEY`, `WEB3_AUTH_CLIENT_ID`) is the source of truth.
+2. Build and serve:
+
+   ```sh
+   yarn preview            # next build && next start → http://localhost:3000
+   ```
+
+> **You are using real data.** Anything you create, follow, cheer or buy locally happens on production.
+
+Notes:
+
+- Rebuild after changing env values. `NEXT_PUBLIC_*` values are inlined at build time.
+- If pages show stale or empty data after switching backends, clear Next's data cache with `rm -rf .next/cache/fetch-cache` and rebuild.
+- OneSignal push only works on the domain configured in OneSignal, so expect it to be inactive on `localhost`.
+
+---
+
+## Environment variables
+
+Copy `env.production.template` and fill it in. Env files are git-ignored. Never commit them.
+
+| Variable | Exposed to browser | Purpose |
+| --- | --- | --- |
+| `NEXT_PUBLIC_PODIUM_API_URL` | yes | Podium REST API base URL |
+| `NEXT_PUBLIC_WEBSOCKET_ADDRESS` | yes | Real-time server for live outposts |
+| `NEXT_PUBLIC_OUTPOST_SERVER` | yes | Audio (Jitsi) server domain |
+| `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID` | yes | Web3Auth project (devnet in dev, mainnet in prod builds) |
+| `NEXT_PUBLIC_MOVEMENT_RPC_URL` | yes | Movement / Aptos RPC |
+| `NEXT_PUBLIC_PODIUM_PROTOCOL_ADDRESS`, `NEXT_PUBLIC_CHEER_BOO_ADDRESS`, `NEXT_PUBLIC_FIHUB_ADDRESS`, `NEXT_PUBLIC_FIHUB_ADDRESS_APTOS` | yes | On-chain contract addresses |
+| `NEXT_PUBLIC_FIREBASE_*` | yes | Firebase (storage for uploads) |
+| `NEXT_PUBLIC_ONESIGNAL_APP_ID` | yes | Web push |
+| `NEXT_PUBLIC_WEBSITE_LINK_URL` | yes | Canonical site URL (metadata, share links) |
+| `LUMA_API_KEY` | **no** | Luma events API. Only read on the server. |
+| `REVALIDATE_SECRET` | **no** | Optional. Lets backend jobs call `/api/revalidate/*`. |
+
+`NEXT_PUBLIC_LUMA_API_KEY` is still read as a fallback, but please migrate to `LUMA_API_KEY`.
+
+---
+
+## Scripts
+
+| Command | What it does |
+| --- | --- |
+| `yarn dev` | Dev server with Turbopack |
+| `yarn build` | Production build |
+| `yarn start` | Serve the last build |
+| `yarn preview` | `build` + `start` in one go |
+| `yarn lint` | ESLint (flat config, React Compiler rules). Should stay at **0 errors**. |
+| `yarn tsc --noEmit` | Type-check |
+
+`postinstall` runs `patch-package`. If you reinstall or remove packages with a command that skips lifecycle scripts, run `npx patch-package` yourself, or the Jitsi SDK types break.
+
+---
+
+## Project layout
+
+```text
+app/                      Routes (App Router)
+  (unauthenticated)/      Public pages: home feed, all_outposts, outpost_details/[id], user/[id], tags/[id], search, users, dashboard…
+  (authenticated)/        Signed-in pages: profile, create_outpost, my_outposts, ongoing_outpost/[id], analytics
+  api/                    Route handlers: revalidate/*, cookies, luma proxy, luma-access, coingecko price
+  error.tsx, global-error.tsx, not-found.tsx
+components/               Shared UI (Aurora primitives in components/aurora, dialogs, header, sidebar)
+containers/<feature>/     Feature modules: slice.ts, saga.ts, selectors.ts, components
+services/api/             Podium API client (axios) and Luma client/server helpers
+services/wsClient/        WebSocket client for live outposts
+services/move/            Movement / Aptos transactions
+store/                    Redux store with runtime reducer/saga injection
+lib/                      Utilities: clock, theme, cookies, referral, bans, server request guards…
+hooks/                    Small client hooks (useIsMobile, useHydrated)
+patches/                  patch-package patches for third-party libs
 ```
 
 ---
 
-## Testing
+## How it works
 
-> **Note:** Add details here if you have a test suite. If not, this is a good place to describe your testing strategy.
+**Rendering.** Public pages are server components. They fetch through `unstable_cache` with tags, so they're fast and cache-friendly. These cached pages carry no viewer context. Anything viewer-specific (am I following, am I banned, mutual followers) is fetched client-side after hydration.
 
-### Running Tests
+**State.** One Redux store per browser session (and a fresh one per server request). Feature slices are injected on demand:
 
-```sh
-npm test
+```ts
+export const injectUsersSlice = () =>
+  injectContainer({ name: usersSlice.name, reducer: usersSlice.reducer, saga: usersSaga });
 ```
 
-- Use [Jest](https://jestjs.io/) for unit tests (add config if available)
-- Use [Cypress](https://www.cypress.io/) or [Playwright](https://playwright.dev/) for end-to-end tests
-- Add new tests in the `__tests__/` directory or alongside components
+These `inject*Slice` functions are plain functions, not hooks, so they're safe to call from sagas.
+
+**Side effects.** Login, joining outposts, reminders, passes and notifications live in redux-saga. Web3Auth is lazy-loaded from the init saga, so it stays out of the main bundle.
+
+**Time.** Use `useClock(select, interval)` / `useNow()` from `lib/clock.ts` instead of `Date.now()` in render. `now` is `null` on the server. `select` must return a primitive, otherwise the component re-renders forever.
+
+**Cache invalidation.** After mutations the client calls `/api/revalidate/*` (POST, same-origin only) to refresh tagged server caches.
 
 ---
 
-## Deployment & Production
+## Design system (Aurora)
 
-### Build for Production
+Theme tokens are CSS variables (`--p-accent`, `--p-surface`, `--p-text-muted`, …) defined per theme in `app/globals.css`, switchable from the header theme picker. Building blocks:
 
-```sh
-npm run build
-npm run start
-```
+- Utilities: `glass-card`, `btn-aurora`, `bg-grad-primary`, `label-caps`, `animate-entrance`, `press`
+- Components (`components/aurora`): `GlassCard`, `IconTile`, `Pill`, `Skeleton`, `OutpostThumb`, `AvatarStack`, `LiveDot`, `StatusPage`
 
-### Deployment Targets
-
-- **Vercel**: Zero-config deployment for Next.js
-- **Docker**: Add a `Dockerfile` for containerized deployment
-- **Custom Server**: Use `npm run build` and `npm run start` on your own infrastructure
-
-### Required Services
-
-- **Firebase**: Auth, storage, messaging
-- **OneSignal**: Push notifications
-- **Podium API**: Main backend
-- **Web3Auth**: Web3 login
-- **Aptos/Movement**: Blockchain integration
-
-### Security Notes
-
-- Never commit `.env.*` files to version control
-- Use secret managers for production deployments
-- Review CORS and authentication settings
+User-facing copy says **outposts**, never "rooms".
 
 ---
 
-## Troubleshooting & FAQ
+## Security model
 
-### Common Issues
-
-- **Web3Auth errors**: Check your `NEXT_PUBLIC_WEB3AUTH_CLIENT_ID` and network settings
-- **Missing env vars**: Ensure `.env.local` is present and filled
-- **CORS issues**: Check API and WebSocket server CORS settings
-- **Push notifications not working**: Verify OneSignal setup and browser permissions
-- **Blockchain errors**: Check RPC URLs and contract addresses
-
-### FAQ
-
-- **How do I add a new feature?**
-  - Create a new folder in `containers/`, add a slice, saga, selectors, and components
-  - Use the `injectContainer` pattern for dynamic loading
-- **How do I update environment variables?**
-  - Edit `.env.local` and restart the dev server
+- **Auth token:** a cookie the API client sends as a Bearer token. It's cleared on logout and on any 401 for the current token.
+- **Internal API routes** (`/api/revalidate/*`, `/api/cookies`, `/api/luma*`) accept same-origin requests only, or a valid `x-revalidate-secret` header. They validate ids and allowlist cookie names.
+- **Luma:** the key never reaches the browser. `/api/luma/*` proxies an allowlist of endpoints and requires a signed-in Podium user for writes. Guest lists are never exposed. `/api/luma-access/:eventId` returns only `{ allowed }`.
+- **Headers** (`next.config.ts`): `X-Frame-Options: DENY`, `nosniff`, a strict referrer policy, a Permissions-Policy (microphone for self only) and HSTS in production. The full CSP currently runs in **report-only** mode. Watch the console for violations before enforcing it.
 
 ---
 
-## Contribution Guidelines
+## Conventions
 
-1. **Fork and clone the repo**
-2. **Create a new branch** for your feature or bugfix
-3. **Follow coding standards** (ESLint, Prettier)
-4. **Write tests** for new features
-5. **Open a pull request** with a clear description
-6. **Participate in code review**
-
-### Branching Model
-
-- Use `develop` for ongoing work
-- Use `main` for production releases
-- Feature branches: `feature/<name>`
-- Bugfix branches: `bugfix/<name>`
-
-### PR Process
-
-- Reference issues in your PR
-- Add screenshots or demos if UI changes
-- Ensure all checks pass before merging
+- Branches: work on feature branches, merge into `develop`; `main` is production.
+- Keep `yarn lint` at 0 errors and `yarn tsc --noEmit` clean before merging.
+- Don't set state synchronously inside effects. Derive it during render, use `useSyncExternalStore` for browser APIs and storage, or set it from async callbacks.
+- Don't read `window`, `localStorage` or `Date.now()` during render. Use `useHydrated`, `useSyncExternalStore` or `useClock`.
 
 ---
 
-## Credits & Acknowledgements
+## Troubleshooting
 
-- [Next.js](https://nextjs.org/)
-- [Redux Toolkit](https://redux-toolkit.js.org/)
-- [Redux-Saga](https://redux-saga.js.org/)
-- [Web3Auth](https://web3auth.io/)
-- [Firebase](https://firebase.google.com/)
-- [OneSignal](https://onesignal.com/)
-- [Aptos](https://aptos.dev/)
-- [Radix UI](https://www.radix-ui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [All contributors](https://github.com/your-org/nexus/graphs/contributors)
-
----
-
-## License
-
-[MIT](LICENSE)
+| Symptom | Likely cause |
+| --- | --- |
+| Every page shows empty or error states | The backend in `NEXT_PUBLIC_PODIUM_API_URL` is down, or you're pointing at the wrong environment. Check with `curl "$NEXT_PUBLIC_PODIUM_API_URL/outposts?page=0&page_size=1"`. |
+| Stale data after switching backends | `rm -rf .next/cache/fetch-cache` and rebuild |
+| "Failed to initialize the app" toast | Web3Auth client ID doesn't match the network (devnet in `yarn dev`, mainnet in builds), or the origin isn't allow-listed in the Web3Auth dashboard |
+| Type errors in `meet.tsx` after installing packages | Patches weren't applied. Run `npx patch-package`. |
+| Luma details "unavailable" | `LUMA_API_KEY` missing, or the Luma calendar has no active Luma Plus plan |
+| Push notifications don't work locally | Expected. OneSignal is bound to the production domain. |
