@@ -1,41 +1,32 @@
-"use server";
+import "server-only";
 
 import { cookies } from "next/headers";
 import { CookieKeys } from "./client-cookies";
 
-// Server-side cookie management using Next.js cookies() function
-export async function getServerCookie(
-  key: CookieKeys
-): Promise<string | undefined> {
-  try {
-    const cookieStore = await cookies();
-    return cookieStore.get(key)?.value;
-  } catch (error) {
-    console.error("Error getting server cookie:", error);
-    return undefined;
-  }
+type ServerCookieOptions = {
+  path?: string;
+  maxAge?: number;
+  expires?: Date;
+  sameSite?: "lax" | "strict" | "none";
+  secure?: boolean;
+  httpOnly?: boolean;
+};
+
+export async function getServerCookie(key: CookieKeys): Promise<string | undefined> {
+  const cookieStore = await cookies();
+  return cookieStore.get(key)?.value;
 }
 
 export async function setServerCookie(
   key: CookieKeys,
   value: string,
-  options?: { path?: string; maxAge?: number; expires?: Date }
+  options?: ServerCookieOptions
 ): Promise<void> {
-  try {
-    const cookieStore = await cookies();
-    cookieStore.set(key, value, options);
-  } catch (error) {
-    console.error("Error setting server cookie:", error);
-    throw error;
-  }
+  const cookieStore = await cookies();
+  cookieStore.set(key, value, options);
 }
 
 export async function deleteServerCookie(key: CookieKeys): Promise<void> {
-  try {
-    const cookieStore = await cookies();
-    cookieStore.delete(key);
-  } catch (error) {
-    console.error("Error deleting server cookie:", error);
-    throw error;
-  }
+  const cookieStore = await cookies();
+  cookieStore.delete(key);
 }

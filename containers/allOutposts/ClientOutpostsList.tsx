@@ -1,20 +1,19 @@
 "use client";
 import { PAGE_SIZE } from "app/lib/constants";
-import { ReduxProvider } from "app/store/Provider";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingOutposts } from "../../components/outpost/LoadingOutposts";
 import { OutpostsList } from "../../components/outpost/OutpostsList";
 import { OutpostModel } from "../../services/api/types";
 import { allOutpostsSelectors } from "./selectors";
-import { allOutpostsActions, useAllOutpostsSlice } from "./slice";
+import { allOutpostsActions, injectAllOutpostsSlice } from "./slice";
 
 interface ClientOutpostsListProps {
   initialOutposts: OutpostModel[];
 }
 
 const Content = ({ initialOutposts }: ClientOutpostsListProps) => {
-  useAllOutpostsSlice();
+  injectAllOutpostsSlice();
   const dispatch = useDispatch();
   const observerRef = useRef<IntersectionObserver | null>(null);
 
@@ -123,8 +122,8 @@ export const ClientOutpostsList = ({
   initialOutposts,
 }: ClientOutpostsListProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content initialOutposts={initialOutposts} />
-    </ReduxProvider>
+    </>
   );
 };

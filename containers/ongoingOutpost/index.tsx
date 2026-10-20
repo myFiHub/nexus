@@ -1,11 +1,10 @@
 "use client";
 import { CheerBooAmountDialogProvider } from "app/components/Dialog/cheerBooAmountDialog";
-import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useUsersSlice } from "../_users/slice";
+import { injectUsersSlice } from "../_users/slice";
 import { GlobalSelectors } from "../global/selectors";
 import { OutpostHeader } from "./components/header";
 import { RecordingIndicator } from "./components/header/RecordingIndicator";
@@ -15,14 +14,16 @@ import { OngoingOutpostSkeleton } from "./components/OngoingOutpostSkeleton";
 import { WaitingForCreator } from "./components/waitingForCreator";
 import { OngoingOutpostTutorial } from "./tutorial/OngoingOutpostTutorial";
 import { onGoingOutpostSelectors } from "./selectors";
-import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
-import { useAssetsSlice } from "../_assets/slice";
+import { onGoingOutpostActions, injectOnGoingOutpostSlice } from "./slice";
+import { injectAssetsSlice } from "../_assets/slice";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
+import { useClock } from "app/lib/clock";
+import { shouldWaitForCreator as checkShouldWaitForCreator } from "./utils/shouldWaitForCreator";
 
 const Content = () => {
-  useUsersSlice();
-  useAssetsSlice();
-  useOnGoingOutpostSlice();
+  injectUsersSlice();
+  injectAssetsSlice();
+  injectOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const { id } = useParams();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
@@ -34,8 +35,9 @@ const Content = () => {
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
   const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
 
-  const shouldWaitForCreator = useSelector(
-    onGoingOutpostSelectors.shouldWaitForCreator
+  const shouldWaitForCreator = useClock(
+    (now) =>
+      !!outpost && now !== null && !!checkShouldWaitForCreator({ outpost, now })
   );
   useEffect(() => {
     return () => {
@@ -89,9 +91,9 @@ const Content = () => {
 
 export const OngoingOutpost = () => {
   return (
-    <ReduxProvider>
+    <>
       <RouteLoaderCleaner />
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

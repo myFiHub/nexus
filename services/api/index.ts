@@ -10,6 +10,7 @@ import {
 } from "app/containers/dashboard/users/configs";
 import {
   CookieKeys,
+  deleteClientCookie,
   getClientCookie,
   setClientCookie,
 } from "app/lib/client-cookies";
@@ -17,7 +18,19 @@ import { isDev } from "app/lib/utils";
 import axios, { AxiosInstance } from "axios";
 import {
   AdditionalDataForLogin,
+  AnalyticsWindow,
+  BlockAction,
+  BlockedUser,
   BuySellPodiumPassRequest,
+  CreateOutpostBanRequest,
+  DiscoveredOutpost,
+  HomeFeed,
+  HostAnalyticsSummary,
+  HostOutpostAnalytics,
+  OutpostBanInfo,
+  OutpostBanItem,
+  PopularTag,
+  TrendingWindow,
   ConnectNewAccountRequest,
   CreateOutpostRequest,
   FollowerModel,
@@ -50,12 +63,31 @@ import {
   User,
 } from "./types";
 
+const tokenCookieAttributes = () => ({
+  secure: !isDev,
+  sameSite: "strict" as const,
+  path: "/",
+  domain: isDev
+    ? "localhost"
+    : process.env.NEXT_PUBLIC_WEBSITE_LINK_URL!.replace("https://", ""),
+});
+
 class PodiumApi {
   private readonly baseUrl: string;
   private readonly axiosInstance: AxiosInstance;
   private token: string | undefined = undefined;
+  /** Called once when an authenticated request comes back 401. */
+  onUnauthorized: (() => void) | undefined = undefined;
+
   setToken(token: string | undefined) {
     this.token = token;
+  }
+
+  /** Forgets the token in memory and in the cookie, including legacy host-only copies. */
+  clearToken() {
+    this.token = undefined;
+    deleteClientCookie(CookieKeys.token, tokenCookieAttributes());
+    deleteClientCookie(CookieKeys.token, { path: "/" });
   }
 
   constructor(baseUrl: string) {
@@ -82,6 +114,20 @@ class PodiumApi {
       }
       return config;
     });
+
+    this.axiosInstance.interceptors.response.use(undefined, (error) => {
+      const sentToken = error?.config?.headers?.Authorization;
+      if (
+        typeof window !== "undefined" &&
+        error?.response?.status === 401 &&
+        sentToken &&
+        sentToken === `Bearer ${this.token}`
+      ) {
+        this.clearToken();
+        this.onUnauthorized?.();
+      }
+      return Promise.reject(error);
+    });
   }
 
   // Auth methods
@@ -101,16 +147,8 @@ class PodiumApi {
 
         if (this.token) {
           setClientCookie(CookieKeys.token, this.token, {
+            ...tokenCookieAttributes(),
             expires: new Date(Date.now() + 6 * 60 * 60 * 1000), // 6 hours from now
-            secure: !isDev,
-            sameSite: "strict",
-            path: "/",
-            domain: isDev
-              ? "localhost"
-              : process.env.NEXT_PUBLIC_WEBSITE_LINK_URL!.replace(
-                  "https://",
-                  ""
-                ),
           });
         }
 
@@ -1130,6 +1168,190 @@ class PodiumApi {
       return false;
     }
   }
+
+  // Home feed
+  async getHomeFeed(utcOffsetMinutes: number): Promise<HomeFeed | undefined> {
+    try {
+      const response = await this.axiosInstance.get(`/home`, {
+        params: { utc_offset_minutes: utcOffsetMinutes },
+      });
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return undefined;
+    }
+  }
+
+  // Discovery
+  async getLiveOutposts(limit = 20): Promise<DiscoveredOutpost[]> {
+    try {
+      const response = await this.axiosInstance.get(`/discover/live`, {
+        params: { limit },
+      });
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  async getLiveFromFollowings(limit = 12): Promise<DiscoveredOutpost[]> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/discover/live-from-followings`,
+        { params: { limit } }
+      );
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  async getTrendingOutposts(
+    window: TrendingWindow = "7d",
+    limit = 12
+  ): Promise<DiscoveredOutpost[]> {
+    try {
+      const response = await this.axiosInstance.get(`/discover/trending`, {
+        params: { window, limit },
+      });
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  async getPopularTags(limit = 16): Promise<PopularTag[]> {
+    try {
+      const response = await this.axiosInstance.get(`/discover/tags`, {
+        params: { limit },
+      });
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  // Host analytics
+  async getHostAnalyticsSummary(
+    window: AnalyticsWindow,
+    utcOffsetMinutes: number
+  ): Promise<ApiResult<HostAnalyticsSummary>> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/analytics/host/summary`,
+        { params: { window, utc_offset_minutes: utcOffsetMinutes } }
+      );
+      return { data: response.data.data, status: response.status };
+    } catch (error: any) {
+      if (isDev) console.log("error", error);
+      return {
+        status: error.response?.status,
+        error: error.response?.data?.message ?? "Failed to load analytics",
+      };
+    }
+  }
+
+  async getHostOutpostAnalytics(
+    outpostId: string,
+    window: AnalyticsWindow,
+    utcOffsetMinutes: number
+  ): Promise<ApiResult<HostOutpostAnalytics>> {
+    try {
+      const response = await this.axiosInstance.get(
+        `/analytics/host/outposts/${encodeURIComponent(outpostId)}`,
+        { params: { window, utc_offset_minutes: utcOffsetMinutes } }
+      );
+      return { data: response.data.data, status: response.status };
+    } catch (error: any) {
+      if (isDev) console.log("error", error);
+      return {
+        status: error.response?.status,
+        error: error.response?.data?.message ?? "Failed to load analytics",
+      };
+    }
+  }
+
+  // User blocks
+  async blockUser(uuid: string, action: BlockAction): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.post(`/users/block`, {
+        uuid,
+        action,
+      });
+      return response.status === 200;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return false;
+    }
+  }
+
+  async getBlockedUsers(): Promise<BlockedUser[]> {
+    try {
+      const response = await this.axiosInstance.get(`/users/blocked`);
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  // Outpost bans and kicks
+  async getOutpostBans(
+    outpostId: string,
+    page = 0,
+    pageSize = 50
+  ): Promise<OutpostBanItem[]> {
+    try {
+      const response = await this.axiosInstance.get(`/outposts/bans`, {
+        params: { uuid: outpostId, page, page_size: pageSize },
+      });
+      return response.data.data ?? [];
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return [];
+    }
+  }
+
+  async banUserFromOutpost(
+    request: CreateOutpostBanRequest
+  ): Promise<OutpostBanInfo | undefined> {
+    try {
+      const response = await this.axiosInstance.post(
+        `/outposts/bans/create`,
+        request
+      );
+      return response.data.data;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return undefined;
+    }
+  }
+
+  async unbanUserFromOutpost(
+    outpostId: string,
+    userId: string
+  ): Promise<boolean> {
+    try {
+      const response = await this.axiosInstance.post(`/outposts/bans/delete`, {
+        outpost_uuid: outpostId,
+        user_uuid: userId,
+      });
+      return response.status === 200;
+    } catch (error) {
+      if (isDev) console.log("error", error);
+      return false;
+    }
+  }
+}
+
+export interface ApiResult<T> {
+  data?: T;
+  status?: number;
+  error?: string;
 }
 
 // Create a single instance with the base URL

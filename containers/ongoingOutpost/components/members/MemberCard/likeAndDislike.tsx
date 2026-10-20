@@ -76,16 +76,16 @@ export const LikeAndDislike = ({
 
   // Countdown effect
   useEffect(() => {
-    if (countdown > 0) {
-      const timer = setTimeout(() => {
-        setCountdown(countdown - 1);
-      }, 1000);
-      return () => clearTimeout(timer);
-    } else if (countdown === 0 && isDisabled) {
-      setIsDisabled(false);
-      setActed(false);
-    }
-  }, [countdown, isDisabled]);
+    if (countdown <= 0) return;
+    const timer = setTimeout(() => {
+      setCountdown(countdown - 1);
+      if (countdown === 1) {
+        setIsDisabled(false);
+        setActed(false);
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [countdown]);
 
   const handleLike = async () => {
     if (isDisabled) return;

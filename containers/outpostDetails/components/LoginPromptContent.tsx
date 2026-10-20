@@ -1,4 +1,5 @@
 import { Img } from "app/components/Img";
+import { useClock } from "app/lib/clock";
 import { logoUrl } from "app/lib/constants";
 import { OutpostModel } from "app/services/api/types";
 import { easeOut, motion } from "framer-motion";
@@ -19,6 +20,10 @@ interface LoginPromptContentProps {
 }
 
 export const LoginPromptContent = ({ outpost }: LoginPromptContentProps) => {
+  const hasStarted = useClock(
+    (now) => now !== null && now >= (outpost.scheduled_for ?? 0),
+    30_000
+  );
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -79,10 +84,7 @@ export const LoginPromptContent = ({ outpost }: LoginPromptContentProps) => {
         bgColor: "bg-green-500/20",
       };
 
-    const now = Date.now();
-    const scheduledTime = outpost.scheduled_for;
-
-    if (now < scheduledTime) {
+    if (!hasStarted) {
       return {
         status: "Scheduled",
         color: "text-blue-400",

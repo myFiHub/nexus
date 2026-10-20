@@ -1,6 +1,7 @@
 "use client";
 
-import { isLiveOutpost, isUpcomingOutpost } from "app/lib/outposts";
+import { useClock } from "app/lib/clock";
+import { isLiveOutpost } from "app/lib/outposts";
 import { OutpostModel } from "app/services/api/types";
 import { useMemo, useState } from "react";
 import { EventOutpostCard } from "./EventsStrip/EventOutpostCard";
@@ -13,9 +14,9 @@ interface EventsListProps {
 
 export function EventsList({ featuredEvents }: EventsListProps) {
   const [filter, setFilter] = useState<FilterTab>("all");
+  const now = useClock((ms) => (ms === null ? 0 : Math.floor(ms / 60_000) * 60_000), 60_000);
 
   const filtered = useMemo(() => {
-    const now = Date.now();
     if (filter === "live") {
       return featuredEvents.filter(isLiveOutpost);
     }
@@ -23,16 +24,14 @@ export function EventsList({ featuredEvents }: EventsListProps) {
       return featuredEvents.filter((ev) => ev.scheduled_for > now);
     }
     return featuredEvents;
-  }, [featuredEvents, filter]);
+  }, [featuredEvents, filter, now]);
 
   if (featuredEvents.length === 0) {
     return null;
   }
 
   const liveCount = featuredEvents.filter(isLiveOutpost).length;
-  const upcomingCount = featuredEvents.filter((ev) =>
-    isUpcomingOutpost(ev)
-  ).length;
+  const upcomingCount = featuredEvents.filter((ev) => ev.scheduled_for > now).length;
 
   const tabOrder: FilterTab[] = ["all", "live", "upcoming"];
 
@@ -40,14 +39,14 @@ export function EventsList({ featuredEvents }: EventsListProps) {
     <section
       className="w-full relative"
       role="region"
-      aria-label="Live and upcoming rooms"
+      aria-label="Live and upcoming outposts"
     >
       <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-purple-500/10 blur-3xl -z-10 pointer-events-none" />
 
       <div className="relative">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-base md:text-lg font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
-            Live & Upcoming Rooms
+            Live & Upcoming Outposts
           </h2>
           <div
             className="flex gap-1.5"
@@ -98,7 +97,7 @@ export function EventsList({ featuredEvents }: EventsListProps) {
 
         {filtered.length === 0 && (
           <p className="text-center py-4 text-sm text-[var(--muted-foreground)]">
-            No {filter === "live" ? "live" : filter === "upcoming" ? "upcoming" : ""} rooms right now. Check back later.
+            No {filter === "live" ? "live" : filter === "upcoming" ? "upcoming" : ""} outposts right now. Check back later.
           </p>
         )}
       </div>

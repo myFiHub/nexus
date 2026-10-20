@@ -3,11 +3,12 @@ import {
   ConfirmDialogResult,
 } from "app/components/Dialog/confirmDialog";
 import { detached_checkPass } from "app/containers/_assets/saga";
-import { useAssetsSlice } from "app/containers/_assets/slice";
+import { injectAssetsSlice } from "app/containers/_assets/slice";
 import {
   onGoingOutpostActions,
-  useOnGoingOutpostSlice,
+  injectOnGoingOutpostSlice,
 } from "app/containers/ongoingOutpost/slice";
+import { banNotice, isBanActive } from "app/lib/outpostBans";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { LiveMember, OutpostModel, User } from "app/services/api/types";
@@ -32,7 +33,7 @@ const FreeOutpostAccessTypes = {
 export function* joinOutpost(
   action: ReturnType<typeof globalActions.joinOutpost>
 ) {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const joiningId: string | undefined = yield select(
     GlobalSelectors.joiningOutpostId
   );
@@ -47,6 +48,18 @@ export function* joinOutpost(
     );
     if (!outpost) {
       toast.error("Outpost not found");
+      return;
+    }
+
+    const now = Date.now();
+    if (outpost.my_ban && isBanActive(outpost.my_ban, now)) {
+      const notice = banNotice(outpost.my_ban, now, outpost.name);
+      yield confirmDialog({
+        title: notice.title,
+        content: notice.message,
+        confirmOpts: { text: "OK" },
+        cancelOpts: { hidden: true },
+      });
       return;
     }
 
@@ -138,7 +151,7 @@ function* getOutpostAccesses({
   ////////////////////////////////////////////////////
 
   if (accessIsBuyableByTicket(outpost) || speakIsBuyableByTicket(outpost)) {
-    useAssetsSlice();
+    injectAssetsSlice();
     const accesses: OutpostAccesses | undefined = yield detached_checkPass({
       outpost,
     });
@@ -209,7 +222,7 @@ function* openOutpost({
   outpost: OutpostModel;
   accesses: OutpostAccesses;
 }) {
-  useOnGoingOutpostSlice();
+  injectOnGoingOutpostSlice();
   const outpost = { ...receivedOutpost };
   const currentMembers: LiveMember[] = outpost.members ?? [];
   const myUser: User | undefined = yield select(GlobalSelectors.podiumUserInfo);

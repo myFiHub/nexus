@@ -1,5 +1,6 @@
 "use client";
 import { getFilterDescription } from "app/app/(unauthenticated)/users/[filter]/_utils";
+import { useHydrated } from "app/hooks/use-hydrated";
 import { useEffect, useState } from "react";
 import TextTransition, { presets } from "react-text-transition";
 import { UserTags } from "../../../../app/(unauthenticated)/users/[filter]/_filters";
@@ -38,25 +39,14 @@ function AnimatedText({
 }
 
 function Description({ filter }: { filter: UserTags }) {
-  let description = getFilterDescription(filter, true);
+  const description = getFilterDescription(filter, true);
+  const isClient = useHydrated();
 
   if (description.includes("@@")) {
     const [staticStart, ...rest] = description.split("@@");
-    let animatedParts: string[] = [];
-    let staticEnd = "";
+    const animatedParts = rest.length >= 3 ? rest.slice(0, -1) : rest;
+    const staticEnd = rest.length >= 3 ? rest[rest.length - 1] : "";
 
-    if (rest.length >= 3) {
-      animatedParts = rest.slice(0, -1);
-      staticEnd = rest[rest.length - 1];
-    } else {
-      animatedParts = rest;
-      staticEnd = "";
-    }
-
-    const [isClient, setIsClient] = useState(false);
-    useEffect(() => {
-      setIsClient(true);
-    }, []);
     if (animatedParts.length > 0) {
       return (
         <span style={{ whiteSpace: "nowrap" }}>

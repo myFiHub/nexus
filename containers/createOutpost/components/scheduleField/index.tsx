@@ -40,7 +40,7 @@ export const ScheduledField = () => {
         >
           <div className="font-medium text-base">Scheduled Outpost</div>
           <div
-            className={`text-[#b0b8c1] text-xs ${
+            className={`text-text-muted text-xs ${
               scheduledFor ? "cursor-pointer" : ""
             }`}
             onClick={(e) => {

@@ -33,7 +33,7 @@ export const EnterTypeField = () => {
         <PopoverTrigger asChild>
           <button
             type="button"
-            className="w-full bg-white/60 text-slate-900 dark:bg-[#181f29] dark:text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-slate-200 dark:hover:bg-[#232b36] focus:bg-slate-200 dark:focus:bg-[#232b36] transition-colors outline-none cursor-pointer"
+            className="w-full bg-white/60 text-slate-900 dark:bg-surface dark:text-white rounded-lg px-4 py-3 text-base text-left shadow-sm hover:bg-slate-200 dark:hover:bg-surface-raised focus:bg-slate-200 dark:focus:bg-surface-raised transition-colors outline-none cursor-pointer"
           >
             {serverEnterTypeToText(allowedToEnter)}
           </button>

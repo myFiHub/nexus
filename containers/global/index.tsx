@@ -1,42 +1,25 @@
 "use client";
-import { DateTimePickerDialogProvider } from "app/components/Calendar/date-time";
-import {
-  BuyOrSellPassDialogProvider,
-  LoginPromptDialogProvider,
-  LogoutDialogProvider,
-  LumaUserDialogProvider,
-  NameDialogProvider,
-  PodiumPassTradeDialogProvider,
-  PromptNotificationsDialogProvider,
-  ReferrerDialogProvider,
-  SearchDialogProvider,
-  TransferBalanceDialogProvider,
-  UserSelectDialogProvider,
-} from "app/components/Dialog";
-import { ConfirmDialogProvider } from "app/components/Dialog/confirmDialog";
-import { LoginMethodSelectDialogProvider } from "app/components/Dialog/loginMethodSelect";
-import { ReminderDialogProvider } from "app/components/Dialog/reminder";
-import { UserSelectToInviteDialogProvider } from "app/components/Dialog/userSelectToInvite";
 import { Toaster } from "app/components/toast";
-import { OutpostAccessesDialogProvider } from "app/containers/_assets/outpostAccessesDialog";
-import { CohostsDialogProvider } from "app/containers/createOutpost/components/cohosts/dialog";
-import { ReduxProvider } from "app/store/Provider";
+import { toast } from "app/lib/toast";
+import podiumApi from "app/services/api";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ExternalWallets } from "../_externalWallets";
-import { useExternalWalletSlice } from "../_externalWallets/slice";
-import { useNotificationsSlice } from "../notifications/slice";
+import { injectExternalWalletSlice } from "../_externalWallets/slice";
+import { injectNotificationsSlice } from "../notifications/slice";
 import { GlobalSelectors } from "./selectors";
-import { globalActions, useGlobalSlice } from "./slice";
+import { globalActions, injectGlobalSlice } from "./slice";
+
+const GlobalUi = dynamic(() => import("./GlobalUi"), { ssr: false });
 
 const Container = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const initialized = useSelector(GlobalSelectors.initialized);
-  useGlobalSlice();
-  useNotificationsSlice();
-  useExternalWalletSlice();
+  injectGlobalSlice();
+  injectNotificationsSlice();
+  injectExternalWalletSlice();
 
   useEffect(() => {
     dispatch(globalActions.getMovePrice());
@@ -45,44 +28,36 @@ const Container = () => {
     }
   }, [router, dispatch]);
 
+  const isLoggedIn = useSelector(GlobalSelectors.isLoggedIn);
+  const logingIn = useSelector(GlobalSelectors.logingIn);
+  const sessionActiveRef = useRef(false);
   useEffect(() => {
-    dispatch(globalActions.startTicker());
+    sessionActiveRef.current = isLoggedIn && !logingIn;
+  }, [isLoggedIn, logingIn]);
+
+  useEffect(() => {
+    podiumApi.onUnauthorized = () => {
+      if (!sessionActiveRef.current) return;
+      sessionActiveRef.current = false;
+      toast.error("Your session expired. Please log in again.");
+      dispatch(globalActions.logout());
+    };
+    return () => {
+      podiumApi.onUnauthorized = undefined;
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
     if (!initialized && window.location.pathname !== "/playground") {
       dispatch(globalActions.initializeWeb3Auth());
     }
   }, []);
   return (
     <>
-      <ExternalWallets />
       <Toaster richColors closeButton position="top-right" />
-      <ConfirmDialogProvider />
-      <ReferrerDialogProvider />
-      <NameDialogProvider />
-      <UserSelectDialogProvider />
-      <SearchDialogProvider />
-      <OutpostAccessesDialogProvider />
-      <DateTimePickerDialogProvider />
-      <ReminderDialogProvider />
-      <LumaUserDialogProvider />
-      <UserSelectToInviteDialogProvider />
-      <BuyOrSellPassDialogProvider />
-      <LogoutDialogProvider />
-      <PromptNotificationsDialogProvider />
-      <LoginPromptDialogProvider />
-      <PodiumPassTradeDialogProvider />
-      <LoginMethodSelectDialogProvider />
-      <TransferBalanceDialogProvider />
+      <GlobalUi />
     </>
   );
 };
 
-export const GlobalContainer = memo(
-  () => {
-    return (
-      <ReduxProvider>
-        <Container />
-      </ReduxProvider>
-    );
-  },
-  () => true
-);
+export const GlobalContainer = memo(Container, () => true);

@@ -1,6 +1,5 @@
 "use client";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { ReduxProvider } from "app/store/Provider";
 import { useSelector } from "react-redux";
 
 const Content = ({ amountInMove }: { amountInMove: number }) => {
@@ -14,8 +13,8 @@ export const EquivalentPrice_StyleLess = ({
   amountInMove: number;
 }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content amountInMove={amountInMove} />
-    </ReduxProvider>
+    </>
   );
 };

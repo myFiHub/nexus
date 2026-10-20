@@ -16,6 +16,10 @@ export const AppPages = {
   dashboard: "/dashboard",
   users: "/users",
   tokens: "/tokens",
+  analytics: "/analytics",
+  search: "/search",
+  tag: (tagId: number | string) => `/tags/${tagId}`,
+  outpostAnalytics: (outpostId: string) => `/analytics/${outpostId}`,
 };
 
 export const ApiEndpoints = {

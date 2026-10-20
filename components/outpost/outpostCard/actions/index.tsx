@@ -2,7 +2,6 @@
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { JoinButton } from "app/containers/outpostDetails/components/JoinButton";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
 import { useSelector } from "react-redux";
 import { ArchiveButton } from "./archiveButton";
@@ -35,8 +34,8 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
 export const OutpostCardActions = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

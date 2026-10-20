@@ -2,7 +2,6 @@
 
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import {
@@ -126,8 +125,8 @@ const Content = () => {
 
 export const OutpostAccessesDialogProvider = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

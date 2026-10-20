@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import { notificationsSelectors } from "./selectors";
-import { notificationsActions, useNotificationsSlice } from "./slice";
+import { notificationsActions, injectNotificationsSlice } from "./slice";
 
 export const useNotifications = () => {
-  useNotificationsSlice();
+  injectNotificationsSlice();
   const dispatch = useDispatch();
   const notifications = useSelector(notificationsSelectors.notifications);
   const isLoading = useSelector(notificationsSelectors.isLoadingNotifications);

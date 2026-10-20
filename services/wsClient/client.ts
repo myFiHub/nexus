@@ -724,7 +724,6 @@ export class WebSocketService {
     const myUserAddress = myUser.address;
 
     if (message.data.address === myUserAddress) {
-      console.log("user joined!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! from ws");
       const joinId = this.generateJoinId(message.data.outpost_uuid!);
       const store = getStore();
       const router: AppRouterInstance | undefined =

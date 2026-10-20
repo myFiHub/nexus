@@ -2,7 +2,6 @@
 
 import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
 import { Loader } from "app/components/Loader";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { dashboardUsersSelectors } from "../selectors";
@@ -74,9 +73,9 @@ const Content = ({ filter }: { filter: UserTags }) => {
 
 const ListEndObserver = ({ filter }: { filter: UserTags }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content filter={filter} />
-    </ReduxProvider>
+    </>
   );
 };
 

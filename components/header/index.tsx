@@ -2,10 +2,9 @@
 import { searchDialog } from "app/components/Dialog";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
 import { Button } from "../Button";
@@ -13,30 +12,24 @@ import { Img } from "../Img";
 import { LoginButton } from "./LoginButton";
 import { ThemeToggle } from "./themeToggle";
 
-const Content = ({ theme }: { theme: "light" | "dark" }) => {
-  const [mobileOpen, setMobileOpen] = useState(false);
+const Content = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
   const isLoggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY) {
-        // Scrolling down
-        setIsVisible(false);
-      } else {
-        // Scrolling up
-        setIsVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      if (y < 64) setIsVisible(true);
+      else if (Math.abs(delta) > 8) setIsVisible(delta < 0);
+      else return;
+      lastScrollY.current = y;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleSearchClick = async () => {
     await searchDialog({
@@ -46,7 +39,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] shadow-md transition-transform duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-border/60 transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -69,7 +62,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
           {/* Desktop nav */}
 
           <div className="flex items-center gap-1">
-            <ThemeToggle initialValue={theme} />
+            <ThemeToggle />
 
             <Button
               variant="ghost"
@@ -103,10 +96,6 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
   );
 };
 
-export default function Header({ theme }: { theme: "light" | "dark" }) {
-  return (
-    <ReduxProvider>
-      <Content theme={theme} />
-    </ReduxProvider>
-  );
+export default function Header() {
+  return <Content />;
 }

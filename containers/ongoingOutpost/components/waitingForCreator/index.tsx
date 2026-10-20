@@ -16,7 +16,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useClock } from "app/lib/clock";
 
 interface WaitingForCreatorProps {
   outpost?: OutpostModel;
@@ -102,21 +102,17 @@ const itemVariants = {
   },
 };
 
+const CurrentTimeText = () => {
+  const text = useClock((now) =>
+    now === null ? "" : new Date(now).toLocaleTimeString()
+  );
+  return <>{text}</>;
+};
+
 export const WaitingForCreator = ({ outpost }: WaitingForCreatorProps) => {
-  const [currentTime, setCurrentTime] = useState(new Date());
   const creatorName = outpost?.creator_user_name || "Creator";
   const outpostName = outpost?.name || "Outpost";
   const outpostImage = outpost?.image || logoUrl;
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center bg-gradient-to-br from-background via-background to-muted/20 p-6 relative overflow-hidden">
@@ -235,7 +231,7 @@ export const WaitingForCreator = ({ outpost }: WaitingForCreatorProps) => {
                   <Clock className="w-6 h-6" />
                 </motion.div>
                 <span className="text-sm font-medium">
-                  {currentTime.toLocaleTimeString()}
+                  <CurrentTimeText />
                 </span>
               </motion.div>
 

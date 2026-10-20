@@ -9,7 +9,6 @@ import { assetsActions } from "app/containers/_assets/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import podiumApi from "app/services/api";
 import { User } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { UserInfoDisplay } from "./UserInfoDisplay";
@@ -135,8 +134,8 @@ const Content = ({ address }: { address: string }) => {
 
 export const UserCardActions = ({ address }: { address: string }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content address={address} />
-    </ReduxProvider>
+    </>
   );
 };

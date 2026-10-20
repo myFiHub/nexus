@@ -1,5 +1,5 @@
 "use client";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Provider } from "react-redux";
 import { getStore } from "./index";
 
@@ -8,6 +8,6 @@ interface ProviderProps {
 }
 
 export function ReduxProvider({ children }: ProviderProps) {
-
-  return <Provider store={getStore()!}>{children}</Provider>;
+  const [store] = useState(getStore);
+  return <Provider store={store}>{children}</Provider>;
 }

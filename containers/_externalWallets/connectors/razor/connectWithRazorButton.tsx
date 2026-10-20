@@ -41,11 +41,10 @@ export const ConnectWithRazorButton_InternalUse = ({
     onModalOpenChange(open);
   };
   const onConnectionSuccess = (walletName: string) => {
-    console.log(`connected to: ${walletName}`);
     onConnect(walletName);
   };
   const onConnectError = (error: any) => {
-    console.log({ error });
+    console.warn("Wallet connection failed", error);
   };
 
   return (

@@ -1,7 +1,6 @@
 "use client";
 
 import { UserTags } from "app/app/(unauthenticated)/users/[filter]/_filters";
-import { ReduxProvider } from "app/store/Provider";
 import { useSelector } from "react-redux";
 import { getDisplayConfig } from ".";
 import { UserCard } from "../components/userCard";
@@ -36,9 +35,9 @@ const Content = ({ filter }: { filter: UserTags }) => {
 
 const ClientSideList = ({ filter }: { filter: UserTags }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content filter={filter} />
-    </ReduxProvider>
+    </>
   );
 };
 

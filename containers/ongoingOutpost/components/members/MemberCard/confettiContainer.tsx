@@ -63,6 +63,9 @@ interface ConfettiPiece {
   type: IncomingMessageType;
   x: number;
   delay: number;
+  /** 0..1, picks the color when rendering. */
+  hue: number;
+  drift: [number, number];
 }
 
 const likeColors = ["#4CAF50", "#45a049", "#66BB6A"];
@@ -129,6 +132,8 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
                 type,
                 x: Math.random() * 100, // Random horizontal position
                 delay: Math.random() * 0.5, // Random delay
+                hue: Math.random(),
+                drift: [Math.random() * 60 - 30, Math.random() * 60 - 30],
               });
             }
 
@@ -154,7 +159,7 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
       <AnimatePresence>
         {confettiPieces.map((piece) => {
           const { colors, gravity } = getConfettiConfig(piece.type);
-          const color = colors[Math.floor(Math.random() * colors.length)];
+          const color = colors[Math.floor(piece.hue * colors.length)];
 
           return (
             <motion.div
@@ -174,7 +179,7 @@ export const ConfettiContainer = ({ address }: { address: string }) => {
               }}
               animate={{
                 y: gravity > 0 ? "120px" : "-120px",
-                x: [0, Math.random() * 60 - 30, Math.random() * 60 - 30],
+                x: [0, ...piece.drift],
                 rotate: [0, 180, 360],
                 scale: [0, 1.2, 1],
                 opacity: [0, 1, 1, 0],

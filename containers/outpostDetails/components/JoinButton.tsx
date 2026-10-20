@@ -3,13 +3,14 @@ import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
-import { useOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
+import { injectOnGoingOutpostSlice } from "app/containers/ongoingOutpost/slice";
 import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient";
-import { ReduxProvider } from "app/store/Provider";
-import { useEffect, useState } from "react";
+import { useClock } from "app/lib/clock";
+import { isBanActive } from "app/lib/outpostBans";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { outpostDetailsSelectors } from "../selectors";
@@ -26,20 +27,22 @@ const JoinButtonContent = ({
   fromCard,
   joinComponent,
 }: JoinButtonProps) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  useOnGoingOutpostSlice();
-  useSelector(GlobalSelectors.tick);
+  injectOnGoingOutpostSlice();
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   // const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
+  const scheduledFor = outpost?.scheduled_for ?? 0;
+  const displayText = useClock((now) =>
+    now === null
+      ? null
+      : getTimerInfo(scheduledFor, undefined, undefined, now).displayText
+  );
+  const isPassed = useClock((now) => now !== null && now >= scheduledFor);
+  const myBan = outpost?.my_ban;
+  const banned = useClock((now) => now !== null && isBanActive(myBan, now), 30_000);
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -69,7 +72,7 @@ const JoinButtonContent = ({
   if (!outpost) return null;
 
   // Show loading state until client-side hydration is complete
-  if (!isClient) {
+  if (displayText === null) {
     return (
       <Button className="w-full" disabled>
         <span className="font-medium">Loading...</span>
@@ -79,11 +82,19 @@ const JoinButtonContent = ({
 
   // Client-side only logic
   const joining = joiningId === outpost.uuid || checkingWsHealth;
-  const timerInfo = getTimerInfo(outpost.scheduled_for);
-  const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
   const disabled = (iAmCreator ? loading : !isPassed || loading) || joining;
+
+  if (banned && myBan) {
+    return (
+      <Button className="w-full" disabled>
+        <span className="font-medium">
+          {myBan.kind === "kick" && myBan.expires_at != null ? "Removed by a host" : "Blocked by a host"}
+        </span>
+      </Button>
+    );
+  }
 
   return (
     <Button className="w-full" onClick={join} disabled={disabled}>
@@ -105,12 +116,12 @@ export function JoinButton({
   joinComponent,
 }: JoinButtonProps) {
   return (
-    <ReduxProvider>
+    <>
       <JoinButtonContent
         outpost={outpost}
         fromCard={fromCard}
         joinComponent={joinComponent}
       />
-    </ReduxProvider>
+    </>
   );
 }

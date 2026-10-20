@@ -23,7 +23,7 @@ export const TrendingVolumeSection = ({
   // Create mock users with volume data
   const usersWithVolume = tradingVolume.slice(0, 6).map((owner, index) => ({
     ...owner,
-    volume: mockVolumeData[index]?.volume || Math.random() * 50 + 10,
+    volume: mockVolumeData[index]?.volume || 10 + ((index * 17) % 50),
   }));
 
   return (

@@ -128,6 +128,7 @@ export interface CreateOutpostRequest {
   enabled_luma?: boolean;
   luma_guests?: AddGuestModel[];
   luma_hosts?: AddHostModel[];
+  is_music_mode?: boolean;
 }
 
 export interface UpdateOutpostRequest {
@@ -136,6 +137,7 @@ export interface UpdateOutpostRequest {
   image?: string;
   uuid: string;
   cohost_user_uuids?: string[];
+  is_music_mode?: boolean;
 }
 
 // Follow related types
@@ -276,6 +278,241 @@ export interface OutpostModel {
   i_am_member: boolean;
   reminder_offset_minutes?: number;
   cohost_user_uuids?: string[];
+  is_music_mode?: boolean;
+  my_ban?: OutpostBanInfo | null;
+}
+
+// Moderation
+export type OutpostBanKind = "kick" | "ban";
+
+export interface OutpostBanInfo {
+  kind: OutpostBanKind;
+  expires_at: number | null;
+}
+
+export interface OutpostBanItem {
+  user_uuid: string;
+  name?: string | null;
+  image?: string | null;
+  address: string;
+  aptos_address?: string | null;
+  kind: OutpostBanKind;
+  reason?: string | null;
+  expires_at?: number | null;
+  created_at: number;
+  banned_by_user_uuid: string;
+  banned_by_user_name?: string | null;
+}
+
+export interface CreateOutpostBanRequest {
+  outpost_uuid: string;
+  user_uuid: string;
+  kind: OutpostBanKind;
+  reason?: string;
+  duration_minutes?: number;
+}
+
+export type BlockAction = "block" | "unblock";
+
+export interface BlockedUser {
+  uuid: string;
+  address: string;
+  name?: string | null;
+  image?: string | null;
+  blocked_at: number;
+}
+
+// Discovery
+export interface LiveSessionMember {
+  uuid: string;
+  name?: string | null;
+  image?: string | null;
+}
+
+export interface DiscoveredOutpost extends OutpostModel {
+  recent_listeners: number;
+  recent_reactions: number;
+  host_is_followed: boolean;
+  followed_users_in_room: LiveSessionMember[];
+  followed_users_in_room_count: number;
+}
+
+export type TrendingWindow = "24h" | "7d";
+
+export interface PopularTag {
+  id: number;
+  name: string;
+  outposts_count: number;
+  active_outposts_count: number;
+}
+
+// Home feed
+export type UpNextReason =
+  | "hosting"
+  | "cohosting"
+  | "member"
+  | "invited"
+  | "followed_host";
+
+export interface UpNextOutpost extends OutpostModel {
+  reason: UpNextReason;
+  reminder_set: boolean;
+}
+
+export interface RecentOutpost extends OutpostModel {
+  last_listened_at: number;
+  listened_minutes: number;
+}
+
+export type SuggestionReason =
+  | "you_listened"
+  | "follows_you"
+  | "followed_by_followings"
+  | "popular_host";
+
+export interface SuggestedUser {
+  uuid: string;
+  name: string;
+  image?: string | null;
+  followers_count: number;
+  outposts_count: number;
+  reason: SuggestionReason;
+  mutual_count: number;
+  mutual_names: string[];
+  is_live: boolean;
+}
+
+export interface HomeActivityPeriod {
+  listen_minutes: number;
+  speak_minutes: number;
+  outposts_joined: number;
+  new_followers: number;
+  cheers_received: number;
+}
+
+export interface HomeActivity {
+  current: HomeActivityPeriod;
+  previous: HomeActivityPeriod;
+  streak_days: number;
+  active_today: boolean;
+  last_7_days: boolean[];
+}
+
+export interface HomeFeed {
+  up_next: UpNextOutpost[];
+  jump_back_in: RecentOutpost[];
+  suggested_people: SuggestedUser[];
+  activity: HomeActivity;
+}
+
+// Host analytics
+export type AnalyticsWindow = "7d" | "30d" | "90d";
+
+export interface HostAnalyticsTotals {
+  sessions: number;
+  hosted_minutes: number;
+  unique_listeners: number;
+  returning_listeners: number;
+  listener_visits: number;
+  listen_minutes: number;
+  avg_listen_minutes: number;
+  peak_listeners: number;
+  avg_peak_listeners: number;
+  retention_10min_rate: number;
+  cheers: number;
+  boos: number;
+  earned: number;
+}
+
+export interface HostAnalyticsDay {
+  date: string;
+  sessions: number;
+  listener_visits: number;
+  listen_minutes: number;
+  peak_listeners: number;
+}
+
+export interface RetentionPoint {
+  minute: number;
+  listeners: number;
+  share: number;
+}
+
+export interface EarningsByChain {
+  chain_id: string;
+  cheers: number;
+  boos: number;
+  cheers_amount: number;
+  boos_amount: number;
+  total_amount: number;
+}
+
+export type AudienceSource = "followers" | "listeners" | "none";
+
+export interface AudienceSlot {
+  dow: number;
+  hour: number;
+  users: number;
+}
+
+export interface HostOutpostStat {
+  uuid: string;
+  name: string;
+  image?: string | null;
+  is_archived: boolean;
+  sessions: number;
+  unique_listeners: number;
+  peak_listeners: number;
+  listen_minutes: number;
+  avg_listen_minutes: number;
+  retention_10min_rate: number;
+  earned: number;
+  last_session_at?: number | null;
+}
+
+export interface HostAnalyticsSummary {
+  window: AnalyticsWindow;
+  earned_chain_id: string;
+  outposts_count: number;
+  totals: HostAnalyticsTotals;
+  daily: HostAnalyticsDay[];
+  retention_curve: RetentionPoint[];
+  earnings_by_chain: EarningsByChain[];
+  audience_source: AudienceSource;
+  audience_heatmap: AudienceSlot[];
+  best_slots: AudienceSlot[];
+  top_outposts: HostOutpostStat[];
+}
+
+export interface HostOutpostBrief {
+  uuid: string;
+  name: string;
+  image?: string | null;
+  is_archived: boolean;
+}
+
+export interface HostSessionStat {
+  uuid: string;
+  started_at: number;
+  duration_seconds: number;
+  listeners: number;
+  peak_listeners: number;
+  avg_listen_minutes: number;
+  retention_10min_rate: number;
+  cheers: number;
+  boos: number;
+  earned: number;
+}
+
+export interface HostOutpostAnalytics {
+  window: AnalyticsWindow;
+  earned_chain_id: string;
+  outpost: HostOutpostBrief;
+  totals: HostAnalyticsTotals;
+  daily: HostAnalyticsDay[];
+  retention_curve: RetentionPoint[];
+  earnings_by_chain: EarningsByChain[];
+  sessions: HostSessionStat[];
 }
 
 export interface TagModel {

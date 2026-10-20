@@ -1,3 +1,4 @@
+import { getCachedDiscovery } from "app/lib/discovery";
 import { sortFeaturedOutposts } from "app/lib/outposts";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
@@ -45,10 +46,11 @@ const getCachedRecentUsers = unstable_cache(
 );
 
 export default async function Home() {
-  const [outposts, statistics, recentUsers] = await Promise.all([
+  const [outposts, statistics, recentUsers, discovery] = await Promise.all([
     getCachedOutposts(),
     getCachedStatistics(),
     getCachedRecentUsers(),
+    getCachedDiscovery(),
   ]);
 
   const featuredEvents = sortFeaturedOutposts(outposts);
@@ -58,6 +60,9 @@ export default async function Home() {
       featuredEvents={featuredEvents}
       statistics={statistics}
       recentUsers={recentUsers}
+      live={discovery.live}
+      trending={discovery.trending}
+      tags={discovery.tags}
     />
   );
 }

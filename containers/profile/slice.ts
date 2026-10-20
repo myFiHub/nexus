@@ -76,7 +76,7 @@ export const {
   actions: profileActions,
 } = profileSlice;
 
-export const useProfileSlice = () => {
+export const injectProfileSlice = () => {
   injectContainer({
     name: profileSlice.name,
     reducer: profileSlice.reducer,

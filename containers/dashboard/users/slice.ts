@@ -148,7 +148,7 @@ export const {
   actions: dashboardUsersActions,
 } = dashboardUsersSlice;
 
-export const useDashboardUsersSlice = () => {
+export const injectDashboardUsersSlice = () => {
   injectContainer({
     name: dashboardUsersSlice.name,
     reducer: dashboardUsersSlice.reducer,

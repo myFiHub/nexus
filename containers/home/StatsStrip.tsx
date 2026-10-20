@@ -69,7 +69,7 @@ export function StatsStrip({ statistics }: { statistics?: Statistics }) {
               {totalRooms.toLocaleString()}
             </span>
             <span className="mt-2 text-lg font-semibold text-blue-700 dark:text-blue-300 tracking-wide">
-              Rooms
+              Outposts
             </span>
             <span className="mt-1 text-sm text-[var(--muted-foreground)]">
               Active Communities

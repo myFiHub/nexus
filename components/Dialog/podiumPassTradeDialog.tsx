@@ -226,27 +226,6 @@ const Content = () => {
   } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const handleShowDialog = (
-      event: CustomEvent<PodiumPassTradeDialogProps>
-    ) => {
-      setDialogContent(event.detail);
-      setIsOpen(true);
-      fetchPassData(event.detail);
-    };
-
-    window.addEventListener(
-      "show-podium-pass-trade-dialog",
-      handleShowDialog as EventListener
-    );
-    return () => {
-      window.removeEventListener(
-        "show-podium-pass-trade-dialog",
-        handleShowDialog as EventListener
-      );
-    };
-  }, []);
-
   const fetchPassData = async (content: PodiumPassTradeDialogProps) => {
     // Check if we need to make any API calls
     const needsOwnedNumberFetch = content.ownedNumber === undefined;
@@ -256,10 +235,8 @@ const Content = () => {
 
     // Only show loading if we need to fetch data
     if (needsOwnedNumberFetch || needsPriceFetch || needsSellPriceFetch) {
-      console.log("Setting loading to true - API calls needed");
       setIsLoading(true);
     } else {
-      console.log("Skipping loading - all data provided");
       setIsLoading(false);
     }
     setError(null);
@@ -325,6 +302,27 @@ const Content = () => {
       }
     }
   };
+
+  useEffect(() => {
+    const handleShowDialog = (
+      event: CustomEvent<PodiumPassTradeDialogProps>
+    ) => {
+      setDialogContent(event.detail);
+      setIsOpen(true);
+      fetchPassData(event.detail);
+    };
+
+    window.addEventListener(
+      "show-podium-pass-trade-dialog",
+      handleShowDialog as EventListener
+    );
+    return () => {
+      window.removeEventListener(
+        "show-podium-pass-trade-dialog",
+        handleShowDialog as EventListener
+      );
+    };
+  }, []);
 
   const handleConfirm = () => {
     setIsOpen(false);

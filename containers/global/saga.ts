@@ -1,13 +1,7 @@
 "use client";
-import {
-  IProvider,
-  UserInfo,
-  Web3Auth,
-  WEB3AUTH_NETWORK,
-} from "@web3auth/modal";
-import { Web3AuthContextConfig } from "@web3auth/modal/react";
+import type { IProvider, UserInfo, Web3Auth } from "@web3auth/modal";
 import { promptNotifications } from "app/components/Dialog";
-import { CookieKeys, deleteClientCookie } from "app/lib/client-cookies";
+import { CookieKeys } from "app/lib/client-cookies";
 import { deleteServerCookieViaAPI } from "app/lib/client-server-cookies";
 import { logoutFromOneSignal } from "app/lib/onesignal";
 import { initOneSignalForUser } from "app/lib/onesignal-init";
@@ -37,7 +31,7 @@ import {
 import { detached_checkPass } from "../_assets/saga";
 import { externalWalletsSelectors } from "../_externalWallets/selectors";
 import { disconnectType } from "../_externalWallets/slice";
-import { myOutpostsActions, useMyOutpostsSlice } from "../myOutposts/slice";
+import { myOutpostsActions, injectMyOutpostsSlice } from "../myOutposts/slice";
 
 import { joinOutpost } from "./effects/joinOutpost";
 import { detached_afterConnect } from "./effects/login/after_connect";
@@ -80,8 +74,10 @@ function* initializeWeb3Auth(
   action: ReturnType<typeof globalActions.initializeWeb3Auth>
 ) {
   yield put(globalActions.setInitializingWeb3Auth(true));
-  const web3AuthContextConfig: Web3AuthContextConfig = {
-    web3AuthOptions: {
+  try {
+    const { Web3Auth, WEB3AUTH_NETWORK }: typeof import("@web3auth/modal") =
+      yield import("@web3auth/modal");
+    const web3auth = new Web3Auth({
       clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID!,
       uiConfig: {
         logoLight: logoUrl,
@@ -92,16 +88,7 @@ function* initializeWeb3Auth(
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
           : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      ssr: false,
-    },
-  };
-
-  const web3auth = new Web3Auth({
-    uiConfig: web3AuthContextConfig.web3AuthOptions.uiConfig,
-    clientId: web3AuthContextConfig.web3AuthOptions.clientId,
-    web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
-  });
-  try {
+    });
     yield web3auth.init();
     yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
@@ -115,7 +102,7 @@ function* initializeWeb3Auth(
       movementService.clearAccount(),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
     toast.error("Failed to initialize the app");
   } finally {
     yield put(globalActions.setInitializingWeb3Auth(false));
@@ -219,9 +206,14 @@ function* getAndSetAccountUsingSocialLogin() {
       put(globalActions.setWeb3AuthUserInfo(undefined)),
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
   }
 }
+
+const clearSessionCookies = () => {
+  deleteServerCookieViaAPI(CookieKeys.myUserId).catch(() => {});
+  deleteServerCookieViaAPI(CookieKeys.myMoveAddress).catch(() => {});
+};
 
 function* switchAccount(
   action: ReturnType<typeof globalActions.switchAccount>
@@ -241,16 +233,7 @@ function* logout() {
   const web3Auth: Web3Auth = yield select(GlobalSelectors.web3Auth);
 
   try {
-    // remove token from cookies
-    deleteClientCookie(CookieKeys.token);
-  } catch (error) {
-    if (isDev) {
-      console.error(error);
-    }
-  }
-
-  try {
-    podiumApi.setToken(undefined);
+    podiumApi.clearToken();
   } catch (error) {
     if (isDev) {
       console.error(error);
@@ -264,7 +247,7 @@ function* logout() {
       put(globalActions.setPodiumUserInfo(undefined)),
     ]);
 
-    deleteServerCookieViaAPI(CookieKeys.myUserId);
+    clearSessionCookies();
     try {
       yield logoutFromOneSignal();
     } catch (error) {
@@ -297,12 +280,6 @@ function* logout() {
   yield put(globalActions.setLogingOut(false));
 }
 
-function* startTicker(): any {
-  yield put(globalActions.increaseTick_());
-  yield delay(1000);
-  yield startTicker();
-}
-
 function* checkIfIHavePass(
   action: ReturnType<typeof globalActions.checkIfIHavePass>
 ) {
@@ -332,7 +309,7 @@ function* checkIfIHavePass(
 function* setViewArchivedOutposts(
   action: ReturnType<typeof globalActions.setViewArchivedOutposts>
 ) {
-  useMyOutpostsSlice();
+  injectMyOutpostsSlice();
   yield put(myOutpostsActions.getOutposts());
 }
 
@@ -359,26 +336,23 @@ function* getLatestOnlineUsersForOutposts(
 }
 
 function* getMovePrice(): Generator<any, void, any> {
-  let movePrice = 0;
-  try {
-    const response = yield fetch("/api/coingecko/price");
-    if (response.ok) {
-      const data = yield response.json();
-      const price = Number(data?.movement?.usd);
-      if (!isNaN(price)) {
-        movePrice = price;
+  if (document.visibilityState !== "hidden") {
+    try {
+      const response = yield fetch("/api/coingecko/price");
+      if (response.ok) {
+        const data = yield response.json();
+        const price = Number(data?.movement?.usd);
+        if (Number.isFinite(price) && price > 0) {
+          yield put(globalActions.setMovePrice(price));
+        }
       }
-    }
-  } catch (error) {
-    // Optionally log error
+    } catch {}
   }
-  yield put(globalActions.setMovePrice(movePrice));
   yield delay(60 * 1000);
   yield put(globalActions.getMovePrice());
 }
 
 export function* globalSaga() {
-  yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.login, login);

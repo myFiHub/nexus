@@ -2,7 +2,7 @@ import { Ed25519PublicKey, Ed25519Signature } from "@aptos-labs/ts-sdk";
 import { UserResponseStatus } from "@aptos-labs/wallet-standard";
 import { ExternalWalletsState } from "app/containers/_externalWallets/slice";
 import { getStore } from "app/store";
-import { ethers } from "ethers";
+import { Wallet } from "ethers";
 import { toast } from "sonner";
 
 export const signMessage = async ({
@@ -12,7 +12,7 @@ export const signMessage = async ({
   privateKey: string;
   message: string;
 }) => {
-  const wallet = new ethers.Wallet(privateKey);
+  const wallet = new Wallet(privateKey);
   const signature = await wallet.signMessage(message);
   return signature;
 };

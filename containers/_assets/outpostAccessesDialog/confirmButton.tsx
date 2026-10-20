@@ -16,7 +16,7 @@ export const ConfirmButton = ({
   const accesses = useSelector(AssetsSelectors.accesses(outpostId));
   const { canEnter, canSpeak } = accesses;
 
-  let buttonState = {
+  const buttonState = {
     label: "Confirm",
     variant: "outline",
     disabled: true,

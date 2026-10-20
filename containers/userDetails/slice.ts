@@ -37,7 +37,7 @@ export const {
   actions: userDetailsActions,
 } = userDetailsSlice;
 
-export const useUserDetailsSlice = () => {
+export const injectUserDetailsSlice = () => {
   injectContainer({
     name: userDetailsSlice.name,
     reducer: userDetailsSlice.reducer,

@@ -1,4 +1,4 @@
-import { UserInfo } from "@web3auth/modal";
+import type { UserInfo } from "@web3auth/modal";
 import { CookieKeys, getClientCookie } from "app/lib/client-cookies";
 import podiumApi from "app/services/api";
 import {
@@ -16,7 +16,7 @@ import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { GlobalSelectors } from "../../selectors";
 import { hasCreatorPodiumPass } from "../podiumPassCheck";
 import { getPrivateKey } from "../socialPrivateKey";
-import { ethers } from "ethers";
+import { Wallet } from "ethers";
 import {
   signMessageWithTimestamp,
   signMessageWithTimestampUsingExternalWallet,
@@ -25,6 +25,7 @@ import {
   referrerDialog,
   ReferrerDialogResult,
 } from "app/components/Dialog/referrerDialog";
+import { clearStoredReferrer, getStoredReferrer } from "app/lib/referral";
 import { isUuid } from "app/lib/utils";
 import { detached_checkName } from "./check_name";
 import { detached_afterGettingPodiumUser } from "./afterGettingPodiumUser";
@@ -54,13 +55,8 @@ export function* detached_afterConnect(
       }
     }
 
-    let {
-      authConnection: loginType,
-      userId: identifierId,
-      name,
-      profileImage: image,
-      email,
-    } = userInfo;
+    let { userId: identifierId } = userInfo;
+    const { authConnection: loginType, name, profileImage: image, email } = userInfo;
 
     if (!isSocialLogin) {
       const account: accountType = yield select(
@@ -72,7 +68,7 @@ export function* detached_afterConnect(
       }
 
       const publicKey = account.publicKey;
-      let publicKeyString =
+      const publicKeyString =
         typeof publicKey === "string"
           ? publicKey
           : Array.from(publicKey)
@@ -110,7 +106,7 @@ export function* detached_afterConnect(
         const aptosAddress = movementService.address;
 
         if (!identifierId) {
-          console.log("Identifier ID is required");
+          console.warn("Identifier ID is required");
           return;
         }
         if (identifierId.includes("|")) {
@@ -120,7 +116,7 @@ export function* detached_afterConnect(
           buyerAddress: aptosAddress,
         });
 
-        const evmWallet = new ethers.Wallet(privateKey);
+        const evmWallet = new Wallet(privateKey);
         const evmAddress = evmWallet.address;
 
         const loginRequest: LoginRequest = {
@@ -220,10 +216,16 @@ function* detached_continueWithLoginRequestAndAdditionalData({
 
   let referrerId = "";
   if (response.statusCode === 428 && !retried) {
-    const { confirmed, enteredText }: ReferrerDialogResult =
-      yield referrerDialog();
-    if (confirmed && enteredText && isUuid(enteredText)) {
-      referrerId = enteredText;
+    let referrer = getStoredReferrer();
+    if (referrer) {
+      clearStoredReferrer();
+    } else {
+      const { confirmed, enteredText }: ReferrerDialogResult =
+        yield referrerDialog();
+      referrer = confirmed && enteredText && isUuid(enteredText) ? enteredText : null;
+    }
+    if (referrer) {
+      referrerId = referrer;
       loginRequest.referrer_user_uuid = referrerId;
       yield detached_continueWithLoginRequestAndAdditionalData({
         loginRequest,

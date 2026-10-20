@@ -2,7 +2,6 @@
 
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Subject } from "rxjs";
@@ -58,8 +57,8 @@ const Content = ({ outpost }: CohostsProps) => {
 
 export const Cohosts = ({ outpost }: CohostsProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

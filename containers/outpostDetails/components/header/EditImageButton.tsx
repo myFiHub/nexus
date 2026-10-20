@@ -8,7 +8,6 @@ import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { outpostImageService } from "app/services/imageUpload";
 import { revalidateService } from "app/services/revalidate";
-import { ReduxProvider } from "app/store/Provider";
 import { Edit } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -93,8 +92,8 @@ export const EditImageButton = ({
   className,
 }: EditImageButtonProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} className={className} />
-    </ReduxProvider>
+    </>
   );
 };

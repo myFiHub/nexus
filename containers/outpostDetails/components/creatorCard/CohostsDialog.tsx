@@ -120,6 +120,31 @@ export const CohostsViewDialogProvider = () => {
   const [iAmCreator, setIAmCreator] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const fetchCohosts = async (uuids: string[]) => {
+    setIsLoading(true);
+
+    try {
+      // Fetch all cohosts in parallel
+      const cohostPromises = uuids.map((uuid) =>
+        podiumApi.getUserByUuidOrAptosAddress(uuid)
+      );
+      const results = await Promise.allSettled(cohostPromises);
+      // Map results, replacing each placeholder with actual data or keeping null on error
+      const fetchedCohosts = results.map((result) => {
+        if (result.status === "fulfilled" && result.value) {
+          return result.value;
+        }
+        return null;
+      });
+
+      setCohosts(fetchedCohosts);
+    } catch (error) {
+      console.error("Error fetching cohosts:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     const handleShowDialog = (event: CustomEvent<CohostsViewDialogProps>) => {
       setDialogContent(event.detail);
@@ -147,31 +172,6 @@ export const CohostsViewDialogProvider = () => {
       );
     };
   }, []);
-
-  const fetchCohosts = async (uuids: string[]) => {
-    setIsLoading(true);
-
-    try {
-      // Fetch all cohosts in parallel
-      const cohostPromises = uuids.map((uuid) =>
-        podiumApi.getUserByUuidOrAptosAddress(uuid)
-      );
-      const results = await Promise.allSettled(cohostPromises);
-      // Map results, replacing each placeholder with actual data or keeping null on error
-      const fetchedCohosts = results.map((result) => {
-        if (result.status === "fulfilled" && result.value) {
-          return result.value;
-        }
-        return null;
-      });
-
-      setCohosts(fetchedCohosts);
-    } catch (error) {
-      console.error("Error fetching cohosts:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleClose = () => {
     setIsOpen(false);

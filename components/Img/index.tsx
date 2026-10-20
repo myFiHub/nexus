@@ -57,11 +57,12 @@ export const Img = ({
   // Determine if we should use fill mode
   const shouldUseFill = fill || (!width && !height);
 
-  // Reset state when src changes
-  useEffect(() => {
+  const [trackedSrc, setTrackedSrc] = useState(src);
+  if (trackedSrc !== src) {
+    setTrackedSrc(src);
     setImageState("loading");
     setShouldUseFallback(false);
-  }, [src]);
+  }
 
   // Check if image is already loaded (for cached images)
   useEffect(() => {

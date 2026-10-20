@@ -31,7 +31,6 @@ export const nameDialog = (): Promise<NameDialogResult> => {
 export const NameDialogProvider = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [isValid, setIsValid] = useState(false);
 
   useEffect(() => {
     const handleShowDialog = () => {
@@ -44,9 +43,7 @@ export const NameDialogProvider = () => {
     };
   }, []);
 
-  useEffect(() => {
-    setIsValid(inputValue.trim().length >= 3);
-  }, [inputValue]);
+  const isValid = inputValue.trim().length >= 3;
 
   const handleConfirm = () => {
     if (!isValid) return;

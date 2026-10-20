@@ -4,7 +4,7 @@ import {
   serverEnterTypeToText,
   serverSpeakerTypeToText,
 } from "app/components/outpost/types";
-import { Mic, Shield, Video } from "lucide-react";
+import { AudioLines, Mic, Shield, Video } from "lucide-react";
 import { OutpostModel } from "../../../services/api/types";
 import { ScheduledDateSection } from "./scheduledDate/ScheduledDateSection";
 import { TimeUntil } from "./scheduledDate/TimeUntil";
@@ -86,6 +86,18 @@ export function EventDetails({ outpost }: EventDetailsProps) {
             </p>
           </div>
         </div>
+
+        {outpost.is_music_mode && (
+          <div className="flex items-start gap-3">
+            <AudioLines className="w-5 h-5 mt-1 text-primary" />
+            <div>
+              <p className="font-medium">Music mode</p>
+              <p className="text-muted-foreground">
+                Stereo, high-bitrate audio without voice filters
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

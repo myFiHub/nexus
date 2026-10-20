@@ -1,7 +1,10 @@
 import { revalidateTag } from "next/cache";
+import { rejectUntrusted } from "app/lib/server/requestGuards";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  const rejected = rejectUntrusted(request);
+  if (rejected) return rejected;
   try {
     // Revalidate the top owners cache tag
     revalidateTag("top-owners", "hours");
@@ -21,9 +24,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-// Also support GET requests for easier testing
-export async function GET(request: NextRequest) {
-  return POST(request);
 }

@@ -2,12 +2,15 @@ import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { useSelector } from "react-redux";
 import { Img } from "../Img";
 import { RoutingLoadingComponent } from "../listeners/loading/componentAdnHook";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../Tooltip";
 import { SidebarItemProps } from "./types";
+
+const WAVE_PLAYED_KEY = "sidebar-audio-wave-played";
+const noopSubscribe = () => () => {};
 
 export function SidebarItem({
   onClick,
@@ -24,73 +27,46 @@ export function SidebarItem({
   imageSrc,
 }: SidebarItemProps) {
   const loggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
-  const [hasAudioWavePlayed, setHasAudioWavePlayed] = useState(false); // Default to false to allow animation
-  const [showAuthAnimation, setShowAuthAnimation] = useState(false);
-  const [flashedOnce, setFlashedOnce] = useState(false);
-  const [_, setLoginFlashCount] = useState(0);
+  const wavePlayedBefore = useSyncExternalStore(
+    noopSubscribe,
+    () => localStorage.getItem(WAVE_PLAYED_KEY) === "true",
+    () => false
+  );
+  const [waveFinished, setWaveFinished] = useState(false);
+  const [authRevealed, setAuthRevealed] = useState(false);
+  const [loginFlash, setLoginFlash] = useState<"pending" | "on" | "done">("pending");
+  const hasAudioWavePlayed = wavePlayedBefore || waveFinished;
 
   useEffect(() => {
-    // Check if audio wave animation has already played
-    if (typeof window !== "undefined") {
-      const audioWavePlayed = localStorage.getItem("sidebar-audio-wave-played");
-      if (audioWavePlayed === "true") {
-        // Animation has already played, skip it
-        setHasAudioWavePlayed(true);
-      } else {
-        // Animation hasn't played yet, let it play and then mark as played
-        const timer = setTimeout(() => {
-          setHasAudioWavePlayed(true);
-          localStorage.setItem("sidebar-audio-wave-played", "true");
-        }, 1000 + index * 50); // Allow time for animation to complete
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [index]);
+    if (wavePlayedBefore) return;
+    const timer = setTimeout(() => {
+      setWaveFinished(true);
+      localStorage.setItem(WAVE_PLAYED_KEY, "true");
+    }, 1000 + index * 50);
+    return () => clearTimeout(timer);
+  }, [index, wavePlayedBefore]);
 
   useEffect(() => {
-    // Trigger auth animation after wave effect completes (if needed)
-    if (needsAuth && !hasAudioWavePlayed) {
-      const authTimer = setTimeout(() => {
-        setShowAuthAnimation(true);
-      }, 1200 + index * 50); // Delay after wave animation
-      return () => clearTimeout(authTimer);
-    } else if (needsAuth && hasAudioWavePlayed) {
-      // If wave already played, show auth animation immediately
-      setShowAuthAnimation(true);
-    }
+    if (!needsAuth || hasAudioWavePlayed) return;
+    const timer = setTimeout(() => setAuthRevealed(true), 1200 + index * 50);
+    return () => clearTimeout(timer);
   }, [needsAuth, index, hasAudioWavePlayed]);
 
-  // Handle login flash animation
   useEffect(() => {
-    if (needsAuth && loggedIn && typeof window !== "undefined") {
-      if (!flashedOnce) {
-        // Reset and start double flash
-        setLoginFlashCount(0);
-        setShowAuthAnimation(false);
+    if (!needsAuth || !loggedIn || loginFlash === "done") return;
+    const on = setTimeout(() => setLoginFlash("on"), 100);
+    const done = setTimeout(() => setLoginFlash("done"), 2700);
+    return () => {
+      clearTimeout(on);
+      clearTimeout(done);
+    };
+  }, [needsAuth, loggedIn]);
 
-        // First flash
-        const firstFlashTimer = setTimeout(() => {
-          setShowAuthAnimation(true);
-          setLoginFlashCount(1);
-        }, 100);
-
-        // Reset between flashes
-
-        // Final reset and mark as completed
-        const finalResetTimer = setTimeout(() => {
-          setShowAuthAnimation(false);
-          setLoginFlashCount(0);
-          setFlashedOnce(true);
-        }, 2700);
-
-        return () => {
-          clearTimeout(firstFlashTimer);
-
-          clearTimeout(finalResetTimer);
-        };
-      }
-    }
-  }, [needsAuth, loggedIn, index]);
+  const showAuthAnimation =
+    !!needsAuth &&
+    (loggedIn && loginFlash !== "done"
+      ? loginFlash === "on"
+      : loginFlash !== "done" && (hasAudioWavePlayed || authRevealed));
 
   // Audio wave slide-in effect with staggered timing
   const audioWaveVariants = {

@@ -1,164 +1,23 @@
 "use client";
 
-import OutpostLink from "app/components/AppLink/outpostLink";
-import UserLink from "app/components/AppLink/userLink";
 import { Button } from "app/components/Button";
-import { Img } from "app/components/Img";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "app/components/Popover";
 import { motion } from "framer-motion";
-import { Bell, Check, Trash2, X } from "lucide-react";
+import { Bell, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
 import { notificationsEventBus } from "./eventBus";
+import { NotificationItem } from "./NotificationItem";
 import { notificationsSelectors } from "./selectors";
-import { notificationsActions, useNotificationsSlice } from "./slice";
+import { notificationsActions, injectNotificationsSlice } from "./slice";
 
-interface NotificationItemProps {
-  notification: any;
-}
-
-const NotificationItem = ({ notification }: NotificationItemProps) => {
-  const dispatch = useDispatch();
-
-  const handleRead = (id: string) => {
-    dispatch(notificationsActions.markNotificationAsRead(id));
-  };
-  const handleDelete = (id: string) => {
-    dispatch(notificationsActions.deleteNotification(id));
-  };
-
-  const formatTime = (timestamp: number) => {
-    const date = new Date(timestamp * 1000);
-    const now = new Date();
-    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
-
-    if (diffInHours < 1) {
-      const diffInMinutes = Math.floor(diffInHours * 60);
-      return `${diffInMinutes}m ago`;
-    } else if (diffInHours < 24) {
-      return `${Math.floor(diffInHours)}h ago`;
-    } else {
-      const diffInDays = Math.floor(diffInHours / 24);
-      return `${diffInDays}d ago`;
-    }
-  };
-
-  const getNotificationContent = () => {
-    if (
-      notification.notification_type === "follow" &&
-      notification.follow_metadata
-    ) {
-      return {
-        title: "New Follower",
-        message: `${notification.follow_metadata.follower_name} started following you`,
-        image: notification.follow_metadata.follower_image,
-      };
-    } else if (
-      notification.notification_type === "invite" &&
-      notification.invite_metadata
-    ) {
-      const outpostName = notification.invite_metadata.outpost_name;
-      const outpostId = notification.invite_metadata.outpost_uuid;
-
-      return {
-        title: "Outpost Invitation",
-        message: (
-          <span>
-            {notification.invite_metadata.inviter_name} invited you to join{" "}
-            <OutpostLink
-              id={outpostId}
-              className="text-blue-600 hover:text-blue-800 no-underline p-0 m-0"
-              underline={false}
-            >
-              "{outpostName}"
-            </OutpostLink>
-          </span>
-        ),
-        image: notification.invite_metadata.inviter_image,
-      };
-    }
-    return {
-      title: "Notification",
-      message: notification.message,
-      image: null,
-    };
-  };
-
-  const content = getNotificationContent();
-
-  return (
-    <div
-      className={`flex items-start gap-3 p-3 border-b border-border hover:bg-accent transition-colors ${
-        !notification.is_read ? "bg-blue-50 dark:bg-blue-950/20" : ""
-      }`}
-    >
-      <UserLink
-        id={notification.follow_metadata?.follower_uuid}
-        className="p-0 m-0"
-      >
-        {
-          <Img
-            src={content.image ?? ""}
-            alt={notification.follow_metadata?.follower_name ?? ""}
-            width={32}
-            height={32}
-            useImgTag
-            className="w-8 h-8 rounded-full object-cover flex-shrink-0"
-          />
-        }
-      </UserLink>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex-1">
-            <h4 className="font-medium text-foreground text-sm">
-              {content.title}
-            </h4>
-            <UserLink
-              underline={false}
-              id={notification.follow_metadata?.follower_uuid}
-              className="p-0 m-0"
-            >
-              <p className="text-muted-foreground text-xs mt-1 line-clamp-2">
-                {content.message}
-              </p>
-            </UserLink>
-            <p className="text-muted-foreground/70 text-xs mt-1">
-              {formatTime(notification.created_at)}
-            </p>
-          </div>
-          <div className="flex items-center gap-1">
-            {!notification.is_read && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleRead(notification.uuid)}
-                className="h-6 w-6 p-0"
-              >
-                <Check className="h-3 w-3" />
-              </Button>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleDelete(notification.uuid)}
-              className="h-6 w-6 p-0 text-red-500 hover:text-red-700"
-            >
-              <Trash2 className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const NotificationsContent = () => {
-  useNotificationsSlice();
+const NotificationsContent = ({ onNavigate }: { onNavigate?: () => void }) => {
+  injectNotificationsSlice();
   const dispatch = useDispatch();
   const notifications = useSelector(notificationsSelectors.notifications);
   const isLoading = useSelector(notificationsSelectors.isLoadingNotifications);
@@ -233,6 +92,7 @@ const NotificationsContent = () => {
               <NotificationItem
                 key={notification.uuid}
                 notification={notification}
+                onNavigate={onNavigate}
               />
             ))}
           </div>
@@ -333,7 +193,7 @@ export const NotificationsBell = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-0" align="end" sideOffset={8}>
-        <NotificationsContent />
+        <NotificationsContent onNavigate={() => setIsOpen(false)} />
       </PopoverContent>
     </Popover>
   );
