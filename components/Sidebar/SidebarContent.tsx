@@ -1,6 +1,7 @@
 import { globalActions } from "app/containers/global/slice";
 import { AppPages } from "app/lib/routes";
 import {
+  BarChart3,
   HomeIcon,
   LayoutDashboard,
   LogOutIcon,
@@ -31,6 +32,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
   const isCreateOutpost = currentPath === AppPages.createOutpost;
   const isAllOutposts = currentPath === AppPages.allOutposts;
   const isDashboard = currentPath === AppPages.dashboard;
+  const isAnalytics = currentPath.startsWith(AppPages.analytics);
 
   const navigationItems: SidebarItemProps[] = [
     {
@@ -100,6 +102,23 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
     },
     {
       index: 4,
+      label: "Analytics",
+      icon: BarChart3,
+      onClick: () => {
+        if (currentPath === AppPages.analytics) {
+          clearRoutingEventBusId();
+          return;
+        }
+        setRoutingEventBusId("Analytics");
+        router.push(AppPages.analytics);
+      },
+      isOpen: isOpen,
+      isMobile: isMobile,
+      needsAuth: true,
+      isActive: isAnalytics,
+    },
+    {
+      index: 5,
       label: "Create Outpost",
       icon: PlusIcon,
       onClick: () => {
@@ -115,7 +134,7 @@ export function SidebarContent({ isOpen, isMobile }: SidebarProps) {
       isActive: isCreateOutpost,
     },
     {
-      index: 5,
+      index: 6,
       label: "Profile",
       icon: UserIcon,
       onClick: () => {

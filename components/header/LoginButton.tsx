@@ -4,8 +4,9 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { CookieKeys, getClientCookie } from "app/lib/client-cookies";
+import { AppPages } from "app/lib/routes";
 import { cn, truncate } from "app/lib/utils";
-import { ChevronDown, Crown, Loader2, LogIn, LogOut, User } from "lucide-react";
+import { BarChart3, ChevronDown, Crown, Loader2, LogIn, LogOut, User } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
@@ -109,12 +110,20 @@ export const LoginButton = ({ size, className }: LoginButtonProps) => {
               </p>
             </div>
             <AppLink
-              href="/profile"
+              href={AppPages.profile}
               underline={false}
               className="mt-1 flex h-auto w-full items-center justify-start gap-3 rounded-[12px] px-3 py-2 text-sm text-foreground hover:bg-accent"
             >
               <User className="h-4 w-4" />
               Profile
+            </AppLink>
+            <AppLink
+              href={AppPages.analytics}
+              underline={false}
+              className="flex h-auto w-full items-center justify-start gap-3 rounded-[12px] px-3 py-2 text-sm text-foreground hover:bg-accent"
+            >
+              <BarChart3 className="h-4 w-4" />
+              Host dashboard
             </AppLink>
             <button
               type="button"
