@@ -1,11 +1,5 @@
 "use client";
-import {
-  IProvider,
-  UserInfo,
-  Web3Auth,
-  WEB3AUTH_NETWORK,
-} from "@web3auth/modal";
-import { Web3AuthContextConfig } from "@web3auth/modal/react";
+import type { IProvider, UserInfo, Web3Auth } from "@web3auth/modal";
 import { promptNotifications } from "app/components/Dialog";
 import { CookieKeys } from "app/lib/client-cookies";
 import { deleteServerCookieViaAPI } from "app/lib/client-server-cookies";
@@ -80,8 +74,10 @@ function* initializeWeb3Auth(
   action: ReturnType<typeof globalActions.initializeWeb3Auth>
 ) {
   yield put(globalActions.setInitializingWeb3Auth(true));
-  const web3AuthContextConfig: Web3AuthContextConfig = {
-    web3AuthOptions: {
+  try {
+    const { Web3Auth, WEB3AUTH_NETWORK }: typeof import("@web3auth/modal") =
+      yield import("@web3auth/modal");
+    const web3auth = new Web3Auth({
       clientId: process.env.NEXT_PUBLIC_WEB3AUTH_CLIENT_ID!,
       uiConfig: {
         logoLight: logoUrl,
@@ -92,16 +88,7 @@ function* initializeWeb3Auth(
         process.env.NODE_ENV === "development"
           ? WEB3AUTH_NETWORK.SAPPHIRE_DEVNET
           : WEB3AUTH_NETWORK.SAPPHIRE_MAINNET,
-      ssr: false,
-    },
-  };
-
-  const web3auth = new Web3Auth({
-    uiConfig: web3AuthContextConfig.web3AuthOptions.uiConfig,
-    clientId: web3AuthContextConfig.web3AuthOptions.clientId,
-    web3AuthNetwork: web3AuthContextConfig.web3AuthOptions.web3AuthNetwork,
-  });
-  try {
+    });
     yield web3auth.init();
     yield put(globalActions.setWeb3Auth(web3auth));
     const connected: boolean = yield web3auth.connected;
@@ -349,20 +336,18 @@ function* getLatestOnlineUsersForOutposts(
 }
 
 function* getMovePrice(): Generator<any, void, any> {
-  let movePrice = 0;
-  try {
-    const response = yield fetch("/api/coingecko/price");
-    if (response.ok) {
-      const data = yield response.json();
-      const price = Number(data?.movement?.usd);
-      if (!isNaN(price)) {
-        movePrice = price;
+  if (document.visibilityState !== "hidden") {
+    try {
+      const response = yield fetch("/api/coingecko/price");
+      if (response.ok) {
+        const data = yield response.json();
+        const price = Number(data?.movement?.usd);
+        if (Number.isFinite(price) && price > 0) {
+          yield put(globalActions.setMovePrice(price));
+        }
       }
-    }
-  } catch (error) {
-    // Optionally log error
+    } catch {}
   }
-  yield put(globalActions.setMovePrice(movePrice));
   yield delay(60 * 1000);
   yield put(globalActions.getMovePrice());
 }

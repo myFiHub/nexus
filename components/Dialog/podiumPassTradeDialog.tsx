@@ -256,10 +256,8 @@ const Content = () => {
 
     // Only show loading if we need to fetch data
     if (needsOwnedNumberFetch || needsPriceFetch || needsSellPriceFetch) {
-      console.log("Setting loading to true - API calls needed");
       setIsLoading(true);
     } else {
-      console.log("Skipping loading - all data provided");
       setIsLoading(false);
     }
     setError(null);

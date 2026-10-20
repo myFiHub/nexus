@@ -60,7 +60,6 @@ const Content = ({
             invitee_user_uuid: user.user.uuid,
             can_speak: user.invitedToSpeak,
           };
-          console.log("invite", invite);
           return podiumApi.inviteUserToJoinOutpost(invite);
         });
 
@@ -76,7 +75,6 @@ const Content = ({
             } to the outpost`
           );
           const newOutpost = await podiumApi.getOutpost(outpostToUse.uuid);
-          console.log("newOutpost", newOutpost);
           if (newOutpost) {
             setOutpostToUse(newOutpost);
           }

@@ -1,4 +1,4 @@
-import { Web3Auth } from "@web3auth/modal";
+import type { Web3Auth } from "@web3auth/modal";
 import { select } from "redux-saga/effects";
 import { GlobalSelectors } from "../selectors";
 

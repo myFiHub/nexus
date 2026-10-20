@@ -1,9 +1,13 @@
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { OutpostDetailsContainer } from "app/containers/outpostDetails";
-import { LumaEventDetails } from "app/containers/outpostDetails/components/LumaEventDetails";
+import {
+  LumaEventDetails,
+  LumaEventDetailsSkeleton,
+} from "app/containers/outpostDetails/components/LumaEventDetails";
 import podiumApi from "app/services/api";
 import { unstable_cache } from "next/cache";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { generateEventStructuredData, generateMetadata } from "./_metadata";
 
 interface PageProps {
@@ -50,7 +54,9 @@ export default async function OutpostDetailsPage({ params }: PageProps) {
         outpost={outpost}
         lumaSlot={
           outpost.luma_event_id ? (
-            <LumaEventDetails eventId={outpost.luma_event_id} />
+            <Suspense fallback={<LumaEventDetailsSkeleton />}>
+              <LumaEventDetails eventId={outpost.luma_event_id} />
+            </Suspense>
           ) : undefined
         }
       />

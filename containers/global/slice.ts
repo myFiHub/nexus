@@ -1,7 +1,7 @@
 "use client";
 import { WalletAccount } from "@aptos-labs/wallet-standard";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { UserInfo, Web3Auth } from "@web3auth/modal";
+import type { UserInfo, Web3Auth } from "@web3auth/modal";
 import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { MOBILE_BREAKPOINT } from "app/hooks/use-mobile";
 import {

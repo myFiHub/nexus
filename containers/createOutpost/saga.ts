@@ -253,14 +253,12 @@ function* createOutpost(
     }
 
     if (params.scheduled_for) {
-      console.log("calling setReminder");
       yield detached_setReminder({
         outpost,
         scheduledFor: params.scheduled_for,
       });
     }
     if (enabled_luma && luma_guests && luma_hosts && luma_hosts.length > 0) {
-      console.log("calling createLumaEvent");
       const lumaEventCreated: boolean = yield detached_createLumaEvent({
         guests: luma_guests || [],
         hosts: luma_hosts || [],
@@ -294,7 +292,7 @@ function* createOutpost(
       put(createOutpostActions.reset()),
     ]);
   } catch (error) {
-    console.log({ error });
+    console.error("Failed to create outpost", error);
   } finally {
     yield put(createOutpostActions.setIsSubmitting(false));
   }

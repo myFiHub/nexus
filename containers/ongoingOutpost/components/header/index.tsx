@@ -13,7 +13,6 @@ export const OutpostHeader = () => {
   const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
 
   if (!accesses?.canEnter && !leaving && !joiningOutpostId) {
-    console.log("Access denied");
     return <></>;
   }
 

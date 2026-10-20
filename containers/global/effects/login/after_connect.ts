@@ -1,4 +1,4 @@
-import { UserInfo } from "@web3auth/modal";
+import type { UserInfo } from "@web3auth/modal";
 import { CookieKeys, getClientCookie } from "app/lib/client-cookies";
 import podiumApi from "app/services/api";
 import {
@@ -16,7 +16,7 @@ import { validWalletNames } from "app/components/Dialog/loginMethodSelect";
 import { GlobalSelectors } from "../../selectors";
 import { hasCreatorPodiumPass } from "../podiumPassCheck";
 import { getPrivateKey } from "../socialPrivateKey";
-import { ethers } from "ethers";
+import { Wallet } from "ethers";
 import {
   signMessageWithTimestamp,
   signMessageWithTimestampUsingExternalWallet,
@@ -55,13 +55,8 @@ export function* detached_afterConnect(
       }
     }
 
-    let {
-      authConnection: loginType,
-      userId: identifierId,
-      name,
-      profileImage: image,
-      email,
-    } = userInfo;
+    let { userId: identifierId } = userInfo;
+    const { authConnection: loginType, name, profileImage: image, email } = userInfo;
 
     if (!isSocialLogin) {
       const account: accountType = yield select(
@@ -73,7 +68,7 @@ export function* detached_afterConnect(
       }
 
       const publicKey = account.publicKey;
-      let publicKeyString =
+      const publicKeyString =
         typeof publicKey === "string"
           ? publicKey
           : Array.from(publicKey)
@@ -111,7 +106,7 @@ export function* detached_afterConnect(
         const aptosAddress = movementService.address;
 
         if (!identifierId) {
-          console.log("Identifier ID is required");
+          console.warn("Identifier ID is required");
           return;
         }
         if (identifierId.includes("|")) {
@@ -121,7 +116,7 @@ export function* detached_afterConnect(
           buyerAddress: aptosAddress,
         });
 
-        const evmWallet = new ethers.Wallet(privateKey);
+        const evmWallet = new Wallet(privateKey);
         const evmAddress = evmWallet.address;
 
         const loginRequest: LoginRequest = {

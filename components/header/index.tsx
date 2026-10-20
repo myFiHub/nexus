@@ -4,7 +4,7 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { AppLink } from "../AppLink";
 import { Button } from "../Button";
@@ -13,29 +13,23 @@ import { LoginButton } from "./LoginButton";
 import { ThemeToggle } from "./themeToggle";
 
 const Content = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollY = useRef(0);
   const isLoggedIn = !!useSelector(GlobalSelectors.podiumUserInfo);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY) {
-        // Scrolling down
-        setIsVisible(false);
-      } else {
-        // Scrolling up
-        setIsVisible(true);
-      }
-
-      setLastScrollY(currentScrollY);
+      const y = window.scrollY;
+      const delta = y - lastScrollY.current;
+      if (y < 64) setIsVisible(true);
+      else if (Math.abs(delta) > 8) setIsVisible(delta < 0);
+      else return;
+      lastScrollY.current = y;
     };
 
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleSearchClick = async () => {
     await searchDialog({
