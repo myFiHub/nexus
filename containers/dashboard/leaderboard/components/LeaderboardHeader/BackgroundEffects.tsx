@@ -12,7 +12,7 @@ export const BackgroundEffects = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}
-        className="absolute inset-0 bg-gradient-to-r from-[#23262F] via-[#181A20] to-[#23262F] opacity-80 rounded-lg z-0"
+        className="absolute inset-0 bg-gradient-to-r from-surface-raised via-surface to-surface-raised opacity-80 rounded-lg z-0"
       />
 
       {/* Animated gradient overlay */}

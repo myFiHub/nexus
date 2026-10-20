@@ -297,12 +297,6 @@ function* logout() {
   yield put(globalActions.setLogingOut(false));
 }
 
-function* startTicker(): any {
-  yield put(globalActions.increaseTick_());
-  yield delay(1000);
-  yield startTicker();
-}
-
 function* checkIfIHavePass(
   action: ReturnType<typeof globalActions.checkIfIHavePass>
 ) {
@@ -378,7 +372,6 @@ function* getMovePrice(): Generator<any, void, any> {
 }
 
 export function* globalSaga() {
-  yield takeLatest(globalActions.startTicker, startTicker);
   yield takeLatest(globalActions.initializeWeb3Auth, initializeWeb3Auth);
   yield takeLatest(globalActions.initOneSignal, initOneSignal);
   yield takeLatest(globalActions.login, login);

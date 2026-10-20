@@ -6,9 +6,9 @@
     --wkit-bg-rgb: 255, 255, 255;
     /* Convert foreground color from oklch(0.145 0 0) to RGB - very dark */
     --wkit-on-bg-rgb: 23, 23, 23;
-    /* Use app's font system - assuming Geist Sans is primary */
-    --wkit-font-family: var(--font-geist-sans, 'Inter', sans-serif);
-    --wkit-font-family-mono: var(--font-geist-mono, 'IBM Plex Mono', monospace);
+    /* Use app's font system - Sora */
+    --wkit-font-family: var(--font-sora, 'Inter', sans-serif);
+    --wkit-font-family-mono: var(--font-mono, 'IBM Plex Mono', monospace);
     --wkit-font-size-large: 18px;
     --wkit-font-size-medium: 16px;
     --wkit-font-size-small: 14px;

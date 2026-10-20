@@ -3,6 +3,7 @@
 import { loginPromptDialog } from "app/components/Dialog/loginPromptDialog";
 import { reminderDialog } from "app/components/Dialog/reminder";
 import { Img } from "app/components/Img";
+import { useClock } from "app/lib/clock";
 import { AppPages } from "app/lib/routes";
 import { isLiveOutpost } from "app/lib/outposts";
 import { toast } from "app/lib/toast";
@@ -30,7 +31,10 @@ export function EventOutpostCard({
   const router = useRouter();
   const reducedMotion = useReducedMotion();
   const isLive = isLiveOutpost(outpost);
-  const isUpcoming = outpost.scheduled_for > Date.now();
+  const isUpcoming = useClock(
+    (now) => now !== null && outpost.scheduled_for > now,
+    30_000
+  );
   const hasReminderSet = outpost.reminder_offset_minutes != null;
   const [reminderSetLocal, setReminderSetLocal] = useState(false);
   const [lumaLoading, setLumaLoading] = useState(false);

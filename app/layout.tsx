@@ -1,23 +1,29 @@
+import { AuroraBackground } from "app/components/AuroraBackground";
 import Header from "app/components/header";
-import { cookies } from "next/headers";
-
-// import LoadingIndicator from "app/app/loading-indicator";
 import { GlobalContainer } from "app/containers/global";
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { ReduxProvider } from "app/store/Provider";
+import { AuthFlag } from "app/components/listeners/AuthFlag";
+import { bootScript } from "app/lib/bootScript";
+import { DEFAULT_THEME } from "app/lib/theme";
+import type { Metadata, Viewport } from "next";
+import { Sora } from "next/font/google";
 import NextTopLoader from "nextjs-toploader";
 import { Sidebar } from "../components/Sidebar";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  colorScheme: "dark light",
+  themeColor: "#0B0B1E",
+};
 
 export const metadata: Metadata = {
   title: {
@@ -104,40 +110,31 @@ export const metadata: Metadata = {
   classification: "social networking",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const cookieStore = await cookies();
-  const theme = cookieStore.get("theme")?.value || "dark"; // default to light
   return (
-    <html lang="en" className={theme}>
+    <html
+      lang="en"
+      data-theme={DEFAULT_THEME}
+      className={`dark ${sora.variable}`}
+      suppressHydrationWarning
+    >
       <head>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=5"
-        />
-        {/* Prefetch social login icons for faster loading */}
-        <link rel="prefetch" href="/social_login_icons/apple.png" />
-        <link rel="prefetch" href="/social_login_icons/email.png" />
-        <link rel="prefetch" href="/social_login_icons/facebook.png" />
-        <link rel="prefetch" href="/social_login_icons/github.png" />
-        <link rel="prefetch" href="/social_login_icons/g_icon.png" />
-        <link rel="prefetch" href="/social_login_icons/linkedin.png" />
-        <link rel="prefetch" href="/social_login_icons/x_platform.png" />
-        {/* Prefetch Nightly wallet logo */}
-        <link rel="prefetch" href="/nightly_logo.webp" />
+        <script dangerouslySetInnerHTML={{ __html: bootScript }} />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* <LoadingIndicator /> */}
-        <NextTopLoader showSpinner={false} color="#ff00ff" />
-        <GlobalContainer />
-        <Header theme={theme as "light" | "dark"} />
-        <Sidebar />
-        <main className="pt-16">{children}</main>
+      <body className="font-sans antialiased">
+        <AuroraBackground />
+        <NextTopLoader showSpinner={false} color="var(--p-accent)" />
+        <ReduxProvider>
+          <GlobalContainer />
+          <AuthFlag />
+          <Header />
+          <Sidebar />
+          <main className="pt-16">{children}</main>
+        </ReduxProvider>
       </body>
     </html>
   );

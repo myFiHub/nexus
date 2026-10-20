@@ -3,7 +3,6 @@
 import { Loader } from "app/components/Loader";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { Edit } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { outpostDetailsSelectors } from "../../selectors";
@@ -48,8 +47,8 @@ export function EditScheduledDateButton({
   outpost,
 }: EditScheduledDateButtonProps) {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 }

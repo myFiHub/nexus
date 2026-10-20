@@ -4,7 +4,6 @@ import { ConfirmAddOrSwitchAccountDialogProvider } from "app/components/Dialog/c
 import { isExternalWalletLoginMethod } from "app/components/Dialog/loginMethodSelect";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
 import { cn } from "app/lib/utils";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { assetsActions, useAssetsSlice } from "../_assets/slice";
@@ -117,9 +116,9 @@ const Content = () => {
 
 export const Profile = () => {
   return (
-    <ReduxProvider>
+    <>
       <RouteLoaderCleaner />
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

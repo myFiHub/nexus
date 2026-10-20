@@ -1,7 +1,6 @@
 "use client";
 
 import { AppPages } from "app/lib/routes";
-import { ReduxProvider } from "app/store/Provider";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -22,8 +21,8 @@ const Content = ({ id }: { id: string }) => {
 
 export const ClientRedirecter = ({ id }: { id: string }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content id={id} />
-    </ReduxProvider>
+    </>
   );
 };

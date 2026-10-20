@@ -4,7 +4,6 @@ import { usersActions, useUsersSlice } from "app/containers/_users/slice";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { cn } from "app/lib/utils";
 import podiumApi from "app/services/api";
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -208,7 +207,7 @@ export const FollowButton = ({
   noScale?: boolean;
 }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content
         id={id}
         followed={followed}
@@ -218,6 +217,6 @@ export const FollowButton = ({
         noRouterRefresh={noRouterRefresh}
         noScale={noScale}
       />
-    </ReduxProvider>
+    </>
   );
 };

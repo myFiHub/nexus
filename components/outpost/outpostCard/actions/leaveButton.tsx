@@ -13,7 +13,6 @@ import {
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { LogOut } from "lucide-react";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -67,8 +66,8 @@ const Content = ({ outpost: passedOutpost }: { outpost: OutpostModel }) => {
 
 export const LeaveButton = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

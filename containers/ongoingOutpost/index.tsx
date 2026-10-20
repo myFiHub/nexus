@@ -1,6 +1,5 @@
 "use client";
 import { CheerBooAmountDialogProvider } from "app/components/Dialog/cheerBooAmountDialog";
-import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
 import { useEffect } from "react";
@@ -18,6 +17,8 @@ import { onGoingOutpostSelectors } from "./selectors";
 import { onGoingOutpostActions, useOnGoingOutpostSlice } from "./slice";
 import { useAssetsSlice } from "../_assets/slice";
 import { RouteLoaderCleaner } from "app/components/listeners/loading/eventBus";
+import { useClock } from "app/lib/clock";
+import { shouldWaitForCreator as checkShouldWaitForCreator } from "./utils/shouldWaitForCreator";
 
 const Content = () => {
   useUsersSlice();
@@ -34,8 +35,9 @@ const Content = () => {
   const outpost = useSelector(onGoingOutpostSelectors.outpost);
   const joiningOutpostId = useSelector(GlobalSelectors.joiningOutpostId);
 
-  const shouldWaitForCreator = useSelector(
-    onGoingOutpostSelectors.shouldWaitForCreator
+  const shouldWaitForCreator = useClock(
+    (now) =>
+      !!outpost && now !== null && !!checkShouldWaitForCreator({ outpost, now })
   );
   useEffect(() => {
     return () => {
@@ -89,9 +91,9 @@ const Content = () => {
 
 export const OngoingOutpost = () => {
   return (
-    <ReduxProvider>
+    <>
       <RouteLoaderCleaner />
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

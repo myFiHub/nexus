@@ -1,6 +1,5 @@
 "use client";
 
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -43,9 +42,9 @@ const Content = () => {
 
 export const MyOutposts = () => {
   return (
-    <ReduxProvider>
+    <>
       <RouteLoaderCleaner />
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

@@ -9,7 +9,6 @@ import {
   MostPassHeld,
   MostUniquePassHeld,
 } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { useSelector } from "react-redux";
 
 const Content = ({
@@ -65,8 +64,8 @@ export const LeaderboardFees = ({
   type: LeaderboardTags;
 }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content user={user} type={type} />
-    </ReduxProvider>
+    </>
   );
 };

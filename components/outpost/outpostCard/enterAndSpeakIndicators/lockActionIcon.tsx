@@ -4,7 +4,6 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { toast } from "app/lib/toast";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { Lock } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -61,8 +60,8 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
 export const LockActionIcon = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

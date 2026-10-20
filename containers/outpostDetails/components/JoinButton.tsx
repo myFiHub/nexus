@@ -8,8 +8,8 @@ import { toast } from "app/lib/toast";
 import { getTimerInfo } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
 import { wsClient } from "app/services/wsClient";
-import { ReduxProvider } from "app/store/Provider";
-import { useEffect, useState } from "react";
+import { useClock } from "app/lib/clock";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "../../../components/Button";
 import { outpostDetailsSelectors } from "../selectors";
@@ -26,20 +26,20 @@ const JoinButtonContent = ({
   fromCard,
   joinComponent,
 }: JoinButtonProps) => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
   useOnGoingOutpostSlice();
-  useSelector(GlobalSelectors.tick);
   const dispatch = useDispatch();
   const myUser = useSelector(GlobalSelectors.podiumUserInfo);
   // const logingIn = useSelector(GlobalSelectors.logingIn);
   const joiningId = useSelector(GlobalSelectors.joiningOutpostId);
   const stateOutpost = useSelector(outpostDetailsSelectors.outpost);
   const outpost = (fromCard ? passedOutpost : stateOutpost) || passedOutpost;
+  const scheduledFor = outpost?.scheduled_for ?? 0;
+  const displayText = useClock((now) =>
+    now === null
+      ? null
+      : getTimerInfo(scheduledFor, undefined, undefined, now).displayText
+  );
+  const isPassed = useClock((now) => now !== null && now >= scheduledFor);
   const [checkingWsHealth, setCheckingWsHealth] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -69,7 +69,7 @@ const JoinButtonContent = ({
   if (!outpost) return null;
 
   // Show loading state until client-side hydration is complete
-  if (!isClient) {
+  if (displayText === null) {
     return (
       <Button className="w-full" disabled>
         <span className="font-medium">Loading...</span>
@@ -79,8 +79,6 @@ const JoinButtonContent = ({
 
   // Client-side only logic
   const joining = joiningId === outpost.uuid || checkingWsHealth;
-  const timerInfo = getTimerInfo(outpost.scheduled_for);
-  const { displayText, isPassed } = timerInfo;
   const iAmCreator = myUser?.uuid === outpost.creator_user_uuid;
 
   const disabled = (iAmCreator ? loading : !isPassed || loading) || joining;
@@ -105,12 +103,12 @@ export function JoinButton({
   joinComponent,
 }: JoinButtonProps) {
   return (
-    <ReduxProvider>
+    <>
       <JoinButtonContent
         outpost={outpost}
         fromCard={fromCard}
         joinComponent={joinComponent}
       />
-    </ReduxProvider>
+    </>
   );
 }

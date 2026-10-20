@@ -2,7 +2,6 @@
 
 import { LeaderboardTags } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
 import { GlobalSelectors } from "app/containers/global/selectors";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { leaderboardActions, useLeaderboardSlice } from "./slice";
@@ -37,8 +36,8 @@ const Content = () => {
 
 export const LeaderboardInjector = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

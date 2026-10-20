@@ -38,8 +38,53 @@ const injectedSagas: Record<string, any> = {};
 // Declare store variable
 let store: Store<RootState, AnyAction>;
 
+// Initial state of each injected slice, computed once per server process.
+const serverInitialStates: Record<string, unknown> = {};
+
+function serverInitialState(key: string) {
+  if (!(key in serverInitialStates)) {
+    serverInitialStates[key] = injectedReducers[key](undefined, {
+      type: "@@nexus/SERVER_INIT",
+    });
+  }
+  return serverInitialStates[key];
+}
+
+// Server renders must never share state between requests, and sagas only run
+// in the browser, so the server gets a fresh, saga-less store. Slices injected
+// during the render read as their initial state, matching the client's first
+// render, so hydration stays consistent.
+function makeServerStore(): Store<RootState, AnyAction> {
+  const serverStore = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({ serializableCheck: false }),
+    devTools: false,
+  }) as Store<RootState, AnyAction>;
+
+  let base: RootState | undefined;
+  let view: RootState | undefined;
+  const getState = () => {
+    const next = serverStore.getState();
+    if (next !== base || !view) {
+      base = next;
+      view = new Proxy(next, {
+        get: (target, key, receiver) =>
+          typeof key === "string" && !(key in target) && key in injectedReducers
+            ? serverInitialState(key)
+            : Reflect.get(target, key, receiver),
+      });
+    }
+    return view;
+  };
+  return { ...serverStore, getState };
+}
+
 // Function to get or create store - using function declaration for hoisting
 export function getStore(): Store<RootState, AnyAction> {
+  if (typeof window === "undefined") {
+    return makeServerStore();
+  }
   if (!store) {
     // Configure the store
     store = configureStore({
@@ -59,25 +104,27 @@ export function getStore(): Store<RootState, AnyAction> {
 
 // Function to inject a reducer
 function injectReducer(key: string, reducer: Reducer<any, UnknownAction>) {
-  if (typeof window !== "undefined") {
-    if (injectedReducers[key]) {
-      return;
-    }
+  if (typeof window === "undefined") {
+    injectedReducers[key] ??= reducer;
+    return;
+  }
+  if (injectedReducers[key]) {
+    return;
+  }
 
-    injectedReducers[key] = reducer;
-    const combinedReducer = combineReducers<RootState>(
-      // @ts-ignore
-      {
-        ...rootReducer,
-        ...injectedReducers,
-      }
-    ) as Reducer<RootState, UnknownAction>;
-
-    getStore().replaceReducer(combinedReducer);
-    if (isDev) {
-      // siringe emoji instead of text
-      console.log("💉 reducer", key);
+  injectedReducers[key] = reducer;
+  const combinedReducer = combineReducers<RootState>(
+    // @ts-ignore
+    {
+      ...rootReducer,
+      ...injectedReducers,
     }
+  ) as Reducer<RootState, UnknownAction>;
+
+  getStore().replaceReducer(combinedReducer);
+  if (isDev) {
+    // siringe emoji instead of text
+    console.log("💉 reducer", key);
   }
 }
 

@@ -6,7 +6,6 @@ import { AssetsSelectors } from "app/containers/_assets/selectore";
 import { bigIntCoinToMoveOnAptos } from "app/lib/conversion";
 import { User } from "app/services/api/types";
 import { movementService } from "app/services/move/aptosMovement";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { assetsActions, useAssetsSlice } from "../../../_assets/slice";
@@ -115,8 +114,8 @@ const Content = ({ user }: { user: User }) => {
 
 export const PodiumPassButton = ({ user }: { user: User }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content user={user} />
-    </ReduxProvider>
+    </>
   );
 };

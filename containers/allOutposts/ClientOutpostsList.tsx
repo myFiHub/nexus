@@ -1,6 +1,5 @@
 "use client";
 import { PAGE_SIZE } from "app/lib/constants";
-import { ReduxProvider } from "app/store/Provider";
 import { useCallback, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingOutposts } from "../../components/outpost/LoadingOutposts";
@@ -123,8 +122,8 @@ export const ClientOutpostsList = ({
   initialOutposts,
 }: ClientOutpostsListProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content initialOutposts={initialOutposts} />
-    </ReduxProvider>
+    </>
   );
 };

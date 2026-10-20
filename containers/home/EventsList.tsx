@@ -1,6 +1,7 @@
 "use client";
 
-import { isLiveOutpost, isUpcomingOutpost } from "app/lib/outposts";
+import { useClock } from "app/lib/clock";
+import { isLiveOutpost } from "app/lib/outposts";
 import { OutpostModel } from "app/services/api/types";
 import { useMemo, useState } from "react";
 import { EventOutpostCard } from "./EventsStrip/EventOutpostCard";
@@ -13,9 +14,9 @@ interface EventsListProps {
 
 export function EventsList({ featuredEvents }: EventsListProps) {
   const [filter, setFilter] = useState<FilterTab>("all");
+  const now = useClock((ms) => (ms === null ? 0 : Math.floor(ms / 60_000) * 60_000), 60_000);
 
   const filtered = useMemo(() => {
-    const now = Date.now();
     if (filter === "live") {
       return featuredEvents.filter(isLiveOutpost);
     }
@@ -23,16 +24,14 @@ export function EventsList({ featuredEvents }: EventsListProps) {
       return featuredEvents.filter((ev) => ev.scheduled_for > now);
     }
     return featuredEvents;
-  }, [featuredEvents, filter]);
+  }, [featuredEvents, filter, now]);
 
   if (featuredEvents.length === 0) {
     return null;
   }
 
   const liveCount = featuredEvents.filter(isLiveOutpost).length;
-  const upcomingCount = featuredEvents.filter((ev) =>
-    isUpcomingOutpost(ev)
-  ).length;
+  const upcomingCount = featuredEvents.filter((ev) => ev.scheduled_for > now).length;
 
   const tabOrder: FilterTab[] = ["all", "live", "upcoming"];
 

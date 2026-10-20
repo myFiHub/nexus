@@ -2,7 +2,6 @@
 import { searchDialog } from "app/components/Dialog";
 import { GlobalSelectors } from "app/containers/global/selectors";
 import { NotificationsBell } from "app/containers/notifications";
-import { ReduxProvider } from "app/store/Provider";
 import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -13,7 +12,7 @@ import { Img } from "../Img";
 import { LoginButton } from "./LoginButton";
 import { ThemeToggle } from "./themeToggle";
 
-const Content = ({ theme }: { theme: "light" | "dark" }) => {
+const Content = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -46,7 +45,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] shadow-md transition-transform duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-50 bg-[var(--header-bg)] backdrop-blur-xl border-b border-border/60 transition-transform duration-300 ${
         isVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
@@ -69,7 +68,7 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
           {/* Desktop nav */}
 
           <div className="flex items-center gap-1">
-            <ThemeToggle initialValue={theme} />
+            <ThemeToggle />
 
             <Button
               variant="ghost"
@@ -103,10 +102,6 @@ const Content = ({ theme }: { theme: "light" | "dark" }) => {
   );
 };
 
-export default function Header({ theme }: { theme: "light" | "dark" }) {
-  return (
-    <ReduxProvider>
-      <Content theme={theme} />
-    </ReduxProvider>
-  );
+export default function Header() {
+  return <Content />;
 }

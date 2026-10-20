@@ -4,7 +4,6 @@ import {
   LEADERBOARD_PAGE_SIZE,
   LeaderboardTags,
 } from "app/app/(unauthenticated)/dashboard/@leaderboard/_configs";
-import { ReduxProvider } from "app/store/Provider";
 import { useSelector } from "react-redux";
 import { leaderboardSelectors } from "../selectors";
 import { LeaderboardRow } from "./LeaderboardRow";
@@ -27,9 +26,9 @@ const Content = ({ type }: { type: LeaderboardTags }) => {
 
 const ClientSideList = ({ type }: { type: LeaderboardTags }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content type={type} />
-    </ReduxProvider>
+    </>
   );
 };
 

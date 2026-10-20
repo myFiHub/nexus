@@ -7,7 +7,6 @@ import { canInvite } from "app/lib/outpostPermissions";
 import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { InviteRequestModel, OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -125,13 +124,13 @@ export function InviteUsersButton({
   buttonSize = "md",
 }: InviteUsersButtonProps) {
   return (
-    <ReduxProvider>
+    <>
       <Content
         outpost={outpost}
         className={className}
         withWrapper={withWrapper}
         buttonSize={buttonSize}
       />
-    </ReduxProvider>
+    </>
   );
 }

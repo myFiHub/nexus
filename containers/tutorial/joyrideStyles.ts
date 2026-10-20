@@ -22,7 +22,7 @@ export function buildJoyrideStyles(theme: JoyrideTheme) {
     },
     tooltipContainer: {
       textAlign: "left" as const,
-      fontFamily: "var(--font-geist-sans, ui-sans-serif, system-ui)",
+      fontFamily: "var(--font-sora, ui-sans-serif, system-ui)",
     },
     tooltipTitle: {
       margin: 0,

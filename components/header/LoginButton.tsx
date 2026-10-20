@@ -5,7 +5,6 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { cn, truncate } from "app/lib/utils";
-import { ReduxProvider } from "app/store/Provider";
 import { motion } from "framer-motion";
 import { ChevronDown, Crown, Loader2, LogOut, User } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -25,9 +24,9 @@ interface LoginButtonProps {
 
 export const LoginButton = ({ size, className, fancy }: LoginButtonProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content size={size} className={className} fancy={fancy} />
-    </ReduxProvider>
+    </>
   );
 };
 

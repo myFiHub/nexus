@@ -1,6 +1,5 @@
 "use client";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { GlobalSelectors } from "../global/selectors";
@@ -30,8 +29,8 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
 export const StateInitializer = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

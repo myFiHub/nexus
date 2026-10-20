@@ -1,5 +1,4 @@
 "use client";
-import { ReduxProvider } from "app/store/Provider";
 import { AdultsField } from "./components/AdultsField";
 import CreateButton from "./components/CreateButton";
 import { EnterTypeField } from "./components/enterTypeField";
@@ -80,8 +79,8 @@ const Content = () => {
 
 export const CreateOutpost = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

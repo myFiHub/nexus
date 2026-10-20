@@ -15,7 +15,6 @@ import { toast } from "app/lib/toast";
 import podiumApi from "app/services/api";
 import { OutpostModel } from "app/services/api/types";
 import { revalidateService } from "app/services/revalidate";
-import { ReduxProvider } from "app/store/Provider";
 import { ArchiveRestore, ArchiveX } from "lucide-react";
 import { useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -87,8 +86,8 @@ const Content = ({ outpost }: { outpost: OutpostModel }) => {
 
 export const ArchiveButton = ({ outpost }: { outpost: OutpostModel }) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} />
-    </ReduxProvider>
+    </>
   );
 };

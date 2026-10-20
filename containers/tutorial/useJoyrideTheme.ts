@@ -1,5 +1,6 @@
 "use client";
 
+import { useTheme } from "app/lib/useTheme";
 import { useEffect, useState } from "react";
 
 export type JoyrideTheme = {
@@ -24,6 +25,7 @@ const defaultTheme: JoyrideTheme = {
 
 export function useJoyrideTheme(): JoyrideTheme {
   const [theme, setTheme] = useState<JoyrideTheme>(defaultTheme);
+  const themeId = useTheme();
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -50,7 +52,7 @@ export function useJoyrideTheme(): JoyrideTheme {
         overlay: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.4)",
       });
     } catch {}
-  }, []);
+  }, [themeId]);
 
   return theme;
 }

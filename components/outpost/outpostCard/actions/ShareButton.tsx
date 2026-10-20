@@ -3,7 +3,6 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { canShareOutpostUrl } from "app/lib/outpostPermissions";
 import { generateOutpostShareUrl } from "app/lib/utils";
 import { OutpostModel } from "app/services/api/types";
-import { ReduxProvider } from "app/store/Provider";
 import { Check, Share2 } from "lucide-react";
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -68,8 +67,8 @@ const Content = ({ outpost, className }: ShareButtonProps) => {
 
 export const ShareButton = ({ outpost, className }: ShareButtonProps) => {
   return (
-    <ReduxProvider>
+    <>
       <Content outpost={outpost} className={className} />
-    </ReduxProvider>
+    </>
   );
 };

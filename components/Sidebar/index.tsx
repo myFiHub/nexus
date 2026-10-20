@@ -4,7 +4,6 @@ import { GlobalSelectors } from "app/containers/global/selectors";
 import { globalActions } from "app/containers/global/slice";
 import { useIsMobile } from "app/hooks/use-mobile";
 import { cn } from "app/lib/utils";
-import { ReduxProvider } from "app/store/Provider";
 import { motion, useAnimation } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -124,8 +123,8 @@ const Content = () => {
 
 export const Sidebar = () => {
   return (
-    <ReduxProvider>
+    <>
       <Content />
-    </ReduxProvider>
+    </>
   );
 };

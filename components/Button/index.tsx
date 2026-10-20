@@ -3,20 +3,20 @@ import * as React from "react";
 import { cn } from "../../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center cursor-pointer rounded-xl text-sm font-semibold transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:pointer-events-none ring-offset-background relative overflow-hidden group ",
+  "inline-flex items-center justify-center cursor-pointer rounded-[14px] text-sm font-semibold transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:pointer-events-none ring-offset-background relative overflow-hidden group ",
   {
     variants: {
       variant: {
         primary:
-          "bg-gradient-to-r from-primary to-primary/80  shadow-[0_4px_14px_0_rgba(0,118,255,0.39)] hover:shadow-[0_6px_20px_rgba(0,118,255,0.23)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100 before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/20 before:to-transparent before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 text-white",
+          "bg-grad-primary text-[var(--p-on-accent)] shadow-[0_6px_22px_-8px_color-mix(in_oklab,var(--p-accent)_60%,transparent)] hover:brightness-110 hover:scale-[1.02] active:scale-[0.97] disabled:opacity-50 disabled:hover:scale-100 disabled:hover:brightness-100",
         outline:
           "border-2 border-primary/30 bg-background/50 backdrop-blur-sm text-foreground hover:bg-primary/10 hover:border-primary/50 shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
         ghost:
           "bg-transparent text-foreground hover:bg-accent/50 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
         secondary:
-          "bg-gradient-to-r from-secondary to-secondary/80 text-foreground shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
+          "bg-secondary text-foreground border border-border hover:bg-surface-raised hover:border-border-strong hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
         destructive:
-          "bg-gradient-to-r from-destructive to-destructive/80 text-foreground shadow-[0_4px_14px_0_rgba(239,68,68,0.39)] hover:shadow-[0_6px_20px_rgba(239,68,68,0.23)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
+          "bg-destructive text-white shadow-[0_6px_22px_-8px_color-mix(in_oklab,var(--p-danger)_60%,transparent)] hover:brightness-110 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:hover:scale-100",
       },
       size: {
         xxs: "h-6 px-2 text-xs",
